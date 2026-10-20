@@ -24,6 +24,11 @@
 
 set -eu
 
+# Git Bash on Windows rewrites "/srv/ost"-like arguments; keep container paths intact
+# for docker only, and convert host paths explicitly.
+docker() { MSYS_NO_PATHCONV=1 command docker "$@"; }
+if command -v cygpath >/dev/null 2>&1; then lp() { cygpath -w "$1"; }; else lp() { printf %s "$1"; }; fi
+
 HERE=$(cd "$(dirname "$0")" && pwd)
 PHP_IMAGE=${OST_PHP_IMAGE:-wordpress:php8.2-apache}
 DB_IMAGE=${OST_DB_IMAGE:-mariadb:11.4}
@@ -56,16 +61,16 @@ docker run -d --name "$DB" --network "$NET" \
     "$DB_IMAGE" --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci >/dev/null
 
 echo "== osTicket tree (git archive HEAD)"
-git -c core.autocrlf=false archive -o "$TMP/ost.tar" HEAD
+git -c core.autocrlf=false archive -o "$(lp "$TMP/ost.tar")" HEAD
 docker run -d --name "$WEB" --network "$NET" --entrypoint sleep "$PHP_IMAGE" 3600 >/dev/null
 docker exec "$WEB" mkdir -p /srv/ost
-docker cp "$TMP/ost.tar" "$WEB:/srv/ost.tar"
+docker cp "$(lp "$TMP/ost.tar")" "$WEB:/srv/ost.tar"
 docker exec "$WEB" sh -c 'cd /srv/ost && tar xf ../ost.tar && cp include/ost-sampleconfig.php include/ost-config.php && chmod 666 include/ost-config.php'
 for f in boot.php setup_plugin.php scenario-flow.php scenario-concurrency.php; do
-    docker cp "$HERE/$f" "$WEB:/tmp/$f"
+    docker cp "$(lp "$HERE/$f")" "$WEB:/tmp/$f"
 done
 printf '#!/bin/sh\ncat > /tmp/mail-$(date +%%s%%N).eml\n' > "$TMP/fakesendmail"
-docker cp "$TMP/fakesendmail" "$WEB:/usr/local/bin/fakesendmail"
+docker cp "$(lp "$TMP/fakesendmail")" "$WEB:/usr/local/bin/fakesendmail"
 docker exec "$WEB" chmod +x /usr/local/bin/fakesendmail
 
 echo "== waiting for the database"
@@ -94,14 +99,14 @@ curl -s -c \$J -b \$J \$B -o /tmp/inst.html \
 kill \$PID
 grep -q Congratulations /tmp/inst.html
 EOF
-docker cp "$TMP/install.sh" "$WEB:/tmp/install.sh"
+docker cp "$(lp "$TMP/install.sh")" "$WEB:/tmp/install.sh"
 docker exec "$WEB" sh /tmp/install.sh || { echo "osTicket installation failed"; exit 1; }
 
 echo "== installing the plugin like an administrator would"
 docker exec "$WEB" sh -c 'cp -r /srv/ost/contrib/stripe-sync /srv/ost/include/plugins/stripe-sync && rm -rf /srv/ost/include/plugins/stripe-sync/tests && chmod -R a+rX /srv/ost && cd /tmp && php setup_plugin.php'
 
 echo "== starting Apache (port 8001, secret set) and php -S (port 8002, secret NOT set)"
-docker cp "$HERE/apache-vhost.conf" "$WEB:/etc/apache2/sites-enabled/ost-int.conf"
+docker cp "$(lp "$HERE/apache-vhost.conf")" "$WEB:/etc/apache2/sites-enabled/ost-int.conf"
 docker exec "$WEB" sh -c 'rm -f /etc/apache2/sites-enabled/000-default.conf; a2enmod rewrite >/dev/null 2>&1 || true'
 docker exec -d -e STRIPE_SYNC_WEBHOOK_SECRET="$WHSEC" "$WEB" apache2ctl -D FOREGROUND
 docker exec -d -w /srv/ost "$WEB" php -S 127.0.0.1:8002 -t /srv/ost
