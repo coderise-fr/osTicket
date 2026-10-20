@@ -145,3 +145,15 @@ Conservez ces fichiers et le dossier `secrets/` hors du serveur, chiffrés.
 | `OSTICKET_COOKIE_SECURE` | `1` | `0` uniquement pour un test en HTTP local |
 | `OSTICKET_TRUSTED_PROXIES` | réseaux privés | Proxys autorisés à fournir `X-Forwarded-For` |
 | `OST_SECRETS_DIR` | `./secrets` | Dossier des secrets de la base |
+
+## App Platform (DigitalOcean)
+
+No volumes there, so `OSTICKET_CONFIG_FROM_ENV=1` makes the entrypoint render `ost-config.php`
+from `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASS/DB_PREFIX/DB_SSL/DB_SSL_CA/SECRET_SALT/ADMIN_EMAIL`
+at start (the `/etc/osticket` read-only check does not apply in that mode). The default (last) Dockerfile
+stage is `production` = `runtime`, because App Platform cannot select a target. See `app-spec.yaml`.
+
+1. Create a MySQL cluster (not PostgreSQL). 2. Run the `install` target locally against it (allow your IP in
+the cluster's trusted sources) and keep the generated `SECRET_SALT`. 3. Set `SECRET_SALT` as an encrypted env
+var and deploy. Never change the salt afterwards. Not verified on App Platform: TLS to the managed database
+(`DB_SSL=1`, mysqlnd without a CA file does not verify the server).

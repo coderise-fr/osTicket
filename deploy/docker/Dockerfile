@@ -144,3 +144,9 @@ RUN set -eux; \
     find /var/www/html/setup -type f -exec chmod 0644 '{}' +
 USER 33:33
 CMD ["install"]
+
+
+# ------------------------------------------------------------ production ----
+# Must stay the LAST stage: platforms that cannot pick a build target (DigitalOcean
+# App Platform) build the final stage, and that must never be the setup wizard.
+FROM runtime AS production

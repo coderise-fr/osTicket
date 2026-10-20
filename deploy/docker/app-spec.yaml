@@ -1,0 +1,52 @@
+# DigitalOcean App Platform spec. See the "App Platform" section of README.md.
+#   doctl apps update <APP_ID> --spec deploy/docker/app-spec.yaml
+# First run the install target once against the same database (the schema and
+# SECRET_SALT come from that install), then set SECRET_SALT below as a secret.
+name: king-prawn-app
+region: fra
+
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+
+databases:
+- name: db
+  engine: MYSQL
+  version: "8"
+  production: false
+
+x-envs: &envs
+- {key: OSTICKET_CONFIG_FROM_ENV, scope: RUN_TIME, value: "1"}
+- {key: DB_HOST, scope: RUN_TIME, value: "${db.HOSTNAME}"}
+- {key: DB_PORT, scope: RUN_TIME, value: "${db.PORT}"}
+- {key: DB_NAME, scope: RUN_TIME, value: "${db.DATABASE}"}
+- {key: DB_USER, scope: RUN_TIME, value: "${db.USERNAME}"}
+- {key: DB_PASS, scope: RUN_TIME, type: SECRET, value: "${db.PASSWORD}"}
+- {key: DB_SSL, scope: RUN_TIME, value: "1"}
+- {key: SECRET_SALT, scope: RUN_TIME, type: SECRET, value: "SET_IN_THE_UI"}
+
+ingress:
+  rules:
+  - component: {name: web}
+    match: {path: {prefix: /}}
+
+services:
+- name: web
+  dockerfile_path: deploy/docker/Dockerfile
+  source_dir: /
+  github: {repo: coderise-fr/osTicket, branch: main, deploy_on_push: true}
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  health_check: {http_path: /login.php, initial_delay_seconds: 40}
+  envs: *envs
+
+workers:
+- name: cron
+  dockerfile_path: deploy/docker/Dockerfile
+  source_dir: /
+  github: {repo: coderise-fr/osTicket, branch: main, deploy_on_push: true}
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  run_command: cron
+  envs: *envs
