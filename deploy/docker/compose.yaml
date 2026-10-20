@@ -62,6 +62,13 @@ services:
     tmpfs:
       - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
     networks: [backend, egress]
+    # No web server here: healthy means "the scheduler completed a run in the last 3 minutes".
+    healthcheck:
+      test: ["CMD-SHELL", "find /tmp/osticket-cron.ok -mmin -3 2>/dev/null | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
     mem_limit: 384m
     cpus: 1.0
 

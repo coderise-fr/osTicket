@@ -51,7 +51,12 @@ case "$mode" in
         check_installed
         trap 'exit 0' TERM INT
         while :; do
-            php "$APP/api/cron.php" || echo "osticket-entrypoint: cron run failed with status $?" >&2
+            # The heartbeat file feeds the container health check (see compose.yaml).
+            if php "$APP/api/cron.php"; then
+                touch /tmp/osticket-cron.ok
+            else
+                echo "osticket-entrypoint: cron run failed with status $?" >&2
+            fi
             sleep 60 &
             wait $!
         done
