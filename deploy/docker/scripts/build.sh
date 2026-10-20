@@ -19,7 +19,8 @@ fi
 
 ctx="$(mktemp -d)"
 trap 'rm -rf "$ctx"' EXIT INT TERM
-git -C "$repo" archive --format=tar HEAD | tar -x -C "$ctx"
+# core.autocrlf=false: `git archive` honours it too, and we want the blobs as committed.
+git -C "$repo" -c core.autocrlf=false archive --format=tar HEAD | tar -x -C "$ctx"
 
 # Docker on Windows needs a Windows path for the build context.
 if command -v cygpath >/dev/null 2>&1; then
