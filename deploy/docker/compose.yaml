@@ -1,0 +1,119 @@
+# osTicket production stack: web + cron + MariaDB.
+#
+# Run from this folder. First install: see README.md (compose.install.yaml).
+#
+#   cp .env.example .env && ./scripts/gen-secrets.sh
+#   docker compose -f compose.yaml -f compose.install.yaml up -d --build db web   # wizard
+#   docker compose up -d --build                                                  # runtime
+
+name: ${OST_PROJECT:-osticket}
+
+x-hardened: &hardened
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 256
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+x-osticket-build: &osticket-build
+  # scripts/build.sh sets OST_CONTEXT to a clean `git archive` export of the commit.
+  context: ${OST_CONTEXT:-../..}
+  dockerfile: deploy/docker/Dockerfile
+  target: runtime
+  args:
+    OST_VERSION: ${OST_VERSION:-1.18.4}
+    OST_REVISION: ${OST_REVISION:-unknown}
+
+services:
+  web:
+    <<: *hardened
+    build: *osticket-build
+    image: coderise/osticket:${OST_VERSION:-1.18.4}
+    command: ["web"]
+    depends_on:
+      db: { condition: service_healthy }
+    # Publish on loopback only: a TLS reverse proxy is the public entry point.
+    ports:
+      - "${OST_BIND:-127.0.0.1}:${OST_PORT:-8080}:8080"
+    environment:
+      OSTICKET_COOKIE_SECURE: ${OSTICKET_COOKIE_SECURE:-1}
+      OSTICKET_TRUSTED_PROXIES: ${OSTICKET_TRUSTED_PROXIES:-10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1}
+    volumes:
+      - ost-config:/etc/osticket:ro
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+      - /run/apache2:size=1m,uid=33,gid=33,mode=0755,noexec,nosuid,nodev
+    networks: [backend, egress]
+    mem_limit: 768m
+    cpus: 2.0
+
+  # osTicket's scheduler: fetches mail, marks overdue tickets, purges old data.
+  cron:
+    <<: *hardened
+    image: coderise/osticket:${OST_VERSION:-1.18.4}
+    command: ["cron"]
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ost-config:/etc/osticket:ro
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+    networks: [backend, egress]
+    mem_limit: 384m
+    cpus: 1.0
+
+  db:
+    <<: *hardened
+    image: mariadb:11.4@sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873
+    # The entrypoint starts as root, fixes ownership of the data directory, then
+    # drops to the mysql user: it needs these four capabilities and no others.
+    cap_add: [CHOWN, DAC_OVERRIDE, SETGID, SETUID]
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-name-resolve
+      - --local-infile=0
+      - --max-connections=100
+    environment:
+      MARIADB_DATABASE: osticket
+      MARIADB_USER: osticket
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_MYSQL_LOCALHOST_USER: "1"
+    secrets: [db_password, db_root_password]
+    volumes:
+      - ost-db:/var/lib/mysql
+    tmpfs:
+      - /tmp:size=128m,mode=1777,noexec,nosuid,nodev
+      - /run/mysqld:size=1m,mode=0755
+    # Reachable from the application only: no published port, no internet access.
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    mem_limit: 1g
+
+networks:
+  # Database traffic only; "internal" means containers on it have no route out.
+  backend:
+    internal: true
+  # Outbound access for IMAP/SMTP and for the reverse proxy.
+  egress:
+
+volumes:
+  ost-db:
+  # ost-config.php (database password, secret salt). Writable only during install.
+  ost-config:
+
+secrets:
+  db_password:
+    file: ${OST_SECRETS_DIR:-./secrets}/db_password.txt
+  db_root_password:
+    file: ${OST_SECRETS_DIR:-./secrets}/db_root_password.txt

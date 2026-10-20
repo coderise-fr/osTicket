@@ -1,0 +1,15 @@
+# Build context = repository root. Keep repository metadata, secrets and local
+# files out of the image.
+**/.git
+**/.github
+.gitignore
+.gitattributes
+CLAUDE.md
+nbproject
+Vagrantfile
+*.code-workspace
+stage
+**/*.phar
+deploy/docker/secrets
+deploy/docker/.env
+setup/test

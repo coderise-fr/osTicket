@@ -1,0 +1,15 @@
+# Overlay for the first install and for upgrades: setup wizard enabled, config
+# volume writable. Never leave this running.
+#
+#   docker compose -f compose.yaml -f compose.install.yaml up -d --build db web
+#
+# (the cron service is not started: it refuses to run without an installed config)
+
+services:
+  web:
+    build:
+      target: install
+    image: coderise/osticket:${OST_VERSION:-1.18.4}-install
+    command: ["install"]
+    volumes:
+      - ost-config:/etc/osticket
