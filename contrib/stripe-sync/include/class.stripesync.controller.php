@@ -57,10 +57,14 @@ class StripeSyncController {
         $this->service = $service;
     }
 
+    // Not Http::response(): it only knows a handful of status codes and
+    // turns 413/503 into 500.
     private function reply($code, $text) {
-        Http::response($code, $text, 'text/plain');
-        // Http::response() exits; this keeps the method testable.
-        return $text;
+        http_response_code($code);
+        header('Content-Type: text/plain; charset=UTF-8');
+        header('Cache-Control: no-store');
+        print $text;
+        exit;
     }
 
     private function logError($message) {
