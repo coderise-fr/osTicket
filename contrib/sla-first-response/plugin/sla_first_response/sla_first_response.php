@@ -14,6 +14,11 @@
     d'échéance (getSLADueDate() de la classe Ticket renvoie null), donc plus
     de retard.
 
+    Seule une réponse ADRESSÉE AU CLIENT compte (voir isClientReply()) : une
+    réponse enregistrée sans e-mail (« Répondre à : aucun ») ou adressée aux
+    seuls collaborateurs n'arrête pas le chronomètre. Le critère est le même
+    que dans sql/premiere-reponse.sql.
+
     Le plugin ne touche pas au cœur d'osTicket : il écoute le signal
     'threadentry.created' (include/class.thread.php, ThreadEntry::create()).
 
@@ -96,6 +101,36 @@ class SlaFirstResponsePlugin extends Plugin {
     }
 
     /**
+     * Critère « réponse adressée au client » (une seule définition, reprise
+     * telle quelle dans sql/premiere-reponse.sql) :
+     *
+     * La réponse porte, dans thread_entry.recipients, la liste des
+     * destinataires calculée par Ticket->postReply() AVANT l'enregistrement
+     * (JSON : {"to": {...}, "cc": {...}}). Dans postReply(), seul le
+     * propriétaire du ticket (le client) est placé dans « to » (choix
+     * « Propriétaire » ou « Tous les destinataires actifs ») ; les
+     * collaborateurs sont toujours dans « cc ». « Ne pas envoyer d'e-mail »
+     * ne laisse aucune liste (colonne NULL). Donc :
+     *   « to » non vide  <=>  le client est destinataire de la réponse.
+     *
+     * Les indicateurs FLAG_REPLY_USER / FLAG_REPLY_ALL ne suffisent pas : ils
+     * sont aussi posés quand seuls des collaborateurs sont destinataires.
+     * thread_entry_email ne sert pas non plus : osTicket n'y enregistre que
+     * les e-mails ENTRANTS (ThreadEntry->saveEmailInfo, « TODO: include
+     * outgoing emails »).
+     *
+     * Limite : c'est l'intention enregistrée par osTicket (liste des
+     * destinataires), pas la preuve de remise par le serveur de messagerie.
+     */
+    static function isClientReply($entry) {
+        $raw = $entry->recipients;
+        if (!is_string($raw) || $raw === '')
+            return false;
+        $list = json_decode($raw, true);
+        return is_array($list) && !empty($list['to']);
+    }
+
+    /**
      * Bascule le ticket sur le plan « réponse faite » si $entry est la
      * réponse d'un agent humain sur un ticket au plan « surveillé ».
      */
@@ -111,6 +146,10 @@ class SlaFirstResponsePlugin extends Plugin {
                     || $entry->isSystem()
                     || $entry->hasFlag(ThreadEntry::FLAG_HIDDEN)
                     || $entry->getPoster() === __('SYSTEM (Canned Reply)'))
+                return;
+
+            // Réponse effectivement adressée au client uniquement.
+            if (!self::isClientReply($entry))
                 return;
 
             // Tickets uniquement (le fil d'une tâche porte aussi des réponses)
