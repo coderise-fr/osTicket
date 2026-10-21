@@ -42,6 +42,16 @@ class StripeSyncMapper {
             ? $arr[$key] : null;
     }
 
+    // A Unix timestamp (seconds, UTC): positive integer, or its decimal string.
+    private static function ts($arr, $key) {
+        if (!is_array($arr) || !isset($arr[$key]))
+            return null;
+        $v = $arr[$key];
+        if (is_string($v) && ctype_digit($v))
+            $v = (int) $v;
+        return (is_int($v) && $v > 0) ? $v : null;
+    }
+
     // A reference to an object is an id, or the object itself if expanded.
     private static function ref($value) {
         if (is_array($value) && isset($value['id']))
@@ -109,6 +119,7 @@ class StripeSyncMapper {
             }
             $status = self::str($obj, 'status');
             $deleted = ($type == 'customer.subscription.deleted');
+            $terminal = $deleted || in_array($status, self::$TERMINAL_STATUSES, true);
             return $base + array(
                 'kind' => 'subscription',
                 'subscription' => self::str($obj, 'id'),
@@ -116,7 +127,16 @@ class StripeSyncMapper {
                 'status' => $deleted ? 'canceled' : $status,
                 'prices' => array_values(array_unique($prices)),
                 'products' => array_values(array_unique($products)),
-                'terminal' => $deleted || in_array($status, self::$TERMINAL_STATUSES, true),
+                'terminal' => $terminal,
+                // Very first start of the subscription (NOT the current
+                // period): the anniversary date of the customer.
+                'start_date' => self::ts($obj, 'start_date'),
+                // End of a terminal subscription: ended_at, else
+                // canceled_at, else the event time. Null while it runs
+                // (a pending cancel_at_period_end is not an end yet).
+                'ended' => $terminal
+                    ? (self::ts($obj, 'ended_at') ?: self::ts($obj, 'canceled_at') ?: $base['created'] ?: null)
+                    : null,
             );
 
         case 'invoice.payment_failed':
@@ -131,18 +151,27 @@ class StripeSyncMapper {
     }
 
     /**
-     * Does this subscription fact grant the Priority support?
+     * Is this a Priority subscription (its price or product is one of the
+     * configured Priority ones), whatever its status?
      * $settings is a StripeSyncSettings.
+     */
+    static function isPrioritySubscription(array $fact, $settings) {
+        if (array_intersect($fact['prices'], $settings->getPriorityPriceIds()))
+            return true;
+        if (array_intersect($fact['products'], $settings->getPriorityProductIds()))
+            return true;
+        return false;
+    }
+
+    /**
+     * Does this subscription fact grant the Priority support right now?
+     * Priority subscription AND status among the active ones.
      */
     static function grantsPriority(array $fact, $settings) {
         if (!empty($fact['terminal']))
             return false;
         if (!in_array($fact['status'], $settings->getActiveStatuses(), true))
             return false;
-        if (array_intersect($fact['prices'], $settings->getPriorityPriceIds()))
-            return true;
-        if (array_intersect($fact['products'], $settings->getPriorityProductIds()))
-            return true;
-        return false;
+        return self::isPrioritySubscription($fact, $settings);
     }
 }

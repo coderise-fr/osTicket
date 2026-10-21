@@ -20,7 +20,10 @@
         when the Priority support ends (osTicket users have ONE
         organization only);
       - we only remove from the Priority organization the users that we
-        put there ourselves.
+        put there ourselves;
+      - every Priority subscription is published for other modules as one
+        `sub:<id>` row (user, start date, end, status): see
+        StripeSyncDbStore for the format.
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
@@ -44,6 +47,12 @@ interface StripeSyncStore {
     /** array|null - state of one Stripe customer */
     function getCustomer($customerId);
     function putCustomer($customerId, array $state);
+    /**
+     * Publish the record of one Priority subscription for other modules
+     * (see StripeSyncDbStore for the exact format). Idempotent: writing the
+     * same value again changes nothing.
+     */
+    function putSubscription($subscriptionId, $value);
     /** Exclusive lock per Stripe customer; false if it cannot be obtained. */
     function lock($customerId);
     function unlock($customerId);
@@ -218,10 +227,26 @@ class StripeSyncService {
             if ($cur && $fact['created'] < $cur['ts'])
                 return array($state, 'stale');          // older than what we know
 
+            $plan = StripeSyncMapper::isPrioritySubscription($fact, $this->settings);
+            $row = $plan || ($cur && !empty($cur['row']));
+            // The first start date we saw is kept: a renewal never moves it.
+            $start = ($cur && !empty($cur['start'])) ? $cur['start'] : $fact['start_date'];
+            if ($fact['terminal'])
+                $ended = $fact['ended'];
+            elseif ($plan)
+                $ended = null;
+            else    // moved away from the Priority price: the period ends now
+                $ended = ($cur && !empty($cur['ended'])) ? $cur['ended'] : $fact['created'];
+
             $state['subs'][$sub] = array(
                 'priority' => StripeSyncMapper::grantsPriority($fact, $this->settings),
                 'ts' => $fact['created'],
                 'terminal' => (bool) $fact['terminal'],
+                // Data published for other modules (see publishSubscriptions)
+                'row' => $row,
+                'start' => $start,
+                'ended' => $ended,
+                'status' => $fact['status'],
             );
 
             if (!$state['user_id'])
@@ -280,6 +305,33 @@ class StripeSyncService {
         }
         elseif ($state['attached']) {
             $this->release($state);
+        }
+
+        $this->publishSubscriptions($state);
+    }
+
+    /**
+     * Publish "user|start|ended|status" for every subscription of the
+     * customer that is (or was) a Priority one, so that other modules (SLA
+     * counting per subscription year) can read it with plain SQL. Needs the
+     * osTicket user, hence called from reconcile(); a subscription seen
+     * before the customer is known is published as soon as it is.
+     * Non Priority subscriptions never get a record.
+     */
+    private function publishSubscriptions(array $state) {
+        foreach ($state['subs'] as $id => $s) {
+            if (empty($s['row']))
+                continue;
+            if (empty($s['start'])) {
+                $this->log->warning('Stripe sync: subscription without start date',
+                    sprintf('Subscription %s', $id));
+                continue;
+            }
+            // Stripe statuses are lowercase words with underscores.
+            $status = preg_replace('/[^a-z_]/', '', (string) $s['status']);
+            $this->store->putSubscription($id, sprintf('%d|%d|%s|%s',
+                $state['user_id'], $s['start'],
+                empty($s['ended']) ? '' : (int) $s['ended'], $status));
         }
     }
 
