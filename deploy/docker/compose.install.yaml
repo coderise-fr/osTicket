@@ -1,7 +1,9 @@
-# Overlay for the first install and for upgrades: setup wizard enabled, config
-# volume writable. Never leave this running.
+# Overlay for the FIRST INSTALL only: setup wizard enabled, config volume writable.
+# Never leave this running. Upgrades do not need it: the upgrader lives in the admin
+# panel (/scp/upgrade.php) and runs on the normal runtime image (see README.md).
 #
-#   docker compose -f compose.yaml -f compose.install.yaml up -d --build db web
+#   ./scripts/build.sh -f compose.yaml -f compose.install.yaml build web
+#   docker compose -f compose.yaml -f compose.install.yaml up -d db web
 #
 # (the cron service is not started: it refuses to run without an installed config)
 

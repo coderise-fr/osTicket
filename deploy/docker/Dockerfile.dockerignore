@@ -12,4 +12,6 @@ stage
 **/*.phar
 deploy/docker/secrets
 deploy/docker/.env
+deploy/docker/plugins.env
+deploy/docker/backups
 setup/test
