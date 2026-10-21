@@ -45,8 +45,8 @@ class StripeSyncPluginConfig extends PluginConfig {
             )),
             'active_statuses' => new TextboxField(array(
                 'label' => 'Subscription statuses that keep Priority',
-                'hint' => 'Default: active, trialing, past_due (past_due = grace period while Stripe retries the payment).',
-                'default' => 'active, trialing, past_due',
+                'hint' => 'Default: active, trialing. A past_due subscription (payment failed) loses Priority until Stripe sets it back to active.',
+                'default' => 'active, trialing',
                 'configuration' => array('size' => 60, 'length' => 256),
             )),
             'accept_test' => new BooleanField(array(

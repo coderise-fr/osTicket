@@ -22,10 +22,16 @@ function post($body, $sig='auto', $ts=null) {
 function ev($id, $type, $obj, $created=null, $live=true) {
     return json_encode(array('id' => $id, 'object' => 'event', 'type' => $type, 'created' => $created ?? time(), 'livemode' => $live, 'data' => array('object' => $obj)));
 }
-function sub($id, $cus, $status, $price='price_prio') {
-    return array('id' => $id, 'object' => 'subscription', 'customer' => $cus, 'status' => $status,
+const SUB_START = 1690000000;       // start_date of every test subscription (first start)
+function sub($id, $cus, $status, $price='price_prio', $extra=array()) {
+    return $extra + array('id' => $id, 'object' => 'subscription', 'customer' => $cus, 'status' => $status,
+        'start_date' => SUB_START,
         'items' => array('data' => array(array('price' => array('id' => $price, 'product' => 'prod_x')))));
 }
+// What the other modules read: the value of the `sub:<id>` row, or null.
+function subRow($id) { return one("SELECT `value` FROM ".CONFIG_TABLE." WHERE `namespace`='stripesync' AND `key`=".db_input("sub:$id")); }
+function subUpdated($id) { return one("SELECT `updated` FROM ".CONFIG_TABLE." WHERE `namespace`='stripesync' AND `key`=".db_input("sub:$id")); }
+function userId($email) { return one("SELECT user_id FROM ".USER_EMAIL_TABLE." WHERE address=".db_input($email)); }
 function checkout($cus, $email, $name='Bea Buyer') {
     return array('object' => 'checkout.session', 'customer' => $cus, 'payment_status' => 'paid',
         'customer_details' => array('email' => $email, 'name' => $name));
@@ -79,6 +85,9 @@ list($c, $t) = post(ev('evt_i020', 'customer.subscription.created', sub('sub_I1'
 ok($c == 200 && $t == 'ok', "subscription.created (Priority price) -> ok (got $c $t)");
 ok(userOrg('bea.buyer@example.com') == 'Priority', 'user is in the Priority organization');
 ok(one("SELECT status FROM ".ORGANIZATION_TABLE." WHERE name='Priority'") == 0, 'Priority org created with sharing disabled (status 0)');
+$beaId = userId('bea.buyer@example.com');
+ok(subRow('sub_I1') === "$beaId|".SUB_START."||active", 'row sub:sub_I1 = <user_id>|<start_date>||active (got '.var_export(subRow('sub_I1'), true).')');
+ok(one("SELECT COUNT(*) FROM ".CONFIG_TABLE." WHERE `namespace`='stripesync' AND `key` LIKE 'sub:%'") == 1, 'exactly one sub: row so far');
 
 // 6. ticket filter routes on the organization (API ticket creation as the customer)
 $orgField = one("SELECT ff.id FROM ".FORM_FIELD_TABLE." ff JOIN ".FORM_SEC_TABLE." f ON f.id=ff.form_id WHERE f.type='O' AND ff.name='name'");
@@ -103,25 +112,58 @@ ok(one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($num)) == $s
 list($c, $num2) = apiTicket('someone.else@example.com', 'Non priority ticket');
 ok($c == 201 && one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($num2)) != $sla, 'other customer does not get the Priority SLA');
 
-// 7. renewal / past_due keep it; payment_failed only logs
+// 7. renewal keeps Priority and the start date; past_due removes Priority, active gives it back;
+//    payment_failed only logs
+sleep(1);
+$upd = subUpdated('sub_I1');
+list($c, $t) = post(ev('evt_i029', 'customer.subscription.updated',
+    sub('sub_I1', 'cus_I1', 'active', 'price_prio', array('current_period_start' => SUB_START + 2592000, 'current_period_end' => SUB_START + 5184000)), $now + 5));
+ok($c == 200 && $t == 'ok' && userOrg('bea.buyer@example.com') == 'Priority', 'renewal keeps Priority');
+ok(subRow('sub_I1') === "$beaId|".SUB_START."||active", 'renewal: start_date unchanged in the sub: row');
+ok(subUpdated('sub_I1') === $upd, 'renewal: row not rewritten (same value)');
+list($c, $t) = post(ev('evt_i029', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'active'), $now + 5));
+ok($t == 'duplicate' && subRow('sub_I1') === "$beaId|".SUB_START."||active", 'replayed event id: duplicate, row unchanged');
+list($c, $t) = post(ev('evt_i029b', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'active'), $now + 6));
+ok($c == 200 && subRow('sub_I1') === "$beaId|".SUB_START."||active" && subUpdated('sub_I1') === $upd
+    && one("SELECT COUNT(*) FROM ".CONFIG_TABLE." WHERE `namespace`='stripesync' AND `key` LIKE 'sub:%'") == 1,
+    'same content under another event id: idempotent (same value, same row, untouched)');
+
 list($c, $t) = post(ev('evt_i030', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'past_due'), $now + 10));
-ok(userOrg('bea.buyer@example.com') == 'Priority', 'past_due keeps Priority (grace)');
+ok($c == 200 && $t == 'ok', "subscription.updated past_due -> ok (got $c $t)");
+ok(userOrg('bea.buyer@example.com') === null, 'past_due removes Priority (back to no organization)');
+ok(subRow('sub_I1') === "$beaId|".SUB_START."||past_due", 'past_due: row updated, not ended, same start_date');
+list($c, $numPd) = apiTicket('bea.buyer@example.com', 'Ticket while past_due');
+ok($c == 201 && one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($numPd)) != $sla, 'ticket opened while past_due: no Priority SLA');
 list($c, $t) = post(ev('evt_i031', 'invoice.payment_failed', array('id' => 'in_I1', 'customer' => 'cus_I1'), $now + 11));
 ok($c == 200 && $t == 'logged', "invoice.payment_failed -> logged ($t)");
+list($c, $t) = post(ev('evt_i033', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'active'), $now + 20));
+ok($c == 200 && $t == 'ok' && userOrg('bea.buyer@example.com') == 'Priority', 'payment received, subscription active again: Priority granted again');
+ok(subRow('sub_I1') === "$beaId|".SUB_START."||active", 'active again: row back to active, same start_date');
+list($c, $numBack) = apiTicket('bea.buyer@example.com', 'Ticket after payment');
+ok($c == 201 && one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($numBack)) == $sla, 'ticket opened after the payment: Priority SLA again');
 
 // 8. out of order: an older 'created' delivered late is ignored
 list($c, $t) = post(ev('evt_i032', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'trialing'), $now - 500));
 ok($t == 'stale', "event older than the known state ignored ($t)");
 
 // 9. end of subscription -> back to included support
-list($c, $t) = post(ev('evt_i040', 'customer.subscription.deleted', sub('sub_I1', 'cus_I1', 'canceled'), $now + 100));
+list($c, $t) = post(ev('evt_i040', 'customer.subscription.deleted',
+    sub('sub_I1', 'cus_I1', 'canceled', 'price_prio', array('canceled_at' => $now + 90, 'ended_at' => $now + 100)), $now + 100));
 ok($c == 200 && $t == 'ok', "subscription.deleted -> ok ($t)");
+ok(subRow('sub_I1') === "$beaId|".SUB_START."|".($now + 100)."|canceled", 'cancellation: row = <user_id>|<start_date>|<ended_at>|canceled (got '.var_export(subRow('sub_I1'), true).')');
 ok(userOrg('bea.buyer@example.com') === null, 'user left the Priority organization');
 list($c, $num3) = apiTicket('bea.buyer@example.com', 'After cancellation');
 ok($c == 201 && one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($num3)) != $sla, 'new ticket after cancellation: no Priority SLA');
 ok(one("SELECT sla_id FROM ".TICKET_TABLE." WHERE number=".db_input($num)) == $sla, 'ticket opened while Priority keeps its SLA');
 list($c, $t) = post(ev('evt_i041', 'customer.subscription.updated', sub('sub_I1', 'cus_I1', 'active'), $now + 200));
 ok($t == 'stale' && userOrg('bea.buyer@example.com') === null, 'canceled subscription never comes back');
+ok(subRow('sub_I1') === "$beaId|".SUB_START."|".($now + 100)."|canceled", 'canceled subscription: row unchanged by a late event');
+
+// 9b. a subscription that is not Priority writes nothing (neither created nor deleted)
+list($c, $t) = post(ev('evt_i045', 'customer.subscription.created', sub('sub_NP1', 'cus_I1', 'active', 'price_license'), $now + 300));
+ok($c == 200 && $t == 'ok' && subRow('sub_NP1') === null, 'non Priority subscription: no sub: row');
+list($c, $t) = post(ev('evt_i046', 'customer.subscription.deleted', sub('sub_NP1', 'cus_I1', 'canceled', 'price_license', array('ended_at' => $now + 400)), $now + 400));
+ok($c == 200 && subRow('sub_NP1') === null && userOrg('bea.buyer@example.com') === null, 'non Priority subscription ended: still no row, no organization change');
 
 // 10. previous org restored (company org by e-mail domain)
 db_query("INSERT INTO ".ORGANIZATION_TABLE." (name, manager, status, domain, created, updated) VALUES ('Acme Corp', '', 8, 'acme.test', NOW(), NOW())");
@@ -136,8 +178,18 @@ ok(userOrg('carl@acme.test') == 'Acme Corp', 'company organization restored at t
 // 11. subscription before the purchase event: deferred then applied
 list($c, $t) = post(ev('evt_i060', 'customer.subscription.created', sub('sub_I3', 'cus_I3', 'active'), $now));
 ok($t == 'deferred', "subscription for an unknown customer -> deferred ($t)");
+ok(subRow('sub_I3') === null, 'deferred subscription: no row yet (user unknown)');
 post(ev('evt_i061', 'invoice.paid', array('customer' => 'cus_I3', 'customer_email' => 'dora@example.com', 'customer_name' => 'Dora D', 'status' => 'paid')));
 ok(userOrg('dora@example.com') == 'Priority', 'deferred state applied once the customer e-mail is known (invoice.paid)');
+$doraId = userId('dora@example.com');
+ok(subRow('sub_I3') === "$doraId|".SUB_START."||active", 'deferred subscription: row written once the user is known');
+
+// 11b. a very long subscription id: the key is hashed like the event keys (`key` is 64 characters max)
+$long = 'sub_' . str_repeat('L', 58);
+list($c, $t) = post(ev('evt_i062', 'customer.subscription.created', sub($long, 'cus_I3', 'active'), $now + 1));
+$lk = 'sub:' . sha1($long);
+ok($c == 200 && strlen('sub:' . $long) > 64 && one("SELECT `value` FROM ".CONFIG_TABLE." WHERE `namespace`='stripesync' AND `key`=".db_input($lk)) === "$doraId|".SUB_START."||active",
+    'id too long for `key`: row stored under sub:<sha1(id)>');
 
 // 12. unsafe Priority org configuration is refused (retry), then recovers
 db_query("UPDATE ".ORGANIZATION_TABLE." SET status = 8 WHERE name='Priority'");

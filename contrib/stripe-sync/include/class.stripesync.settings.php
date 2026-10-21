@@ -21,8 +21,11 @@ class StripeSyncSettings {
     const ENV_PREFIX = 'STRIPE_SYNC_';
 
     // Statuses of a Stripe subscription that keep the Priority support.
-    // `past_due` is a grace period: Stripe is still retrying the payment.
-    static $DEFAULT_ACTIVE_STATUSES = array('active', 'trialing', 'past_due');
+    // `past_due` (payment failed, Stripe still retrying) deliberately does
+    // NOT keep Priority (decision of 2026-10-21): the user goes back to
+    // the standard support at once, and gets Priority again when Stripe
+    // sets the subscription back to `active` after a successful payment.
+    static $DEFAULT_ACTIVE_STATUSES = array('active', 'trialing');
 
     private $values;
     private $env;

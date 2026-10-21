@@ -82,7 +82,10 @@ $envOf = function (array $vars) { return function ($n) use ($vars) { return isse
 $s = new StripeSyncSettings(array(), $none);
 check($s->getWebhookSecret() === null, 'no secret -> null');
 check($s->getOrgName() === 'Priority', 'default org name');
-check($s->getActiveStatuses() == array('active', 'trialing', 'past_due'), 'default statuses');
+check($s->getActiveStatuses() == array('active', 'trialing'), 'default statuses: past_due does not keep Priority');
+check(!in_array('past_due', StripeSyncSettings::$DEFAULT_ACTIVE_STATUSES, true), 'past_due is not an active status by default');
+$s2 = new StripeSyncSettings(array('active_statuses' => 'active, trialing, past_due'), $none);
+check(in_array('past_due', $s2->getActiveStatuses(), true), 'past_due can still be re-enabled explicitly');
 check(!$s->hasPriorityCatalog(), 'no catalog by default');
 check(!$s->acceptTestEvents(), 'test events refused by default');
 
@@ -103,9 +106,12 @@ check($s->getWebhookSecret() === null, 'the secret is never read from the form/d
 
 // ------------------------------------------------------------------- mapper
 
-function sub_event($id, $type, $created, $status, $price, $cus='cus_A', $sub='sub_1', $product='prod_P') {
+// $extra: more fields of the Subscription object (start_date, ended_at, ...).
+// start_date defaults to 1690000000 (the very first start, constant across renewals).
+function sub_event($id, $type, $created, $status, $price, $cus='cus_A', $sub='sub_1', $product='prod_P', $extra=array()) {
     return array('id' => $id, 'type' => $type, 'created' => $created, 'livemode' => true,
-        'data' => array('object' => array('id' => $sub, 'customer' => $cus, 'status' => $status,
+        'data' => array('object' => $extra + array('id' => $sub, 'customer' => $cus, 'status' => $status,
+            'start_date' => 1690000000,
             'items' => array('data' => array(array('price' => array('id' => $price, 'product' => $product)))))));
 }
 function paid_event($id, $cus='cus_A', $email='client@example.com', $ps='paid') {
@@ -133,14 +139,34 @@ $f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 1
 check(!StripeSyncMapper::grantsPriority($f, $cfg), 'other price does not grant');
 $f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 10, 'active', 'price_other', 'cus_A', 'sub_1', 'prod_prio'));
 check(StripeSyncMapper::grantsPriority($f, $cfg), 'matching product grants');
-foreach (array('canceled', 'unpaid', 'incomplete', 'incomplete_expired', 'paused') as $st) {
+foreach (array('past_due', 'canceled', 'unpaid', 'incomplete', 'incomplete_expired', 'paused') as $st) {
     $f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 10, $st, 'price_prio'));
     check(!StripeSyncMapper::grantsPriority($f, $cfg), "status $st does not grant");
+    check(StripeSyncMapper::isPrioritySubscription($f, $cfg), "status $st: still a Priority subscription (record kept)");
 }
-foreach (array('active', 'trialing', 'past_due') as $st) {
+foreach (array('active', 'trialing') as $st) {
     $f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 10, $st, 'price_prio'));
     check(StripeSyncMapper::grantsPriority($f, $cfg), "status $st grants");
 }
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 10, 'active', 'price_other'));
+check(!StripeSyncMapper::isPrioritySubscription($f, $cfg), 'other price: not a Priority subscription');
+
+// dates of the subscription
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 500, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('current_period_start' => 1750000000, 'canceled_at' => 1750000100, 'cancel_at_period_end' => true)));
+check($f['start_date'] === 1690000000 && $f['ended'] === null, 'start_date read as is; a pending cancel_at_period_end is not an end');
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.deleted', 500, 'canceled', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('ended_at' => 1760000000, 'canceled_at' => 1750000100)));
+check($f['ended'] === 1760000000, 'ended = ended_at');
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.deleted', 500, 'canceled', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('canceled_at' => 1750000100)));
+check($f['ended'] === 1750000100, 'ended falls back to canceled_at');
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.deleted', 500, 'canceled', 'price_prio'));
+check($f['ended'] === 500, 'ended falls back to the event time');
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 500, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P', array('start_date' => '1690000000')));
+check($f['start_date'] === 1690000000, 'numeric string start_date accepted');
+$f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.updated', 500, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P', array('start_date' => 'x; DROP')));
+check($f['start_date'] === null, 'garbage start_date rejected');
 $f = StripeSyncMapper::map(sub_event('evt_1', 'customer.subscription.deleted', 10, 'active', 'price_prio'));
 check($f['terminal'] && !StripeSyncMapper::grantsPriority($f, $cfg), 'deleted is terminal even if payload says active');
 check(StripeSyncMapper::isId('cus_Nf8xABC123', 'cus') && !StripeSyncMapper::isId('cus_<script>', 'cus')
@@ -150,6 +176,11 @@ check(StripeSyncMapper::isId('cus_Nf8xABC123', 'cus') && !StripeSyncMapper::isId
 
 class FakeStore implements StripeSyncStore {
     public $events = array(); public $customers = array(); public $locked = array(); public $failLock = false;
+    public $subs = array(); public $subWrites = 0;      // published sub:<id> records
+    function putSubscription($id, $value) {
+        if (!isset($this->subs[$id]) || $this->subs[$id] !== $value) $this->subWrites++;
+        $this->subs[$id] = $value; return true;
+    }
     function claimEvent($id) {
         if (!isset($this->events[$id])) { $this->events[$id] = 'p'; return 'claimed'; }
         return $this->events[$id] == 'done' ? 'done' : 'busy';
@@ -230,10 +261,46 @@ check($st->customers['cus_A']['prev_org_id'] === 7, 'previous organization remem
 $svc->handle(sub_event('evt_c', 'customer.subscription.updated', 200, 'active', 'price_prio'));
 check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'renewal keeps Priority');
 $svc->handle(sub_event('evt_d', 'customer.subscription.updated', 300, 'past_due', 'price_prio'));
-check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'past_due = grace period');
+check($dir->users[1]['org'] === 7, 'past_due: Priority removed, company organization restored');
+check($st->customers['cus_A']['attached'] === false && $st->customers['cus_A']['prev_org_id'] === null, 'past_due: state detached');
+$svc->handle(sub_event('evt_d2', 'customer.subscription.updated', 350, 'past_due', 'price_prio'));
+check($dir->users[1]['org'] === 7, 'a second past_due event changes nothing');
+$svc->handle(sub_event('evt_d3', 'customer.subscription.updated', 360, 'active', 'price_prio'));
+check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'back to active after the payment: Priority granted again');
+check($st->customers['cus_A']['attached'] === true && $st->customers['cus_A']['prev_org_id'] === 7, 'state: re-attached, company organization remembered again');
 $svc->handle(sub_event('evt_e', 'customer.subscription.deleted', 400, 'canceled', 'price_prio'));
 check($dir->users[1]['org'] === 7, 'end of subscription restores the previous organization');
 check($st->customers['cus_A']['attached'] === false, 'state: detached');
+
+// 2b. past_due then unpaid then canceled, and a user without company organization
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'));
+$svc->handle(sub_event('evt_c', 'customer.subscription.updated', 200, 'past_due', 'price_prio'));
+check($dir->users[1]['org'] === null, 'past_due, no company organization: back to none');
+$svc->handle(sub_event('evt_d', 'customer.subscription.updated', 300, 'active', 'price_prio'));
+check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'active again: Priority again');
+$svc->handle(sub_event('evt_e', 'customer.subscription.updated', 400, 'past_due', 'price_prio'));
+$svc->handle(sub_event('evt_f', 'customer.subscription.updated', 500, 'unpaid', 'price_prio'));
+check($dir->users[1]['org'] === null, 'unpaid: still no Priority');
+$svc->handle(sub_event('evt_g', 'customer.subscription.updated', 450, 'active', 'price_prio'));
+check($dir->users[1]['org'] === null, 'late "active" (older than unpaid) is ignored');
+
+// 2c. past_due on one subscription does not remove Priority granted by another
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio', 'cus_A', 'sub_1'));
+$svc->handle(sub_event('evt_c', 'customer.subscription.created', 110, 'active', 'price_prio', 'cus_A', 'sub_2'));
+$svc->handle(sub_event('evt_d', 'customer.subscription.updated', 200, 'past_due', 'price_prio', 'cus_A', 'sub_1'));
+check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'one subscription past_due, another active: still Priority');
+$svc->handle(sub_event('evt_e', 'customer.subscription.updated', 210, 'past_due', 'price_prio', 'cus_A', 'sub_2'));
+check($dir->users[1]['org'] === null, 'all subscriptions past_due: Priority removed');
+
+// 2d. the setting can bring the old behaviour back
+list($svc, $st, $dir, $log) = make(new StripeSyncSettings(array('price_ids' => 'price_prio', 'active_statuses' => 'active, trialing, past_due'), function ($n) { return false; }));
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.updated', 100, 'past_due', 'price_prio'));
+check($dir->users[1]['org'] === FakeDirectory::PRIORITY, 'explicit active_statuses with past_due keeps Priority');
 
 // 3. Out of order: stale event ignored, canceled is final
 list($svc, $st, $dir, $log) = make();
@@ -343,6 +410,96 @@ check($r == 'logged' && count($log->lines) == 1 && !$dir->users, 'payment_failed
 list($svc, $st, $dir, $log) = make();
 $r = $svc->handle(array('id' => 'evt_f', 'type' => 'invoice.payment_failed', 'created' => 5, 'data' => array('object' => array('id' => '<script>', 'customer' => '"; DROP'))));
 check(strpos(implode("\n", $log->lines), '<script>') === false && strpos(implode("\n", $log->lines), 'DROP') === false, 'ids are sanitized in logs');
+
+// 16. Records exposed to other modules: sub:<id> = user|start_date|ended|status
+$START = 1690000000;
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+check($st->subs === array(), 'no subscription, no record');
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'));
+check($st->subs === array('sub_1' => "1|$START||active"), 'exact format: user|start_date||status while running');
+check(preg_match('/^\d+\|\d+\|\d*\|[a-z_]+$/', $st->subs['sub_1']) === 1 && strpos($st->subs['sub_1'], ' ') === false, 'no space, no JSON');
+$w = $st->subWrites;
+$svc->handle(sub_event('evt_c', 'customer.subscription.updated', 200, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('current_period_start' => 1692000000, 'current_period_end' => 1694600000)));
+check($st->subs['sub_1'] === "1|$START||active" && $st->subWrites == $w, 'renewal: start_date unchanged, nothing rewritten');
+$svc->handle(sub_event('evt_c2', 'customer.subscription.updated', 210, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('start_date' => $START + 99999)));
+check($st->subs['sub_1'] === "1|$START||active", 'the first start_date seen is kept');
+$svc->handle(sub_event('evt_d', 'customer.subscription.updated', 300, 'past_due', 'price_prio'));
+check($st->subs['sub_1'] === "1|$START||past_due", 'past_due: record updated, not ended');
+$svc->handle(sub_event('evt_d2', 'customer.subscription.updated', 310, 'active', 'price_prio'));
+check($st->subs['sub_1'] === "1|$START||active", 'back to active: same start_date');
+$svc->handle(sub_event('evt_d3', 'customer.subscription.updated', 320, 'active', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('cancel_at_period_end' => true, 'canceled_at' => 1700000000)));
+check($st->subs['sub_1'] === "1|$START||active", 'cancel_at_period_end pending: still running (ended empty)');
+$w = $st->subWrites;
+$svc->handle(sub_event('evt_e', 'customer.subscription.deleted', 400, 'canceled', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('ended_at' => 1760000000, 'canceled_at' => 1700000000)));
+check($st->subs['sub_1'] === "1|$START|1760000000|canceled", 'cancellation: ended filled (epoch UTC), status canceled');
+check($svc->handle(sub_event('evt_e', 'customer.subscription.deleted', 400, 'canceled', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('ended_at' => 1760000000))) == 'duplicate' && $st->subWrites == $w + 1, 'replayed event: duplicate, no further write');
+$svc->handle(sub_event('evt_e2', 'customer.subscription.deleted', 401, 'canceled', 'price_prio', 'cus_A', 'sub_1', 'prod_P',
+    array('ended_at' => 1760000000)));
+$svc->handle(paid_event('evt_p2'));
+check($st->subs['sub_1'] === "1|$START|1760000000|canceled" && $st->subWrites == $w + 1 && count($st->subs) == 1,
+    'same content under a new event id: idempotent (no new write, no new row)');
+$svc->handle(sub_event('evt_e3', 'customer.subscription.updated', 500, 'active', 'price_prio'));
+check($st->subs['sub_1'] === "1|$START|1760000000|canceled", 'a canceled subscription never comes back in the record either');
+
+// not a Priority subscription: no record at all
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_license'));
+$svc->handle(sub_event('evt_c', 'customer.subscription.deleted', 200, 'canceled', 'price_license'));
+check($st->subs === array(), 'non Priority subscription: nothing written');
+
+// subscription event before the purchase: written once the user is known (checkout.session.completed)
+list($svc, $st, $dir, $log) = make();
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'));
+check($st->subs === array(), 'unknown user yet: nothing written');
+$svc->handle(paid_event('evt_a'));
+check($st->subs === array('sub_1' => "1|$START||active"), 'written when the checkout event reveals the user');
+
+// matching by product, several subscriptions, unknown start_date
+list($svc, $st, $dir, $log) = make(new StripeSyncSettings(array('product_ids' => 'prod_prio'), function ($n) { return false; }));
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'trialing', 'price_x', 'cus_A', 'sub_1', 'prod_prio'));
+$svc->handle(sub_event('evt_c', 'customer.subscription.created', 101, 'active', 'price_x', 'cus_A', 'sub_2', 'prod_prio', array('start_date' => 1600000000)));
+$svc->handle(sub_event('evt_d', 'customer.subscription.created', 102, 'active', 'price_x', 'cus_A', 'sub_3', 'prod_other'));
+check($st->subs === array('sub_1' => "1|$START||trialing", 'sub_2' => '1|1600000000||active'), 'one record per Priority subscription (by product), none for the others');
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$e = sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'); unset($e['data']['object']['start_date']);
+$svc->handle($e);
+check($st->subs === array() && strpos(implode("\n", $log->lines), 'without start date') !== false && $dir->users[1]['org'] === FakeDirectory::PRIORITY,
+    'no start_date: no record (warning logged) but Priority still granted');
+
+// customer changes e-mail: the record follows the new user
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a', 'cus_A', 'old@example.com'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'));
+$svc->handle(paid_event('evt_c', 'cus_A', 'new@example.com'));
+check($st->subs['sub_1'] === "2|$START||active", 'record points to the new user after an e-mail change');
+
+// subscription moved away from the Priority price: the Priority period ends at that event
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$svc->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio'));
+$svc->handle(sub_event('evt_c', 'customer.subscription.updated', 250, 'active', 'price_license'));
+check($st->subs['sub_1'] === "1|$START|250|active" && $dir->users[1]['org'] === null, 'downgrade to a non Priority price: ended at the event time, Priority removed');
+$svc->handle(sub_event('evt_d', 'customer.subscription.updated', 260, 'active', 'price_license'));
+check($st->subs['sub_1'] === "1|$START|250|active", 'the end of the Priority period is not moved by later events');
+
+// a failing write is retried by Stripe: the event is released
+list($svc, $st, $dir, $log) = make();
+$svc->handle(paid_event('evt_a'));
+$st2 = new class extends FakeStore { function putSubscription($i, $v) { throw new StripeSyncRetryableError('db down'); } };
+$st2->customers = $st->customers;
+$svc2 = new StripeSyncService($st2, $dir, new StripeSyncSettings(array('price_ids' => 'price_prio'), function ($n) { return false; }), $log);
+throws('StripeSyncRetryableError', function () use ($svc2) {
+    $svc2->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio')); }, 'record write failure -> retry later');
+check(!isset($st2->events['evt_b']) && !isset($st2->customers['cus_A']['subs']['sub_1']), 'failed write: event released, state not saved');
 
 printf("%d checks, %d failure(s)\n", Counter::$count, Counter::$fail);
 exit(Counter::$fail);

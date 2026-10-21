@@ -173,7 +173,7 @@ Stripe ──POST──▶ reverse proxy (TLS, liste d'IP Stripe, limite de déb
 |---|---|
 | `checkout.session.completed` | Si `payment_status` vaut `paid` ou `no_payment_required` : crée l'utilisateur, le compte portail et envoie l'invitation. Sinon ignoré. |
 | `checkout.session.async_payment_succeeded` | Idem, pour les moyens de paiement différés (SEPA…) où la session se termine avant l'encaissement. |
-| `customer.subscription.created` / `updated` / `deleted` | Met à jour l'état de l'abonnement ; recalcule l'appartenance à Priority. |
+| `customer.subscription.created` / `updated` / `deleted` | Met à jour l'état de l'abonnement ; recalcule l'appartenance à Priority ; écrit la ligne `sub:<id>` des abonnements Priority (§5.10). |
 | `invoice.paid` | Apprend le lien client Stripe ↔ e-mail (`customer_email`) quand l'abonnement ne vient pas de Checkout ; peut renvoyer une invitation (voir §5.5). |
 | `invoice.payment_failed` | Écrit un avertissement dans le journal système. Aucun changement d'accès : c'est le statut de l'abonnement (`past_due`, `unpaid`, `canceled`) qui décide. |
 
@@ -210,7 +210,8 @@ Le vecteur de test de l'HMAC a été calculé avec OpenSSL, indépendamment du c
   réservation abandonnée par un plantage est reprise après 5 minutes (compare-and-swap). Les
   marqueurs sont purgés au fil de l'eau après 30 jours.
 - **Doublons à identifiant différent** : couverts par l'état par abonnement ci-dessous.
-- **Désordre** : l'état d'un client contient, par abonnement, `{priority, ts, terminal}`.
+- **Désordre** : l'état d'un client contient, par abonnement, `{priority, ts, terminal, …}`
+  (plus `row`, `start`, `ended`, `status` pour la ligne publiée au §5.10).
   Un événement plus ancien que `ts` est ignoré ; un abonnement `canceled` / `incomplete_expired`
   ou `deleted` est **définitif**. Limite : `created` a une précision d'une seconde ; deux
   événements de la même seconde sont appliqués dans l'ordre d'arrivée, d'où le caractère définitif de l'annulation.
@@ -226,7 +227,7 @@ Le vecteur de test de l'HMAC a été calculé avec OpenSSL, indépendamment du c
 
 - Clé naturelle : l'**adresse e-mail** (celle de l'utilisateur osTicket, unique).
 - Table de correspondance : `cus:<cus_id>` dans `ost_config`, en JSON :
-  `{user_id, email, prev_org_id, attached, invited_at, subs:{sub_id:{priority, ts, terminal}}}`.
+  `{user_id, email, prev_org_id, attached, invited_at, subs:{sub_id:{priority, ts, terminal, row, start, ended, status}}}`.
 - Un événement d'abonnement reçu **avant** qu'on connaisse l'e-mail du client est enregistré et
   répond « différé » ; il est appliqué dès qu'un événement `checkout.session.completed` ou
   `invoice.paid` apporte l'e-mail (Stripe ne garantit pas l'ordre de livraison). Vérifié.
@@ -260,9 +261,13 @@ renvoie le lien (action « Register » de la liste des utilisateurs, `scp/users.
 ### 5.6 Appartenance à l'organisation Priority
 
 - Règle : *au moins un abonnement du client est dans un statut actif ET contient un prix ou un
-  produit Priority*. Statuts actifs par défaut : `active`, `trialing`, `past_due`
-  (`past_due` = délai de grâce pendant les relances de Stripe). `unpaid`, `incomplete`, `paused`,
-  `canceled` retirent Priority. `cancel_at_period_end` ne change rien avant la fin de période :
+  produit Priority*. Statuts actifs par défaut : `active`, `trialing`. `past_due` (paiement
+  échoué, relances de Stripe en cours) **retire** Priority aussitôt (décision du 21/10/2026, voir §10),
+  comme `unpaid`, `incomplete`, `paused` et `canceled` ; l'organisation d'origine est restaurée. Quand
+  le paiement aboutit et que Stripe repasse l'abonnement en `active`, Priority est de nouveau accordé
+  (et l'organisation d'origine, restaurée entre-temps, est mémorisée de nouveau). Les tickets ouverts
+  pendant la période `past_due` n'ont pas le SLA Priority (le SLA est fixé à la création, §2). Le
+  réglage `STRIPE_SYNC_ACTIVE_STATUSES` permet de rétablir l'ancien comportement. `cancel_at_period_end` ne change rien avant la fin de période :
   Stripe envoie `customer.subscription.deleted` à l'échéance.
 - Identification de l'abonnement Priority : ids de prix (`price_…`) et/ou de produit
   (`prod_…`) configurés. Sans configuration, les événements d'abonnement répondent 503 plutôt
@@ -308,6 +313,52 @@ défaut du filtre (support inclus). Rien n'est supprimé.
 - Sauvegarde/restauration de la base : l'état (`cus:…`, `evt:…`) suit la base. Après une restauration, rejouer les
   événements récents depuis Stripe.
 - Désinstaller le plugin laisse les lignes `stripesync` dans `ost_config` (inoffensif).
+
+### 5.10 Données exposées à d'autres modules
+
+Pour chaque abonnement Priority, le plugin écrit une ligne dans `ost_config` (`CONFIG_TABLE`) que
+d'autres modules lisent en SQL. Premier lecteur : le comptage des dépassements de SLA par client et par
+période d'abonnement (date anniversaire, issue #1). **Contrat d'interface fixe** :
+
+| Colonne | Valeur |
+|---|---|
+| `namespace` | `stripesync` |
+| `key` | `sub:<subscription_id>` (ex. `sub:sub_1Abc…`) ; au-delà de 64 caractères, `sub:` + `sha1(id)`, comme les clés `evt:` (en pratique les ids Stripe tiennent) |
+| `value` | `<user_id osTicket>\|<start_date>\|<ended>\|<status>` |
+
+- `start_date` : champ `start_date` de l'objet Subscription Stripe (secondes epoch UTC), date du tout
+  premier démarrage et **non** de la période courante. Un renouvellement ne la change pas : la première
+  valeur reçue est conservée.
+- `ended` : secondes epoch UTC de la fin (`ended_at`, sinon `canceled_at`, sinon l'heure de
+  l'événement) ; chaîne vide tant que l'abonnement est en cours (une annulation programmée en fin de
+  période, `cancel_at_period_end`, n'est pas une fin). Si l'abonnement passe sur un prix non Priority,
+  `ended` vaut l'heure de cet événement.
+- `status` : statut Stripe tel que reçu (`active`, `trialing`, `past_due`, `unpaid`, `canceled`,
+  `incomplete_expired`…), `canceled` pour `customer.subscription.deleted`.
+- Pas de JSON, séparateur `|`, aucun espace. Exemples : `42|1690000000||active` ;
+  `42|1690000000|1760000000|canceled`.
+
+Règles :
+
+- Écrite sur `customer.subscription.created/updated/deleted` pour les abonnements dont le prix ou le
+  produit est Priority, **quel que soit le statut** (un `past_due` écrit `past_due`), avec le `user_id` du
+  client, sous le verrou par client, de façon idempotente (valeur identique : aucune écriture).
+- Écart avec l'énoncé initial : l'objet `checkout.session.completed` ne porte ni prix, ni `start_date`,
+  ni statut d'abonnement (seulement son id) ; la donnée vient donc toujours de l'événement
+  d'abonnement. Si celui-ci arrive avant que le client soit connu (§5.4), la ligne est écrite dès que
+  `checkout.session.completed` (ou `invoice.paid`) fournit l'e-mail.
+- Aucune ligne pour un abonnement non Priority. La ligne d'un abonnement terminé est conservée
+  (historique) ; seuls les marqueurs `evt:` sont purgés.
+- Si le client change d'e-mail, le `user_id` est mis à jour. Sans `start_date` dans l'événement, aucune
+  ligne n'est écrite (avertissement au journal système).
+- Lecture (l'identifiant d'abonnement est la partie après `sub:`) :
+
+  ```sql
+  SELECT `key`, `value` FROM ost_config
+   WHERE `namespace` = 'stripesync' AND `key` LIKE 'sub:%';
+  ```
+- Après une restauration de la base ou un nouveau déploiement, rejouer les événements récents depuis
+  Stripe reconstitue les lignes (§5.9).
 
 ## 6. Mise en place
 
@@ -356,15 +407,20 @@ README du dossier), puis relire le changelog pour ces symboles.
 
 **Exécuté** (conteneurs Docker, sans réseau externe) :
 
-- 81 tests unitaires (`contrib/stripe-sync/tests/run.php`, PHP 8.4) : signature, réglages, mapping, règles
-  métier avec doublures. Une mutation volontaire du code (comparaison de signature, garde d'ordre) fait échouer les tests concernés.
+- 129 tests unitaires (`contrib/stripe-sync/tests/run.php`, PHP 8.4) : signature, réglages, mapping, règles
+  métier avec doublures, dont `past_due` (retrait puis retour en `active`) et les lignes `sub:` (format exact,
+  `start_date` inchangé au renouvellement, `ended` à l'annulation, abonnement non Priority sans ligne, rejeu
+  idempotent). Une mutation volontaire du code (comparaison de signature, garde d'ordre, statut `past_due`
+  par défaut, conservation de `start_date`) fait échouer les tests concernés.
 - La suite statique d'osTicket (`php setup/test/run-tests.php`, PHP 8.4) ne signale aucun échec sur les nouveaux fichiers
   (le binaire `jsl` du test JavaScript est absent du conteneur).
 - Intégration : osTicket 1.18.4 installé par l'assistant sur PHP 8.2 + Apache + MariaDB 11.4,
-  plugin installé via `PluginManager::install` et `addInstance`. 39 contrôles (répétés 10 fois) +
-  11 contrôles de concurrence : signature (absente, fausse, vieille), achat → utilisateur +
+  plugin installé via `PluginManager::install` et `addInstance`. 59 contrôles + 12 contrôles de concurrence
+  (la version précédente : 39 contrôles répétés 10 fois + 11 ; la nouvelle n'a été exécutée qu'une fois) : signature (absente, fausse, vieille), achat → utilisateur +
   compte non confirmé + e-mail avec lien, rejeu, lien de confirmation → session et compte confirmé,
-  abonnement → organisation, **création d'un ticket par l'API et filtre « Organisation / Nom = Priority » → plan SLA 4 h**,
+  abonnement → organisation, `past_due` → retrait de Priority puis retour en `active` → Priority de nouveau
+  (SLA du ticket vérifié dans les deux états), lignes `sub:` lues en SQL (format, renouvellement, annulation,
+  abonnement non Priority, rejeu, abonnement différé, identifiant trop long), **création d'un ticket par l'API et filtre « Organisation / Nom = Priority » → plan SLA 4 h**,
   fin d'abonnement → retour au support inclus, restauration de l'organisation d'origine, événements hors ordre, différés,
   organisation non sûre refusée puis rejeu, 8 requêtes simultanées, relance d'invitation limitée, compte verrouillé,
   secret absent (503), corps trop gros (413), aucune adresse e-mail dans le journal système.
@@ -384,7 +440,9 @@ README du dossier), puis relire le changelog pour ces symboles.
 
 1. Quels ids de prix/produit désignent Priority Support ? Les licences sont-elles des paiements uniques ou des abonnements ?
 2. Tout achat payé donne-t-il un accès au portail, ou seulement certains produits (licences) ?
-3. `past_due` garde-t-il Priority (hypothèse actuelle : oui, pendant les relances Stripe) ?
+3. ~~`past_due` garde-t-il Priority ?~~ **Décidé le 21/10/2026 : non.** Un abonnement `past_due` perd
+   l'organisation Priority (organisation d'origine restaurée) et la retrouve quand Stripe le repasse en
+   `active` après paiement (§5.6). Conséquence assumée : un ticket ouvert pendant les relances n'a pas le SLA Priority.
 4. Les clients sont-ils déjà rangés dans des organisations d'entreprise utiles (partage de tickets) ? Une seule organisation par utilisateur impose le retour à l'organisation d'origine ; une alternative est un champ personnalisé « Support » sur l'utilisateur, au prix d'un couplage plus fort.
 5. Durée de validité du lien d'invitation : garder 30 min avec renvoi, ou passer `pw_reset_window` à 24 h ou plus ?
 6. Reprise des clients existants (avant la mise en service) : script de rattrapage à partir d'un export Stripe ?

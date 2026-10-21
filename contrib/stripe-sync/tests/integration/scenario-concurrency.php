@@ -31,7 +31,7 @@ ok(!array_diff($codes, array(200, 503)), 'losers got 200 (duplicate) or 503 (ret
 
 // (a2) parallel different events for the same customer (subscription + invoice.paid)
 $now = time();
-$sub = function ($id, $st, $ts) { return ev($id, 'customer.subscription.updated', array('id' => 'sub_R1', 'customer' => 'cus_R1', 'status' => $st, 'items' => array('data' => array(array('price' => array('id' => 'price_prio', 'product' => 'prod_x'))))), $ts); };
+$sub = function ($id, $st, $ts) { return ev($id, 'customer.subscription.updated', array('id' => 'sub_R1', 'customer' => 'cus_R1', 'status' => $st, 'start_date' => 1690000000, 'items' => array('data' => array(array('price' => array('id' => 'price_prio', 'product' => 'prod_x'))))), $ts); };
 $mh = curl_multi_init(); $hs = array();
 foreach (array($sub('evt_r010', 'active', $now), $sub('evt_r011', 'past_due', $now + 1), $sub('evt_r012', 'active', $now + 2)) as $b) { $h = req($base, $b, $secret); curl_multi_add_handle($mh, $h); $hs[] = $h; }
 do { curl_multi_exec($mh, $run); curl_multi_select($mh); } while ($run);
@@ -41,6 +41,10 @@ $org = one("SELECT o.name FROM ".USER_TABLE." u JOIN ".USER_EMAIL_TABLE." e ON e
 ok($org == 'Priority', 'parallel events for one customer converge to Priority');
 $st = json_decode(one("SELECT value FROM ".CONFIG_TABLE." WHERE namespace='stripesync' AND `key`='cus:cus_R1'"), true);
 ok($st['subs']['sub_R1']['ts'] == $now + 2, 'latest event wins in the stored state');
+$uidR = one("SELECT user_id FROM ".USER_EMAIL_TABLE." WHERE address='race@example.com'");
+ok(one("SELECT COUNT(*) FROM ".CONFIG_TABLE." WHERE namespace='stripesync' AND `key` LIKE 'sub:%'") == 1
+    && one("SELECT value FROM ".CONFIG_TABLE." WHERE namespace='stripesync' AND `key`='sub:sub_R1'") === "$uidR|1690000000||active",
+    'parallel events: a single sub:sub_R1 row, converged to the latest status');
 
 // (b) unconfirmed account whose link expired: renewal re-sends an invitation, but only after the delay
 $m = count(glob('/tmp/mail-*.eml'));

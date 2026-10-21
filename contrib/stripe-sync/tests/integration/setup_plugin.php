@@ -16,7 +16,7 @@ $errors = array();
 $i = $p->addInstance(array(
     'name' => 'Stripe sync', 'isactive' => 1, 'notes' => '',
     'org_name' => 'Priority', 'price_ids' => 'price_prio', 'product_ids' => '',
-    'active_statuses' => 'active, trialing, past_due', 'accept_test' => '1',
+    'active_statuses' => 'active, trialing', 'accept_test' => '1',
 ), $errors);
 if (!$i || $errors) {
     echo "plugin instance failed: " . json_encode($errors) . "\n";

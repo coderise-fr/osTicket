@@ -10,6 +10,19 @@
 
       evt:<event id>   idempotency marker ('p:<time>' in progress, 'done')
       cus:<cus id>     JSON state of a Stripe customer
+      sub:<sub id>     record of a Priority subscription, read by OTHER modules
+
+    The `sub:` rows are a published interface (documented in
+    docs/stripe-integration.md and in the README, "Donnees exposees a
+    d'autres modules"): namespace `stripesync`, key `sub:<subscription id>`
+    (sha1 of the id if the key would exceed 64 characters), value
+
+        <osTicket user id>|<start_date>|<ended>|<status>
+
+    start_date = `start_date` of the Stripe subscription (epoch UTC,
+    seconds, first start, not the current period), ended = epoch UTC of
+    the end or empty while it runs, status = Stripe status. No JSON, no
+    space. Do not change this format without updating its readers.
 
     Per customer exclusion uses a MySQL/MariaDB advisory lock
     (GET_LOCK), released automatically if the connection drops.
@@ -44,6 +57,11 @@ class StripeSyncDbStore implements StripeSyncStore {
     private function evKey($eventId) {
         $k = 'evt:' . $eventId;
         return strlen($k) <= 64 ? $k : 'evt:' . sha1($eventId);
+    }
+
+    private function subKey($subscriptionId) {
+        $k = 'sub:' . $subscriptionId;
+        return strlen($k) <= 64 ? $k : 'sub:' . sha1($subscriptionId);
     }
 
     private function row($key) {
@@ -131,6 +149,18 @@ class StripeSyncDbStore implements StripeSyncStore {
     function putCustomer($customerId, array $state) {
         if (!$this->put('cus:' . $customerId, json_encode($state)))
             throw new StripeSyncRetryableError('Unable to save the customer state');
+        return true;
+    }
+
+    // --- subscriptions (published to other modules) ------------------------
+
+    function putSubscription($subscriptionId, $value) {
+        $key = $this->subKey($subscriptionId);
+        // Same value: leave the row (and its `updated`) untouched.
+        if ($this->row($key) === (string) $value)
+            return true;
+        if (!$this->put($key, (string) $value))
+            throw new StripeSyncRetryableError('Unable to save the subscription record');
         return true;
     }
 
