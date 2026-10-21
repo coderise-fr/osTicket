@@ -32,12 +32,13 @@ if command -v cygpath >/dev/null 2>&1; then lp() { cygpath -w "$1"; }; else lp()
 HERE=$(cd "$(dirname "$0")" && pwd)
 PHP_IMAGE=${OST_PHP_IMAGE:-wordpress:php8.2-apache}
 DB_IMAGE=${OST_DB_IMAGE:-mariadb:11.4}
-P=ostsync-$$
+rand() { od -An -N12 -tx1 /dev/urandom | tr -d ' \n'; }
+# Unique names (random suffix): several runs, or other Docker users, never clash.
+P=ostsync-$$-$(rand | cut -c1-8)
 WEB=$P-web
 DB=$P-db
 NET=$P-net
 TMP=$(mktemp -d)
-rand() { od -An -N12 -tx1 /dev/urandom | tr -d ' \n'; }
 DBPASS=$(rand)
 ROOTPASS=$(rand)
 WHSEC=whsec_$(rand)
