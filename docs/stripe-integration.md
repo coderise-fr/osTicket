@@ -407,15 +407,20 @@ README du dossier), puis relire le changelog pour ces symboles.
 
 **Exécuté** (conteneurs Docker, sans réseau externe) :
 
-- 81 tests unitaires (`contrib/stripe-sync/tests/run.php`, PHP 8.4) : signature, réglages, mapping, règles
-  métier avec doublures. Une mutation volontaire du code (comparaison de signature, garde d'ordre) fait échouer les tests concernés.
+- 129 tests unitaires (`contrib/stripe-sync/tests/run.php`, PHP 8.4) : signature, réglages, mapping, règles
+  métier avec doublures, dont `past_due` (retrait puis retour en `active`) et les lignes `sub:` (format exact,
+  `start_date` inchangé au renouvellement, `ended` à l'annulation, abonnement non Priority sans ligne, rejeu
+  idempotent). Une mutation volontaire du code (comparaison de signature, garde d'ordre, statut `past_due`
+  par défaut, conservation de `start_date`) fait échouer les tests concernés.
 - La suite statique d'osTicket (`php setup/test/run-tests.php`, PHP 8.4) ne signale aucun échec sur les nouveaux fichiers
   (le binaire `jsl` du test JavaScript est absent du conteneur).
 - Intégration : osTicket 1.18.4 installé par l'assistant sur PHP 8.2 + Apache + MariaDB 11.4,
-  plugin installé via `PluginManager::install` et `addInstance`. 39 contrôles (répétés 10 fois) +
-  11 contrôles de concurrence : signature (absente, fausse, vieille), achat → utilisateur +
+  plugin installé via `PluginManager::install` et `addInstance`. 59 contrôles + 12 contrôles de concurrence
+  (la version précédente : 39 contrôles répétés 10 fois + 11 ; la nouvelle n'a été exécutée qu'une fois) : signature (absente, fausse, vieille), achat → utilisateur +
   compte non confirmé + e-mail avec lien, rejeu, lien de confirmation → session et compte confirmé,
-  abonnement → organisation, **création d'un ticket par l'API et filtre « Organisation / Nom = Priority » → plan SLA 4 h**,
+  abonnement → organisation, `past_due` → retrait de Priority puis retour en `active` → Priority de nouveau
+  (SLA du ticket vérifié dans les deux états), lignes `sub:` lues en SQL (format, renouvellement, annulation,
+  abonnement non Priority, rejeu, abonnement différé, identifiant trop long), **création d'un ticket par l'API et filtre « Organisation / Nom = Priority » → plan SLA 4 h**,
   fin d'abonnement → retour au support inclus, restauration de l'organisation d'origine, événements hors ordre, différés,
   organisation non sûre refusée puis rejeu, 8 requêtes simultanées, relance d'invitation limitée, compte verrouillé,
   secret absent (503), corps trop gros (413), aucune adresse e-mail dans le journal système.
