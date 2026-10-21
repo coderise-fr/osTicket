@@ -59,13 +59,53 @@ function age($ticket_id, $heures, $grace = 4) {
         . ' est_duedate = IF(est_duedate IS NULL, NULL, NOW() - INTERVAL ' . (int) $heures . ' HOUR + INTERVAL ' . (int) $grace . ' HOUR)'
         . ' WHERE ticket_id=' . (int) $ticket_id);
 }
-function agent_reply($ticket, $text = 'Réponse agent') {
+// Réponse d'un agent. $to = valeur du choix « Répondre à » : 'user' (propriétaire),
+// 'all' (propriétaire + collaborateurs actifs), 'collabs' (collaborateurs seuls,
+// non proposé par l'interface) ou 'none' (« Ne pas envoyer d'e-mail »).
+// L'envoi réel est désactivé ($alert = false) : la liste des destinataires est
+// quand même calculée et enregistrée par postReply(), c'est ce que le plugin
+// et le SQL lisent.
+function agent_reply($ticket, $text = 'Réponse agent', $to = 'user') {
     global $thisstaff;
     $thisstaff = Staff::lookup(1);
     $errors = array();
-    $r = $ticket->postReply(array('response' => $text, 'reply-to' => 'none'), $errors, false);
+    $r = $ticket->postReply(array('response' => $text, 'reply-to' => $to), $errors, false);
     if (!$r) { echo "reply failed: " . print_r($errors, true) . "\n"; exit(2); }
     return $r;
+}
+// Ligne brute d'une entrée du fil (flags, recipients) relue en base.
+function entry_row($entry_id) {
+    return db_fetch_array(db_query('SELECT id, type, staff_id, flags, poster, recipients, created FROM '
+        . THREAD_ENTRY_TABLE . ' WHERE id=' . (int) $entry_id));
+}
+// Ajoute un collaborateur actif au ticket.
+function add_collab($ticket, $email, $name = 'Collab') {
+    $user = User::fromVars(array('name' => $name, 'email' => $email));
+    $errors = array();
+    $c = $ticket->addCollaborator($user, array('isactive' => 1), $errors, false);
+    if (!$c) { echo "collab failed: " . print_r($errors, true) . "\n"; exit(2); }
+    return $c;
+}
+// Ticket d'un client identifié par son e-mail (même e-mail = même utilisateur).
+function client_ticket($email, $name, $sla_id, $subject) {
+    $errors = array();
+    $t = Ticket::create(array(
+        'name' => $name, 'email' => $email,
+        'subject' => $subject, 'message' => "Bonjour $name",
+        'slaId' => $sla_id, 'ip' => '127.0.0.1', 'source' => 'API',
+    ), $errors, 'API', false, false);
+    if (!$t) { echo "create failed: " . print_r($errors, true) . "\n"; exit(2); }
+    return $t;
+}
+// Fixe la date de création du ticket (et de son message initial).
+function set_created($ticket_id, $datetime) {
+    db_query('UPDATE ' . TICKET_TABLE . " SET created='$datetime' WHERE ticket_id=" . (int) $ticket_id);
+    db_query('UPDATE ' . THREAD_ENTRY_TABLE . " SET created='$datetime' WHERE type='M' AND thread_id="
+        . '(SELECT id FROM ' . THREAD_TABLE . " WHERE object_type='T' AND object_id=" . (int) $ticket_id . ')');
+}
+// Fixe la date d'une entrée du fil.
+function set_entry_created($entry_id, $datetime) {
+    db_query('UPDATE ' . THREAD_ENTRY_TABLE . " SET created='$datetime' WHERE id=" . (int) $entry_id);
 }
 function reload($id) {
     return Ticket::lookup($id);

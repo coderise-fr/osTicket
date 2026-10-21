@@ -12,11 +12,11 @@
 **********************************************************************/
 return array(
     'id' => 'coderise:sla-first-response',
-    'version' => '0.1',
+    'version' => '0.2',
     'name' => 'SLA : première réponse',
     'author' => 'Coderise',
     'description' => 'Fait du plan de SLA un délai de première réponse : '
-        . 'à la première réponse d\'un agent, le ticket passe sur un plan '
+        . 'à la première réponse d\'un agent adressée au client, le ticket passe sur un plan '
         . 'de SLA désactivé, ce qui supprime l\'échéance et le statut '
         . '« en retard ».',
     'url' => 'https://github.com/coderise-fr/osTicket',

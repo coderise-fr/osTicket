@@ -102,5 +102,65 @@ $r = $t->postReply(array('response' => 'Réponse envoyée', 'reply-to' => 'user'
 $e = db_fetch_array(db_query('SELECT flags FROM ' . THREAD_ENTRY_TABLE . ' WHERE id=' . (int) $r->getId()));
 check('flags & 0x200 (REPLY_USER) posé', ($e['flags'] & 0x200) != 0, $e['flags']);
 check('bascule du plan', fresh($id6)['sla_id'] == $done);
+$rec = json_decode($e2 = db_result(db_query('SELECT recipients FROM ' . THREAD_ENTRY_TABLE . ' WHERE id=' . (int) $r->getId())), true);
+check('recipients JSON : le client est dans "to"', !empty($rec['to']) && empty($rec['cc']), (string) $e2);
+
+echo "== P7 : réponse SANS e-mail au client (« Ne pas envoyer d'e-mail ») : n'arrête PAS le chronomètre\n";
+$t = new_ticket('P7', $watch); $id7 = $t->getId();
+$r1 = agent_reply($t, 'Réponse enregistrée sans e-mail', 'none');
+$row = entry_row($r1->getId());
+check('entrée R d\'un agent, sans destinataires ni indicateur REPLY', $row['type'] == 'R' && $row['staff_id'] > 0
+    && $row['recipients'] === null && ($row['flags'] & 0x300) == 0, json_encode($row));
+$f = fresh($id7);
+check('plan inchangé, échéance conservée', $f['sla_id'] == $watch && $f['est_duedate'] !== null, json_encode($f));
+check('(cœur) onResponse a quand même posé isanswered = 1', $f['isanswered'] == 1);
+age($id7, 5);
+Ticket::checkOverdue();
+check('cron à +5 h : le ticket est EN RETARD (réponse sans e-mail non comptée)', fresh($id7)['isoverdue'] == 1 && nb_overdue_events($id7) == 1);
+$t = reload($id7);
+$r2 = agent_reply($t, 'Cette fois par e-mail', 'user');
+$f = fresh($id7);
+check('la réponse suivante AVEC e-mail arrête : sla=done, échéance null, retard effacé',
+    $f['sla_id'] == $done && $f['est_duedate'] === null && $f['isoverdue'] == 0, json_encode($f));
+check('l\'entrée porte le client dans "to"', SlaFirstResponsePlugin::isClientReply(ThreadEntry::lookup($r2->getId())));
+check('l\'entrée sans e-mail n\'est pas une réponse client', !SlaFirstResponsePlugin::isClientReply(ThreadEntry::lookup($r1->getId())));
+
+echo "== P8 : « Tous les destinataires actifs » avec un collaborateur : le client est dans \"to\"\n";
+$t = new_ticket('P8', $watch); $id8 = $t->getId();
+add_collab($t, 'collab-p8@example.com', 'Collab P8');
+$t = reload($id8);
+$r = agent_reply($t, 'Pour tous', 'all');
+$row = entry_row($r->getId());
+$rec = json_decode($row['recipients'], true);
+check('to = client, cc = collaborateur, flag REPLY_ALL (0x100)', !empty($rec['to']) && !empty($rec['cc']) && ($row['flags'] & 0x100), json_encode($row));
+check('bascule du plan', fresh($id8)['sla_id'] == $done);
+
+echo "== P9 : collaborateurs SEULS (choix absent de l'interface) : le client n'est pas prévenu, n'arrête pas\n";
+$t = new_ticket('P9', $watch); $id9 = $t->getId();
+add_collab($t, 'collab-p9@example.com', 'Collab P9');
+$t = reload($id9);
+$r = agent_reply($t, 'Aux collaborateurs seuls', 'collabs');
+$row = entry_row($r->getId());
+$rec = json_decode($row['recipients'], true);
+check('cc seul, pas de "to"', empty($rec['to']) && !empty($rec['cc']), json_encode($row));
+check('(constat) l\'indicateur REPLY_USER est pourtant posé : il ne suffit pas comme critère', ($row['flags'] & 0x200) != 0, $row['flags']);
+check('plan inchangé', fresh($id9)['sla_id'] == $watch && fresh($id9)['est_duedate'] !== null);
+$t = reload($id9);
+agent_reply($t, 'Au client', 'user');
+check('puis réponse au client : bascule', fresh($id9)['sla_id'] == $done);
+
+echo "== P9b : collaborateurs seuls alors qu'il n'y en a aucun : aucune liste, n'arrête pas\n";
+$t = new_ticket('P9b', $watch); $id9b = $t->getId();
+$r = agent_reply($t, 'Personne', 'collabs');
+$row = entry_row($r->getId());
+check('aucune liste de destinataires', $row['recipients'] === null && ($row['flags'] & 0x300) == 0, json_encode($row));
+check('plan inchangé', fresh($id9b)['sla_id'] == $watch);
+
+echo "== P10 : deux réponses sans e-mail de suite : toujours pas d'arrêt\n";
+$t = new_ticket('P10', $watch); $id10 = $t->getId();
+agent_reply($t, 'a', 'none');
+$t = reload($id10);
+agent_reply($t, 'b', 'none');
+check('deux réponses sans e-mail : plan inchangé', fresh($id10)['sla_id'] == $watch && fresh($id10)['est_duedate'] !== null);
 
 echo "\nPhase 2b : " . ($nfail ? $nfail . " échec(s)" : 'tout est conforme aux attentes') . "\n";
