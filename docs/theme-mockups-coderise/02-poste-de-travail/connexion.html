@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexion | Support Coderise</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000F26">
+<link rel="icon" href="../_shared/img/favicon-64.png" type="image/png">
+<link rel="stylesheet" href="../_shared/fonts.css">
+<link rel="stylesheet" href="../_shared/tokens.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body class="p02 auth">
+<a class="mockup-back" href="../index.html">Retour à la comparaison des maquettes</a>
+<a class="skip" href="#content">Aller au contenu</a>
+<header class="auth-bar on-dark"><a class="brand" href="index.html" aria-label="Coderise : accueil du support"><img class="logo" src="../_shared/img/logo-horizontal-sombre.png" width="2041" height="345" alt="Coderise"></a><a class="btn btn-line-dark" href="base-de-connaissances.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 5a2 2 0 0 1 2-2h12v15H7a2 2 0 0 0-2 2z"/><path d="M5 20a1 1 0 0 0 1 1h13v-3"/></svg><span>Base de connaissances</span></a></header>
+<main id="content" class="auth-main"><div class="auth-grid"><section class="panel"><header class="panel-h"><h1>Connexion</h1></header><div class="pad">
+<div class="form-errors" role="alert"><h2><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4 3 19.500h18z"/><path d="M12 10v4.500M12 17.200h.01"/></svg> Connexion impossible</h2><p>Adresse e-mail ou mot de passe incorrect. Vérifiez-les ou demandez un lien de connexion.</p></div>
+<form id="loginForm" method="post" action="login.php" novalidate><div class="field  ">
+<label for="luser">E-mail <span class="req" aria-hidden="true">*</span></label>
+<div class="control"><input type="email" id="luser" name="luser" required aria-required="true" value="lea.marchand@maison-verdier.fr"></div>
+</div><div class="field has-error ">
+<label for="lpasswd">Mot de passe <span class="req" aria-hidden="true">*</span></label>
+<div class="control"><input type="password" id="lpasswd" name="lpasswd" required aria-required="true" aria-invalid="true" aria-describedby="lpasswd-err" value=""><p class="error" id="lpasswd-err"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4 3 19.500h18z"/><path d="M12 10v4.500M12 17.200h.01"/></svg><span>Le mot de passe est incorrect.</span></p></div>
+</div>
+<div class="form-actions"><button class="btn btn-primary" type="submit">Se connecter</button><a href="#">Mot de passe oublié&nbsp;?</a></div></form>
+<p class="after">Pas de compte&nbsp;? <a href="inscription.html">Créer un compte</a></p></div></section>
+<section class="panel"><header class="panel-h"><h2>Suivre un ticket sans compte</h2></header><div class="pad"><p>Saisissez votre e-mail et le numéro reçu dans l'e-mail de confirmation.</p><form method="post" action="login.php" novalidate><div class="field  ">
+<label for="lemail">E-mail <span class="req" aria-hidden="true">*</span></label>
+<div class="control"><input type="email" id="lemail" name="lemail" required aria-required="true" value=""></div>
+</div><div class="field  ">
+<label for="lticket">N° de ticket <span class="req" aria-hidden="true">*</span></label>
+<div class="control"><input type="text" id="lticket" name="lticket" required aria-required="true" placeholder="260418" value=""></div>
+</div><div class="form-actions"><button class="btn btn-line" type="submit">Voir le ticket</button></div></form></div></section></div></main>
+<footer class="auth-foot"><p class="small"><a href="mailto:contact@coderise.fr">contact@coderise.fr</a> · +33 (0)6 69 93 92 86 · Support standard&nbsp;: jours ouvrés&nbsp;; Priority&nbsp;: 24&nbsp;h/24. © 2026 Coderise, propulsé par <a href="https://osticket.com">osTicket</a>.</p></footer>
+</body>
+</html>

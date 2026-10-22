@@ -1,0 +1,59 @@
+/* Charte Coderise v1.0 (juin 2026) : jetons communs aux 5 propositions. */
+:root {
+  /* Couleurs de marque */
+  --nuit: #000F26;       /* dominant : fonds, titres, logotype, texte */
+  --cyan: #10C9DE;       /* accent : pictos, soulignages, aplats, éléments interactifs. Jamais de texte cyan sur blanc */
+  --blanc: #FFFFFF;
+  /* Couleurs de support */
+  --cyan-profond: #0A7C8C; /* texte et liens cyan sur fond blanc (4,9:1) */
+  --ardoise: #5B6675;      /* texte secondaire */
+  --gris: #E8ECF1;         /* fonds de sections, lignes de tableau, séparateurs */
+  --voile: #E3F8FB;        /* fonds teintés, encadrés */
+  /* États : EXTENSION À VALIDER, la charte n'en définit pas */
+  --erreur: #B3261E;  --erreur-fond: #FCECEA;
+  --succes: #0F6B4B;  --succes-fond: #E4F5EC;
+  --alerte: #7A4B00;  --alerte-fond: #FFF3D1;
+  /* Polices : Montserrat (titres), Inter (texte), Arial en substitut universel */
+  --f-titre: "Montserrat", Arial, sans-serif;
+  --f-texte: "Inter", Arial, sans-serif;
+  --f-code: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; /* extension à valider : la charte ne prévoit pas de police de code */
+  --focus: var(--cyan-profond);
+  --x: 24px; /* X = hauteur du logo (symbole) ; zone de protection = X sur les 4 côtés */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--f-texte); font-size: 1rem; line-height: 1.6; color: var(--nuit); background: var(--blanc); font-weight: 400; }
+h1, h2, h3, h4 { font-family: var(--f-titre); color: inherit; margin: 0; line-height: 1.2; }
+h1 { font-weight: 800; }
+h2 { font-weight: 700; }
+h3, h4 { font-weight: 600; }
+p { margin: 0 0 1em; }
+img, svg { max-width: 100%; }
+a { color: var(--cyan-profond); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+ul, ol { margin: 0; padding: 0; }
+table { border-collapse: collapse; }
+code, pre { font-family: var(--f-code); font-size: .9em; }
+.ic { flex: none; vertical-align: middle; }
+small { font-size: .8125rem; }
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+.on-dark { --focus: var(--cyan); }
+
+.skip, .mockup-back { position: absolute; left: 8px; top: -80px; z-index: 100; background: var(--nuit); color: var(--blanc); padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; }
+.skip:focus, .mockup-back:focus { top: 8px; outline: 3px solid var(--cyan); }
+.mockup-back { left: auto; right: 8px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Motif « Sommet » : le chevron du symbole, jamais étiré ni incliné (rapport 409:342 conservé) */
+.sommet { display: block; aspect-ratio: 409 / 342; background: currentColor; clip-path: polygon(49.9% 0, 100% 100%, 84.1% 100%, 49.9% 29.8%, 15.9% 100%, 0 100%); }
+
+/* Signature : sous le logo, à 1X au moins, jamais dans un cadre */
+.signature { font-family: var(--f-titre); font-weight: 600; margin: 0; }
+.signature .up { color: var(--cyan); }
+.on-light .signature .up { color: var(--cyan-profond); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
