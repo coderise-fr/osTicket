@@ -15,6 +15,12 @@ return array(
     'You' => 'Vous',
     'Support team' => 'Équipe support',
     'New reply' => 'Nouvelle réponse',
+    // Contract level pill (list and ticket), read by screen readers only
+    'Contract:' => 'Contrat :',
+    // Expected first reply under the contract level (ticket side column)
+    'First reply' => 'Premier retour',
+    'Within 4 h, 24/7' => 'Sous 4 h, 24 h/24',
+    'On business days' => 'Les jours ouvrés',
     'Tips' => 'Conseils',
     'A person from the team reads every ticket.' =>
         'Une personne de l’équipe lit chaque ticket.',

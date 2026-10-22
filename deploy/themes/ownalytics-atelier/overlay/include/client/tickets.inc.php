@@ -221,6 +221,7 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
 <?php
  $subject_field = TicketForm::objects()->one()->getField('subject');
  $defaultDept=Dept::getDefaultDeptName(); //Default public dept.
+ $oa_atelier_owners = array(); // Ownalytics Atelier theme: owners of shared tickets (User, or false)
  if ($tickets->exists(true)) { ?>
     <ul class="tlist" aria-describedby="ticket-count">
 <?php
@@ -258,6 +259,21 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
                 <span class="pill pill-new"><?php echo __oa('New reply'); ?></span>
 <?php } ?>
                 <span class="pill pill-<?php echo $is_open ? 'open' : 'closed'; ?>"><?php echo $status; ?></span>
+<?php
+                // Contract level of the ticket's OWNER (current level, from
+                // the sla-first-response plugin; nothing without it). Own
+                // tickets: the signed-in client. Shared tickets: one lookup
+                // per distinct owner (then cached by oa_atelier_contract()).
+                if (function_exists('coderise_contract_level')) {
+                    if (!$isCollab)
+                        $oa_atelier_owner = null;
+                    elseif (!isset($oa_atelier_owners[$T['user_id']]))
+                        $oa_atelier_owner = $oa_atelier_owners[$T['user_id']]
+                            = (User::lookup((int) $T['user_id']) ?: false);
+                    else
+                        $oa_atelier_owner = $oa_atelier_owners[$T['user_id']];
+                    echo oa_atelier_contract_badge(oa_atelier_contract($oa_atelier_owner));
+                } ?>
                 <i class="chev icon-chevron-right" aria-hidden="true"></i>
             </span>
         </a>

@@ -1,0 +1,117 @@
+{
+ "lea-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "lea-suivi-sans-reponse-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "hugo-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "nina-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "marc-invite-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "zoe-invitee-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "lea-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "lea-suivi-sans-reponse-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "hugo-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "nina-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "marc-invite-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "zoe-invitee-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [],
+  "pillCount": 0,
+  "firstReply": null
+ },
+ "requetes-desactive": {
+  "ouverts-25": 34,
+  "ouverts-31": 33,
+  "fermes-7": 33,
+  "suivi": 48,
+  "hugo": 33
+ }
+}

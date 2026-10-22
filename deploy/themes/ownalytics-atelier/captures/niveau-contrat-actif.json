@@ -1,0 +1,577 @@
+{
+ "lea-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 25,
+  "firstReply": null
+ },
+ "lea-liste-p2-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 7,
+  "firstReply": null
+ },
+ "lea-fermes-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 7,
+  "firstReply": null
+ },
+ "lea-suivi-sans-reponse-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "Within 4 h, 24/7"
+ },
+ "lea-suivi-repondu-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-suivi-reponse-envoyee-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-suivi-ferme-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-collab-hugo-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "hugo-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   }
+  ],
+  "pillCount": 4,
+  "firstReply": null
+ },
+ "hugo-suivi-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "nina-liste-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   }
+  ],
+  "pillCount": 2,
+  "firstReply": null
+ },
+ "marc-invite-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "Within 4 h, 24/7"
+ },
+ "zoe-invitee-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "lea-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 25,
+  "firstReply": null
+ },
+ "lea-liste-p2-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 7,
+  "firstReply": null
+ },
+ "lea-fermes-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   },
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 7,
+  "firstReply": null
+ },
+ "lea-suivi-sans-reponse-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "Within 4 h, 24/7"
+ },
+ "lea-suivi-repondu-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-suivi-reponse-envoyee-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-suivi-ferme-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": null
+ },
+ "lea-collab-hugo-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "hugo-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   }
+  ],
+  "pillCount": 4,
+  "firstReply": null
+ },
+ "hugo-suivi-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "nina-liste-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   },
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 6.64,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(255,255,255)"
+   }
+  ],
+  "pillCount": 2,
+  "firstReply": null
+ },
+ "marc-invite-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Priority",
+    "cls": "pill pill-contract pill-priority",
+    "ratio": 9.7,
+    "fg": "rgb(255, 210, 63)",
+    "bg": "rgb(59,30,84)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "Within 4 h, 24/7"
+ },
+ "zoe-invitee-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": [],
+  "pills": [
+   {
+    "text": "Standard",
+    "cls": "pill pill-contract pill-standard",
+    "ratio": 5.98,
+    "fg": "rgb(95, 92, 89)",
+    "bg": "rgb(246,241,251)"
+   }
+  ],
+  "pillCount": 1,
+  "firstReply": "On business days"
+ },
+ "requetes-actif": {
+  "ouverts-25": 38,
+  "ouverts-31": 38,
+  "fermes-7": 37,
+  "suivi": 52,
+  "hugo": 39
+ }
+}

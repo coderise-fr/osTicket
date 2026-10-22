@@ -49,6 +49,11 @@ if ($thisclient && $thisclient->isGuest()
     <div class="meta">
         <span class="pill pill-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
             echo $S ? $S->getLocalName() : ''; ?></span>
+<?php
+// Contract level of the ticket's OWNER (never a collaborator), current
+// level, from the sla-first-response plugin; nothing without it.
+$oa_atelier_contract = oa_atelier_contract($ticket);
+echo oa_atelier_contract_badge($oa_atelier_contract); ?>
         <span class="muted"><i class="icon-calendar" aria-hidden="true"></i>
             <span class="visually-hidden"><?php echo __('Create Date'); ?></span>
             <?php echo Format::datetime($ticket->getCreateDate()); ?></span>
@@ -144,6 +149,15 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
                 <dd><?php echo Format::htmlchars($dept instanceof Dept ? $dept->getName() : ''); ?></dd></div>
             <div><dt><?php echo __('Create Date');?></dt>
                 <dd><?php echo Format::datetime($ticket->getCreateDate()); ?></dd></div>
+<?php
+// Expected first reply under the owner's contract level, while the ticket is
+// open and the team has never replied (no response in the thread: a later
+// message of the client clears "answered" but the first reply was made).
+// No level (no plugin, unknown level): no promise.
+if ($oa_atelier_contract && $state != 'closed' && !$ticket->getLastResponseDate()) { ?>
+            <div class="first-reply"><dt><?php echo __oa('First reply'); ?></dt>
+                <dd><?php echo Format::htmlchars(oa_atelier_contract_promise($oa_atelier_contract)); ?></dd></div>
+<?php } ?>
 <?php if ($ticket->getLastResponseDate()) { ?>
             <div><dt><?php echo __('Last Response');?></dt>
                 <dd><?php echo Format::datetime($ticket->getLastResponseDate()); ?></dd></div>
