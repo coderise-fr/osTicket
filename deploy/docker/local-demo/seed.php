@@ -419,8 +419,19 @@ function demo_tickets($DEMO) {
     );
     if (!$admin || !$agent || !$closed || !$watch || !$done || in_array(0, $topics))
         return demo_fail('configuration incomplète : relancer la phase config');
-    if ((int) demo_one('SELECT COUNT(*) FROM ' . TICKET_TABLE) > 3)
-        return demo_say('des tickets existent déjà : rien à faire');
+    if ((int) demo_one('SELECT COUNT(*) FROM ' . TICKET_TABLE) > 3) {
+        demo_say('des tickets existent déjà : rien à faire');
+        // Numéros utiles au script (credentials.txt, captures), relus en base.
+        $guest = User::lookupByEmail($D_GUEST['email']);
+        if ($guest)
+            demo_out('guest_ticket', demo_one('SELECT number FROM ' . TICKET_TABLE . ' WHERE user_id='
+                . (int) $guest->getId() . ' ORDER BY ticket_id LIMIT 1'));
+        $lea = User::lookupByEmail($D_CLIENTS['lea']['email']);
+        if ($lea)
+            demo_out('lea_priority_ticket', demo_one('SELECT number FROM ' . TICKET_TABLE . ' WHERE user_id='
+                . (int) $lea->getId() . " AND sla_id=$watch AND est_duedate > NOW() ORDER BY ticket_id LIMIT 1"));
+        return;
+    }
 
     mt_srand(2026);
     $now = time();
