@@ -24,8 +24,8 @@ Grotesque, IBM Plex Mono), pictogramme « ticket » redessiné, mentions de la m
 | Polices | `overlay/assets/atelier/fonts/` | Montserrat 600/700/800 et Inter 400/500/600, sous-ensembles latin et latin-ext, WOFF2, licence SIL OFL 1.1 (`OFL-montserrat.txt`, `OFL-inter.txt`) ; copiées de `docs/theme-mockups-coderise/_shared/fonts/` |
 | Logo | `overlay/assets/atelier/img/logo-coderise-horizontal.png` | Logo horizontal officiel détouré (PNG des maquettes, 2041 × 345, dérivé de `2.jpg`), affiché à 24 px de haut (142 px de large) dans l'en-tête et 28 px (166 px) dans le pied de page |
 | Favicon | `overlay/assets/atelier/img/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png` | Le symbole sur carré bleu nuit : `symbole-sur-bleu-nuit.svg` de `deploy/themes/_shared/coderise/` (copie à l'identique) et les PNG des maquettes |
-| Aide PHP | `overlay/include/client/atelier/atelier.inc.php` | `__a()` (chaînes du thème), initiales, icônes en ligne (SVG), motif Sommet, coordonnées de Coderise, frise d'avancement et indicateur Priority calculés sur les données du ticket |
-| Traductions du thème | `overlay/include/client/atelier/i18n/fr/LC_MESSAGES/atelier.mo.php` | Catalogue français des 31 chaînes propres au thème |
+| Aide PHP | `overlay/include/client/atelier/atelier.inc.php` | `__a()` (chaînes du thème), initiales, icônes en ligne (SVG), motif Sommet, coordonnées de Coderise, frise d'avancement et indicateur Priority calculés sur les données du ticket, pastille du niveau de contrat (`atelier_contract()`, `atelier_contract_badge()`) lue dans le plugin `sla_first_response` |
+| Traductions du thème | `overlay/include/client/atelier/i18n/fr/LC_MESSAGES/atelier.mo.php` | Catalogue français des 32 chaînes propres au thème |
 | Gabarits | `overlay/include/client/…` | 9 fichiers du cœur remplacés (liste ci-dessous) |
 
 Rien n'est servi depuis l'extérieur : polices, logo, icônes (SVG en ligne, Font Awesome local
@@ -76,8 +76,8 @@ n'a pas changé avec le passage à Coderise (9 fichiers).
 | `include/client/footer.inc.php` | Pied de page bleu nuit : logo et signature, coordonnées (contact@coderise.fr, +33 (0)6 69 93 92 86, Aix-en-Provence, horaires de l'entreprise), délais de réponse (standard : jours ouvrés ; Priority : sous 4 h, 24 h/24), pages « Autres ressources » actives et www.coderise.fr, copyright ; mêmes scripts de fin que l'original |
 | `include/client/open.inc.php` | Formulaire en cartes, colonne de conseils et questions à la une ; `#topicId` recharge toujours `#dynamic-form` en AJAX |
 | `include/client/login.inc.php` | Deux cartes : connexion et accès par e-mail + numéro de ticket (même formulaire et même cible `login.php` que `accesslink.inc.php`) |
-| `include/client/tickets.inc.php` | Tickets en cartes, onglets Ouverts/Fermés, recherche, filtre par sujet, barre de tri, pastilles de statut et « Priority », dernière étape connue (« Nouvelle réponse », « Réponse de l'équipe à venir », « Fermé le … ») ; requête d'origine plus deux colonnes lues (`sla__name`, `closed`) |
-| `include/client/view.inc.php` | Bandeau du ticket (fil d'Ariane, sujet, statut, Priority, date, actions), frise d'avancement, fil en bulles, réponse en carte, colonne : indicateur Priority, informations, coordonnées, champs personnalisés, pièces jointes, « Un point rapide ? » |
+| `include/client/tickets.inc.php` | Tickets en cartes, onglets Ouverts/Fermés, recherche, filtre par sujet, barre de tri, pastilles de statut et de niveau de contrat (Priority / Standard), dernière étape connue (« Nouvelle réponse », « Réponse de l'équipe à venir », « Fermé le … ») ; requête d'origine plus une colonne lue (`closed`) |
+| `include/client/view.inc.php` | Bandeau du ticket (fil d'Ariane, sujet, statut, niveau de contrat, date, actions), frise d'avancement, fil en bulles, réponse en carte, colonne : indicateur Priority, informations, coordonnées, champs personnalisés, pièces jointes, « Un point rapide ? » |
 | `include/client/kb-categories.inc.php` | Bandeau bleu nuit avec grande recherche et chevron cyan, filtre par sujet, catégories en cartes |
 | `include/client/templates/thread-entry.tmpl.php` | Bulles : client à droite (voile cyan), équipe à gauche (bleu nuit, avatar cerclé de cyan), rôle « Vous » / « Équipe Coderise », initiales au lieu des images distantes |
 | `include/client/templates/thread-event.tmpl.php` | Même balisage ; retire les images d'avatar des événements (Gravatar par défaut dans osTicket) |
@@ -92,7 +92,7 @@ Elles sont listées dans `WATCH.sha256`. `dynamic-form.tmpl.php` n'est pas écra
 | Élément de la maquette | Implémentation |
 |---|---|
 | Frise d'ascension du ticket (4 étapes) | **3 étapes** tirées du ticket : « Reçu » (date de création), « Première réponse » (date de la première réponse de l'équipe dans le fil ; à défaut `isanswered`), « Résolu » ou le nom du statut fermé (date de fermeture). L'étape courante est la première non faite ; sous-titres « Nous lisons votre demande », « En cours », « À venir ». Pas d'étape « Correctif en cours » : osTicket n'a pas cet état |
-| Pastille « Priority » | Affichée si le nom du plan de SLA du ticket commence par `ATELIER_PRIORITY_PREFIX` (« Priority »), dans la liste et sur le ticket. **À valider** : le client voit ainsi son niveau de contrat |
+| Pastilles « Priority » / « Standard » (liste et bandeau du ticket) | Niveau de contrat **actuel du propriétaire du ticket**, lu dans le plugin `sla_first_response` (`coderise_contract_level()`), voir « Niveau de contrat » ci-dessous. Sans le plugin : aucune pastille. Ne dépend plus du nom du plan de SLA |
 | Indicateur « premier retour sous 4 h » | Facultatif, **à valider**. Affiché seulement si le plan du ticket est **actif** et s'appelle exactement `ATELIER_PRIORITY_SLA` (« Priority 4h », le plan surveillé du plugin `contrib/sla-first-response`), que le ticket est ouvert, sans réponse (`isanswered = 0`) et que son échéance (`est_duedate`) est à venir. Barre du temps écoulé depuis la création (ou réouverture) jusqu'à l'échéance, et « Premier retour attendu au plus tard le … ». Disparaît seul à la première réponse (`isanswered`), et quand le plugin bascule le ticket sur son plan désactivé. Non affiché après l'échéance (afficher un dépassement au client est une décision ouverte). `define('ATELIER_PRIORITY_SLA', '')` le désactive |
 | « Apporté en 44 min, objectif tenu » (maquette) | Non fait : le délai réel n'est pas exposé au portail ; voir `contrib/sla-first-response/sql/` |
 | Bulle d'exemple de l'accueil (Hugo, Nora, Sacha) | Omise (équipe et échange inventés) ; la colonne droite est la carte d'actions d'osTicket (ouvrir, suivre, questions à la une) |
@@ -102,16 +102,53 @@ Elles sont listées dans `WATCH.sha256`. `dynamic-form.tmpl.php` n'est pas écra
 | Compteurs, avatar et nom de l'agent dans la liste | Omis (non exposés au client) ; icône d'état et dernière étape connue à la place |
 | Liens LinkedIn et GitHub du pied de page | Omis : adresses non confirmées ; seul www.coderise.fr est mis. À ajouter dans `footer.inc.php` si validés |
 
+## Niveau de contrat (Priority / Standard)
+
+La maquette montre une pastille de contrat sur chaque ticket de la liste (« Priority », accentuée, avec
+un éclair ; « Standard », discrète) et dans le bandeau du ticket. osTicket n'a pas cette notion : chez
+Coderise, le niveau est l'appartenance à l'organisation « Priority » (alimentée par le plugin
+`contrib/stripe-sync`). Le thème le lit dans le plugin `contrib/sla-first-response` (version 0.3 et
+suivantes), qui expose `coderise_contract_level($subject)` (README du plugin, sections 9 et 10).
+
+- **Dépendance facultative.** Le thème appelle la fonction seulement si
+  `function_exists('coderise_contract_level')`. Plugin absent de l'overlay, plugin ou instance
+  désactivés : la fonction n'existe pas, **aucune pastille** n'est affichée (jamais « Standard » par
+  défaut) et le reste du thème est inchangé, indicateur « premier retour sous 4 h » compris.
+- **Niveau inconnu = pas de pastille.** Une réponse de source `default` (organisation Priority non
+  configurée dans le plugin, utilisateur inconnu) n'est pas affichée.
+- **Qui.** Toujours le **propriétaire** du ticket, jamais un collaborateur : dans la liste, ses propres
+  tickets donnent le niveau du client connecté (`coderise_contract_level()`), un ticket partagé celui de
+  son propriétaire (`User::lookup($T['user_id'])`, une fois par propriétaire distinct) ; sur le ticket,
+  `coderise_contract_level($ticket)`, y compris pour un invité arrivé par le lien d'accès.
+- **Coût.** Une valeur par personne et par page (mémo du thème, `atelier_contract()`, en plus du cache
+  du plugin) : aucune requête par ligne. Mesuré sur la liste de 25 tickets : 1 requête de plus
+  qu'avec le plugin chargé sans pastille, 2 avec un ticket partagé d'un autre propriétaire (voir
+  « Vérifications »).
+- **Rendu.** `<span class="plan plan-priority">` (bleu nuit, texte blanc, éclair cyan : 19,2:1) ou
+  `<span class="plan plan-standard">` (gris clair, texte ardoise : 4,9:1). Libellé configuré dans le
+  plugin, échappé (`Format::htmlchars`) ; préfixe « Contrat : » (`__a('Contract:')`) lu par les
+  lecteurs d'écran seulement.
+- **Limite : niveau actuel.** C'est le niveau du propriétaire **aujourd'hui**, pas celui qu'il avait à la
+  création du ticket : à la fin d'un abonnement, ses anciens tickets passent en « Standard » (et
+  inversement). Un collègue qui écrit depuis une autre adresse est un autre utilisateur, avec son propre
+  niveau.
+- **Indicateur « premier retour sous 4 h ».** Autre information, inchangée : il dépend toujours du plan
+  de SLA actif du ticket (`ATELIER_PRIORITY_SLA`). Un client standard dont le ticket est sur ce plan voit
+  donc la pastille « Standard » et l'indicateur ; c'est le filtre de création des tickets qui décide du
+  plan.
+
 ## Chaînes et langues
 
 - Les chaînes d'osTicket passent par `__()` et sont traduites par les packs de langue officiels (le
   pack français `fr.phar` se place dans `deploy/docker/overlay/include/i18n/`).
-- Les 31 chaînes propres au thème passent par `__a()` (`_dgettext('atelier', …)`) avec un catalogue
+- Les 32 chaînes propres au thème passent par `__a()` (`_dgettext('atelier', …)`) avec un catalogue
   français fourni. Pour une autre langue : copier `i18n/fr/LC_MESSAGES/atelier.mo.php` dans
   `i18n/<code>/LC_MESSAGES/` et traduire. Le catalogue n'est pas sous `include/i18n/` exprès (sinon une
   langue de plus apparaîtrait dans osTicket).
-- Ne passent pas par la traduction : la marque, la signature (française par nature), « Priority »
-  (nom du contrat), les coordonnées.
+- Ne passent pas par la traduction du thème : la marque, la signature (française par nature), les
+  coordonnées. Les libellés « Priority » / « Standard » des pastilles sont ceux configurés dans le
+  plugin (passés par `__()` par le plugin) ; « Priority » dans les textes de l'indicateur et du pied de
+  page est le nom du contrat.
 - Ton : voix active, phrases courtes (« Nous lisons votre demande », « Un point rapide ? »).
 
 ## Installation
@@ -158,8 +195,12 @@ antérieure partent ainsi). `--force` écrase les fichiers du thème modifiés �
    copyright (« Coderise » sinon).
 5. **Plans de SLA** (indicateur Priority) : plan actif « Priority 4h » (délai 4 h, calendrier 24/7) et
    plan désactivé, non transitoire, « Priority 4h - 1re reponse faite » pour le plugin
-   `sla_first_response`. Les noms se changent dans `atelier.inc.php` (`ATELIER_PRIORITY_PREFIX`,
-   `ATELIER_PRIORITY_SLA`).
+   `sla_first_response`. Le nom du plan surveillé se change dans `atelier.inc.php`
+   (`ATELIER_PRIORITY_SLA`).
+6. **Niveau de contrat** (pastilles, facultatif) : plugin `contrib/sla-first-response/plugin/sla_first_response/`
+   copié dans `deploy/docker/overlay/include/plugins/sla_first_response/`, installé et activé (Admin >
+   Gérer > Extensions), avec une instance active dont le champ « Organisation Priority » désigne la même
+   organisation que le plugin Stripe. Sans ce réglage, aucune pastille n'est affichée.
 
 ## Désinstallation
 
@@ -249,9 +290,53 @@ piloté par `playwright-core` installé hors dépôt. Détail : `captures/parcou
 - **Apache** : les fichiers du thème sous `include/` (aide, gabarit, catalogue, manifeste) répondent
   403 ; feuille, polices (`font/woff2`), favicon et logo répondent 200.
 
+### Niveau de contrat (22/10/2026, second passage)
+
+Nouvelle instance, même recette (`git archive` du commit, `apply.sh` dans l'overlay de la copie,
+assistant web, image `runtime`), plus le plugin `contrib/sla-first-response/plugin/sla_first_response/`
+(0.3) copié dans `include/plugins/sla_first_response/` de l'overlay **de la copie** (non committé),
+installé et activé, instance active avec les plans « Priority 4h » / « Priority 4h - 1re reponse faite »
+et l'organisation « Priority ». Données : Léa (organisation Priority, 38 tickets dont 7 fermés, plans
+Priority 4h et Default SLA, 7 tickets basculés **par le plugin** sur le plan désactivé après une réponse
+adressée au client), Hugo (organisation standard), Nina (sans organisation), Marc et Zoé (organisation
+Priority, sans compte), tickets partagés dans les deux sens. Détail : `captures/niveau-contrat.txt`.
+
+- **Plugin actif**, à 1280 et 390 px, tous les contrôles passés : liste de Léa, une pastille par ligne
+  (25 + 7 en page 2, 7 fermés), « Priority » sur ses tickets quel que soit le plan (Priority 4h, Default
+  SLA, plan désactivé après bascule), « Standard » sur le ticket de Hugo dont elle est collaboratrice
+  (niveau du propriétaire) ; suivi de Léa : « Priority », indicateur présent sur le ticket sans réponse,
+  absent après bascule ; Léa sur le ticket de Hugo : « Standard » ; Hugo : « Standard » sur ses tickets
+  (y compris celui sur le plan Priority 4h, avec l'indicateur), « Priority » sur celui de Léa ; Nina :
+  « Standard » ; invité Marc (propriétaire, organisation Priority) : « Priority » ; invitée Zoé
+  (collaboratrice, elle-même dans l'organisation Priority) sur le ticket de Nina : « Standard », jamais
+  son propre niveau. Préfixe « Contract: » masqué à l'écran, présent pour les lecteurs d'écran.
+- **Plugin désactivé** (base) puis **absent de l'image** (dossier retiré de l'overlay, image
+  reconstruite, plugin toujours enregistré en base) : aucune pastille nulle part, indicateur inchangé,
+  aucune erreur.
+- **Requêtes SQL** (compteur `Questions` de MariaDB, minimum de 3 mesures, cron arrêté) : liste de
+  25 tickets de Léa 38 (plugin actif) contre 33 (désactivé) ; accueil sans pastille 30 contre 26 : le
+  chargement du plugin coûte 4 requêtes, les 25 pastilles **1**. Liste de Hugo avec un ticket d'un autre
+  propriétaire : 39 contre 33, soit 2 pour les pastilles. Suivi : 0 ou 1 de plus que le chargement.
+- **Console et réseau** : 0 erreur JavaScript, 0 réponse HTTP ≥ 400, 0 requête vers un autre hôte ;
+  journaux du conteneur sans erreur ni avertissement PHP (seul « Mailer Error » dans le journal
+  d'osTicket, pas de serveur de courrier). Aucun débordement horizontal à 390 et 1280 px.
+- **Contrastes mesurés** : « Priority » blanc sur bleu nuit 19,16:1 ; « Standard » ardoise sur gris
+  clair 4,91:1.
+- **Scripts** : `check-drift.sh` sans dérive ; `apply.sh` (simulation, installation, idempotence, refus
+  de `sommet` tant qu'Atelier est installé) puis `remove.sh` sur un export du commit : arborescence
+  identique à l'export d'origine. Suite statique `setup/test/run-tests.php` (php:8.3-cli) : 0 échec.
+- **Captures remplacées** : `mes-tickets-*`, `mes-tickets-page-2-*`, `mes-tickets-fermes-*`,
+  `suivi-ticket-*`, `suivi-ticket-priority-*`, `suivi-ticket-ferme-*`, `suivi-invite-*` ; nouvelles :
+  `niveau-collaborateur-standard-*`, `niveau-standard-liste-*`, `niveau-standard-suivi-*`,
+  `niveau-invite-collaborateur-*`. Les captures `*-fr-*` et `suivi-ticket-reponse-*`,
+  `impression-suivi-ticket-*` datent du premier passage (pastille alors tirée du plan de SLA).
+- Un passage sur quatre a échoué une fois sur la connexion de Nina en 1280 px (page non connectée, donc
+  sans pastille) ; non reproduit sur les trois passages suivants, journal de connexion ajouté au test.
+
 Non vérifié : lecteur d'écran, navigateurs autres que Chromium, tablette 820 px en parcours complet
-(le point de rupture du menu est à 1240 px), RTL, envoi réel des e-mails, plugin `sla_first_response`
-installé (bascule simulée), pack de langue officiel.
+(le point de rupture du menu est à 1240 px), RTL, envoi réel des e-mails, pack de langue officiel,
+plugin Stripe réel (organisation Priority remplie à la main), libellés de niveau personnalisés ou
+traduits, liste d'organisation partagée (`canSeeOrgTickets`) à grand nombre de propriétaires distincts.
 
 ## Écarts avec la maquette Coderise
 
@@ -265,8 +350,8 @@ installé (bascule simulée), pack de langue officiel.
 - **Suivi** : frise en 3 étapes au lieu de 4 ; pas de « Apporté en 44 min » ; actions Actualiser /
   Imprimer / Modifier conservées ; colonne plus complète (coordonnées, champs, pièces jointes) ; le
   titre du message (souvent le sujet) est affiché sous l'auteur, comme à l'origine.
-- **Liste** : pas d'avatar ni de nom de l'agent, pas de « il y a 3 h » ; pastille « Priority » d'après le
-  plan de SLA ; barre de tri et filtre par sujet ajoutés ; pagination « [1] 2 » d'osTicket.
+- **Liste** : pas d'avatar ni de nom de l'agent, pas de « il y a 3 h » ; pastilles Priority / Standard
+  seulement avec le plugin `sla_first_response` ; barre de tri et filtre par sujet ajoutés ; pagination « [1] 2 » d'osTicket.
 - **Connexion** : titres d'osTicket (« Se connecter », « Vérifier le statut d'un ticket ») ; le lien
   « Mot de passe oublié » est toujours affiché.
 - **Base de connaissances** : icône de dossier commune ; pas de « Les plus lus ».
@@ -286,13 +371,18 @@ installé (bascule simulée), pack de langue officiel.
   pas d'`aria-describedby`, et un même message peut apparaître plusieurs fois.
 - Le PDF d'impression d'osTicket (`tickets.php?a=print`) garde sa mise en page.
 - Sur la page de suivi en mobile, l'indicateur Priority est dans la colonne, donc sous le fil.
+- Pastille de contrat : niveau **actuel** du propriétaire (un ancien ticket change de pastille à la fin
+  d'un abonnement) ; rien sans le plugin `sla_first_response` actif et configuré. Une liste
+  d'organisation partagée coûte une recherche par propriétaire distinct de la page.
 - RTL : règles de base, non testées.
 
 ## Points à valider
 
 1. **Couleurs d'état** (extension de la charte) et la règle des liens sur fond teinté.
 2. **Indicateur Priority** : l'afficher au client, les noms de plans, et ce qu'il faut montrer après
-   l'échéance (rien aujourd'hui). **Pastille Priority** visible du client.
+   l'échéance (rien aujourd'hui). **Pastilles de contrat** visibles du client : niveau actuel du
+   propriétaire plutôt que niveau au moment du ticket ; « Standard » affiché (la maquette le montre) ;
+   pastille montrée aussi à un invité (niveau du propriétaire du ticket).
 3. **Logo** : un SVG horizontal officiel remplacerait le PNG ; le favicon (symbole sous 56 px) est une
    exception à la taille minimale, comme dans les maquettes.
 4. Les textes administrables proposés (accueil, remerciement, hors ligne) et les chaînes du thème.

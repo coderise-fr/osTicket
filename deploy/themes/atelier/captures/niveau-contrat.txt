@@ -1,0 +1,196 @@
+Niveau de contrat (coderise_contract_level), thème Atelier, instance réelle du 22/10/2026
+Plugin sla_first_response 0.3 installé et actif, organisation Priority configurée (n° 2).
+Léa Marchand : organisation Priority, 38 tickets (31 ouverts, 7 fermés ; plans Priority 4h, Default SLA,
+et 7 tickets basculés par le plugin sur le plan désactivé). Hugo : organisation Maison Verdier (standard),
+Léa collaboratrice de son ticket n° 40 et lui du ticket n° 2 de Léa. Nina : sans organisation.
+Marc : organisation Priority, sans compte (invité, lien d'accès). Zoé : organisation Priority, sans compte,
+collaboratrice du ticket de Nina (invitée, lien d'accès).
+
+== Plugin actif
+OK   [on] bureau Léa list: one badge per row :: [25,25]
+OK   [on] bureau Léa list: own tickets Priority :: ["standard:Standard","priority:Priority","priority:Priority"]
+OK   [on] bureau Léa list: Hugo's ticket (collaborator) shows the owner's level, Standard :: [{"cls":"plan plan-standard","text":"Contract: Standard","visible":"Standard","srHidden":true,"row":"40","contrast":4.91,"inViewport":true}]
+OK   [on] bureau Léa list: screen reader prefix :: "Contract: Standard"
+OK   [on] bureau badges inside viewport
+OK   [on] bureau screen reader prefix visually hidden
+     contrasts list: plan plan-standard 4.91, plan plan-priority 19.16
+OK   [on] bureau Léa list page 2: one badge per row :: [7,7]
+OK   [on] bureau Léa closed list: Priority (current level, closed tickets too) :: [7,["priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority"]]
+OK   [on] bureau Léa view (Priority plan, unanswered): indicator kept
+OK   [on] bureau Léa view: Priority badge :: ["priority:Priority"]
+     contrasts view: plan plan-priority 19.16
+OK   [on] bureau Léa view (plan switched by the plugin): no indicator
+OK   [on] bureau Léa view (plan switched): Priority badge kept :: ["priority:Priority"]
+OK   [on] bureau Léa view (default SLA plan): Priority from the organisation :: ["priority:Priority"]
+OK   [on] bureau Léa views Hugo's ticket as collaborator: owner's level, Standard :: ["standard:Standard"]
+     contrasts collab view: plan plan-standard 4.91
+OK   [on] bureau Hugo list: own tickets Standard (including one on the Priority 4h plan) :: ["standard:Standard","standard:Standard","priority:Priority"]
+OK   [on] bureau Hugo list: Léa's ticket (collaborator) Priority, owner's level :: [{"cls":"plan plan-priority","text":"Contract: Priority","visible":"Priority","srHidden":true,"row":"2","contrast":19.16,"inViewport":true}]
+OK   [on] bureau Hugo view (Priority 4h plan, standard client): Standard badge, indicator still from the plan :: [["standard:Standard"],true]
+OK   [on] bureau Nina (no organisation) list: Standard :: ["standard:Standard"]
+OK   [on] bureau Nina view: Standard :: ["standard:Standard"]
+OK   [on] bureau guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [on] bureau guest Marc: owner's level, Priority :: ["priority:Priority"]
+OK   [on] bureau guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [on] bureau guest Zoé: owner's level (Nina, Standard), never the collaborator's :: ["standard:Standard"]
+OK   [on] mobile Léa list: one badge per row :: [25,25]
+OK   [on] mobile Léa list: own tickets Priority :: ["standard:Standard","priority:Priority","priority:Priority"]
+OK   [on] mobile Léa list: Hugo's ticket (collaborator) shows the owner's level, Standard :: [{"cls":"plan plan-standard","text":"Contract: Standard","visible":"Standard","srHidden":true,"row":"40","contrast":4.91,"inViewport":true}]
+OK   [on] mobile Léa list: screen reader prefix :: "Contract: Standard"
+OK   [on] mobile badges inside viewport
+OK   [on] mobile screen reader prefix visually hidden
+     contrasts list: plan plan-standard 4.91, plan plan-priority 19.16
+OK   [on] mobile Léa list page 2: one badge per row :: [7,7]
+OK   [on] mobile Léa closed list: Priority (current level, closed tickets too) :: [7,["priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority","priority:Priority"]]
+OK   [on] mobile Léa view (Priority plan, unanswered): indicator kept
+OK   [on] mobile Léa view: Priority badge :: ["priority:Priority"]
+     contrasts view: plan plan-priority 19.16
+OK   [on] mobile Léa view (plan switched by the plugin): no indicator
+OK   [on] mobile Léa view (plan switched): Priority badge kept :: ["priority:Priority"]
+OK   [on] mobile Léa view (default SLA plan): Priority from the organisation :: ["priority:Priority"]
+OK   [on] mobile Léa views Hugo's ticket as collaborator: owner's level, Standard :: ["standard:Standard"]
+     contrasts collab view: plan plan-standard 4.91
+OK   [on] mobile Hugo list: own tickets Standard (including one on the Priority 4h plan) :: ["standard:Standard","standard:Standard","priority:Priority"]
+OK   [on] mobile Hugo list: Léa's ticket (collaborator) Priority, owner's level :: [{"cls":"plan plan-priority","text":"Contract: Priority","visible":"Priority","srHidden":true,"row":"2","contrast":19.16,"inViewport":true}]
+OK   [on] mobile Hugo view (Priority 4h plan, standard client): Standard badge, indicator still from the plan :: [["standard:Standard"],true]
+OK   [on] mobile Nina (no organisation) list: Standard :: ["standard:Standard"]
+OK   [on] mobile Nina view: Standard :: ["standard:Standard"]
+OK   [on] mobile guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [on] mobile guest Marc: owner's level, Priority :: ["priority:Priority"]
+OK   [on] mobile guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [on] mobile guest Zoé: owner's level (Nina, Standard), never the collaborator's :: ["standard:Standard"]
+console errors 0 []
+http >=400 0 []
+external 0 []
+overflow 0 []
+checks failed 0
+
+== Plugin désactivé (ost_plugin.isactive = 0 : la fonction n'existe pas)
+OK   [off] bureau Léa list: no level at all :: [0,25]
+     contrasts list: 
+OK   [off] bureau Léa view (Priority plan, unanswered): indicator kept
+OK   [off] bureau Léa view: no badge :: []
+     contrasts view: 
+OK   [off] bureau Léa view (plan switched by the plugin): no indicator
+OK   [off] bureau Léa view (plan switched): no badge :: []
+OK   [off] bureau Léa view (default SLA plan): no badge :: []
+OK   [off] bureau Léa views Hugo's ticket as collaborator: no badge :: []
+     contrasts collab view: 
+OK   [off] bureau Hugo list: no level :: [3]
+OK   [off] bureau Hugo view (Priority 4h plan, standard client): no badge :: [[],true]
+OK   [off] bureau Nina (no organisation) list: no badge :: []
+OK   [off] bureau Nina view: no badge :: []
+OK   [off] bureau guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [off] bureau guest Marc: no badge :: []
+OK   [off] bureau guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [off] bureau guest Zoé: no badge :: []
+OK   [off] mobile Léa list: no level at all :: [0,25]
+     contrasts list: 
+OK   [off] mobile Léa view (Priority plan, unanswered): indicator kept
+OK   [off] mobile Léa view: no badge :: []
+     contrasts view: 
+OK   [off] mobile Léa view (plan switched by the plugin): no indicator
+OK   [off] mobile Léa view (plan switched): no badge :: []
+OK   [off] mobile Léa view (default SLA plan): no badge :: []
+OK   [off] mobile Léa views Hugo's ticket as collaborator: no badge :: []
+     contrasts collab view: 
+OK   [off] mobile Hugo list: no level :: [3]
+OK   [off] mobile Hugo view (Priority 4h plan, standard client): no badge :: [[],true]
+OK   [off] mobile Nina (no organisation) list: no badge :: []
+OK   [off] mobile Nina view: no badge :: []
+OK   [off] mobile guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [off] mobile guest Marc: no badge :: []
+OK   [off] mobile guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [off] mobile guest Zoé: no badge :: []
+console errors 0 []
+http >=400 0 []
+external 0 []
+overflow 0 []
+checks failed 0
+
+== Plugin absent de l'image (dossier retiré de l'overlay, image reconstruite ; toujours enregistré en base)
+OK   [absent] bureau Léa list: no level at all :: [0,25]
+     contrasts list: 
+OK   [absent] bureau Léa view (Priority plan, unanswered): indicator kept
+OK   [absent] bureau Léa view: no badge :: []
+     contrasts view: 
+OK   [absent] bureau Léa view (plan switched by the plugin): no indicator
+OK   [absent] bureau Léa view (plan switched): no badge :: []
+OK   [absent] bureau Léa view (default SLA plan): no badge :: []
+OK   [absent] bureau Léa views Hugo's ticket as collaborator: no badge :: []
+     contrasts collab view: 
+OK   [absent] bureau Hugo list: no level :: [3]
+OK   [absent] bureau Hugo view (Priority 4h plan, standard client): no badge :: [[],true]
+OK   [absent] bureau Nina (no organisation) list: no badge :: []
+OK   [absent] bureau Nina view: no badge :: []
+OK   [absent] bureau guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [absent] bureau guest Marc: no badge :: []
+OK   [absent] bureau guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [absent] bureau guest Zoé: no badge :: []
+OK   [absent] mobile Léa list: no level at all :: [0,25]
+     contrasts list: 
+OK   [absent] mobile Léa view (Priority plan, unanswered): indicator kept
+OK   [absent] mobile Léa view: no badge :: []
+     contrasts view: 
+OK   [absent] mobile Léa view (plan switched by the plugin): no indicator
+OK   [absent] mobile Léa view (plan switched): no badge :: []
+OK   [absent] mobile Léa view (default SLA plan): no badge :: []
+OK   [absent] mobile Léa views Hugo's ticket as collaborator: no badge :: []
+     contrasts collab view: 
+OK   [absent] mobile Hugo list: no level :: [3]
+OK   [absent] mobile Hugo view (Priority 4h plan, standard client): no badge :: [[],true]
+OK   [absent] mobile Nina (no organisation) list: no badge :: []
+OK   [absent] mobile Nina view: no badge :: []
+OK   [absent] mobile guest Marc (owner, Priority organisation, no account) sees the ticket :: "Ticket de Marc (invité Priority)"
+OK   [absent] mobile guest Marc: no badge :: []
+OK   [absent] mobile guest Zoé (collaborator, herself in the Priority organisation) sees Nina's ticket :: "Ticket de Nina sans organisation"
+OK   [absent] mobile guest Zoé: no badge :: []
+console errors 0 []
+http >=400 0 []
+external 0 []
+overflow 0 []
+checks failed 0
+
+== Requêtes SQL par page (compteur global Questions de MariaDB, cron arrêté, 3 mesures, ressources statiques bloquées)
+plugin-on lea@verdier.test index.php rows=0 badges=0 queries=30,30,30 min=30
+plugin-on lea@verdier.test tickets.php?status=open rows=25 badges=25 queries=39,38,38 min=38
+plugin-on lea@verdier.test tickets.php?id=2 rows=0 badges=1 queries=53,54,53 min=53
+plugin-on lea@verdier.test tickets.php?id=40 rows=0 badges=1 queries=59,60,59 min=59
+plugin-on hugo@verdier.test index.php rows=0 badges=0 queries=30,31,30 min=30
+plugin-on hugo@verdier.test tickets.php?status=open rows=3 badges=3 queries=44,40,39 min=39
+plugin-on hugo@verdier.test tickets.php?id=2 rows=0 badges=1 queries=59,59,60 min=59
+plugin-on hugo@verdier.test tickets.php?id=40 rows=0 badges=1 queries=54,54,54 min=54
+plugin-off lea@verdier.test index.php rows=0 badges=0 queries=26,26,26 min=26
+plugin-off lea@verdier.test tickets.php?status=open rows=25 badges=0 queries=34,34,33 min=33
+plugin-off lea@verdier.test tickets.php?id=2 rows=0 badges=0 queries=49,50,49 min=49
+plugin-off lea@verdier.test tickets.php?id=40 rows=0 badges=0 queries=54,54,54 min=54
+plugin-off hugo@verdier.test index.php rows=0 badges=0 queries=30,26,27 min=26
+plugin-off hugo@verdier.test tickets.php?status=open rows=3 badges=0 queries=34,33,33 min=33
+plugin-off hugo@verdier.test tickets.php?id=2 rows=0 badges=0 queries=55,54,54 min=54
+plugin-off hugo@verdier.test tickets.php?id=40 rows=0 badges=0 queries=49,50,49 min=49
+plugin-absent lea@verdier.test index.php rows=0 badges=0 queries=27,27,28 min=27
+plugin-absent lea@verdier.test tickets.php?status=open rows=25 badges=0 queries=35,34,34 min=34
+plugin-absent lea@verdier.test tickets.php?id=2 rows=0 badges=0 queries=51,50,50 min=50
+plugin-absent lea@verdier.test tickets.php?id=40 rows=0 badges=0 queries=55,56,55 min=55
+plugin-absent hugo@verdier.test index.php rows=0 badges=0 queries=28,27,27 min=27
+plugin-absent hugo@verdier.test tickets.php?status=open rows=3 badges=0 queries=35,35,34 min=34
+plugin-absent hugo@verdier.test tickets.php?id=2 rows=0 badges=0 queries=55,55,56 min=55
+plugin-absent hugo@verdier.test tickets.php?id=40 rows=0 badges=0 queries=50,50,50 min=50
+
+== apply.sh / remove.sh sur un export du commit
+== apply --dry-run
+Simulation : 30 fichier(s) à copier ou retirer, rien n'a été écrit.
+== apply
+Thème Atelier installé dans <copie>/rt/deploy/docker/overlay (30 fichiers).
+Ensuite : git add -A deploy/docker/overlay && git commit, puis deploy/docker/scripts/build.sh (voir README.md).
+== apply again (idempotent)
+Thème Atelier déjà à jour dans <copie>/rt/deploy/docker/overlay.
+== badge code installed:
+deploy/docker/overlay/include/client/tickets.inc.php:1
+deploy/docker/overlay/include/client/view.inc.php:1
+== other theme refuses while atelier is installed:
+apply.sh: le thème « atelier » est installé dans <copie>/rt/deploy/docker/overlay ; retirez-le d'abord (deploy/themes/atelier/remove.sh).
+== remove
+Thème Atelier retiré de <copie>/rt/deploy/docker/overlay (30 fichier(s)).
+== diff with pristine export (empty = identical):
+identical
