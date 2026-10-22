@@ -1,0 +1,12 @@
+# Fichiers binaires : ne jamais les traiter comme du texte (core.autocrlf=true sous Windows
+# a déjà altéré une police woff2 au `git add` de deploy/docker/overlay/).
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.phar binary
