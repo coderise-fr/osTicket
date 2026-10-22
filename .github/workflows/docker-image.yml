@@ -6,9 +6,11 @@ name: docker-image
 #   ghcr.io/<owner>/osticket:sha-abc1234            runtime image (production)
 #   ghcr.io/<owner>/osticket:sha-abc1234-install    + setup wizard (first install only)
 
+# DISABLED until the DigitalOcean registry is configured (this file still pushes to
+# GHCR). Manual runs only. To re-enable on every push to main, add under `on:`
+#   push:
+#     branches: [main]
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
