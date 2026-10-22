@@ -3,8 +3,12 @@
 # Run from this folder. First install: see README.md (compose.install.yaml).
 #
 #   cp .env.example .env && ./scripts/gen-secrets.sh
-#   docker compose -f compose.yaml -f compose.install.yaml up -d --build db web   # wizard
-#   docker compose up -d --build                                                  # runtime
+#   ./scripts/build.sh && ./scripts/build.sh -f compose.yaml -f compose.install.yaml build web
+#   docker compose -f compose.yaml -f compose.install.yaml up -d db web   # wizard
+#   docker compose up -d                                                  # runtime
+#
+# Never use `up --build` / `build` directly: they would build the working tree (CRLF on
+# Windows, uncommitted files). scripts/build.sh builds the committed HEAD.
 
 name: ${OST_PROJECT:-osticket}
 
@@ -38,6 +42,11 @@ services:
     # Publish on loopback only: a TLS reverse proxy is the public entry point.
     ports:
       - "${OST_BIND:-127.0.0.1}:${OST_PORT:-8080}:8080"
+    # Optional secrets for overlay plugins (e.g. STRIPE_SYNC_WEBHOOK_SECRET=whsec_...), one
+    # NAME=value per line in plugins.env (git-ignored, mode 0600). Absent file = no variable.
+    env_file:
+      - path: ./plugins.env
+        required: false
     environment:
       OSTICKET_COOKIE_SECURE: ${OSTICKET_COOKIE_SECURE:-1}
       OSTICKET_TRUSTED_PROXIES: ${OSTICKET_TRUSTED_PROXIES:-10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1}
