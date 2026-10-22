@@ -1,0 +1,218 @@
+{
+ "accueil-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "ouverture-ticket-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "connexion-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "inscription-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mot-de-passe-oublie-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "acces-par-numero-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "base-de-connaissances-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-categorie-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-vide-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-article-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": []
+ },
+ "mes-tickets-fermes-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-vide-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-ferme-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "profil-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "modifier-ticket-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 6.59,
+  "lowContrast": []
+ },
+ "accueil-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "ouverture-ticket-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "connexion-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "inscription-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mot-de-passe-oublie-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "acces-par-numero-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "base-de-connaissances-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-categorie-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-vide-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-article-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": []
+ },
+ "mes-tickets-fermes-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-vide-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-ferme-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "profil-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "modifier-ticket-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 6.59,
+  "lowContrast": []
+ }
+}

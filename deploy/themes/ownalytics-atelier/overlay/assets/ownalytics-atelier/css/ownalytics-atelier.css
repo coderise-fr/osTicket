@@ -1,0 +1,877 @@
+/* =====================================================================
+   osTicket client portal, "Ownalytics Atelier" theme
+   deploy/themes/ownalytics-atelier — replaces assets/default/css/theme.css.
+
+   Warm, people first: the Ownalytics plum and paper, small touches of the
+   plugin colours (sun, pink, tangerine, mint), rounded cards, pill buttons,
+   initials avatars and a conversation in bubbles.
+   Light only (the brand has no dark mode). Fonts are local (SIL OFL 1.1,
+   see ../fonts/OFL.txt). No external request.
+   ===================================================================== */
+
+/* ---------- Fonts ---------- */
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url(../fonts/archivo-100-900-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 700 800;
+  font-display: swap;
+  src: url(../fonts/bricolage-grotesque-700-800-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-500-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-600-latin.woff2) format("woff2");
+}
+
+/* ---------- Tokens ---------- */
+
+:root {
+  --plum: #3B1E54;
+  --plum-deep: #2A1340;
+  --plum-light: #CDB6E3;
+  --lilac: #F6F1FB;
+  --lilac-2: #EADFF5;
+  --paper: #FBFBF6;
+  --white: #FFFFFF;
+  --ink: #22201F;
+  --ink-soft: #5F5C59;
+  --sun: #FFD23F;
+  --sun-tint: #FFF4C7;
+  --sun-line: #F0D66A;
+  --pink: #FF4D8D;          /* decorative or very large text only */
+  --pink-deep: #B3175A;     /* accessible pink text (6.6:1 on white) */
+  --pink-tint: #FFE0EC;
+  --tangerine: #FF9F1C;
+  --mint: #DFF5EA;
+  --mint-line: #9FD8BA;
+  --mint-ink: #17603F;
+  --danger: #A3202D;
+  --danger-tint: #FFF6F7;
+  --warn-tint: #FFF4C7;
+  --line: #E1D6EC;
+  --field: #6E6A66;          /* field borders: 5.3:1 on white */
+  --display: "Bricolage Grotesque", "Archivo", system-ui, sans-serif;
+  --sans: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 22px;
+  --r-sm: 14px;
+  --gutter: 16px;
+  --maxw: 1160px;
+}
+@media (min-width: 720px) { :root { --gutter: 32px; } }
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body.ownalytics-atelier {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--lilac);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+.ownalytics-atelier #container { flex: 1 0 auto; display: flex; flex-direction: column; }
+.ownalytics-atelier p { margin: 0 0 1em; }
+.ownalytics-atelier h1, .ownalytics-atelier h2, .ownalytics-atelier h3, .ownalytics-atelier h4 { margin: 0 0 .5em; line-height: 1.15; }
+.ownalytics-atelier h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.02em; font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3rem); line-height: 1.06; }
+.ownalytics-atelier h2 { font-family: var(--display); font-weight: 800; letter-spacing: -.012em; font-size: 1.35rem; }
+.ownalytics-atelier h3 { font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
+.ownalytics-atelier a { color: var(--plum); text-underline-offset: .22em; text-decoration-thickness: 2px; }
+.ownalytics-atelier a:hover { color: var(--pink-deep); }
+.ownalytics-atelier img { max-width: 100%; height: auto; }
+.ownalytics-atelier hr { border: 0; border-top: 2px dashed var(--line); margin: 18px 0; }
+.ownalytics-atelier small { font-size: .875rem; }
+.ownalytics-atelier strong, .ownalytics-atelier b { font-weight: 700; }
+.ownalytics-atelier code, .ownalytics-atelier kbd { font-family: var(--mono); font-size: .9em; }
+.ownalytics-atelier pre { font-family: var(--mono); }
+.ownalytics-atelier :focus-visible { outline: 3px solid var(--plum); outline-offset: 3px; }
+.ownalytics-atelier .site-header :focus-visible,
+.ownalytics-atelier .site-footer :focus-visible,
+.ownalytics-atelier .news :focus-visible { outline-color: var(--sun); }
+.ownalytics-atelier #content:focus { outline: none; }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.ownalytics-atelier .skip {
+  position: absolute; left: var(--gutter); top: -200px; z-index: 3000;
+  padding: .7em 1.2em; border-radius: 99px; background: var(--sun); color: var(--ink);
+  font-weight: 700; text-decoration: none;
+}
+.ownalytics-atelier .skip:focus { top: 10px; outline: 3px solid var(--ink); }
+
+/* Utilities osTicket's markup relies on */
+.ownalytics-atelier .clear { clear: both; height: 0; }
+.ownalytics-atelier .hidden { display: none; }
+.ownalytics-atelier .faded, .ownalytics-atelier .muted { color: var(--ink-soft); }
+.ownalytics-atelier .centered { text-align: center; }
+.ownalytics-atelier .flush-left { text-align: left; }
+.ownalytics-atelier .flush-right { text-align: right; }
+.ownalytics-atelier .truncate { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.ownalytics-atelier .small { font-size: .9375rem; color: var(--ink-soft); }
+.ownalytics-atelier .small a { font-weight: 600; }
+.ownalytics-atelier .error, .ownalytics-atelier font.error, .ownalytics-atelier span.error, .ownalytics-atelier div.error { color: var(--danger); font-weight: 700; }
+.ownalytics-atelier .label { display: inline-block; padding: 1px 9px; border-radius: 99px; background: var(--lilac-2); color: var(--plum); font-size: .75rem; font-weight: 700; }
+
+/* ---------- Layout ---------- */
+
+.ownalytics-atelier .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.ownalytics-atelier .main { flex: 1 0 auto; padding-block: 36px 72px; }
+.ownalytics-atelier .card {
+  background: var(--white); border: 2px solid var(--line); border-radius: var(--r);
+  padding: 22px 24px; box-shadow: 0 5px 0 var(--line); min-width: 0;
+}
+.ownalytics-atelier .card > :last-child { margin-bottom: 0; }
+.ownalytics-atelier .card-title {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 14px;
+  font-family: var(--display); font-weight: 800; font-size: 1.25rem; letter-spacing: -.01em; line-height: 1.2;
+}
+.ownalytics-atelier .stack { display: grid; gap: 22px; align-content: start; min-width: 0; }
+.ownalytics-atelier .split { display: grid; gap: 28px; align-items: start; }
+@media (min-width: 980px) {
+  .ownalytics-atelier .split { grid-template-columns: minmax(0, 1fr) 340px; gap: 36px; }
+  .ownalytics-atelier .split > .side { position: sticky; top: 20px; }
+}
+.ownalytics-atelier .page-head { margin-bottom: 28px; max-width: 60rem; }
+.ownalytics-atelier .page-head.center { text-align: center; margin-inline: auto; }
+.ownalytics-atelier .page-head h1 { margin-bottom: 10px; }
+.ownalytics-atelier .page-head .sub { font-size: 1.125rem; color: var(--ink-soft); max-width: 52ch; margin: 0; }
+.ownalytics-atelier .page-head .sub p:last-child { margin-bottom: 0; }
+.ownalytics-atelier .page-head.center .sub { margin-inline: auto; }
+.ownalytics-atelier .back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; font-weight: 700; text-decoration: none; }
+.ownalytics-atelier .back:hover { text-decoration: underline; }
+.ownalytics-atelier .plain-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.ownalytics-atelier .duo { display: grid; gap: 28px; max-width: 980px; margin-inline: auto; }
+@media (min-width: 860px) { .ownalytics-atelier .duo { grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; } }
+
+/* ---------- Avatars and pills ---------- */
+
+.ownalytics-atelier .avatar {
+  flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  font-family: var(--display); font-weight: 800; font-size: .875rem; letter-spacing: .01em; line-height: 1;
+}
+.ownalytics-atelier .avatar.sm { width: 30px; height: 30px; font-size: .75rem; }
+.ownalytics-atelier .av-plum { background: var(--plum-light); color: var(--plum); }
+.ownalytics-atelier .av-sun { background: var(--sun); color: var(--ink); }
+.ownalytics-atelier .av-pink { background: var(--pink); color: var(--ink); }
+.ownalytics-atelier .av-tangerine { background: var(--tangerine); color: var(--ink); }
+.ownalytics-atelier .av-mint { background: var(--mint); color: var(--mint-ink); box-shadow: inset 0 0 0 2px var(--mint-line); }
+
+.ownalytics-atelier .pill { display: inline-block; padding: 2px 12px; border-radius: 99px; font-size: .8125rem; font-weight: 700; line-height: 1.6; white-space: nowrap; }
+.ownalytics-atelier .pill-open { background: var(--mint); color: var(--mint-ink); }
+.ownalytics-atelier .pill-closed { background: var(--lilac-2); color: var(--plum); }
+.ownalytics-atelier .pill-new { background: var(--pink-tint); color: var(--pink-deep); }
+.ownalytics-atelier .count {
+  display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 99px;
+  background: var(--lilac-2); color: var(--plum); font-family: var(--sans); font-size: .8125rem; font-weight: 700; line-height: 1;
+}
+
+/* ---------- Buttons ---------- */
+
+/* :where() keeps every button at the specificity of one class, so that the
+   variants below (.btn-primary, .btn-ghost...) always win. */
+.ownalytics-atelier :where(.btn, #content input[type=submit], #content input[type=reset], #content input[type=button],
+  #content button:not(.re-button, [class*=redactor], .ui-button, .ui-datepicker-trigger, .action-button), .button) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; margin: 0; padding: .55em 1.4em;
+  border: 2px solid var(--ink); border-radius: 99px;
+  background: var(--white); color: var(--ink);
+  font: inherit; font-weight: 700; line-height: 1.1; text-decoration: none; text-align: center;
+  cursor: pointer; box-shadow: 0 4px 0 var(--plum-light);
+  transition: transform .12s ease, box-shadow .12s ease;
+  -webkit-appearance: none; appearance: none;
+}
+.ownalytics-atelier :where(#content input[type=submit], .button.blue),
+.ownalytics-atelier .btn-primary {
+  background: var(--sun); color: var(--ink); box-shadow: 0 4px 0 var(--ink);
+}
+.ownalytics-atelier .btn-ghost, .ownalytics-atelier .button.green { background: var(--white); color: var(--ink); box-shadow: 0 4px 0 var(--plum-light); }
+.ownalytics-atelier .search-form .button.green { background: var(--sun); box-shadow: 0 4px 0 var(--ink); }
+.ownalytics-atelier input.btn-link {
+  min-height: 44px; border-color: transparent; background: transparent; box-shadow: none;
+  color: var(--plum); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .22em; padding-inline: .8em;
+}
+.ownalytics-atelier input.btn-link:hover { color: var(--pink-deep); transform: none; box-shadow: none; }
+.ownalytics-atelier .btn-lg { min-height: 56px; padding-inline: 2em; font-size: 1.125rem; }
+.ownalytics-atelier .btn-sm { min-height: 40px; padding: .35em 1em; font-size: .9375rem; box-shadow: 0 3px 0 var(--plum-light); }
+.ownalytics-atelier :where(.btn, #content input[type=submit], #content input[type=reset], .button):hover,
+.ownalytics-atelier :where(#content input[type=button]:not(.btn-link)):hover {
+  transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); color: var(--ink);
+}
+.ownalytics-atelier :where(.btn, #content input[type=submit]):active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+.ownalytics-atelier :where(#content input[type=submit])[disabled] { opacity: .65; cursor: progress; transform: none; }
+/* osticket.js paints the submit button text red once the form has changed:
+   red on sun fails AA (2.8:1) and the cue also fires when Redactor starts, so
+   the text keeps the ink colour. The "leave page?" warning is unchanged. */
+.ownalytics-atelier #content input[type=submit][style*="color"] { color: var(--ink) !important; }
+.ownalytics-atelier .actions, .ownalytics-atelier p.buttons {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin: 8px 0 0; text-align: left;
+}
+.ownalytics-atelier .action-button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--line);
+  border-radius: 99px; background: var(--white); color: var(--plum); font-family: inherit; font-size: .9375rem; font-weight: 700;
+  line-height: 1.3; text-decoration: none; cursor: pointer;
+}
+.ownalytics-atelier .action-button:hover { border-color: var(--plum); color: var(--plum); }
+
+/* ---------- Messages ---------- */
+
+.ownalytics-atelier .sysbar {
+  height: auto; margin: 0; padding: 10px var(--gutter); border: 0; background-image: none;
+  font-weight: 600; text-align: center; line-height: 1.4;
+}
+.ownalytics-atelier .error_bar { background: var(--danger); color: var(--white); }
+.ownalytics-atelier .warning_bar { background: var(--sun); color: var(--ink); }
+.ownalytics-atelier .notice_bar { background: var(--mint); color: var(--mint-ink); }
+.ownalytics-atelier .alert, .ownalytics-atelier #msg_error, .ownalytics-atelier #msg_notice, .ownalytics-atelier #msg_warning, .ownalytics-atelier #msg_info, .ownalytics-atelier .warning-banner {
+  display: block; margin: 0 0 24px; padding: 14px 20px; border: 2px solid; border-radius: 18px; background-image: none;
+  font-weight: 600;
+}
+.ownalytics-atelier #msg_error, .ownalytics-atelier .alert-error { background: var(--danger-tint); border-color: var(--danger); color: var(--danger); }
+.ownalytics-atelier #msg_notice, .ownalytics-atelier .alert-notice { background: var(--mint); border-color: var(--mint-line); color: var(--mint-ink); }
+.ownalytics-atelier #msg_warning, .ownalytics-atelier .alert-warning, .ownalytics-atelier .warning-banner { background: var(--warn-tint); border-color: var(--sun-line); color: var(--ink); }
+.ownalytics-atelier #msg_info, .ownalytics-atelier .alert-info { background: var(--white); border-color: var(--plum-light); color: var(--ink); font-weight: 500; }
+.ownalytics-atelier #msg_info:after { content: ""; display: table; clear: both; }
+.ownalytics-atelier #msg_info i { color: var(--plum); margin-right: 12px; }
+.ownalytics-atelier .alert a { color: inherit; }
+.ownalytics-atelier .err { margin: 6px 0 0; font-size: .9375rem; font-weight: 700; color: var(--danger); }
+
+/* ---------- Header ---------- */
+
+.ownalytics-atelier .site-header { background: var(--plum); color: var(--paper); }
+.ownalytics-atelier .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 14px; }
+.ownalytics-atelier .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--paper); text-decoration: none; line-height: 1; }
+.ownalytics-atelier .brand:hover { color: var(--paper); }
+.ownalytics-atelier .brand .mark { flex: none; }
+.ownalytics-atelier .brand .wm { font-weight: 800; font-stretch: 125%; font-variation-settings: "wdth" 125; font-size: 1.3rem; letter-spacing: -.01em; }
+.ownalytics-atelier .brand .wm-sub {
+  padding: 3px 11px; border-radius: 99px; background: var(--sun); color: var(--ink);
+  font-family: var(--display); font-weight: 800; font-size: .9rem; transform: rotate(-3deg);
+}
+.ownalytics-atelier .brand-logo { display: block; max-height: 48px; width: auto; }
+.ownalytics-atelier .menu { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 0; padding: 0; list-style: none; }
+.ownalytics-atelier .menu a {
+  display: inline-block; padding: 8px 14px; border-radius: 99px; color: var(--plum-light);
+  font-weight: 600; text-decoration: none; line-height: 1.3;
+}
+.ownalytics-atelier .menu a:hover { background: var(--plum-deep); color: var(--paper); }
+.ownalytics-atelier .menu a.active, .ownalytics-atelier .menu a[aria-current] { background: var(--paper); color: var(--plum); }
+.ownalytics-atelier .who { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; font-size: .9375rem; }
+.ownalytics-atelier .who a { color: var(--paper); }
+.ownalytics-atelier .who a:hover { color: var(--sun); }
+.ownalytics-atelier .who .me { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 600; }
+.ownalytics-atelier .who .me:hover .me-name { text-decoration: underline; }
+.ownalytics-atelier .who .out { color: var(--plum-light); }
+.ownalytics-atelier .who .guest { color: var(--plum-light); }
+.ownalytics-atelier .lang { display: inline-flex; gap: 2px; }
+.ownalytics-atelier .lang a { padding: 3px 9px; border-radius: 99px; text-decoration: none; font-size: .8125rem; font-weight: 700; color: var(--plum-light); }
+.ownalytics-atelier .lang a:hover { color: var(--paper); background: var(--plum-deep); }
+.ownalytics-atelier .lang a[aria-current] { background: var(--plum-deep); color: var(--paper); }
+@media (max-width: 899px) {
+  .ownalytics-atelier .site-nav { order: 3; width: 100%; }
+  .ownalytics-atelier .menu a { padding: 7px 12px; }
+}
+@media (max-width: 480px) {
+  .ownalytics-atelier .who .me-name { display: none; }
+  .ownalytics-atelier .brand .wm { font-size: 1.15rem; }
+}
+
+/* ---------- Forms (shared) ---------- */
+
+.ownalytics-atelier #content label { font-weight: 700; }
+.ownalytics-atelier input[type=text], .ownalytics-atelier input[type=email], .ownalytics-atelier input[type=password],
+.ownalytics-atelier input[type=search], .ownalytics-atelier input[type=tel], .ownalytics-atelier input[type=url],
+.ownalytics-atelier input[type=number], .ownalytics-atelier input[type=date], .ownalytics-atelier input:not([type]),
+.ownalytics-atelier select, .ownalytics-atelier textarea {
+  width: 100%; max-width: 100%; min-height: 48px; margin: 0; padding: .5em .95em;
+  border: 2px solid var(--field); border-radius: var(--r-sm); background: var(--white); color: var(--ink);
+  font: inherit; font-weight: 400; line-height: 1.4;
+}
+.ownalytics-atelier textarea { min-height: 9em; resize: vertical; }
+.ownalytics-atelier select {
+  -webkit-appearance: none; appearance: none; padding-right: 2.6em;
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%233B1E54' stroke-width='2.2'/%3E%3C/svg%3E") no-repeat right 1em center;
+}
+.ownalytics-atelier select[multiple] { background-image: none; padding-right: .95em; }
+.ownalytics-atelier input::placeholder, .ownalytics-atelier textarea::placeholder { color: var(--ink-soft); opacity: 1; }
+.ownalytics-atelier input:focus-visible, .ownalytics-atelier select:focus-visible, .ownalytics-atelier textarea:focus-visible {
+  outline: 3px solid var(--plum); outline-offset: 2px; border-color: var(--plum);
+}
+.ownalytics-atelier input[type=radio], .ownalytics-atelier input[type=checkbox] { width: 20px; height: 20px; margin: 0 8px 0 0; accent-color: var(--plum); vertical-align: -4px; }
+.ownalytics-atelier .field { margin-bottom: 18px; min-width: 0; }
+.ownalytics-atelier .field > label, .ownalytics-atelier .lbl { display: block; margin-bottom: 6px; font-weight: 700; }
+.ownalytics-atelier .req, .ownalytics-atelier label .error, .ownalytics-atelier span.required .error { color: var(--pink-deep); }
+.ownalytics-atelier .help { margin: 6px 0 0; font-size: .875rem; color: var(--ink-soft); }
+.ownalytics-atelier .has-error input, .ownalytics-atelier .has-error select,
+.ownalytics-atelier tr.error input, .ownalytics-atelier td.error input { border-color: var(--danger); border-width: 3px; background: var(--danger-tint); }
+
+/* Field tables rendered by templates/dynamic-form.tmpl.php (one <tr> per field)
+   and the account forms (register, profile): shown as stacked fields. */
+.ownalytics-atelier .form-table, .ownalytics-atelier .form-table > tbody, .ownalytics-atelier .form-table tr, .ownalytics-atelier .form-table td,
+.ownalytics-atelier table.padded, .ownalytics-atelier table.padded > tbody, .ownalytics-atelier table.padded tr, .ownalytics-atelier table.padded td,
+.ownalytics-atelier.v-edit #content form > table, .ownalytics-atelier.v-edit #content form > table > tbody,
+.ownalytics-atelier.v-edit #content form > table tr, .ownalytics-atelier.v-edit #content form > table td {
+  display: block; width: auto !important; padding: 0; border: 0;
+}
+.ownalytics-atelier .form-table tr, .ownalytics-atelier table.padded tr, .ownalytics-atelier.v-edit #content form > table tr { margin: 0 0 18px; }
+.ownalytics-atelier .form-table td, .ownalytics-atelier table.padded td { padding: 0 !important; }
+.ownalytics-atelier .form-table hr, .ownalytics-atelier table.padded hr, .ownalytics-atelier.v-edit #content form > table hr { display: none; }
+.ownalytics-atelier .form-table tr:last-child, .ownalytics-atelier table.padded tr:last-child { margin-bottom: 0; }
+.ownalytics-atelier .form-header { margin: 0 0 4px !important; }
+.ownalytics-atelier .form-header h3, .ownalytics-atelier table.padded h3 {
+  margin: 0 0 6px; font-family: var(--display); font-weight: 800; font-size: 1.25rem; letter-spacing: -.01em;
+}
+.ownalytics-atelier .form-header > div { color: var(--ink-soft); font-size: .9375rem; }
+.ownalytics-atelier .form-header > div:empty { display: none; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label, .ownalytics-atelier table.padded label { display: block; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label > span:first-child:not(.req),
+.ownalytics-atelier table.padded label > span:first-child:not(.req) { display: block; font-weight: 700; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label > span:first-child + br,
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label > em + br { display: none; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) > tbody + tbody > tr:first-child { margin-top: 8px; padding-top: 22px; border-top: 2px dashed var(--line); }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) em, .ownalytics-atelier table.padded em {
+  display: block !important; margin: 2px 0 6px; color: var(--ink-soft) !important; font-style: normal; font-size: .875rem; font-weight: 400;
+}
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) input[type=text], .ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) input[type=email], .ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) select,
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) textarea, .ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) .redactor-box { margin-top: 6px; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) input[size], .ownalytics-atelier table.padded input[size] { width: 100%; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) div.error { margin-top: 6px; font-size: .9375rem; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label.checkbox, .ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label.inline,
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) .radio label, .ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) label[for$="_cb"] { display: inline-flex; align-items: center; font-weight: 500; margin: 4px 18px 4px 0; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) .section-break { border-top: 2px dashed var(--line); padding-top: 14px !important; }
+/* Account forms: label column then field */
+.ownalytics-atelier table.padded td[width] { font-weight: 700; margin-bottom: 6px; }
+/* Field cells hold stray "&nbsp;" text next to full-width inputs: hide the bare text,
+   keep every element (and the error messages) at normal size. */
+.ownalytics-atelier table.padded td + td, .ownalytics-atelier table.padded td[colspan] { font-size: 0; }
+.ownalytics-atelier table.padded td + td > *, .ownalytics-atelier table.padded td[colspan] > * { font-size: 1rem; }
+.ownalytics-atelier table.padded td + td > .error { display: block; margin-top: 4px; font-size: .875rem; line-height: 1.2; }
+.ownalytics-atelier #content table.padded td > button { font-size: 1rem !important; margin-top: 10px; }
+.ownalytics-atelier table.padded tr { margin-bottom: 12px; }
+.ownalytics-atelier table.padded .select2-container { width: 100% !important; }
+@supports selector(:has(a)) {
+  @media (min-width: 640px) {
+    /* Two columns for short fields, full width for headers, text areas, files and choices */
+    .ownalytics-atelier .form-table > tbody { display: grid !important; grid-template-columns: 1fr 1fr; column-gap: 22px; }
+    .ownalytics-atelier .form-table > tbody > tr { min-width: 0; }
+    .ownalytics-atelier .form-table > tbody > tr:has(.form-header),
+    .ownalytics-atelier .form-table > tbody > tr:has(textarea),
+    .ownalytics-atelier .form-table > tbody > tr:has(.filedrop),
+    .ownalytics-atelier .form-table > tbody > tr:has(input[type=radio]),
+    .ownalytics-atelier .form-table > tbody > tr:has(input[type=checkbox]),
+    .ownalytics-atelier .form-table > tbody > tr:has(select[multiple]),
+    .ownalytics-atelier .form-table > tbody > tr:has(.section-break),
+    .ownalytics-atelier .form-table > tbody > tr.topic-row,
+    .ownalytics-atelier .form-table > tbody > tr.client-identity,
+    .ownalytics-atelier .form-table > tbody > tr:only-child,
+    .ownalytics-atelier .form-table > tbody > tr:has(+ tr textarea),
+    .ownalytics-atelier .form-table > tbody > tr:has(input[type=tel]) { grid-column: 1 / -1; }
+  }
+}
+
+/* Rich text editor (Redactor 3) and file drop zone: skinned, not rebuilt */
+.ownalytics-atelier .redactor-box { border: 2px solid var(--field); border-radius: var(--r-sm); background: var(--white); overflow: hidden; }
+.ownalytics-atelier .redactor-box.redactor-focus, .ownalytics-atelier .redactor-box:focus-within { border-color: var(--plum); box-shadow: 0 0 0 3px var(--lilac-2); }
+.ownalytics-atelier .redactor-toolbar-wrapper, .ownalytics-atelier .redactor-toolbar { background: var(--lilac) !important; border-bottom: 2px solid var(--line); }
+.ownalytics-atelier .redactor-toolbar { padding: 6px !important; box-shadow: none !important; }
+.ownalytics-atelier .redactor-toolbar a, .ownalytics-atelier .redactor-toolbar .re-button { border-radius: 99px !important; color: var(--plum) !important; background: transparent !important; box-shadow: none !important; }
+.ownalytics-atelier .redactor-toolbar a:hover, .ownalytics-atelier .redactor-toolbar .re-button:hover { background: var(--lilac-2) !important; }
+.ownalytics-atelier .redactor-in, .ownalytics-atelier .redactor-styles { font-family: var(--sans) !important; font-size: 1rem !important; color: var(--ink) !important; }
+.ownalytics-atelier .redactor-in { padding: 14px 16px !important; min-height: 9em; }
+.ownalytics-atelier .redactor-placeholder:before { color: var(--ink-soft) !important; }
+.ownalytics-atelier .redactor-statusbar { background: var(--lilac); color: var(--ink-soft); }
+.ownalytics-atelier .draft-saved { background: var(--plum); color: var(--paper); border-radius: 99px; font-size: .8125rem; top: auto; bottom: .6em; }
+.ownalytics-atelier .filedrop { padding-bottom: 0; margin-top: 12px; }
+.ownalytics-atelier .filedrop .dropzone {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 16px 18px;
+  border: 2px dashed var(--plum); border-radius: 16px; background: var(--lilac); color: var(--ink);
+}
+.ownalytics-atelier .filedrop .dropzone i { color: var(--plum); }
+.ownalytics-atelier .filedrop .dropzone a { color: var(--plum); font-weight: 700; }
+.ownalytics-atelier .filedrop .files:not(:empty) { border: 2px solid var(--line); border-radius: 16px 16px 0 0; background: var(--white); }
+.ownalytics-atelier .filedrop .files:not(:empty) + .dropzone { border-radius: 0 0 16px 16px; }
+.ownalytics-atelier .filedrop .files .file { height: auto; padding: 6px 12px; }
+.ownalytics-atelier .filedrop .files .file .filesize, .ownalytics-atelier .filedrop .files .file .upload-rate { color: var(--ink-soft); }
+.ownalytics-atelier .filedrop .files .file .trash { color: var(--danger); }
+.ownalytics-atelier .select2-container--default .select2-selection--single,
+.ownalytics-atelier .select2-container--default .select2-selection--multiple { min-height: 48px; border: 2px solid var(--field); border-radius: var(--r-sm); }
+.ownalytics-atelier .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 44px; padding-left: .95em; color: var(--ink); }
+.ownalytics-atelier .select2-container--default .select2-selection--single .select2-selection__arrow { height: 44px; }
+.ownalytics-atelier .ui-datepicker-trigger { width: auto; height: auto; top: 0; }
+.ownalytics-atelier input.dp { width: 12em; }
+
+/* Captcha */
+.ownalytics-atelier .captcha-line { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.ownalytics-atelier .captcha-line input { width: 10em; }
+.ownalytics-atelier .captcha img { display: block; border-radius: 8px; border: 2px solid var(--line); }
+
+/* ---------- Home (index.php, unchanged markup) ---------- */
+
+.ownalytics-atelier #landing_page { display: grid; gap: 36px 56px; }
+@media (min-width: 980px) {
+  .ownalytics-atelier #landing_page { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); align-items: start; }
+  .ownalytics-atelier #landing_page > .sidebar { grid-column: 2; grid-row: 1; }
+  .ownalytics-atelier #landing_page > .main-content { grid-column: 1; grid-row: 1; }
+}
+.ownalytics-atelier #landing_page > .clear { display: none; }
+.ownalytics-atelier #landing_page > div:not([class]) { grid-column: 1 / -1; }
+.ownalytics-atelier .main-content { display: flex; flex-direction: column; min-width: 0; }
+.ownalytics-atelier .main-content > .thread-body { order: 1; }
+.ownalytics-atelier .main-content > .search-form { order: 2; }
+.ownalytics-atelier #landing_page .thread-body {
+  padding: 0; background: transparent; color: var(--ink); font-family: var(--sans);
+  font-size: 1.0625rem !important; line-height: 1.6; overflow: visible;
+}
+.ownalytics-atelier #landing_page .thread-body h1 {
+  font-size: clamp(2.3rem, 1.2rem + 4.4vw, 4.2rem); line-height: 1.02; letter-spacing: -.025em; max-width: 14ch; margin: 0 0 20px;
+}
+.ownalytics-atelier #landing_page .thread-body h2 { font-size: 1.35rem; margin-top: 1em; }
+.ownalytics-atelier #landing_page .thread-body p { max-width: 52ch; font-size: 1.125rem; color: var(--ink-soft); margin-bottom: 1em !important; }
+.ownalytics-atelier #landing_page .thread-body ul {
+  display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 16px 0 0 !important; padding: 0 !important; list-style: none;
+  font-weight: 600; font-size: .9375rem;
+}
+.ownalytics-atelier #landing_page .thread-body ul li { display: inline-flex; align-items: center; gap: 6px; }
+.ownalytics-atelier #landing_page .thread-body ul li::before {
+  content: ""; width: 14px; height: 9px; margin-right: 2px; border-left: 2.5px solid var(--mint-ink); border-bottom: 2.5px solid var(--mint-ink);
+  transform: rotate(-45deg) translateY(-2px);
+}
+.ownalytics-atelier .search-form form { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.ownalytics-atelier .search-form .search, .ownalytics-atelier .ask input[type=search], .ownalytics-atelier .ask input[type=text] {
+  flex: 1 1 260px; width: auto; min-height: 58px; border-radius: 99px; padding-inline: 1.5em; border-color: var(--ink); font-size: 1.0625rem;
+}
+.ownalytics-atelier .search-form .button, .ownalytics-atelier .ask .btn, .ownalytics-atelier #content .ask input[type=submit] { min-height: 58px; }
+.ownalytics-atelier .search-form button.button.green { background: var(--sun); box-shadow: 0 4px 0 var(--ink); }
+/* Phone field: number then a short extension box */
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) input[type=tel] { width: min(22rem, calc(100% - 8em)); display: inline-block; margin-right: .5em; }
+.ownalytics-atelier :is(.form-table, table.padded, #dynamic-form) input[name$="-ext"] { width: 5.5em; display: inline-block; margin-left: .3em; }
+/* Sidebar becomes the plum card: actions and featured questions */
+.ownalytics-atelier #landing_page .sidebar {
+  float: none; width: auto; padding: 24px; border-radius: var(--r);
+  background: var(--plum); color: var(--paper); box-shadow: 0 6px 0 var(--plum-deep); transform: rotate(1deg);
+}
+/* Small screens keep the source order of index.php (actions card first), so that
+   the visual order matches the keyboard order. */
+@media (max-width: 979px) { .ownalytics-atelier #landing_page .sidebar { transform: none; } }
+.ownalytics-atelier #landing_page .front-page-button { display: grid; gap: 12px; text-align: left; }
+.ownalytics-atelier #landing_page .front-page-button p { margin: 0; }
+.ownalytics-atelier #landing_page .front-page-button .button { display: flex !important; width: 100%; min-height: 54px; font-size: 1.0625rem; }
+.ownalytics-atelier #landing_page .front-page-button .button.blue { box-shadow: 0 4px 0 var(--plum-deep); border-color: var(--ink); }
+.ownalytics-atelier #landing_page .front-page-button .button.green { box-shadow: 0 4px 0 var(--plum-deep); }
+.ownalytics-atelier #landing_page .sidebar .content { margin-top: 18px; }
+.ownalytics-atelier #landing_page .sidebar .content:empty { display: none; }
+.ownalytics-atelier #landing_page .sidebar section { display: grid; gap: 8px; }
+.ownalytics-atelier #landing_page .sidebar section + section { margin-top: 18px; }
+.ownalytics-atelier #landing_page .sidebar .header {
+  margin: 0 0 4px; font-family: var(--display); font-weight: 800; font-size: 1.2rem; color: var(--sun);
+}
+.ownalytics-atelier #landing_page .sidebar section > div:not(.header) a {
+  display: block; padding: 12px 16px; border-radius: 16px; background: var(--paper); color: var(--ink);
+  font-weight: 600; text-decoration: none; line-height: 1.35;
+}
+.ownalytics-atelier #landing_page .sidebar section > div:not(.header) a:hover { background: var(--white); color: var(--plum); text-decoration: underline; }
+/* Featured categories (below) become topic cards */
+.ownalytics-atelier #landing_page > div:not([class]) { display: grid; gap: 18px; }
+@media (min-width: 700px) { .ownalytics-atelier #landing_page > div:not([class]) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .ownalytics-atelier #landing_page > div:not([class]) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ownalytics-atelier #landing_page > div:not([class]) > br { display: none; }
+.ownalytics-atelier #landing_page > div:not([class]) > h1 {
+  grid-column: 1 / -1; margin: 12px 0 0; font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); line-height: 1.12;
+}
+.ownalytics-atelier .featured-category {
+  display: grid; align-content: start; gap: 8px; padding: 22px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--white); box-shadow: 0 5px 0 var(--line); min-width: 0;
+}
+.ownalytics-atelier .featured-category > i {
+  display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+  background: var(--lilac-2); color: var(--plum); font-size: 20px !important;
+}
+.ownalytics-atelier .featured-category:nth-of-type(4n+2) > i { background: var(--sun); color: var(--ink); }
+.ownalytics-atelier .featured-category:nth-of-type(4n+3) > i { background: var(--mint); color: var(--mint-ink); }
+.ownalytics-atelier .featured-category:nth-of-type(4n+4) > i { background: var(--pink-tint); color: var(--pink-deep); }
+.ownalytics-atelier .featured-category .category-name { font-family: var(--display); font-weight: 800; font-size: 1.3rem; line-height: 1.2; }
+.ownalytics-atelier .article-headline { padding-top: 10px; border-top: 2px dashed var(--line); }
+.ownalytics-atelier .article-headline .article-title a { font-weight: 700; }
+.ownalytics-atelier .article-teaser { color: var(--ink-soft); font-size: .9375rem; }
+
+/* Offline and thank-you pages: admin content shown as one card */
+.ownalytics-atelier.p-offline #landing_page { display: block; max-width: 46rem; }
+.ownalytics-atelier.p-offline #landing_page,
+.ownalytics-atelier.v-thanks #content {
+  margin: 6vh auto 72px; padding: 32px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier.v-thanks #content { flex: 0 0 auto; width: calc(100% - 2 * var(--gutter)); max-width: 46rem; }
+.ownalytics-atelier.v-thanks #content > :last-child { margin-bottom: 0; }
+.ownalytics-atelier.v-thanks #content p { color: var(--ink-soft); font-size: 1.125rem; }
+
+/* ---------- Ticket view ---------- */
+
+.ownalytics-atelier .ticket-head { max-width: none; }
+.ownalytics-atelier .num { margin: 0 0 6px; font-family: var(--mono); font-weight: 600; color: var(--ink-soft); }
+.ownalytics-atelier .h-ticket { font-size: clamp(1.7rem, 1.2rem + 2.2vw, 2.6rem) !important; max-width: 30ch; }
+.ownalytics-atelier .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 12px; }
+.ownalytics-atelier .meta i { color: var(--plum); margin-right: 4px; }
+.ownalytics-atelier .ticket-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+
+.ownalytics-atelier #ticketThread { display: grid; gap: 20px; }
+.ownalytics-atelier #ticketThread > div { min-width: 0; }
+.ownalytics-atelier .thread-entry { display: flex; gap: 12px; align-items: flex-end; margin: 0; padding: 0; border: 0; background: none; }
+.ownalytics-atelier .thread-entry::before, .ownalytics-atelier .thread-entry::after { content: none; }
+.ownalytics-atelier .thread-entry.from-me { flex-direction: row-reverse; }
+.ownalytics-atelier .thread-entry > .avatar { margin-bottom: 4px; }
+.ownalytics-atelier .bubble {
+  min-width: 0; max-width: min(92%, 46rem); padding: 16px 20px 14px;
+  border: 2px solid var(--line); border-radius: 22px; background: var(--white);
+}
+.ownalytics-atelier .from-team .bubble { border-color: var(--plum-light); border-bottom-left-radius: 6px; box-shadow: 0 4px 0 var(--plum-light); }
+.ownalytics-atelier .from-me .bubble { background: var(--sun-tint); border-color: var(--sun-line); border-bottom-right-radius: 6px; }
+.ownalytics-atelier .from-other .bubble { background: var(--white); border-bottom-left-radius: 6px; }
+.ownalytics-atelier .thread-entry .header {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 6px; padding: 0;
+  background: none; border: 0; font-size: 1rem; color: var(--ink);
+}
+.ownalytics-atelier .thread-entry .header::before, .ownalytics-atelier .thread-entry .header::after { content: none; }
+.ownalytics-atelier .thread-entry .header time { margin-left: auto; font-size: .8125rem; color: var(--ink-soft); }
+.ownalytics-atelier .thread-entry .textra:empty { display: none; }
+.ownalytics-atelier .thread-entry .textra .action-button { padding: 2px 10px; font-size: .8125rem; }
+.ownalytics-atelier .role { padding: 1px 10px; border-radius: 99px; background: var(--plum); color: var(--paper); font-size: .75rem; font-weight: 700; }
+.ownalytics-atelier .role.me { background: var(--sun-line); color: var(--ink); }
+.ownalytics-atelier .b-title { margin: 0 0 8px; font-size: .875rem; font-weight: 600; color: var(--ink-soft); }
+.ownalytics-atelier .thread-entry .thread-body {
+  padding: 0; background: transparent; color: var(--ink); font-family: var(--sans);
+  font-size: 1rem !important; line-height: 1.6; overflow-x: auto;
+}
+.ownalytics-atelier .thread-body a:not(.button) { color: var(--plum) !important; text-decoration-thickness: 2px; }
+.ownalytics-atelier .thread-body a:not(.button):hover { color: var(--pink-deep) !important; }
+.ownalytics-atelier .thread-body pre, .ownalytics-atelier .thread-body > div > pre:first-child {
+  padding: 12px 14px; border-radius: 12px; background: var(--plum-deep) !important; color: var(--paper);
+  font-family: var(--mono); font-size: .875rem; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.ownalytics-atelier .thread-body blockquote { margin: 0 0 10px; padding: 4px 0 4px 14px; border-left: 3px solid var(--plum-light); color: var(--ink-soft); }
+.ownalytics-atelier .thread-body table { max-width: 100%; }
+.ownalytics-atelier .thread-body .attachments, .ownalytics-atelier .thread-body .attachments:not(:empty) {
+  display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0 !important; padding: 0; border: 0; background: none;
+}
+.ownalytics-atelier .attachment-info {
+  display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 12px; border-radius: 99px;
+  background: var(--lilac); border: 2px solid var(--line); font-size: .875rem;
+}
+.ownalytics-atelier .attachment-info i { color: var(--plum); }
+.ownalytics-atelier .attachment-info .filename { max-width: 22ch; font-weight: 600; }
+.ownalytics-atelier .attachment-info .filesize { color: var(--ink-soft); white-space: nowrap; }
+.ownalytics-atelier .thread-body pre a:not(.button) { color: var(--sun) !important; }
+.ownalytics-atelier .thread-body a:focus, .ownalytics-atelier .attachments a:focus { outline: none; }
+.ownalytics-atelier .thread-body a:focus-visible, .ownalytics-atelier .attachments a:focus-visible { outline: 3px solid var(--plum); outline-offset: 2px; }
+/* thread.css pins every block of a message to 14px: follow the bubble instead */
+.ownalytics-atelier .thread-body :is(div, p, ul, ol, table, dl, blockquote) { font-size: inherit; line-height: inherit; }
+@media (max-width: 599px) {
+  .ownalytics-atelier .thread-entry > .avatar { display: none; }
+  .ownalytics-atelier .bubble { max-width: none; flex: 1; padding: 14px 16px 12px; }
+  .ownalytics-atelier .thread-entry.from-me { padding-left: 18px; }
+  .ownalytics-atelier .thread-entry.from-team, .ownalytics-atelier .thread-entry.from-other { padding-right: 18px; }
+  .ownalytics-atelier .thread-entry .header time { margin-left: 0; width: 100%; }
+}
+.ownalytics-atelier .thread-event {
+  display: flex; justify-content: center; align-items: center; gap: 8px; margin: 0; padding: 4px 8px;
+  color: var(--ink-soft); font-size: .875rem; text-align: center; background: none;
+}
+.ownalytics-atelier .thread-event .type-icon {
+  display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; margin: 0; border-radius: 50%;
+  background: var(--lilac-2); border: 0; color: var(--plum);
+}
+.ownalytics-atelier .thread-event .type-icon i { color: var(--plum); opacity: 1; }
+.ownalytics-atelier .thread-event .type-icon::after { content: none; }
+.ownalytics-atelier .thread-event .description { color: var(--ink-soft); }
+.ownalytics-atelier .thread-event .description b, .ownalytics-atelier .thread-event .description strong { color: var(--ink); }
+.ownalytics-atelier .thread-event img.avatar { display: none; }
+.ownalytics-atelier #ticketThread > p em { color: var(--ink-soft); }
+
+.ownalytics-atelier .reply .card-title { margin-bottom: 10px; }
+.ownalytics-atelier .reply label.lbl { font-weight: 500; color: var(--ink-soft); font-size: .9375rem; }
+.ownalytics-atelier .reply .warning-banner { margin: 16px 0 0; }
+.ownalytics-atelier .kv { margin: 0; }
+.ownalytics-atelier .kv > div { display: grid; grid-template-columns: minmax(7rem, 40%) 1fr; gap: 10px; padding: 9px 0; border-top: 2px dashed var(--line); font-size: .9375rem; }
+.ownalytics-atelier .kv > div:first-child { border-top: 0; padding-top: 0; }
+.ownalytics-atelier .kv dt { color: var(--ink-soft); font-weight: 600; }
+.ownalytics-atelier .kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ownalytics-atelier .files { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ownalytics-atelier .files li { display: flex; align-items: baseline; gap: 8px; font-size: .9375rem; min-width: 0; }
+.ownalytics-atelier .files i { flex: none; color: var(--plum); }
+.ownalytics-atelier .files a { min-width: 0; word-break: break-all; font-weight: 600; }
+.ownalytics-atelier .files small { margin-left: auto; flex: none; color: var(--ink-soft); }
+
+/* ---------- Ticket list ---------- */
+
+.ownalytics-atelier .list-head h1 a { color: inherit; text-decoration: none; }
+.ownalytics-atelier .list-head h1 a:hover { color: var(--plum); }
+.ownalytics-atelier .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin-bottom: 14px; }
+.ownalytics-atelier .tabs { display: inline-flex; flex-wrap: wrap; padding: 4px; border-radius: 99px; background: var(--white); border: 2px solid var(--line); }
+.ownalytics-atelier .tab { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 99px; color: var(--ink); font-weight: 700; text-decoration: none; }
+.ownalytics-atelier .tab:hover { color: var(--plum); background: var(--lilac); }
+.ownalytics-atelier .tab.on { background: var(--plum); color: var(--paper); }
+.ownalytics-atelier .tab.on .count { background: var(--sun); color: var(--ink); }
+.ownalytics-atelier .tsearch-form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; flex: 1 1 420px; }
+.ownalytics-atelier .tsearch { position: relative; display: flex; align-items: center; gap: 8px; flex: 1 1 260px; max-width: 460px; }
+.ownalytics-atelier .tsearch > i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--plum); pointer-events: none; }
+.ownalytics-atelier .tsearch input[type=search] { padding-left: 44px; border-radius: 99px; }
+.ownalytics-atelier .tsearch-form select { width: auto; flex: 0 1 17rem; max-width: 100%; border-radius: 99px; padding-left: 1.2em; }
+.ownalytics-atelier .sortbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0 0 18px; font-size: .9375rem; }
+.ownalytics-atelier .sortbar .muted { margin-right: 4px; }
+.ownalytics-atelier .sortbar a { padding: 3px 10px; border-radius: 99px; text-decoration: none; font-weight: 600; }
+.ownalytics-atelier .sortbar a:hover { background: var(--white); text-decoration: underline; }
+.ownalytics-atelier .sortbar a.on { background: var(--lilac-2); color: var(--plum); }
+.ownalytics-atelier .sortbar .clear-filters { margin-left: auto; color: var(--ink-soft); }
+.ownalytics-atelier .tlist { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.ownalytics-atelier .tcard {
+  display: flex; align-items: center; gap: 16px; padding: 18px 22px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--white); color: var(--ink); text-decoration: none; box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier .tcard:hover { border-color: var(--plum); color: var(--ink); }
+.ownalytics-atelier .tcard:hover .t-subj { text-decoration: underline; text-decoration-thickness: 2px; }
+.ownalytics-atelier .tcard.unread { border-color: var(--pink); box-shadow: 0 5px 0 #FFB3CF; }
+.ownalytics-atelier .tcard.is-closed { background: var(--paper); }
+.ownalytics-atelier .tcard .t-ic {
+  flex: none; display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--mint); color: var(--mint-ink); font-size: 18px;
+}
+.ownalytics-atelier .tcard.unread .t-ic { background: var(--pink-tint); color: var(--pink-deep); }
+.ownalytics-atelier .tcard.is-closed .t-ic { background: var(--lilac-2); color: var(--plum); }
+.ownalytics-atelier .t-main { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.ownalytics-atelier .t-subj { font-family: var(--display); font-weight: 800; font-size: 1.1875rem; line-height: 1.25; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.ownalytics-atelier .t-subj i { color: var(--plum); font-size: .9em; margin-right: 4px; }
+.ownalytics-atelier .t-sub { display: flex; flex-wrap: wrap; gap: 2px 16px; font-size: .875rem; color: var(--ink-soft); }
+.ownalytics-atelier .t-num { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+.ownalytics-atelier .t-side { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 10px; flex: none; }
+.ownalytics-atelier .chev { color: var(--plum); }
+@media (max-width: 640px) {
+  .ownalytics-atelier .tcard { flex-wrap: wrap; padding: 16px 18px; gap: 12px; }
+  .ownalytics-atelier .tcard .t-ic { display: none; }
+  .ownalytics-atelier .t-side { width: 100%; justify-content: flex-start; }
+  .ownalytics-atelier .t-side .chev { margin-left: auto; }
+  .ownalytics-atelier .tsearch-form select { flex: 1 1 100%; }
+}
+.ownalytics-atelier .empty { text-align: center; padding-block: 36px; }
+.ownalytics-atelier .empty .actions { justify-content: center; }
+.ownalytics-atelier .pager { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 26px; color: var(--ink-soft); }
+.ownalytics-atelier .pager a, .ownalytics-atelier .pager > b {
+  display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 10px; border-radius: 99px;
+  background: var(--white); border: 2px solid var(--line); text-decoration: none; color: var(--plum);
+}
+.ownalytics-atelier .pager > b { background: var(--plum); border-color: var(--plum); color: var(--paper); }
+.ownalytics-atelier .pager a:hover { border-color: var(--plum); }
+
+/* ---------- Sign in, check status, password reset, account ---------- */
+
+.ownalytics-atelier .login .actions { margin-top: 4px; }
+.ownalytics-atelier .login .plain-link.suggest { color: var(--pink-deep); }
+.ownalytics-atelier .login.alt { background: var(--sun-tint); border-color: var(--sun-line); box-shadow: 0 5px 0 var(--sun-line); }
+.ownalytics-atelier .sep { margin: 22px 0 0; padding-top: 16px; border-top: 2px dashed var(--line); }
+.ownalytics-atelier .sep p { margin: 0 0 6px; }
+.ownalytics-atelier .login.alt .sep { border-top-color: #E5CB5A; }
+.ownalytics-atelier .login .card-title i { color: var(--plum); }
+.ownalytics-atelier .external-auth { margin-top: 14px; }
+.ownalytics-atelier a.external-sign-in { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.ownalytics-atelier .external-auth-box { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border: 2px solid var(--line); border-radius: 99px; background: var(--white); }
+.ownalytics-atelier .external-auth-icon { width: 24px; height: 24px; }
+
+/* Original markup of accesslink.inc.php and pwreset.*.php (#clientLogin) */
+.ownalytics-atelier #content > form#clientLogin:not(.card) {
+  max-width: 980px; margin-inline: auto; padding: 24px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--white); box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier.v-accesslink #content > form#clientLogin { background: var(--sun-tint); border-color: var(--sun-line); box-shadow: 0 5px 0 var(--sun-line); }
+.ownalytics-atelier #content > form#clientLogin:not(.card) > div[style*="table-row"] { display: grid !important; gap: 20px 32px; }
+@media (min-width: 860px) { .ownalytics-atelier #content > form#clientLogin:not(.card) > div[style*="table-row"] { grid-template-columns: 1fr 1fr; } }
+.ownalytics-atelier #content > form#clientLogin:not(.card) > div[style*="width:50%"] { width: 100% !important; display: block !important; }
+.ownalytics-atelier #clientLogin .login-box { display: grid; gap: 14px; width: auto; padding: 0; border: 0; float: none; }
+.ownalytics-atelier #clientLogin .login-box label { display: grid; gap: 6px; font-weight: 700; }
+.ownalytics-atelier #clientLogin .login-box p { margin: 4px 0 0; }
+.ownalytics-atelier #clientLogin .instructions { padding: 18px 0 0; border-top: 2px dashed var(--line); color: var(--ink-soft); }
+@media (min-width: 860px) { .ownalytics-atelier #clientLogin .instructions { padding: 0 0 0 28px; border-top: 0; border-left: 2px dashed var(--line); } }
+.ownalytics-atelier #clientLogin > div > div > label, .ownalytics-atelier #clientLogin > div > label { display: block; margin: 12px 0 6px; }
+.ownalytics-atelier #content > h1 + p, .ownalytics-atelier #content > .alert + h1 + p { font-size: 1.125rem; color: var(--ink-soft); max-width: 60ch; }
+.ownalytics-atelier #content > p:last-child { margin-top: 24px; color: var(--ink-soft); }
+.ownalytics-atelier #content > br { display: none; }
+
+/* Registration, profile, ticket edit: original tables inside a card */
+.ownalytics-atelier.p-account #content > form, .ownalytics-atelier #content > form:has(> table.padded), .ownalytics-atelier.v-edit #content > form {
+  max-width: 46rem; padding: 24px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier.p-account #content > form > hr, .ownalytics-atelier #content > form:has(> table.padded) > hr, .ownalytics-atelier.v-edit #content > form > hr { display: none; }
+.ownalytics-atelier.p-account #content > form > p[style], .ownalytics-atelier #content > form:has(> table.padded) > p[style], .ownalytics-atelier.v-edit #content > form > p[style] {
+  display: flex; flex-wrap: wrap; gap: 14px 18px; justify-content: flex-start; margin-top: 24px;
+}
+.ownalytics-atelier table.padded tr:has(h3) { margin-top: 26px; padding-top: 18px; border-top: 2px dashed var(--line); }
+.ownalytics-atelier table.padded tr:first-child:has(h3) { margin-top: 0; padding-top: 0; border-top: 0; }
+.ownalytics-atelier table.padded h3 { margin: 0; }
+.ownalytics-atelier.v-register-confirm #content, .ownalytics-atelier.v-register-confirmed #content, .ownalytics-atelier.v-pwreset-sent #content { max-width: calc(46rem + 2 * var(--gutter)); }
+
+/* ---------- Knowledge base ---------- */
+
+.ownalytics-atelier .kb-hero { margin-bottom: 44px; max-width: 60rem; }
+.ownalytics-atelier .kb-hero h1 { font-size: clamp(2.1rem, 1.2rem + 3.6vw, 3.6rem); margin-bottom: 22px; }
+.ownalytics-atelier .ask { display: flex; flex-wrap: wrap; gap: 12px; max-width: 46rem; }
+.ownalytics-atelier .topic-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 18px; max-width: 46rem; }
+.ownalytics-atelier .topic-filter label { margin: 0; color: var(--ink-soft); }
+.ownalytics-atelier .topic-filter select { flex: 1 1 16rem; width: auto; border-radius: 99px; }
+.ownalytics-atelier .block { margin-bottom: 44px; }
+.ownalytics-atelier .h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); line-height: 1.12; margin-bottom: 8px; }
+.ownalytics-atelier .block > .muted { margin-bottom: 18px; }
+.ownalytics-atelier .topics { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 700px) { .ownalytics-atelier .topics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .ownalytics-atelier .topics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ownalytics-atelier .topic {
+  display: grid; align-content: start; gap: 8px; padding: 22px 24px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--white); color: var(--ink); box-shadow: 0 5px 0 var(--line); min-width: 0;
+}
+.ownalytics-atelier .topic .t-ic { display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; font-size: 20px; }
+.ownalytics-atelier .t0 .t-ic { background: var(--lilac-2); color: var(--plum); }
+.ownalytics-atelier .t1 .t-ic { background: var(--sun); color: var(--ink); }
+.ownalytics-atelier .t2 .t-ic { background: var(--mint); color: var(--mint-ink); }
+.ownalytics-atelier .t3 .t-ic { background: var(--pink-tint); color: var(--pink-deep); }
+.ownalytics-atelier .t-name { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font-family: var(--display); font-weight: 800; font-size: 1.3rem; line-height: 1.2; }
+.ownalytics-atelier .t-name a { color: var(--ink); text-decoration: none; }
+.ownalytics-atelier .t-name a:hover { text-decoration: underline; color: var(--plum); }
+.ownalytics-atelier .t-desc { color: var(--ink-soft); font-size: .9375rem; }
+.ownalytics-atelier .t-desc > :last-child { margin-bottom: 0; }
+.ownalytics-atelier .topic .subs { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: .9375rem; }
+.ownalytics-atelier .topic .subs i { color: var(--plum); margin-right: 4px; }
+.ownalytics-atelier .links { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ownalytics-atelier .links a { font-weight: 600; }
+.ownalytics-atelier .topics.big .links { margin-top: 6px; padding-top: 12px; border-top: 2px dashed var(--line); }
+
+/* Original KB markup: .row > .span8 + .span4 (search results, category, article) */
+.ownalytics-atelier .row { display: grid; gap: 28px; align-items: start; }
+@media (min-width: 980px) { .ownalytics-atelier .row { grid-template-columns: minmax(0, 1fr) 320px; gap: 36px; } }
+.ownalytics-atelier .span8, .ownalytics-atelier .span4 { width: auto; float: none; min-width: 0; }
+.ownalytics-atelier .row .sidebar {
+  float: none; width: auto; display: grid; gap: 18px; padding: 22px; border: 2px solid var(--line); border-radius: var(--r);
+  background: var(--white); box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier .row .sidebar .searchbar input.search { border-radius: 99px; padding-inline: 1.2em; }
+.ownalytics-atelier .row .sidebar .content { display: grid; gap: 16px; }
+.ownalytics-atelier .row .sidebar section { display: grid; gap: 6px; }
+.ownalytics-atelier .row .sidebar section .header, .ownalytics-atelier .row .sidebar section > strong {
+  font-family: var(--display); font-weight: 800; font-size: 1.1rem; margin-bottom: 2px;
+}
+.ownalytics-atelier .row .sidebar section a { font-weight: 600; }
+.ownalytics-atelier .row .sidebar section > a { display: block; }
+.ownalytics-atelier #faq ol { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.ownalytics-atelier #faq ol li a {
+  display: block; padding: 14px 18px; border: 2px solid var(--line); border-radius: 16px; background: var(--white);
+  font-weight: 700; text-decoration: none; color: var(--ink);
+}
+.ownalytics-atelier #faq ol li a:hover { border-color: var(--plum); color: var(--plum); text-decoration: underline; }
+.ownalytics-atelier #faq .Icon.file::before { content: "\f0c6"; font-family: FontAwesome; color: var(--plum); font-weight: 400; }
+.ownalytics-atelier.p-kb .span8 > h2 { margin-top: 24px; }
+.ownalytics-atelier.p-kb .span8 > hr { margin: 18px 0; }
+.ownalytics-atelier.p-kb .span8 > div > div > i { color: var(--plum); margin-right: 6px; }
+.ownalytics-atelier #breadcrumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 0 0 18px; padding: 0 !important; color: var(--ink-soft); font-weight: 600; }
+.ownalytics-atelier .faq-content {
+  padding: 26px 28px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
+}
+.ownalytics-atelier .faq-content .article-title {
+  font-family: var(--display); font-weight: 800; font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.2rem); line-height: 1.12; letter-spacing: -.015em; margin-bottom: 6px;
+}
+.ownalytics-atelier .faq-content > br { display: none; }
+.ownalytics-atelier .faq-content > .faded { margin-bottom: 18px; font-size: .9375rem; }
+.ownalytics-atelier .faq-content .thread-body {
+  padding: 0; background: transparent; color: var(--ink); font-family: var(--sans); font-size: 1.0625rem !important; line-height: 1.65;
+}
+.ownalytics-atelier.v-faq .span8 > h1 { font-size: 1rem; font-family: var(--sans); font-weight: 700; letter-spacing: 0; color: var(--ink-soft); margin-bottom: 4px; }
+
+/* ---------- Footer ---------- */
+
+.ownalytics-atelier .site-footer { flex: none; background: var(--plum-deep); color: var(--plum-light); padding-block: 40px 36px; font-size: .9375rem; }
+.ownalytics-atelier .foot { display: grid; gap: 20px; }
+.ownalytics-atelier .foot .brand .wm { font-size: 1.2rem; }
+.ownalytics-atelier .foot-brand p { margin: 10px 0 0; max-width: 46ch; }
+.ownalytics-atelier .legal { display: flex; flex-wrap: wrap; gap: 4px 24px; margin: 0; padding: 0; list-style: none; }
+.ownalytics-atelier .legal a { display: inline-block; padding-block: 5px; }
+.ownalytics-atelier .site-footer a { color: var(--plum-light); }
+.ownalytics-atelier .site-footer a:hover { color: var(--sun); }
+.ownalytics-atelier .site-footer .small { color: var(--plum-light); margin: 0; }
+.ownalytics-atelier .site-footer #poweredBy { display: inline; width: auto; height: auto; padding: 0; margin-left: 4px; background: none; text-indent: 0; }
+
+/* ---------- Loading overlay (osticket.js) ---------- */
+
+.ownalytics-atelier #overlay { background: var(--plum-deep); }
+.ownalytics-atelier #loading {
+  width: min(320px, calc(100vw - 32px)); height: auto; padding: 18px 20px 18px 64px; border: 2px solid var(--plum);
+  border-radius: 18px; background-color: var(--white); color: var(--ink); box-shadow: 0 6px 0 var(--plum-light);
+}
+.ownalytics-atelier #loading h4 { margin: 0 0 4px; color: var(--plum); font-family: var(--display); font-size: 1.1rem; }
+.ownalytics-atelier #loading p { margin: 0; font-size: .9375rem; }
+
+/* jQuery UI dialogs and date picker, in case a form uses them */
+.ownalytics-atelier .ui-widget { font-family: var(--sans); }
+.ownalytics-atelier .ui-datepicker { border-radius: 14px; border: 2px solid var(--line); }
+.ownalytics-atelier .ui-datepicker .ui-datepicker-header { background: var(--plum); color: var(--paper); border: 0; border-radius: 10px; }
+
+/* ---------- RTL ---------- */
+
+.rtl.ownalytics-atelier .who { margin-left: 0; margin-right: auto; }
+.rtl.ownalytics-atelier .thread-entry.from-me { flex-direction: row; }
+.rtl.ownalytics-atelier .thread-entry.from-team, .rtl.ownalytics-atelier .thread-entry.from-other { flex-direction: row-reverse; }
+.rtl.ownalytics-atelier .thread-entry .header time { margin-left: 0; margin-right: auto; }
+.rtl.ownalytics-atelier .files small { margin-left: 0; margin-right: auto; }
+
+/* ---------- Motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ownalytics-atelier *, .ownalytics-atelier *::before, .ownalytics-atelier *::after { transition: none !important; animation: none !important; }
+  .ownalytics-atelier #landing_page .sidebar, .ownalytics-atelier .brand .wm-sub { transform: none; }
+}
+
+/* ---------- Print (ticket and articles) ---------- */
+
+@media print {
+  @page { margin: 16mm 14mm; }
+  body.ownalytics-atelier { display: block; background: #fff; color: #000; font-size: 11pt; line-height: 1.45; }
+  .ownalytics-atelier .site-header, .ownalytics-atelier .site-footer, .ownalytics-atelier .skip, .ownalytics-atelier .sysbar, .ownalytics-atelier .ticket-actions,
+  .ownalytics-atelier .back, .ownalytics-atelier #reply, .ownalytics-atelier .toolbar, .ownalytics-atelier .sortbar, .ownalytics-atelier .pager, .ownalytics-atelier .row .sidebar,
+  .ownalytics-atelier #overlay, .ownalytics-atelier #loading, .ownalytics-atelier .side .files-card, .ownalytics-atelier .kb-hero form, .ownalytics-atelier .topic-filter,
+  .ownalytics-atelier #landing_page .sidebar, .ownalytics-atelier .search-form { display: none !important; }
+  .ownalytics-atelier .main { padding: 0; }
+  .ownalytics-atelier .wrap { max-width: none; padding: 0; }
+  .ownalytics-atelier .split, .ownalytics-atelier .row { display: block; }
+  .ownalytics-atelier .side { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; page-break-inside: avoid; }
+  .ownalytics-atelier .card, .ownalytics-atelier .bubble, .ownalytics-atelier .tcard, .ownalytics-atelier .topic, .ownalytics-atelier .faq-content {
+    box-shadow: none !important; border: 1px solid #999; border-radius: 8px; background: #fff !important;
+  }
+  .ownalytics-atelier .h-ticket { font-size: 18pt !important; }
+  .ownalytics-atelier .thread-entry { page-break-inside: avoid; break-inside: avoid; }
+  .ownalytics-atelier .bubble { max-width: 100%; }
+  .ownalytics-atelier .from-me .bubble { border-style: dashed; }
+  .ownalytics-atelier .avatar { border: 1px solid #000; background: #fff !important; color: #000 !important; box-shadow: none !important; }
+  .ownalytics-atelier .pill, .ownalytics-atelier .role, .ownalytics-atelier .count { border: 1px solid #000; background: #fff !important; color: #000 !important; }
+  .ownalytics-atelier a, .ownalytics-atelier .thread-body a:not(.button), .ownalytics-atelier .thread-body pre a:not(.button) { color: #000 !important; text-decoration: underline; }
+  .ownalytics-atelier .thread-entry.from-me { padding-left: 0; }
+  .ownalytics-atelier .thread-body pre { background: #f2f2f2 !important; color: #000; border: 1px solid #999; }
+  .ownalytics-atelier .attachment-info { background: #fff; border-color: #999; }
+}

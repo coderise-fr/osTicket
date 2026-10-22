@@ -1,0 +1,7 @@
+# Installé avec le thème dans deploy/docker/overlay/ : sans cette règle, Git sous Windows
+# (core.autocrlf=true) peut prendre une police WOFF2 pour du texte et l'altérer au commit
+# de l'overlay (constaté sur bricolage-grotesque-700-800-latin.woff2).
+*.woff2 binary
+*.svg text eol=lf
+*.css text eol=lf
+*.txt text eol=lf

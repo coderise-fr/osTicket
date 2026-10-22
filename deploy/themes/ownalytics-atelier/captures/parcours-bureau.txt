@@ -1,0 +1,18 @@
+OK   ouverture: erreurs affichées 
+OK   ouverture: champs dynamiques rechargés en AJAX 
+OK   ouverture: page de remerciement avec numéro 514714
+OK   accès: message "lien envoyé" 
+OK   connexion: erreur affichée 
+OK   connexion: liste des tickets 
+OK   liste: onglet Fermés 
+OK   liste: recherche 1
+OK   liste: état vide 
+OK   isolation: ticket d’un autre client absent 
+OK   suivi: réponse publiée avec pièce jointe 
+OK   suivi: message de succès 
+OK   inscription: page de confirmation 
+OK   mot de passe: demande envoyée 
+OK   kb: résultats de recherche 
+OK   kb: fiche article 
+OK   kb: filtre par thème 
+
