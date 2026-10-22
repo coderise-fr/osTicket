@@ -5,7 +5,9 @@ if(!defined('OSTCLIENTINC') || !$thisclient || !$ticket || !$ticket->checkUserAc
  * reopen warning, merged tickets) and inline images script as the original.
  * New layout: title band (subject, status, number, dates, actions, and the
  * "first reply" indicator of the Priority SLA plan when it applies), then
- * the thread and the reply form, with the ticket information on the side. */
+ * the thread and the reply form, with the ticket information on the side.
+ * Support contract badge (band and side column): optional, see
+ * sommet_contract() in include/client/sommet/sommet.inc.php. */
 
 $info=($_POST && $errors)?Format::htmlchars($_POST):array();
 
@@ -24,6 +26,9 @@ if(!$dept || !$dept->isPublic())
 $S = $ticket->getStatus();
 $sommet_state = $ticket->isClosed() ? 'closed' : 'open';
 $sommet_sla = sommet_priority_sla($ticket);
+// Contract level of the ticket OWNER (never a collaborator), current level;
+// null without the sla_first_response plugin (nothing shown). Once per page.
+$sommet_contract = sommet_contract($ticket);
 ?>
 <!--sommet:bandeau-->
 <h1 id="sommet-title" class="ticket-subject"><?php
@@ -33,6 +38,7 @@ $sommet_sla = sommet_priority_sla($ticket);
     <span class="status status-<?php echo $sommet_state; ?>"><?php
         echo sommet_icon($sommet_state == 'closed' ? 'lock' : 'inbox', 14);
         echo $S ? $S->getLocalName() : ''; ?></span>
+<?php if ($sommet_contract) echo '    ', sommet_contract_badge($sommet_contract), "\n"; ?>
     <span class="num">#<?php echo $ticket->getNumber(); ?></span>
     <span class="since"><?php echo sommet_icon('clock', 15, __('Create Date'));
         ?> <time datetime="<?php echo date(DateTime::W3C, Misc::db2gmtime($ticket->getCreateDate()));
@@ -174,6 +180,10 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
 <?php if ($ticket->getPhoneNumber()) { ?>
         <div><dt><?php echo __('Phone');?></dt>
             <dd><?php echo $ticket->getPhoneNumber(); ?></dd></div>
+<?php } ?>
+<?php if ($sommet_contract) { ?>
+        <div class="contract"><dt><?php echo __s('Support contract (current)'); ?></dt>
+            <dd><?php echo sommet_contract_badge($sommet_contract, false); ?></dd></div>
 <?php } ?>
     </dl>
 <!-- Custom Data -->

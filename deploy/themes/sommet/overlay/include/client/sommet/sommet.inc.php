@@ -21,6 +21,11 @@
       stays in the page.
     - sommet_priority_sla(): data of the "first reply" indicator of a
       ticket (Priority SLA plan), see view.inc.php.
+    - sommet_contract(), sommet_contract_badge(): support contract level
+      ("Priority" / "Standard") given by the OPTIONAL function
+      coderise_contract_level() of the sla_first_response plugin
+      (contrib/sla-first-response, README section 9). Without the plugin
+      (absent or disabled), no level is ever shown.
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
@@ -32,7 +37,7 @@ if (!defined('INCLUDE_DIR')) die('Access Denied');
 if (!defined('SOMMET_THEME')) {
     define('SOMMET_THEME', 'sommet');
     // Bumped with every change of the stylesheet (cache busting).
-    define('SOMMET_VERSION', '1.0.0');
+    define('SOMMET_VERSION', '1.1.0');
 
     // Name of the SLA plan of the Priority support (first reply within
     // 4 hours). Can be defined beforehand, e.g. in ost-config.php. The
@@ -90,6 +95,7 @@ if (!defined('SOMMET_THEME')) {
             'file' => '<path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/>',
             'group' => '<circle cx="9" cy="9" r="3.2"/><path d="M3 19a6 6 0 0 1 12 0M16 6.2a3.2 3.2 0 0 1 0 6.1M18 19a6 6 0 0 0-2.5-4.9"/>',
             'clock' => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+            'bolt' => '<path d="m13 3-8 11h6l-1 7 8-11h-6z"/>',
         );
         if (!isset($paths[$name]))
             return '';
@@ -219,5 +225,56 @@ if (!defined('SOMMET_THEME')) {
             'left' => max(0, $t1 - $now),
             'hours' => (int) $sla->getGracePeriod(),
         );
+    }
+
+    /**
+     * Support contract level of a client, or null when nothing reliable can
+     * be shown. $subject: null (signed-in client), User or Ticket (its
+     * OWNER, never a collaborator), as coderise_contract_level().
+     *
+     * The function belongs to the sla_first_response plugin and only exists
+     * while the plugin and its instance are enabled: without it, null (the
+     * theme then shows no level and no Priority commitment). A level that is
+     * only the plugin's default (no signed-in client, guest, Priority
+     * organisation not configured or deleted, error) is not shown either:
+     * only source "organisation" is. It is the CURRENT level of the client,
+     * not the one at the time the ticket was opened. The plugin caches the
+     * result for the request; callers still compute it once per page.
+     */
+    function sommet_contract($subject=null) {
+        if (!function_exists('coderise_contract_level'))
+            return null;
+        try {
+            $level = coderise_contract_level($subject);
+        }
+        catch (Throwable $t) {
+            return null;
+        }
+        if (!is_array($level) || !isset($level['level'], $level['source'])
+                || $level['source'] !== 'organisation'
+                || !in_array($level['level'], array('priority', 'standard'), true))
+            return null;
+        $label = isset($level['label']) ? trim((string) $level['label']) : '';
+        if ($label === '')
+            $label = $level['level'] == 'priority' ? 'Priority' : 'Standard';
+        return array('level' => $level['level'], 'label' => $label);
+    }
+
+    /**
+     * Badge of a contract level (result of sommet_contract()). The label is
+     * typed by an administrator in the plugin: always escaped. $prefix adds
+     * "Support contract:" for screen readers (visually hidden) when the
+     * badge has no visible caption.
+     */
+    function sommet_contract_badge($contract, $prefix=true) {
+        if (!$contract)
+            return '';
+        $priority = ($contract['level'] == 'priority');
+        return sprintf('<span class="plan plan-%s">%s%s%s</span>',
+            $priority ? 'priority' : 'standard',
+            $priority ? sommet_icon('bolt', 13) : '',
+            $prefix ? '<span class="visually-hidden">'
+                . Format::htmlchars(__s('Support contract:')) . ' </span>' : '',
+            Format::htmlchars($contract['label']));
     }
 }

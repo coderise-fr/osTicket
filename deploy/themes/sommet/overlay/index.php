@@ -73,10 +73,40 @@ if ($sommet_topics) { ?>
 </section>
 <?php } ?>
 
-<section class="statement">
-    <p class="big"><?php echo __s('Priority support: a first reply <span class="mark">within 4 hours</span>, day and night.'); ?></p>
-    <p class="small"><?php echo __s('Standard support: business days. Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support.'); ?></p>
+<?php
+// Support levels, adapted to the signed-in client's CURRENT contract level
+// (optional sla_first_response plugin, see sommet_contract()). A Priority
+// commitment is only shown to a client whose level is Priority; a Standard
+// client is told "business days"; a visitor, a guest, or any page without a
+// reliable level (plugin absent or disabled, Priority organisation not
+// configured) gets a neutral presentation of both offers.
+$sommet_contract = $sommet_signed_in ? sommet_contract() : null;
+if ($sommet_contract && $sommet_contract['level'] == 'priority') { ?>
+<section class="statement is-priority">
+    <p class="contract-line"><?php echo __s('Your support contract:'); ?> <?php
+        echo sommet_contract_badge($sommet_contract, false); ?></p>
+    <p class="big"><?php echo sprintf(__s('Your %s support: a first reply <span class="mark">within 4 hours</span>, day and night.'),
+        Format::htmlchars($sommet_contract['label'])); ?></p>
+    <p class="small"><?php echo __s('Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support: write to us at any time.'); ?></p>
 </section>
+<?php } elseif ($sommet_contract) { ?>
+<section class="statement is-standard">
+    <p class="contract-line"><?php echo __s('Your support contract:'); ?> <?php
+        echo sommet_contract_badge($sommet_contract, false); ?></p>
+    <p class="big"><?php echo sprintf(__s('Your %s support: we reply on <span class="mark">business days</span>.'),
+        Format::htmlchars($sommet_contract['label'])); ?></p>
+    <p class="small"><?php echo __s('Monday to Friday, with no guaranteed response time.'); ?></p>
+</section>
+<?php } else { ?>
+<section class="statement is-neutral">
+    <p class="big"><?php echo __s('Two levels of support, one team.'); ?></p>
+    <ul class="offers">
+        <li><?php echo __s('<strong>Standard support:</strong> business days, with no guaranteed response time.'); ?></li>
+        <li><?php echo __s('<strong>Priority support</strong> (subscription): a first reply within 4 hours, day and night.'); ?></li>
+    </ul>
+    <p class="small"><?php echo __s('Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support.'); ?></p>
+</section>
+<?php } ?>
 
 <?php
 if ($cfg && $cfg->isKnowledgebaseEnabled()) { ?>
