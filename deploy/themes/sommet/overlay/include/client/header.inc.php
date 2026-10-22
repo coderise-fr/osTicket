@@ -305,6 +305,15 @@ if (($all_langs = Internationalization::getConfiguredSystemLanguages())
                     . Format::htmlchars(__('Search our knowledge base')) . '"/>'
                     . '<button type="submit" class="btn btn-primary">' . __('Search') . '</button></form>';
             }
+            // Ticket list: the signed-in client's own (current) support contract,
+            // once for the page (optional sla_first_response plugin, see
+            // sommet_contract()). Not per row: see the theme's README.
+            elseif ($sommet_script == 'tickets' && $sommet_signed_in
+                    && isset($inc) && $inc == 'tickets.inc.php'
+                    && ($sommet_contract = sommet_contract())) {
+                $sommet_extra = '<p class="contract-line">' . __s('Your support contract:') . ' '
+                    . sommet_contract_badge($sommet_contract, false) . '</p>';
+            }
             sommet_banner_open($sommet_crumbs, $sommet_fallback, $sommet_extra);
         }
 ?>

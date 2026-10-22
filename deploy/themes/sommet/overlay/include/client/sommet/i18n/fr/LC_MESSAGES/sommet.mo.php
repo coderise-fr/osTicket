@@ -26,10 +26,26 @@ return array(
         'Les horaires de l’entreprise ne sont pas ceux du support Priority.',
     'Follow Coderise' => 'Suivre Coderise',
     'What would you like to entrust us with?' => "Que voulez-vous nous confier\u{a0}?",
-    'Priority support: a first reply <span class="mark">within 4 hours</span>, day and night.' =>
-        "Support Priority\u{a0}: un premier retour <span class=\"mark\">sous 4\u{a0}heures</span>, jour et nuit.",
-    'Standard support: business days. Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support.' =>
-        "Support standard\u{a0}: jours ouvrés. Les horaires de l’entreprise (du lundi au vendredi, 8h30 à 17h00) ne sont pas ceux du support Priority.",
+    // Encart des délais de l'accueil, selon le niveau de contrat (plugin facultatif)
+    'Your support contract:' => "Votre contrat de support\u{a0}:",
+    'Your %s support: a first reply <span class="mark">within 4 hours</span>, day and night.' =>
+        "Votre support %s\u{a0}: un premier retour <span class=\"mark\">sous 4\u{a0}heures</span>, jour et nuit.",
+    'Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support: write to us at any time.' =>
+        "Les horaires de l’entreprise (du lundi au vendredi, 8h30 à 17h00) ne sont pas ceux du support Priority\u{a0}: écrivez-nous à toute heure.",
+    'Your %s support: we reply on <span class="mark">business days</span>.' =>
+        "Votre support %s\u{a0}: nous vous répondons les <span class=\"mark\">jours ouvrés</span>.",
+    'Monday to Friday, with no guaranteed response time.' =>
+        'Du lundi au vendredi, sans délai de réponse garanti.',
+    'Two levels of support, one team.' => 'Deux niveaux de support, une seule équipe.',
+    '<strong>Standard support:</strong> business days, with no guaranteed response time.' =>
+        "<strong>Support standard\u{a0}:</strong> jours ouvrés, sans délai de réponse garanti.",
+    '<strong>Priority support</strong> (subscription): a first reply within 4 hours, day and night.' =>
+        "<strong>Support Priority</strong> (sur abonnement)\u{a0}: un premier retour sous 4\u{a0}heures, jour et nuit.",
+    'Office hours (Monday to Friday, 8:30 am to 5:00 pm) are not the hours of the Priority support.' =>
+        'Les horaires de l’entreprise (du lundi au vendredi, 8h30 à 17h00) ne sont pas ceux du support Priority.',
+    // Pastille du niveau de contrat (suivi d'un ticket)
+    'Support contract:' => "Contrat de support\u{a0}:",
+    'Support contract (current)' => 'Contrat de support (actuel)',
     'The whole knowledge base' => 'Toute la base de connaissances',
     'Priority support: time to the first reply' => 'Support Priority : délai du premier retour',
     'First reply within %d h' => "Premier retour sous %d\u{a0}h",

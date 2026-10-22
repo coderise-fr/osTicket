@@ -1,0 +1,1099 @@
+{
+  "date": "2026-10-22",
+  "commit": "c392ea3d",
+  "note": "Niveau de contrat (plugin sla_first_response 0.3) : 58 rendus, phases plugin actif / plugin désactivé / plugin absent de l image. min = contraste minimal mesuré (WCAG), overflow = débordement horizontal en px.",
+  "requetes_sql": {
+    "plugin": {
+      "accueil": {
+        "status": 200,
+        "queries": 28,
+        "organization": 1,
+        "user": 1
+      },
+      "liste (25 lignes sur 42)": {
+        "status": 200,
+        "queries": 34,
+        "organization": 1,
+        "user": 1
+      },
+      "liste page 2": {
+        "status": 200,
+        "queries": 35,
+        "organization": 1,
+        "user": 1
+      },
+      "suivi Priority": {
+        "status": 200,
+        "queries": 49,
+        "organization": 2,
+        "user": 2
+      },
+      "suivi collaborateur": {
+        "status": 200,
+        "queries": 63,
+        "organization": 3,
+        "user": 2
+      }
+    },
+    "disabled": {
+      "accueil": {
+        "status": 200,
+        "queries": 24,
+        "organization": 1,
+        "user": 1
+      },
+      "liste (25 lignes sur 42)": {
+        "status": 200,
+        "queries": 31,
+        "organization": 1,
+        "user": 1
+      },
+      "liste page 2": {
+        "status": 200,
+        "queries": 39,
+        "organization": 1,
+        "user": 1
+      },
+      "suivi Priority": {
+        "status": 200,
+        "queries": 45,
+        "organization": 2,
+        "user": 2
+      },
+      "suivi collaborateur": {
+        "status": 200,
+        "queries": 50,
+        "organization": 2,
+        "user": 2
+      }
+    },
+    "absent": {
+      "accueil": {
+        "status": 200,
+        "queries": 24,
+        "organization": 1,
+        "user": 1
+      },
+      "liste (25 lignes sur 42)": {
+        "status": 200,
+        "queries": 31,
+        "organization": 1,
+        "user": 1
+      },
+      "liste page 2": {
+        "status": 200,
+        "queries": 32,
+        "organization": 1,
+        "user": 1
+      },
+      "suivi Priority": {
+        "status": 200,
+        "queries": 46,
+        "organization": 2,
+        "user": 2
+      },
+      "suivi collaborateur": {
+        "status": 200,
+        "queries": 50,
+        "organization": 2,
+        "user": 2
+      }
+    }
+  },
+  "pages": {
+    "accueil-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Priority"
+      ],
+      "contractLine": [
+        "Your support contract: Priority"
+      ],
+      "statement": [
+        "statement is-priority"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Priority"
+      ],
+      "contractLine": [
+        "Your support contract: Priority"
+      ],
+      "statement": [
+        "statement is-priority"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-bureau": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Priority (bandeau)"
+      ],
+      "contractLine": [
+        "Your support contract: Priority"
+      ],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-mobile": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Priority (bandeau)"
+      ],
+      "contractLine": [
+        "Your support contract: Priority"
+      ],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-bureau": {
+      "url": "tickets.php?id=42",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-mobile": {
+      "url": "tickets.php?id=42",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-priority-bureau": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-priority-mobile": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-priority-apres-reponse-bureau": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-priority-apres-reponse-mobile": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-bureau": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-mobile": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-collaborateur-bureau": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-collaborateur-mobile": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-standard-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [
+        "statement is-standard"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-standard-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [
+        "statement is-standard"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-standard-bureau": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard (bandeau)"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-standard-mobile": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard (bandeau)"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-standard-bureau": {
+      "url": "tickets.php?id=85",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-standard-mobile": {
+      "url": "tickets.php?id=85",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-sans-organisation-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [
+        "statement is-standard"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-sans-organisation-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Standard"
+      ],
+      "contractLine": [
+        "Your support contract: Standard"
+      ],
+      "statement": [
+        "statement is-standard"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-sans-organisation-bureau": {
+      "url": "tickets.php?id=86",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-sans-organisation-mobile": {
+      "url": "tickets.php?id=86",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Standard (bandeau)",
+        "Standard (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-invite-bureau": {
+      "url": "tickets.php?id=88",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-invite-mobile": {
+      "url": "tickets.php?id=88",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [
+        "Support contract: Priority (bandeau)",
+        "Priority (colonne)"
+      ],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-invite-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-invite-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-plugin-desactive-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-plugin-desactive-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-plugin-desactive-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-plugin-desactive-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-plugin-desactive-bureau": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-plugin-desactive-mobile": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-priority-plugin-desactive-bureau": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-priority-plugin-desactive-mobile": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-apres-reponse-plugin-desactive-bureau": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-apres-reponse-plugin-desactive-mobile": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-plugin-desactive-bureau": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-plugin-desactive-mobile": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-collaborateur-plugin-desactive-bureau": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-collaborateur-plugin-desactive-mobile": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-sans-plugin-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-sans-plugin-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-sans-plugin-bureau": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "accueil-connecte-sans-plugin-mobile": {
+      "url": "index.php",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [
+        "statement is-neutral"
+      ],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-sans-plugin-bureau": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "tickets-sans-plugin-mobile": {
+      "url": "tickets.php",
+      "min": 5.83,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-priority-sans-plugin-bureau": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-priority-sans-plugin-mobile": {
+      "url": "tickets.php?id=82",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-apres-reponse-sans-plugin-bureau": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-apres-reponse-sans-plugin-mobile": {
+      "url": "tickets.php?id=83",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-sans-plugin-bureau": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-changement-plan-agent-sans-plugin-mobile": {
+      "url": "tickets.php?id=84",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 1,
+      "problems": []
+    },
+    "suivi-collaborateur-sans-plugin-bureau": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    },
+    "suivi-collaborateur-sans-plugin-mobile": {
+      "url": "tickets.php?id=87",
+      "min": 4.91,
+      "nfail": 0,
+      "overflow": 0,
+      "console": 0,
+      "external": 0,
+      "http": 0,
+      "phpError": false,
+      "badges": [],
+      "contractLine": [],
+      "statement": [],
+      "altimeter": 0,
+      "problems": []
+    }
+  }
+}
