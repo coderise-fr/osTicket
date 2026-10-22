@@ -13,7 +13,7 @@ Contenu :
 | `sql/premiere-reponse.sql` | Première réponse d'un agent **au client** par ticket Priority (minutes, respecté / dépassé). Contient la définition unique de « première réponse » |
 | `sql/depassements-par-client-periode.sql` | Comptage des dépassements **par client et par période d'abonnement à date anniversaire**, signalement des prolongations dues, tickets « sans abonnement connu », recoupement avec l'événement `overdue` |
 | `sql/masquer-evenements-0.2.sql` | Facultatif, une fois : convertit les événements « SLA modifié » écrits par la version 0.2 du plugin pour que le client ne les voie plus (section 10) |
-| `plugin/sla_first_response/` | Plugin (version 0.3) : après la première réponse adressée au client, le ticket n'est plus jamais « en retard » ; expose aussi le **niveau de contrat** d'un client aux thèmes du portail (section 9) |
+| `plugin/sla_first_response/` | Plugin (version 0.4) : après la première réponse adressée au client, le ticket n'est plus jamais « en retard » ; expose aussi le **niveau de contrat** d'un client aux thèmes du portail (section 9) |
 | `test/` | Test d'intégration jetable (Docker), MariaDB et MySQL : `pwsh contrib/sla-first-response/test/run.ps1` |
 
 ## 0. Décisions prises (à refléter dans la clause)
@@ -353,7 +353,7 @@ le même que osTicket (par défaut celui du serveur). Les dates du résultat son
 ## 6. Vérifié / non vérifié
 
 Vérifié par exécution (instance osTicket du dépôt, schéma d'installation, PHP 8.2 CLI en
-conteneur ; `test/run.ps1`, 256 contrôles par moteur en version 0.3) sur **MariaDB 10.11** et sur **MySQL 8.0**
+conteneur ; `test/run.ps1`, 256 contrôles par moteur en version 0.3, 274 en version 0.4) sur **MariaDB 10.11** et sur **MySQL 8.0**
 (`-MariaDbImage mysql:8.0`), tous passés :
 
 - constats de l'issue (S0, S1) et échec des contournements par statut et `updateEstDueDate`
@@ -393,6 +393,17 @@ conteneur ; `test/run.ps1`, 256 contrôles par moteur en version 0.3) sur **Mari
   sans lui ; **portail client réel en HTTP** (sonde dans un gabarit de `include/client/` de la
   copie de test) : non connecté, client Priority et client Acme connectés sur `index.php`,
   `tickets.php`, `open.php`, `tickets.php?id=…`, `view.php?id=…`, invité par lien d'accès ;
+- version 0.4, **organisation mémorisée par le plugin Stripe** (phase 4d, 18 contrôles, le
+  22/10/2026) : sans identifiant mémorisé, proposition = nom configuré (ancien ordre) ; avec, la
+  proposition et le pré-remplissage d'une nouvelle instance sont l'identifiant, prioritaire sur
+  `STRIPE_SYNC_PRIORITY_ORG` ; identifiant d'une organisation supprimée ou valeur invalide →
+  repli ; aide d'un champ vide = « organisation utilisée par le plugin Stripe » (nom et n°), champ
+  jamais rempli d'office ; même organisation des deux côtés, y compris après renommage → aucun
+  avertissement ; organisation différente → avertissement avec nom, n° et action recommandée ;
+  organisation Stripe supprimée → avertissement « il en créera une nouvelle » ; plugin Stripe sans
+  identifiant → aucun avertissement ; configuration jamais modifiée par l'affichage. **De bout en
+  bout avec le vrai plugin Stripe** (webhooks signés, renommage, suppression) : voir
+  `contrib/stripe-sync/tests/integration/scenario-e2e.php` et `docs/stripe-integration.md` §9 ;
 - version 0.3, **événement de bascule** (section 10) : événement `sla_first_response` écrit
   (plus d'événement `edited`) ; invisible dans le suivi du ticket côté client alors que la
   réponse de l'agent y est ; visible dans le fil côté agent (`scp/tickets.php`) ; témoin : un
@@ -414,7 +425,8 @@ conteneur ; `test/run.ps1`, 256 contrôles par moteur en version 0.3) sur **Mari
   de « Répondre à » est faite dans le code, pas dans un navigateur ;
 - la remise effective des e-mails (4.2, cas 2) ;
 - aucun vrai flux Stripe : les lignes `sub:` sont des fixtures conformes au format annoncé ; le
-  plugin `contrib/stripe-sync` n'a pas été lancé avec cette requête ;
+  plugin `contrib/stripe-sync` n'a pas été lancé avec cette requête (le niveau de contrat, lui, est
+  testé avec le vrai plugin Stripe et des webhooks signés, voir ci-dessus) ;
 - le test n'a pas été rejoué sur l'image Docker de production, ni sur MySQL < 8 / MariaDB
   autre que 10.11 ; ni avec un fuseau de base différent d'UTC (les fixtures supposent
   `NOW() = UTC_TIMESTAMP()`, vérifié au début du test) ;
@@ -518,19 +530,52 @@ Section « Niveau de contrat (thèmes du portail client) » de l'instance du plu
 
 | Champ | Rôle |
 | --- | --- |
-| Organisation Priority | Identifiant (`organizations.php?id=…`) ou nom exact. **Validée à l'enregistrement** (organisation inexistante refusée) et enregistrée sous forme d'**identifiant** (un renommage ne la casse pas). Vide = tout le monde `standard` (source `default`). L'aide rappelle « la même organisation que celle utilisée par le plugin Stripe » et affiche l'organisation actuelle, ou un avertissement si elle a été supprimée |
+| Organisation Priority | Identifiant (`organizations.php?id=…`) ou nom exact. **Validée à l'enregistrement** (organisation inexistante refusée) et enregistrée sous forme d'**identifiant** (un renommage ne la casse pas). Vide = tout le monde `standard` (source `default`). L'aide rappelle « la même organisation que celle utilisée par le plugin Stripe » et affiche l'organisation actuelle, ou un avertissement si elle a été supprimée ou si le plugin Stripe en utilise une autre (voir ci-dessous) |
 | Libellé du niveau Priority | Défaut `Priority` |
 | Libellé du niveau Standard | Défaut `Standard` |
 
 **Proposition du plugin Stripe** (sans dépendance : le plugin SLA fonctionne seul) : si
 `contrib/stripe-sync` est installé et a une instance, son organisation est **pré-remplie** pour
 une nouvelle instance du plugin SLA et **proposée dans l'aide** d'une instance existante dont le
-champ est vide (jamais enregistrée sans action de l'administrateur). Lecture seule, dans le même
-ordre que `StripeSyncSettings::getOrgName()` : variable d'environnement
-`STRIPE_SYNC_PRIORITY_ORG`, puis le champ `org_name` de son instance (lu dans la table de
-configuration, sans charger ses classes), puis `Priority`. Le plugin Stripe crée l'organisation
-au premier abonnement : si elle n'existe pas encore, la créer à la main (sans partage de tickets
-ni domaine, comme l'exige le plugin Stripe) avant d'enregistrer.
+champ est vide (jamais enregistrée sans action de l'administrateur). Lecture seule, sans charger
+ses classes, dans cet ordre (version 0.4) :
+
+1. l'**identifiant** que le plugin Stripe a mémorisé (version 0.2 de `stripe-sync` : table
+   `ost_config`, espace `stripesync`, clé `priority_org_id`, voir
+   [`docs/stripe-integration.md`](../../docs/stripe-integration.md) §5.10), si cette organisation
+   existe : la proposition est alors l'identifiant, et l'aide affiche « Proposition (organisation
+   utilisée par le plugin Stripe) : « Priority » (n° 12) » ;
+2. sinon (plugin Stripe 0.1, ou qui n'a encore rattaché personne, ou organisation mémorisée
+   supprimée) l'ancien ordre, celui de `StripeSyncSettings::getOrgName()` : variable
+   d'environnement `STRIPE_SYNC_PRIORITY_ORG`, puis le champ `org_name` de son instance (lu dans
+   la table de configuration), puis `Priority`.
+
+Le plugin Stripe crée l'organisation au premier abonnement : si elle n'existe pas encore, la
+créer à la main (sans partage de tickets ni domaine, comme l'exige le plugin Stripe) avant
+d'enregistrer ; le plugin Stripe la retrouvera par son nom et mémorisera son identifiant.
+
+**Avertissement d'écart** (version 0.4) : quand le plugin Stripe a mémorisé un identifiant
+**différent** de l'organisation configurée ici, l'aide du champ affiche :
+
+- « ATTENTION : le plugin Stripe rattache maintenant les clients Priority à l'organisation
+  « Priority » (n° 15), et non à l'organisation configurée ici : ces clients sont affichés
+  « Standard ». Action recommandée : vérifier cette organisation (Utilisateurs > Organisations),
+  saisir 15 dans ce champ et enregistrer ; mettre aussi à jour le filtre de tickets
+  « Organisation / Nom ». » ;
+- ou, si l'organisation mémorisée par le plugin Stripe a été supprimée et pas encore recréée :
+  « ATTENTION : l'organisation mémorisée par le plugin Stripe (n° 12) n'existe plus ; il en créera
+  une nouvelle au prochain abonnement Priority. Revenir ensuite sur ce formulaire pour la
+  sélectionner. »
+
+Rien n'est corrigé automatiquement : la configuration enregistrée reste celle de
+l'administrateur. Aucun avertissement si les deux identifiants sont égaux (même après un
+renommage), ni si le plugin Stripe n'a rien mémorisé (version 0.1, aucun abonnement traité).
+L'avertissement n'apparaît que dans le formulaire du plugin (Admin > Gérer > Plugins > SLA :
+première réponse > instance) : penser à l'ouvrir après un avertissement « Priority organization
+replaced » du plugin Stripe dans le journal système.
+
+**Mise à jour depuis la 0.3** : rien à faire ; la configuration existante (identifiant) est
+conservée telle quelle. Ouvrir une fois le formulaire pour vérifier l'absence d'avertissement.
 
 ### 9.3 Chargement côté portail client
 
@@ -618,10 +663,14 @@ coûte au plus une recherche par propriétaire distinct (`User::lookup()`, puis 
   section 5).
 - Un **invité** est `standard` / `default` pour `coderise_contract_level()` sans argument ;
   `coderise_contract_level($ticket)` donne le niveau du propriétaire du ticket consulté.
-- L'organisation est enregistrée par **identifiant** ; le plugin Stripe la retrouve par **nom**.
-  Si elle est renommée ou supprimée, le plugin Stripe en recrée une « Priority » (nouvel
-  identifiant) que ce plugin ignore : reconfigurer le champ (l'aide signale une organisation
-  supprimée). Garder les deux configurations alignées.
+- L'organisation est enregistrée par **identifiant**, et le plugin Stripe (0.2 et suivantes)
+  mémorise aussi la sienne par identifiant : un **renommage** ne casse plus rien (testé de bout en
+  bout, `contrib/stripe-sync/tests/integration/scenario-e2e.php`). Seul le filtre de tickets, qui
+  compare le **nom** de l'organisation, est à mettre à jour après un renommage. Si l'organisation
+  est **supprimée**, le plugin Stripe en recrée une (nouvel identifiant, avertissement au journal
+  système) et le formulaire de ce plugin signale l'écart : reconfigurer le champ (voir 9.2). Avec
+  le plugin Stripe 0.1 (recherche par nom), l'ancien comportement reste : garder les deux
+  configurations alignées à la main.
 - Le plugin ne fournit pas de catalogue de traduction propre : `__()` utilise celui d'osTicket.
   Pour un libellé traduit, choisir un texte présent dans le pack de langue, ou saisir le libellé
   directement dans la langue du portail.

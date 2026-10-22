@@ -29,7 +29,7 @@ class StripeSyncPluginConfig extends PluginConfig {
         return array(
             'org_name' => new TextboxField(array(
                 'label' => 'Priority organization',
-                'hint' => 'Name of the osTicket organization given to customers with an active Priority subscription (the ticket filter matches on it). Created if missing.',
+                'hint' => 'Name of the osTicket organization given to customers with an active Priority subscription. Used to find (or create) it the first time; its id is then remembered, so renaming the organization does not lose it (update the ticket filter, which matches on the name). Changing this setting switches to the organization with the new name.',
                 'default' => 'Priority',
                 'configuration' => array('size' => 40, 'length' => 128),
             )),
@@ -69,11 +69,13 @@ class StripeSyncPlugin extends Plugin {
         // (api/.htaccess) or /api/http.php/stripe-sync/webhook.
         Signal::connect('api', function ($dispatcher) use ($info) {
             $settings = new StripeSyncSettings($info);
+            $store = new StripeSyncDbStore();
+            $logger = new StripeSyncOstLogger();
             $service = new StripeSyncService(
-                new StripeSyncDbStore(),
-                new StripeSyncOsTicketDirectory($settings),
+                $store,
+                new StripeSyncOsTicketDirectory($settings, $store, $logger),
                 $settings,
-                new StripeSyncOstLogger());
+                $logger);
             $controller = new StripeSyncController($settings, $service);
             $dispatcher->append(
                 url_post('^/stripe-sync/webhook$', array($controller, 'webhook')));

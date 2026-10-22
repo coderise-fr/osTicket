@@ -13,6 +13,16 @@
 # webhooks (self-signed with a throw-away secret generated here) and checks the
 # result in the database. Everything is removed at the end.
 #
+# Scenarios, in this order, on the same instance (data reset in between):
+#   scenario-flow.php         main flow (accounts, Priority, sub: rows, filter -> SLA)
+#   scenario-concurrency.php  parallel deliveries, invitations, 503/413
+#   scenario-org.php          Priority organization remembered by id: creation,
+#                             rename, unsafe org found by id, deletion, migration
+#                             from 0.1, concurrent first subscriptions
+#   scenario-e2e.php          stripe-sync + sla_first_response together:
+#                             coderise_contract_level(), filter, rename, deletion,
+#                             gap warning in the SLA plugin form
+#
 # Not covered: real Stripe events, the hardened Docker image, a real SMTP
 # server (mails are captured by a fake sendmail).
 #
@@ -67,7 +77,7 @@ docker run -d --name "$WEB" --network "$NET" --entrypoint sleep "$PHP_IMAGE" 360
 docker exec "$WEB" mkdir -p /srv/ost
 docker cp "$(lp "$TMP/ost.tar")" "$WEB:/srv/ost.tar"
 docker exec "$WEB" sh -c 'cd /srv/ost && tar xf ../ost.tar && cp include/ost-sampleconfig.php include/ost-config.php && chmod 666 include/ost-config.php'
-for f in boot.php setup_plugin.php scenario-flow.php scenario-concurrency.php; do
+for f in boot.php lib.php probe.php setup_plugin.php scenario-flow.php scenario-concurrency.php scenario-org.php scenario-e2e.php; do
     docker cp "$(lp "$HERE/$f")" "$WEB:/tmp/$f"
 done
 printf '#!/bin/sh\ncat > /tmp/mail-$(date +%%s%%N).eml\n' > "$TMP/fakesendmail"
@@ -105,6 +115,8 @@ docker exec "$WEB" sh /tmp/install.sh || { echo "osTicket installation failed"; 
 
 echo "== installing the plugin like an administrator would"
 docker exec "$WEB" sh -c 'cp -r /srv/ost/contrib/stripe-sync /srv/ost/include/plugins/stripe-sync && rm -rf /srv/ost/include/plugins/stripe-sync/tests && chmod -R a+rX /srv/ost && cd /tmp && php setup_plugin.php'
+# The SLA plugin is only copied here; scenario-e2e.php installs and configures it.
+docker exec "$WEB" sh -c 'cp -r /srv/ost/contrib/sla-first-response/plugin/sla_first_response /srv/ost/include/plugins/sla_first_response && chmod -R a+rX /srv/ost/include/plugins'
 
 echo "== starting Apache (port 8001, secret set) and php -S (port 8002, secret NOT set)"
 docker cp "$(lp "$HERE/apache-vhost.conf")" "$WEB:/etc/apache2/sites-enabled/ost-int.conf"
@@ -115,9 +127,25 @@ sleep 3
 
 echo "== scenarios"
 status=0
-docker exec -e STRIPE_SYNC_WEBHOOK_SECRET="$WHSEC" "$WEB" sh -c 'cd /tmp && rm -f /tmp/mail-*.eml /tmp/cj-client && php scenario-flow.php' || status=1
-docker exec "$DB" mariadb -uroot -p"$ROOTPASS" osticket -e "DELETE FROM ost_config WHERE namespace IN ('stripesync','pwreset'); DELETE FROM ost_ticket; DELETE FROM ost_user_account; DELETE FROM ost_user WHERE id>0; DELETE FROM ost_user_email; DELETE FROM ost_organization WHERE name IN ('Priority','Acme Corp'); DELETE FROM ost_session;"
-docker exec -e STRIPE_SYNC_WEBHOOK_SECRET="$WHSEC" "$WEB" sh -c 'cd /tmp && php scenario-concurrency.php' || status=1
+# Back to "plugin installed, nothing received yet" between two scenarios
+# (stripe-sync state, users, tickets, organizations created by the scenarios).
+reset_data() {
+    docker exec "$DB" mariadb -uroot -p"$ROOTPASS" osticket -e "DELETE FROM ost_config WHERE namespace IN ('stripesync','pwreset'); DELETE FROM ost_ticket; DELETE FROM ost_user_account; DELETE FROM ost_user WHERE id>0; DELETE FROM ost_user_email; DELETE FROM ost_organization WHERE name LIKE 'Priority%' OR name IN ('Acme Corp', 'Eve Corp'); DELETE FROM ost_session;"
+}
+run_scenario() {
+    echo "-- $1"
+    docker exec -e STRIPE_SYNC_WEBHOOK_SECRET="$WHSEC" "$WEB" sh -c "cd /tmp && php $1" || status=1
+}
+docker exec "$WEB" sh -c 'rm -f /tmp/mail-*.eml /tmp/cj-client'
+run_scenario scenario-flow.php
+reset_data
+run_scenario scenario-concurrency.php
+# Priority organization remembered by id (stripe-sync 0.2)
+reset_data
+run_scenario scenario-org.php
+# Both Coderise plugins together (stripe-sync + sla_first_response)
+reset_data
+run_scenario scenario-e2e.php
 
 [ $status = 0 ] && echo "ALL GOOD" || echo "FAILURES (see above)"
 exit $status

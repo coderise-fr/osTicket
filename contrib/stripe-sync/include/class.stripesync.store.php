@@ -11,6 +11,9 @@
       evt:<event id>   idempotency marker ('p:<time>' in progress, 'done')
       cus:<cus id>     JSON state of a Stripe customer
       sub:<sub id>     record of a Priority subscription, read by OTHER modules
+      priority_org_id  id of the Priority organization, read by OTHER modules
+                       (since 0.2; see StripeSyncPriorityOrgResolver)
+      priority_org_name  configured name when that id was remembered (internal)
 
     The `sub:` rows are a published interface (documented in
     docs/stripe-integration.md and in the README, "Donnees exposees a
@@ -34,14 +37,22 @@
 **********************************************************************/
 
 require_once dirname(__FILE__) . '/class.stripesync.service.php';
+require_once dirname(__FILE__) . '/class.stripesync.priorityorg.php';
 
-class StripeSyncDbStore implements StripeSyncStore {
+class StripeSyncDbStore implements StripeSyncStore, StripeSyncOrgMemory {
 
     const NS = 'stripesync';
     // A claim older than this is considered abandoned (crashed request).
     const CLAIM_TTL = 300;
     // Idempotency markers are kept this long (Stripe retries for 3 days).
     const EVENT_RETENTION_DAYS = 30;
+    // Published: id of the Priority organization (decimal integer).
+    const PRIORITY_ORG_KEY = 'priority_org_id';
+    // Internal: configured name when that id was remembered (a changed
+    // setting is followed, a renamed organization is not lost).
+    const PRIORITY_ORG_NAME_KEY = 'priority_org_name';
+    // Lock name (lock() hashes it like a customer id; never a `cus_` id).
+    const PRIORITY_ORG_LOCK = '~priority-org';
 
     private $clock;
 
@@ -162,6 +173,47 @@ class StripeSyncDbStore implements StripeSyncStore {
         if (!$this->put($key, (string) $value))
             throw new StripeSyncRetryableError('Unable to save the subscription record');
         return true;
+    }
+
+    // --- Priority organization (published to other modules) ---------------
+
+    /**
+     * Id of the Priority organization remembered by the plugin, or null
+     * (plugin never used yet). Same as reading the row directly:
+     *
+     *   SELECT `value` FROM ost_config
+     *    WHERE `namespace`='stripesync' AND `key`='priority_org_id'
+     *
+     * The organization may have been deleted since: check that it exists.
+     */
+    static function readPriorityOrgId() {
+        $res = db_query(sprintf(
+            'SELECT `value` FROM %s WHERE `namespace`=%s AND `key`=%s',
+            CONFIG_TABLE, db_input(self::NS), db_input(self::PRIORITY_ORG_KEY)));
+        $row = $res ? db_fetch_row($res) : null;
+        $id = $row ? (int) $row[0] : 0;
+        return $id > 0 ? $id : null;
+    }
+
+    function getPriorityOrg() {
+        $id = (int) $this->row(self::PRIORITY_ORG_KEY);
+        $name = $this->row(self::PRIORITY_ORG_NAME_KEY);
+        return array($id > 0 ? $id : null, $name);
+    }
+
+    function putPriorityOrg($id, $configuredName) {
+        if (!$this->put(self::PRIORITY_ORG_KEY, (string) (int) $id)
+                || !$this->put(self::PRIORITY_ORG_NAME_KEY, (string) $configuredName))
+            throw new StripeSyncRetryableError('Unable to remember the Priority organization');
+        return true;
+    }
+
+    function lockPriorityOrg() {
+        return $this->lock(self::PRIORITY_ORG_LOCK);
+    }
+
+    function unlockPriorityOrg() {
+        $this->unlock(self::PRIORITY_ORG_LOCK);
     }
 
     // --- locks ---------------------------------------------------------------

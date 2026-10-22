@@ -10,7 +10,7 @@
 
 return array(
     'id' =>             'coderise:stripe-sync',
-    'version' =>        '0.1',
+    'version' =>        '0.2',
     'name' =>           'Stripe sync (portal accounts and Priority support)',
     'author' =>         'Coderise',
     'description' =>    'Receives Stripe webhooks, gives paying customers a portal account and keeps the Priority organization in line with their subscription.',
