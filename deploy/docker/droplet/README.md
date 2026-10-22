@@ -13,11 +13,33 @@ Internet ─443→ Caddy (hôte) ─127.0.0.1:8080→ web ─réseau interne→ 
 
 - Enregistrement DNS `support.coderise.fr` (A) vers l'IP du Droplet (Caddy en a besoin pour le certificat).
 - Pare-feu DigitalOcean : 22, 80, 443 (UFW est aussi configuré sur le Droplet).
-- Clé SSH ed25519 ajoutée au Droplet (`ssh-keygen -t ed25519 -f ~/.ssh/coderise_droplet`).
+- Une clé SSH ed25519 installée sur le Droplet (voir « Clé SSH » ci-dessous).
 - Une première exécution réussie du workflow **docker-image** (onglet Actions de GitHub, après un push
   sur `main`) : elle publie `ghcr.io/coderise-fr/osticket:sha-<7 caractères>` et `…-install`.
 - Un jeton GitHub `read:packages` (PAT classique) pour que le Droplet puisse tirer l'image (les
   paquets GHCR sont privés par défaut ; sinon rendre le paquet public).
+
+### Clé SSH
+
+Sur votre poste Windows (PowerShell), mettez une passphrase quand elle est demandée :
+
+```powershell
+ssh-keygen -t ed25519 -C "coderise-droplet" -f $HOME\.ssh\coderise_droplet
+Get-Content $HOME\.ssh\coderise_droplet.pub      # la clé PUBLIQUE, à installer sur le Droplet
+```
+
+- **Installation** : DigitalOcean > Settings > Security > *Add SSH Key*, collez le contenu du
+  `.pub`, puis cochez cette clé à la création du Droplet. Sur un Droplet existant :
+  `ssh-copy-id -i $HOME\.ssh\coderise_droplet.pub root@<ip>`, ou ajoutez la ligne du `.pub` dans
+  `/root/.ssh/authorized_keys`.
+- **Connexion** : `ssh -i $HOME\.ssh\coderise_droplet root@<ip>`.
+- **La clé privée** (`coderise_droplet`, sans `.pub`) ne quitte jamais votre poste : ne la copiez
+  ni sur le Droplet, ni dans le dépôt, ni dans une conversation. Seul le `.pub` se partage.
+- `provision.sh` copie les clés autorisées de root vers l'utilisateur `deploy` ; avec
+  `--harden-ssh`, la connexion root et les mots de passe SSH sont ensuite désactivés.
+
+Le certificat TLS de `support.coderise.fr` n'est pas à générer : Caddy l'obtient et le renouvelle
+tout seul (Let's Encrypt).
 
 ## 1. Préparer le serveur (une fois, en root)
 
