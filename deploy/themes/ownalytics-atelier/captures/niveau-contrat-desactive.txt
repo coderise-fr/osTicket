@@ -1,0 +1,30 @@
+OK   bureau Léa connectée  (http://127.0.0.1:18473/tickets.php)
+OK   bureau Léa liste sans plugin (desactive) : aucune pastille  (0)
+OK   bureau Léa liste : pas de débordement  (0)
+OK   bureau suivi sans plugin : aucune pastille, aucune promesse  (null)
+OK   bureau suivi Léa : pas de débordement  (0)
+OK   bureau Hugo liste sans plugin : aucune pastille
+OK   bureau Hugo liste : pas de débordement  (0)
+OK   bureau Nina sans plugin : aucune pastille
+OK   bureau invité Marc : page du ticket  (http://127.0.0.1:18473/tickets.php)
+OK   bureau invité sans plugin : aucune pastille
+OK   bureau invité Marc : pas de débordement  (0)
+OK   bureau invitée sans plugin : aucune pastille
+OK   mobile Léa connectée  (http://127.0.0.1:18473/tickets.php)
+OK   mobile Léa liste sans plugin (desactive) : aucune pastille  (0)
+OK   mobile Léa liste : pas de débordement  (0)
+OK   mobile suivi sans plugin : aucune pastille, aucune promesse  (null)
+OK   mobile suivi Léa : pas de débordement  (0)
+OK   mobile Hugo liste sans plugin : aucune pastille
+OK   mobile Hugo liste : pas de débordement  (0)
+OK   mobile Nina sans plugin : aucune pastille
+OK   mobile invité Marc : page du ticket  (http://127.0.0.1:18473/tickets.php)
+OK   mobile invité sans plugin : aucune pastille
+OK   mobile invité Marc : pas de débordement  (0)
+OK   mobile invitée sans plugin : aucune pastille
+INFO requêtes SQL (desactive) : {"ouverts-25":34,"ouverts-31":33,"fermes-7":33,"suivi":48}
+INFO requêtes SQL Hugo (desactive) : 33
+OK   aucune erreur console / HTTP ≥ 400  ()
+OK   aucune requête externe  ()
+
+desactive : tous les contrôles passés

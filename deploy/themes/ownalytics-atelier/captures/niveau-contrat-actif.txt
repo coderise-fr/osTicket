@@ -1,0 +1,58 @@
+OK   bureau Léa connectée  (http://127.0.0.1:18473/tickets.php)
+OK   bureau Léa liste p.1 : une pastille par ligne  (25/25)
+OK   bureau Léa liste : Standard seulement sur le ticket de Hugo (collaboratrice)  (prio=24 std=1)
+OK   bureau libellé visible « Priority », préfixe lecteur d'écran « Contract: »  ({"cls":"pill pill-contract pill-priority","text":"Priority","full":"Contract: Priority","ratio":9.7,"fg":"rgb(255, 210, 63)","bg":"rgb(59,30,84)","right":1143})
+OK   bureau ticket de Hugo dans la liste de Léa : Standard  (pill pill-contract pill-standard)
+OK   bureau Léa liste : pas de débordement  (0)
+OK   bureau Léa liste p.2 : une pastille par ligne  (7/7)
+OK   bureau Léa fermés : 7 pastilles Priority  (7)
+OK   bureau Léa fermés : pas de débordement  (0)
+OK   bureau suivi Léa : une pastille Priority  (["Priority"])
+OK   bureau suivi Léa sans réponse : premier retour « Within 4 h, 24/7 »  (Within 4 h, 24/7)
+OK   bureau suivi Léa : pas de débordement  (0)
+OK   bureau suivi répondu (plan basculé par le plugin) : Priority, pas de promesse
+OK   bureau événement de bascule invisible au client
+OK   bureau réponse de Léa publiée, pastille toujours là
+OK   bureau suivi fermé : Priority, pas de promesse
+OK   bureau Léa sur le ticket de Hugo : Standard (niveau du propriétaire), « On business days »  (["Standard"] On business days)
+OK   bureau Léa sur le ticket de Hugo : pas de débordement  (0)
+OK   bureau Hugo liste : Standard sur ses tickets, Priority sur celui de Léa  (pill pill-contract pill-priority std=3/4)
+OK   bureau Hugo liste : pas de débordement  (0)
+OK   bureau Hugo, ticket sur plan Priority 4h : Standard, « On business days »
+OK   bureau Nina (sans organisation) : Standard  (2)
+OK   bureau invité Marc : page du ticket  (http://127.0.0.1:18473/tickets.php)
+OK   bureau invité Marc (propriétaire) : Priority, « Within 4 h, 24/7 »  (["Priority"])
+OK   bureau invité Marc : pas de débordement  (0)
+OK   bureau invitée Zoé (collaboratrice, Priority) sur le ticket de Nina : Standard (propriétaire)  (["Standard"] http://127.0.0.1:18473/tickets.php)
+OK   mobile Léa connectée  (http://127.0.0.1:18473/tickets.php)
+OK   mobile Léa liste p.1 : une pastille par ligne  (25/25)
+OK   mobile Léa liste : Standard seulement sur le ticket de Hugo (collaboratrice)  (prio=24 std=1)
+OK   mobile libellé visible « Priority », préfixe lecteur d'écran « Contract: »  ({"cls":"pill pill-contract pill-priority","text":"Priority","full":"Contract: Priority","ratio":9.7,"fg":"rgb(255, 210, 63)","bg":"rgb(59,30,84)","right":184})
+OK   mobile ticket de Hugo dans la liste de Léa : Standard  (pill pill-contract pill-standard)
+OK   mobile Léa liste : pas de débordement  (0)
+OK   mobile Léa liste p.2 : une pastille par ligne  (7/7)
+OK   mobile Léa fermés : 7 pastilles Priority  (7)
+OK   mobile Léa fermés : pas de débordement  (0)
+OK   mobile suivi Léa : une pastille Priority  (["Priority"])
+OK   mobile suivi Léa sans réponse : premier retour « Within 4 h, 24/7 »  (Within 4 h, 24/7)
+OK   mobile suivi Léa : pas de débordement  (0)
+OK   mobile suivi répondu (plan basculé par le plugin) : Priority, pas de promesse
+OK   mobile événement de bascule invisible au client
+OK   mobile réponse de Léa publiée, pastille toujours là
+OK   mobile suivi fermé : Priority, pas de promesse
+OK   mobile Léa sur le ticket de Hugo : Standard (niveau du propriétaire), « On business days »  (["Standard"] On business days)
+OK   mobile Léa sur le ticket de Hugo : pas de débordement  (0)
+OK   mobile Hugo liste : Standard sur ses tickets, Priority sur celui de Léa  (pill pill-contract pill-priority std=3/4)
+OK   mobile Hugo liste : pas de débordement  (0)
+OK   mobile Hugo, ticket sur plan Priority 4h : Standard, « On business days »
+OK   mobile Nina (sans organisation) : Standard  (2)
+OK   mobile invité Marc : page du ticket  (http://127.0.0.1:18473/tickets.php)
+OK   mobile invité Marc (propriétaire) : Priority, « Within 4 h, 24/7 »  (["Priority"])
+OK   mobile invité Marc : pas de débordement  (0)
+OK   mobile invitée Zoé (collaboratrice, Priority) sur le ticket de Nina : Standard (propriétaire)  (["Standard"] http://127.0.0.1:18473/tickets.php)
+INFO requêtes SQL (actif) : {"ouverts-25":38,"ouverts-31":38,"fermes-7":37,"suivi":52}
+INFO requêtes SQL Hugo (actif) : 39
+OK   aucune erreur console / HTTP ≥ 400  ()
+OK   aucune requête externe  ()
+
+actif : tous les contrôles passés

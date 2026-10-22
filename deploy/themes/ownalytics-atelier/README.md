@@ -50,8 +50,8 @@ Ce dossier est la seule source du thème. Il ne modifie ni le cœur d'osTicket n
 | Polices | `overlay/assets/ownalytics-atelier/fonts/` | Archivo (variable), Bricolage Grotesque 700-800, IBM Plex Mono 500-600, sous-ensemble latin WOFF2, licence SIL OFL 1.1 (`OFL.txt`) |
 | Règles Git | `overlay/assets/ownalytics-atelier/.gitattributes` | Marque les polices comme binaires dans `deploy/docker/overlay/` (voir « Installation ») ; refusé par Apache (403) |
 | Favicon | `overlay/assets/ownalytics-atelier/img/favicon.svg` | Pictogramme Ownalytics (ticket sur prune) |
-| Aide PHP | `overlay/include/client/ownalytics-atelier/ownalytics-atelier.inc.php` | Fonction `__oa()` (chaînes propres au thème), initiales et couleurs des avatars, nom de marque (`OA_ATELIER_BRAND` = « Ownalytics ») |
-| Traductions du thème | `overlay/include/client/ownalytics-atelier/i18n/fr/LC_MESSAGES/ownalytics-atelier.mo.php` | Catalogue français des 10 chaînes que seul le thème utilise |
+| Aide PHP | `overlay/include/client/ownalytics-atelier/ownalytics-atelier.inc.php` | Fonction `__oa()` (chaînes propres au thème), initiales et couleurs des avatars, nom de marque (`OA_ATELIER_BRAND` = « Ownalytics »), niveau de contrat (`oa_atelier_contract()`, `oa_atelier_contract_badge()`, `oa_atelier_contract_promise()`, voir « Niveau de contrat ») |
+| Traductions du thème | `overlay/include/client/ownalytics-atelier/i18n/fr/LC_MESSAGES/ownalytics-atelier.mo.php` | Catalogue français des 14 chaînes que seul le thème utilise |
 | Gabarits | `overlay/include/client/…` | 9 fichiers du cœur remplacés (liste ci-dessous) |
 
 Rien n'est servi depuis l'extérieur : polices, icônes (Font Awesome déjà fourni par osTicket,
@@ -72,8 +72,8 @@ est recopiée telle quelle. Empreintes d'origine : `BASE.sha256`.
 | `include/client/footer.inc.php` | Pied de page prune avec la marque, les pages « Autres ressources » actives, copyright et « propulsé par osTicket » ; mêmes scripts de fin que l'original |
 | `include/client/open.inc.php` | Formulaire en cartes (coordonnées, thème d'aide + champs dynamiques, captcha), colonne de conseils et questions à la une ; `#topicId` recharge toujours `#dynamic-form` en AJAX (le tableau et le `tbody` sont conservés pour que la réponse AJAX s'y insère) |
 | `include/client/login.inc.php` | Deux cartes côte à côte : connexion au compte et accès par e-mail + numéro de ticket (même formulaire et même cible `login.php` que `accesslink.inc.php`) |
-| `include/client/tickets.inc.php` | Tickets en cartes au lieu du tableau, onglets Ouverts/Fermés, recherche et filtre par thème, barre de tri (les colonnes triables du tableau), pastille « Nouvelle réponse » ; requêtes d'origine inchangées |
-| `include/client/view.inc.php` | En-tête du ticket (numéro, sujet, statut, date, actions), fil en conversation, formulaire de réponse en carte, colonne « Informations du ticket », « Informations client », champs personnalisés et liste de toutes les pièces jointes |
+| `include/client/tickets.inc.php` | Tickets en cartes au lieu du tableau, onglets Ouverts/Fermés, recherche et filtre par thème, barre de tri (les colonnes triables du tableau), pastille « Nouvelle réponse », pastille de niveau de contrat (avec le plugin `sla_first_response`) ; requêtes d'origine inchangées |
+| `include/client/view.inc.php` | En-tête du ticket (numéro, sujet, statut, niveau de contrat avec le plugin `sla_first_response`, date, actions), fil en conversation, formulaire de réponse en carte, colonne « Informations du ticket », « Informations client », champs personnalisés et liste de toutes les pièces jointes |
 | `include/client/kb-categories.inc.php` | Accueil de la base de connaissances : grande recherche (absente de cette page à l'origine), filtre par thème, catégories en cartes avec leurs articles |
 | `include/client/templates/thread-entry.tmpl.php` | Bulles : messages du client à droite, réponses de l'équipe à gauche, rôle (« Vous », « Équipe support »), avatars à initiales au lieu des images distantes |
 | `include/client/templates/thread-event.tmpl.php` | Même balisage ; retire les images d'avatar des événements (osTicket les prend sur Gravatar par défaut) |
@@ -85,13 +85,57 @@ catégorie de la base de connaissances, fiche d'article, page de remerciement (c
 Ces fichiers sont listés dans `WATCH.sha256` : s'ils changent, il faut revoir les pages concernées.
 
 
+## Niveau de contrat (Priority / Standard)
+
+Le support d'Ownalytics (Heatlens, Auditlens) passe par le même portail osTicket que celui de
+Coderise : **Priority** = premier retour sous 4 h, 24 h/24 ; **Standard** = jours ouvrés. osTicket
+n'a pas de notion de niveau de contrat : le niveau est l'appartenance à l'organisation « Priority »
+(alimentée par le plugin `contrib/stripe-sync`). Le thème le lit dans le plugin
+`contrib/sla-first-response` (version 0.3 et suivantes), qui expose
+`coderise_contract_level($subject)` (README du plugin, sections 9 et 10). Même approche et mêmes
+règles que le thème Coderise `atelier`.
+
+Où il apparaît :
+
+| Page | Affichage |
+|---|---|
+| Liste des tickets (`tickets.inc.php`) | Pastille à droite de l'état, sur chaque carte (onglets Ouverts et Fermés) |
+| Suivi d'un ticket (`view.inc.php`) | Pastille dans l'en-tête, après l'état (comme la pastille « Support prioritaire » de la maquette) ; dans « Basic Ticket Information », ligne « First reply » / « Premier retour » : « Within 4 h, 24/7 » (« Sous 4 h, 24 h/24 ») ou « On business days » (« Les jours ouvrés »), **seulement** tant que le ticket est ouvert et que l'équipe n'y a jamais répondu |
+
+- **Dépendance facultative.** Le thème appelle la fonction seulement si
+  `function_exists('coderise_contract_level')`. Plugin absent de l'overlay, plugin ou instance
+  désactivés : la fonction n'existe pas, **aucune pastille ni aucun délai** ne sont affichés (jamais
+  « Standard » par défaut, jamais de promesse 24 h/24) ; le reste du thème est inchangé.
+- **Niveau inconnu = rien.** Une réponse de source `default` (organisation Priority non configurée
+  ou supprimée dans le plugin, utilisateur inconnu) n'est pas affichée.
+- **Qui.** Toujours le **propriétaire** du ticket, jamais un collaborateur : dans la liste, ses propres
+  tickets donnent le niveau du client connecté (`coderise_contract_level()`), un ticket partagé celui
+  de son propriétaire (`User::lookup($T['user_id'])`, une fois par propriétaire distinct) ; sur le
+  ticket, `coderise_contract_level($ticket)`, y compris pour un invité (lien d'accès ou numéro +
+  e-mail) : un invité collaborateur voit le niveau du propriétaire, jamais le sien.
+- **Coût.** Une valeur par personne et par page (mémo de `oa_atelier_contract()`, en plus du cache du
+  plugin) : aucune requête par ligne (mesures dans « Vérifications »).
+- **Rendu.** `<span class="pill pill-contract pill-priority">` : soleil `#FFD23F` sur prune `#3B1E54`,
+  éclair (Font Awesome local), 9,7:1 ; `<span class="pill pill-contract pill-standard">` : discrète,
+  encre douce `#5F5C59` sur le fond de la carte, contour lilas (5,98:1 sur le lilas de l'en-tête,
+  davantage sur le blanc et le papier). Libellé configuré dans le plugin, échappé
+  (`Format::htmlchars`) ; préfixe « Contract: » / « Contrat : » (`__oa()`) lu par les lecteurs
+  d'écran seulement. Impression : pastille noir sur blanc comme les autres.
+- **Limite : niveau actuel.** C'est le niveau du propriétaire **aujourd'hui**, pas celui qu'il avait à
+  la création du ticket : à la fin d'un abonnement, ses anciens tickets passent en « Standard » (et
+  inversement), et le délai affiché suit. Un collègue qui écrit depuis une autre adresse est un autre
+  utilisateur, avec son propre niveau. Le délai affiché est celui du contrat, pas une échéance
+  calculée : le plan de SLA du ticket (posé par le filtre de création) n'est pas lu, un client
+  standard dont le ticket est sur le plan « Priority 4h » voit « Standard » et « jours ouvrés ».
+
 ## Chaînes et langues
 
 - Toutes les chaînes déjà présentes dans osTicket passent par `__()` et sont traduites par les packs
   de langue officiels (le pack français `fr.phar` se place dans `deploy/docker/overlay/include/i18n/`,
   voir `deploy/docker/overlay/README.md`).
-- Les 10 chaînes propres au thème (« Skip to content », « Support », « Main menu », « You »,
-  « Support team », « New reply », « Tips », deux conseils, l'accroche du pied de page) passent par
+- Les 14 chaînes propres au thème (« Skip to content », « Support », « Main menu », « You »,
+  « Support team », « New reply », « Tips », deux conseils, l'accroche du pied de page, et pour le
+  niveau de contrat « Contract: », « First reply », « Within 4 h, 24/7 », « On business days ») passent par
   `__oa()`, c'est-à-dire `_dgettext('ownalytics-atelier', …)`, la couche gettext d'osTicket avec un
   domaine dédié. Le catalogue français est fourni ; il ne s'affiche que lorsque le français est une
   langue active du portail (donc avec le pack officiel). Pour une autre langue : copier
@@ -172,6 +216,11 @@ existe). Il refuse aussi d'écraser un fichier de l'overlay qui n'appartient pas
    (Admin > Paramètres > Pages), l'en-tête l'affiche à la place du pictogramme et du nom.
 4. **Nom de l'entreprise** (Admin > Gérer > Formulaires > Company Information) : affiché dans le
    copyright du pied de page.
+5. **Niveau de contrat** (pastilles et premier retour attendu, facultatif) : plugin
+   `contrib/sla-first-response/plugin/sla_first_response/` (0.3 ou plus) copié dans
+   `deploy/docker/overlay/include/plugins/sla_first_response/`, installé et activé (Admin > Gérer >
+   Extensions), avec une instance active dont le champ « Organisation Priority » désigne la même
+   organisation que le plugin Stripe. Sans ce réglage, ni pastille ni délai ne sont affichés.
 
 ## Désinstallation
 
@@ -210,7 +259,9 @@ structure, les gabarits, les parcours, l'accessibilité et les scripts sont les 
 la copie (commit `2c9292ef`, avant le rebranding de `atelier`), aux noms internes près (tableau
 ci-dessus) et à deux ajouts propres à ce dossier : le refus générique multi-thèmes d'`apply.sh` et
 le `.gitattributes` des polices. Les évolutions faites ensuite dans l'un des deux thèmes ne sont
-**pas** reportées automatiquement dans l'autre.
+**pas** reportées automatiquement dans l'autre. Le niveau de contrat (Priority / Standard) a été
+reporté à la main (mêmes règles ; en plus ici, le délai « premier retour » selon le niveau ; sans
+l'indicateur « premier retour sous 4 h » tiré du plan de SLA, propre à `atelier`).
 
 ## Mise à jour d'osTicket
 
@@ -282,6 +333,69 @@ réponse de l'invité, confirmation d'inscription, nouveau mot de passe), la pag
 rendu en français avec le pack officiel ; elles l'ont été sur la version d'origine, au code
 identique hors renommage.
 
+### Niveau de contrat (22/10/2026, second passage)
+
+Nouvelle instance, même recette : `git archive` du commit dans une copie, `sommet` (installé dans
+l'overlay committé) retiré par son `remove.sh`, ce thème appliqué par `apply.sh`, plugin
+`contrib/sla-first-response/plugin/sla_first_response/` (0.3) copié dans
+`include/plugins/sla_first_response/` de l'overlay **de la copie** (non committé) ; images `install`
+puis `runtime` construites par `docker compose` sur cette copie, installation par l'assistant web
+(requêtes HTTP), MariaDB 11.4, cron arrêté. Plugin installé et activé (script PHP dans le conteneur,
+mêmes appels que l'administration), instance active avec les plans « Priority 4h » / « Priority 4h -
+1re reponse faite » et l'organisation « Priority ». Données : Léa (organisation Priority, 38 tickets :
+31 ouverts, 7 fermés ; 12 en Default SLA, 17 en Priority 4h, 9 basculés **par le plugin** sur le plan
+désactivé après une réponse adressée au client), Hugo (organisation « Atelier Lumen », standard, un
+ticket sur le plan Priority 4h), Nina (sans organisation), Marc et Zoé (organisation Priority, sans
+compte), tickets partagés dans les deux sens. Navigateur : Chromium privé (`playwright-core`).
+Détail : `captures/niveau-contrat-{actif,desactive,absent}.txt` et `.json`.
+
+- **Plugin actif**, à 1280 et 390 px, 54 contrôles, tous passés : liste de Léa, une pastille par ligne
+  (32 ouverts dont le ticket de Hugo : 25 + 7 en page 2 ; 7 fermés), « Priority » sur ses tickets quel que soit le plan, « Standard » sur
+  le ticket de Hugo dont elle est collaboratrice ; suivi de Léa : « Priority » et « Within 4 h, 24/7 »
+  sur le ticket sans réponse, pas de délai sur un ticket répondu (y compris après un nouveau message
+  de Léa, qui remet `isanswered` à 0) ni sur un ticket fermé ; événement de bascule du plugin
+  invisible ; réponse de Léa publiée ; Léa sur le ticket de Hugo : « Standard », « On business
+  days » ; Hugo : « Standard » sur ses tickets (y compris celui sur le plan Priority 4h), « Priority »
+  sur celui de Léa ; Nina : « Standard » ; invité Marc (propriétaire, Priority) : « Priority » et
+  « Within 4 h, 24/7 » ; invitée Zoé (collaboratrice, elle-même Priority) sur le ticket de Nina :
+  « Standard ». Préfixe « Contract: » masqué à l'écran, présent pour les lecteurs d'écran.
+- **Plugin désactivé** (en base) puis **absent de l'image** (dossier retiré de l'overlay, image
+  reconstruite, plugin toujours enregistré actif en base) : aucune pastille, aucun « Contract: »,
+  aucun délai ni « 24/7 » / « business days » sur la liste, le suivi et l'accès invité ; aucune erreur.
+- **Requêtes SQL** (compteur `Questions` de MariaDB, minimum de 3 mesures, page HTML seule) :
+
+  | Page (Léa sauf mention) | Plugin actif | Désactivé | Absent |
+  |---|---|---|---|
+  | Accueil (aucune pastille : coût du chargement du plugin) | 30 | 26 | |
+  | Liste ouverts, page de 25 lignes | 38 | 34 | 34 |
+  | Liste ouverts, 32 lignes (50 par page) | 38 | 33 | 34 |
+  | Liste fermés, 7 lignes | 37 | 33 | 34 |
+  | Liste de Hugo (un ticket d'un autre propriétaire) | 39 | 33 | 34 |
+  | Suivi | 52 | 48 | 49 |
+
+  Le chargement du plugin coûte 4 requêtes ; les 32 pastilles de la liste de Léa (dont une d'un autre propriétaire) **0 à 1**, la même chose pour 25
+  ou 32 lignes et pour les 7 fermés (aucune requête par ligne) ; la liste de Hugo, avec un autre propriétaire, 2.
+- **Console et réseau** : 0 erreur JavaScript, 0 réponse HTTP ≥ 400, 0 requête vers un autre hôte ;
+  journaux du conteneur sans erreur ni avertissement PHP (seuls « sendmail: not found » et « Mailer
+  Error » : pas de serveur de courrier sur l'instance de test). Aucun débordement horizontal à 390 et
+  1280 px.
+- **Contrastes mesurés** (fond réel composé) : « Priority » 9,7:1 ; « Standard » 5,98:1 (sur le lilas
+  de l'en-tête) ; minimum de toutes les pages contrôlées 5,37:1, aucun texte sous 4,5:1.
+- **Scripts** : `check-drift.sh` sans dérive ; sur un export du commit : `apply.sh` refusé tant que
+  `sommet` est installé, puis simulation, installation (19 fichiers), idempotence, refus de
+  `sommet/apply.sh` tant que ce thème est installé, `remove.sh` : overlay identique (empreintes) à
+  l'état d'avant l'installation. Suite statique `setup/test/run-tests.php` (php:8.3-cli) : 0 échec.
+- **Captures remplacées** : `mes-tickets-*`, `mes-tickets-fermes-*`, `suivi-ticket-*`,
+  `suivi-ticket-ferme-*`, `suivi-reponse-envoyee-*`, `impression-suivi-ticket.png` ; nouvelles :
+  `suivi-ticket-repondu-*`, `niveau-collaborateur-standard-*`, `niveau-standard-liste-*`,
+  `niveau-standard-suivi-*`, `niveau-sans-organisation-liste-*`, `niveau-invite-priority-*`,
+  `niveau-invite-collaborateur-*`, `niveau-sans-plugin-{desactive,absent}-{liste,suivi}-*`.
+
+Non vérifié : rendu en français (pas de pack officiel hors ligne ; le catalogue du thème contient
+les 4 nouvelles chaînes), lecteur d'écran, navigateurs autres que Chromium, plugin Stripe réel
+(organisation Priority remplie à la main), libellés de niveau personnalisés ou traduits, liste
+d'organisation partagée (`canSeeOrgTickets`) à grand nombre de propriétaires distincts.
+
 ## Écarts assumés avec la maquette
 
 - **Accueil** : gabarit d'origine conservé (`index.php` est un fichier racine, pas un gabarit) ;
@@ -294,8 +408,9 @@ identique hors renommage.
 - **Ouverture de ticket** : le thème d'aide vient avant les champs du ticket (il décide des champs
   à afficher) ; les titres des sections sont ceux des formulaires d'osTicket (administrables) ; la
   colonne de conseils n'a pas d'avatar d'agent nommé.
-- **Suivi de ticket** : pas de frise d'avancement (le modèle d'osTicket n'a pas ces étapes) ni de
-  pastille « Support prioritaire » ; le titre de réponse est « Répondre » et non « Répondre à
+- **Suivi de ticket** : pas de frise d'avancement (le modèle d'osTicket n'a pas ces étapes) ; la
+  pastille « Support prioritaire » devient la pastille de niveau de contrat (libellé du plugin,
+  « Priority » ou « Standard »), seulement avec le plugin `sla_first_response` ; le titre de réponse est « Répondre » et non « Répondre à
   Inès » ; colonne latérale plus complète (coordonnées, champs personnalisés, toutes les pièces
   jointes) ; actions Actualiser / Imprimer / Modifier conservées. Le titre de chaque message
   (souvent le sujet) est affiché en petit sous l'auteur, comme à l'origine.
@@ -331,6 +446,10 @@ identique hors renommage.
 - Le PDF d'impression d'osTicket (`tickets.php?a=print`) garde sa mise en page ; seule l'impression
   du navigateur est habillée.
 - RTL : règles de base prévues, non testées.
+- Niveau de contrat : niveau **actuel** du propriétaire (un ancien ticket change de pastille et de
+  délai affiché à la fin d'un abonnement) ; rien sans le plugin `sla_first_response` actif et
+  configuré ; le délai « premier retour » est celui du contrat, pas l'échéance du plan de SLA du
+  ticket. Une liste d'organisation partagée coûte une recherche par propriétaire distinct de la page.
 
 
 ## Points à valider
@@ -349,6 +468,10 @@ identique hors renommage.
 5. Le pack de langue français officiel à ajouter à l'overlay, puis une relecture des écrans en
    français.
 6. Le choix des articles et catégories « mis en avant », qui alimentent l'accueil.
+7. **Niveau de contrat** visible du client : niveau actuel du propriétaire plutôt que niveau au
+   moment du ticket ; « Standard » affiché (discret) ; pastille montrée aussi à un invité (niveau du
+   propriétaire) ; ligne « Premier retour : sous 4 h, 24 h/24 / les jours ouvrés » tant que l'équipe
+   n'a pas répondu (formulation, et faut-il l'afficher à un client standard ?).
 
 ## Contenu du dossier
 
