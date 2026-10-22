@@ -379,6 +379,7 @@ body.atelier {
 .atelier .redactor-in { padding: 14px 16px !important; min-height: 9em; }
 .atelier .redactor-placeholder:before { color: var(--ardoise) !important; }
 .atelier .redactor-statusbar { background: var(--gris); color: var(--ardoise); }
+.atelier .redactor-statusbar li { color: var(--ardoise) !important; }
 .atelier .draft-saved { background: var(--nuit); color: var(--blanc); border-radius: 999px; font-size: .8125rem; top: auto; bottom: .6em; }
 .atelier .filedrop { padding-bottom: 0; margin-top: 12px; }
 .atelier .filedrop .dropzone {
@@ -419,7 +420,7 @@ body.atelier {
 .atelier #landing_page .thread-body > p small, .atelier #landing_page .thread-body > p:last-of-type:not(:first-of-type) { color: var(--ardoise); font-size: .9375rem; }
 .atelier #landing_page > .sidebar { order: 3; }
 .atelier #landing_page > .main-content > .search-form { order: 4; grid-column: 1; }
-.atelier #landing_page .thread-body > :is(h2, h3, ol, ul, div, table, blockquote) { order: 5; grid-column: 1 / -1; }
+.atelier #landing_page > .main-content > .thread-body > :is(h2, h3, ol, ul, div, table, blockquote) { order: 5; grid-column: 1 / -1; }
 .atelier #landing_page > div:not([class]) { order: 6; grid-column: 1 / -1; }
 @media (min-width: 1020px) {
   .atelier #landing_page { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
@@ -586,6 +587,8 @@ body.atelier {
 /* thread.css pins every block of a message to 14px: follow the bubble instead */
 .atelier .thread-body :is(div, p, ul, ol, table, dl, blockquote) { font-size: inherit; line-height: inherit; }
 .atelier .from-team .thread-body :is(div, p, span, li, td, font) { color: inherit !important; }
+.atelier .from-team .thread-body .attachments .attachment-info { color: var(--nuit) !important; }
+.atelier .from-team .thread-body .attachments .attachment-info .filesize { color: var(--ardoise) !important; }
 @media (max-width: 599px) {
   .atelier .thread-entry { gap: 10px; }
   .atelier .thread-entry > .avatar { width: 32px; height: 32px; font-size: .7rem; }
