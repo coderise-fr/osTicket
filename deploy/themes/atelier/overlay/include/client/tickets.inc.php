@@ -138,12 +138,12 @@ $tickets->values(
     'ticket_id', 'number', 'created', 'isanswered', 'source', 'status_id',
     'status__state', 'status__name', 'cdata__subject', 'dept_id',
     'dept__name', 'dept__ispublic', 'user__default_email__address', 'user_id',
-    // Atelier theme: plan name (Priority badge) and close date.
-    'sla__name', 'closed'
+    // Atelier theme: close date.
+    'closed'
 );
 
 // ---- Atelier theme: everything above is the original query logic, verbatim
-// (except the two extra columns of values() marked above).
+// (except the extra column of values() marked above).
 require_once(INCLUDE_DIR . 'client/atelier/atelier.inc.php');
 $atelier_sorts = array(
     'id' => array(__('Ticket #'), __('Ticket ID')),
@@ -224,6 +224,7 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
 <?php
  $subject_field = TicketForm::objects()->one()->getField('subject');
  $defaultDept=Dept::getDefaultDeptName(); //Default public dept.
+ $atelier_owners = array(); // Atelier theme: owners of shared tickets (User, or false)
  if ($tickets->exists(true)) { ?>
     <ul class="tlist" aria-describedby="ticket-count">
 <?php
@@ -260,10 +261,21 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
                 <span class="t-badges">
                 <span class="status status-<?php echo $is_open ? 'open' : 'closed'; ?>"><?php
                     echo atelier_icon($is_open ? 'inbox' : 'lock', 14); echo $status; ?></span>
-<?php if ($T['sla__name'] && ATELIER_PRIORITY_PREFIX !== ''
-        && stripos($T['sla__name'], ATELIER_PRIORITY_PREFIX) === 0) { ?>
-                <span class="plan plan-priority"><?php echo atelier_icon('bolt', 13); ?>Priority</span>
-<?php } ?>
+<?php
+                // Contract level of the ticket's owner (current level, from
+                // the sla-first-response plugin; nothing without it). Own
+                // tickets: the signed-in client. Shared tickets: one lookup
+                // per distinct owner (cached by atelier_contract()).
+                if (function_exists('coderise_contract_level')) {
+                    if (!$isCollab)
+                        $atelier_owner = null;
+                    elseif (!isset($atelier_owners[$T['user_id']]))
+                        $atelier_owner = $atelier_owners[$T['user_id']]
+                            = (User::lookup((int) $T['user_id']) ?: false);
+                    else
+                        $atelier_owner = $atelier_owners[$T['user_id']];
+                    echo atelier_contract_badge(atelier_contract($atelier_owner));
+                } ?>
                 </span>
                 <span class="t-last"><?php
                 if (!$is_open && $T['closed'])

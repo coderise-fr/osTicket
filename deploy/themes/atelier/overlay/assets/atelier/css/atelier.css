@@ -167,6 +167,8 @@ body.atelier {
 .atelier .status-closed { background: var(--gris); color: var(--nuit); }
 .atelier .plan-priority { background: var(--nuit); color: var(--blanc); }
 .atelier .plan-priority .ic { color: var(--cyan); }
+/* Contract level Standard: discreet (ardoise on gris clair, 4.9:1) */
+.atelier .plan-standard { background: var(--gris); color: var(--ardoise); }
 .atelier .pill-new { background: var(--cyan); color: var(--nuit); }
 .atelier .count {
   display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;

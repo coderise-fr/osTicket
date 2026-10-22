@@ -20,6 +20,9 @@
     - atelier_progress(), atelier_priority(): ticket progress and the
       optional "Priority" first-response indicator, computed only from data
       the ticket really has (dates, isanswered, state, SLA plan).
+    - atelier_contract(), atelier_contract_badge(): contract level badge
+      (Priority / Standard) from the optional sla-first-response plugin
+      (coderise_contract_level()); nothing at all without the plugin.
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
@@ -31,7 +34,7 @@ if (!defined('INCLUDE_DIR')) die('Access Denied');
 if (!defined('ATELIER_THEME')) {
     define('ATELIER_THEME', 'atelier');
     // Bumped with every change of the stylesheet (cache busting).
-    define('ATELIER_VERSION', '2.0.0');
+    define('ATELIER_VERSION', '2.1.0');
     // Brand (proper noun: not translated).
     define('ATELIER_BRAND', 'Coderise');
 
@@ -44,15 +47,17 @@ if (!defined('ATELIER_THEME')) {
     define('ATELIER_WEBSITE', 'https://www.coderise.fr');
 
     // Support Priority (to be validated, see README.md):
-    // - a ticket whose SLA plan name starts with ATELIER_PRIORITY_PREFIX
-    //   shows a "Priority" badge;
+    // - the contract level badge (Priority / Standard) comes from
+    //   coderise_contract_level(), provided by the sla-first-response
+    //   plugin (contrib/sla-first-response, version 0.3+): current level of
+    //   the ticket's owner (membership of the "Priority" organisation). No
+    //   plugin, no badge (see atelier_contract());
     // - a ticket whose ACTIVE SLA plan is exactly ATELIER_PRIORITY_SLA, not
     //   answered yet, open and with a due date in the future shows the
     //   "first reply within 4 h" indicator. The sla-first-response plugin
-    //   (contrib/sla-first-response) moves the ticket to a disabled plan on
-    //   the first reply, so the indicator disappears by itself.
+    //   moves the ticket to a disabled plan on the first reply, so the
+    //   indicator disappears by itself.
     // Set ATELIER_PRIORITY_SLA to '' to turn the indicator off.
-    define('ATELIER_PRIORITY_PREFIX', 'Priority');
     define('ATELIER_PRIORITY_SLA', 'Priority 4h');
 
     TextDomain::lookup('atelier')->setPath(dirname(__FILE__) . '/i18n/');
@@ -136,20 +141,59 @@ if (!defined('ATELIER_THEME')) {
     }
 
     /**
-     * Name of the ticket's SLA plan, or ''.
+     * Contract level (Priority / Standard) of a client, from the
+     * sla-first-response plugin: array('level' => 'priority'|'standard',
+     * 'label' => ...), or null when no level must be shown:
+     * - plugin (or its instance) disabled: coderise_contract_level() does
+     *   not exist, the theme shows no level at all (never "Standard" by
+     *   default);
+     * - source "default": the plugin could not apply its rule (guest, no
+     *   Priority organisation configured, unknown user), so the level is
+     *   not known either.
+     * $subject: null (the signed-in client), a User, a Ticket (its OWNER,
+     * never a collaborator), or false (unknown user: nothing). It is the
+     * CURRENT level of that person, not the one at ticket creation.
+     * Computed once per person and per page (the plugin caches too).
      */
-    function atelier_sla_name($ticket) {
-        $sla = $ticket ? $ticket->getSLA() : null;
-        return ($sla && is_object($sla)) ? (string) $sla->getName() : '';
+    function atelier_contract($subject=null) {
+        static $memo = array();
+        if (!function_exists('coderise_contract_level') || $subject === false)
+            return null;
+        if ($subject === null)
+            $key = 'me';
+        elseif ($subject instanceof Ticket)
+            $key = 'u' . (int) $subject->getOwnerId();
+        elseif ($subject instanceof User)
+            $key = 'u' . (int) $subject->getId();
+        else
+            return null;
+        if (!array_key_exists($key, $memo)) {
+            $memo[$key] = null;
+            $l = coderise_contract_level($subject);
+            if (is_array($l) && isset($l['level'], $l['label'], $l['source'])
+                    && $l['source'] != 'default' && trim($l['label']) !== '')
+                $memo[$key] = array(
+                    'level' => $l['level'] == 'priority' ? 'priority' : 'standard',
+                    'label' => (string) $l['label'],
+                );
+        }
+        return $memo[$key];
     }
 
     /**
-     * Does the ticket carry a Priority plan (badge)?
+     * Badge of a contract level (see atelier_contract()), or '' if none.
+     * Priority: accented (bleu nuit, cyan bolt); Standard: discreet (gris
+     * clair, ardoise text). The label is set by an administrator: escaped.
      */
-    function atelier_is_priority($ticket) {
-        $name = atelier_sla_name($ticket);
-        return ATELIER_PRIORITY_PREFIX !== '' && $name !== ''
-            && stripos($name, ATELIER_PRIORITY_PREFIX) === 0;
+    function atelier_contract_badge($contract) {
+        if (!$contract)
+            return '';
+        $priority = ($contract['level'] == 'priority');
+        return sprintf('<span class="plan plan-%s"><span class="visually-hidden">%s </span>%s%s</span>',
+            $priority ? 'priority' : 'standard',
+            Format::htmlchars(__a('Contract:')),
+            $priority ? atelier_icon('bolt', 13) : '',
+            Format::htmlchars($contract['label']));
     }
 
     /**

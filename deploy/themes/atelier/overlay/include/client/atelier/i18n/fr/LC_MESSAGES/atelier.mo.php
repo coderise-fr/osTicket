@@ -20,6 +20,8 @@ return array(
     'New reply' => 'Nouvelle réponse',
     'Waiting for our reply' => 'Réponse de l’équipe à venir',
     'Closed on %s' => 'Fermé le %s',
+    // Contract level badge (list and ticket), read by screen readers only
+    'Contract:' => 'Contrat :',
     // Ticket view: progress and Priority indicator
     'Ticket progress' => 'Avancement du ticket',
     'Received' => 'Reçu',
