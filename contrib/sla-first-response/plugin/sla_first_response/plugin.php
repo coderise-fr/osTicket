@@ -12,7 +12,7 @@
 **********************************************************************/
 return array(
     'id' => 'coderise:sla-first-response',
-    'version' => '0.3',
+    'version' => '0.4',
     'name' => 'SLA : première réponse',
     'author' => 'Coderise',
     'description' => 'Fait du plan de SLA un délai de première réponse : '

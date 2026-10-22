@@ -17,6 +17,8 @@
 #   6. phase4b-niveau-contrat-api    coderise_contract_level() : règles, cache, fin d'abonnement, libellés
 #   7. phase4c-portail-client.php    portail client réel en HTTP (sonde dans un gabarit de la copie
 #                                    de test), événement de bascule invisible au client, visible agent
+#   8. phase4d-organisation-stripe   organisation mémorisée par id par stripe-sync (priority_org_id) :
+#                                    proposition par défaut, avertissement d'écart dans le formulaire
 # Aucun fichier du dépôt n'est modifié ; rien n'est envoyé hors de la machine
 # (à part le téléchargement des images Docker et des paquets Debian du build).
 # Lancer le script une fois par moteur : mariadb:10.11 ET mysql:8.0.
@@ -33,7 +35,7 @@ $net = "ostsla$suffix"; $db = "ostsla-db-$suffix"; $web = "ostsla-web-$suffix"
 $phpImage = "ost-sla-test-php:$suffix"
 $tmp = Join-Path ([IO.Path]::GetTempPath()) "ostsla-$suffix"
 $failed = $false
-$phase4 = @('phase4a-niveau-contrat-config.php', 'phase4b-niveau-contrat-api.php', 'phase4c-portail-client.php')
+$phase4 = @('phase4a-niveau-contrat-config.php', 'phase4b-niveau-contrat-api.php', 'phase4c-portail-client.php', 'phase4d-organisation-stripe.php')
 $isMysql = $MariaDbImage -like 'mysql*'
 $client = if ($isMysql) { 'mysql' } else { 'mariadb' }
 

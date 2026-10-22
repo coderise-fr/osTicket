@@ -35,6 +35,12 @@
       « Priority ») aux thèmes du portail : coderise_contract_level(),
       voir contract_level.php.
 
+    Depuis la version 0.4 : l'organisation proposée est d'abord celle
+    que le plugin Stripe (0.2 et suivantes) a mémorisée par identifiant
+    (ost_config, espace `stripesync`, clé `priority_org_id`), et le
+    formulaire avertit si l'organisation configurée ici n'est plus
+    celle-là. Rien n'est modifié automatiquement.
+
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
 
@@ -118,16 +124,37 @@ class SlaFirstResponseConfig extends PluginConfig {
 
     private static function orgFormHint($current) {
         $hint = '';
+        $stripeId = SlaFirstResponsePlugin::stripeSyncOrgId();
+        $stripeOrg = $stripeId ? Organization::lookup($stripeId) : null;
         if (trim((string) $current) !== '') {
             $org = self::lookupOrg($current);
             $hint .= ' ' . ($org
                 ? sprintf(__('Actuellement : « %1$s » (n° %2$d).'), $org->getName(), $org->getId())
                 : __('Attention : l\'organisation enregistrée n\'existe plus, tous les clients sont au niveau « Standard ».'));
+            $hint .= self::divergenceHint($org ? (int) $org->getId() : 0, $stripeId, $stripeOrg);
+        }
+        elseif ($stripeOrg) {
+            $hint .= ' ' . sprintf(__('Proposition (organisation utilisée par le plugin Stripe) : « %1$s » (n° %2$d).'),
+                $stripeOrg->getName(), $stripeOrg->getId());
         }
         elseif (($stripe = SlaFirstResponsePlugin::stripeSyncOrgName()) !== null) {
             $hint .= ' ' . sprintf(__('Proposition (configuration du plugin Stripe) : « %s ».'), $stripe);
         }
         return $hint;
+    }
+
+    /**
+     * Avertissement si l'organisation configurée ici n'est plus celle que le
+     * plugin Stripe utilise (identifiant qu'il a mémorisé), sinon ''.
+     */
+    static function divergenceHint($configuredId, $stripeId, $stripeOrg) {
+        if (!$stripeId || $stripeId == $configuredId)
+            return '';
+        if ($stripeOrg)
+            return ' ' . sprintf(__('ATTENTION : le plugin Stripe rattache maintenant les clients Priority à l\'organisation « %1$s » (n° %2$d), pas à celle-ci : ils sont affichés « Standard ». Action recommandée : vérifier cette organisation (Utilisateurs > Organisations), saisir %2$d dans ce champ et enregistrer ; mettre aussi à jour le filtre de tickets « Organisation / Nom ».'),
+                $stripeOrg->getName(), $stripeOrg->getId());
+        return ' ' . sprintf(__('ATTENTION : l\'organisation mémorisée par le plugin Stripe (n° %d) n\'existe plus ; il en créera une nouvelle au prochain abonnement Priority. Revenir ensuite sur ce formulaire pour la sélectionner.'),
+            $stripeId);
     }
 
     function pre_save(&$config, &$errors) {
@@ -176,9 +203,42 @@ class SlaFirstResponsePlugin extends Plugin {
      */
     function getNewInstanceDefaults($options) {
         $defaults = array();
-        if (($org = self::stripeSyncOrgName()) !== null)
+        if (($org = self::stripeSyncProposal()) !== null)
             $defaults['contract_org'] = $org;
         return $defaults;
+    }
+
+    /**
+     * Valeur proposée pour le champ « Organisation Priority », ou null :
+     * 1. l'identifiant de l'organisation que le plugin Stripe a mémorisée
+     *    (clé `priority_org_id`, voir stripeSyncOrgId()), si elle existe ;
+     * 2. sinon son nom configuré (stripeSyncOrgName() : variable
+     *    STRIPE_SYNC_PRIORITY_ORG, champ « org_name », « Priority »), pour
+     *    un plugin Stripe installé mais qui n'a encore traité aucun
+     *    abonnement (ou en version 0.1).
+     */
+    static function stripeSyncProposal() {
+        try {
+            if (($id = self::stripeSyncOrgId()) && Organization::lookup($id))
+                return (string) $id;
+        }
+        catch (Throwable $t) {
+            // Proposition seulement.
+        }
+        return self::stripeSyncOrgName();
+    }
+
+    /** Première instance du plugin contrib/stripe-sync installé, ou null. */
+    private static function stripeSyncInstance() {
+        foreach (PluginManager::allInstalled() as $p) {
+            if (!($p instanceof Plugin)
+                    || !is_array($p->info)
+                    || @$p->info['id'] != 'coderise:stripe-sync')
+                continue;
+            foreach ($p->getInstances() as $i)
+                return $i;
+        }
+        return null;
     }
 
     /**
@@ -191,23 +251,43 @@ class SlaFirstResponsePlugin extends Plugin {
      */
     static function stripeSyncOrgName() {
         try {
-            foreach (PluginManager::allInstalled() as $p) {
-                if (!($p instanceof Plugin)
-                        || !is_array($p->info)
-                        || @$p->info['id'] != 'coderise:stripe-sync')
-                    continue;
-                foreach ($p->getInstances() as $i) {
-                    $env = getenv('STRIPE_SYNC_PRIORITY_ORG');
-                    if (is_string($env) && trim($env) !== '')
-                        return trim($env);
-                    $c = new Config($i->getNamespace());
-                    $name = trim((string) $c->get('org_name'));
-                    return $name !== '' ? $name : 'Priority';
-                }
+            if ($i = self::stripeSyncInstance()) {
+                $env = getenv('STRIPE_SYNC_PRIORITY_ORG');
+                if (is_string($env) && trim($env) !== '')
+                    return trim($env);
+                $c = new Config($i->getNamespace());
+                $name = trim((string) $c->get('org_name'));
+                return $name !== '' ? $name : 'Priority';
             }
         }
         catch (Throwable $t) {
             // Proposition seulement : ne jamais bloquer le formulaire.
+        }
+        return null;
+    }
+
+    /**
+     * Identifiant de l'organisation Priority que le plugin
+     * contrib/stripe-sync (0.2 et suivantes) a mémorisé, ou null (plugin
+     * absent, sans instance, ou n'ayant encore rattaché personne).
+     * L'organisation peut avoir été supprimée depuis : vérifier qu'elle
+     * existe. Lecture seule de la ligne publiée par le plugin Stripe
+     * (ost_config, espace `stripesync`, clé `priority_org_id`), sans charger
+     * ses classes ni tout son espace de configuration.
+     */
+    static function stripeSyncOrgId() {
+        try {
+            if (!self::stripeSyncInstance())
+                return null;
+            $res = db_query(sprintf(
+                'SELECT `value` FROM %s WHERE `namespace`=%s AND `key`=%s',
+                CONFIG_TABLE, db_input('stripesync'), db_input('priority_org_id')));
+            $row = $res ? db_fetch_row($res) : null;
+            $id = $row ? (int) $row[0] : 0;
+            return $id > 0 ? $id : null;
+        }
+        catch (Throwable $t) {
+            // Proposition et avertissement seulement : ne jamais bloquer le formulaire.
         }
         return null;
     }
