@@ -114,10 +114,12 @@ fi
 target="$rev"; [ "$mode" = dir ] && target="$dir"
 base_rev="$(sed -n '1s/.* au commit \([0-9a-f]*\).*/\1/p' "$here/BASE.sha256")"
 status=0
+cr="$(printf '\r')"
 
 check() { # $1 = fichier d'empreintes, $2 = libellé, $3 = conseil
     changed=""
     while read -r h f; do
+        f="${f%"$cr"}"   # fichier d'empreintes extrait en CRLF (Windows)
         case "$h" in ''|'#'*) continue ;; esac
         now="$(hash_of "$f")"
         if [ "$now" = absent ]; then
