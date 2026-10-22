@@ -239,24 +239,25 @@ body.atelier {
 /* ---------- Header ---------- */
 
 .atelier .site-header { position: relative; z-index: 50; background: var(--nuit); color: var(--blanc); }
-.atelier .bar { display: flex; align-items: center; gap: 12px 32px; padding-block: var(--x); }
+.atelier .bar { display: flex; align-items: center; gap: 12px 24px; padding-block: var(--x); }
 .atelier .brand { display: inline-flex; align-items: center; flex: none; line-height: 0; color: var(--blanc); text-decoration: none; }
 .atelier .brand .logo { display: block; height: var(--x); width: auto; }
 .atelier .brand-logo { display: block; max-height: 48px; width: auto; }
 .atelier .site-nav { flex: 1 1 auto; min-width: 0; }
-.atelier .menu { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 0; padding: 0; list-style: none; }
+.atelier .menu { display: flex; flex-wrap: nowrap; gap: 4px 4px; margin: 0; padding: 0; list-style: none; }
 .atelier .menu a {
-  display: block; padding: 8px 12px; color: var(--blanc); border-bottom: 3px solid transparent;
+  display: block; padding: 8px 10px; color: var(--blanc); border-bottom: 3px solid transparent; white-space: nowrap;
   font: 600 .9375rem/1.3 var(--f-titre); text-decoration: none;
 }
 .atelier .menu a:hover, .atelier .menu a.active, .atelier .menu a[aria-current] { border-bottom-color: var(--cyan); color: var(--blanc); }
-.atelier .who { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 14px; font-size: .9375rem; }
+.atelier .who { margin-left: auto; display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; justify-content: flex-end; gap: 8px 14px; font-size: .9375rem; }
 .atelier .who a { color: var(--blanc); }
 .atelier .who .me {
   display: inline-flex; align-items: center; gap: 10px; padding: 4px 14px 4px 4px; border-radius: 999px;
   border: 1.5px solid rgba(255,255,255,.4); font: 600 .9375rem var(--f-titre); text-decoration: none;
 }
 .atelier .who .me:hover { border-color: var(--cyan); }
+.atelier .who .me-name { max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .atelier .who .me .avatar { background: var(--cyan); color: var(--nuit); box-shadow: none; }
 .atelier .who .out, .atelier .who .signin { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font: 600 .9375rem var(--f-titre); }
 .atelier .who .out:hover span { text-decoration: underline; text-decoration-color: var(--cyan); }
@@ -278,14 +279,14 @@ body.atelier {
 .atelier .menu-mobile ul { list-style: none; margin: 0; padding: 0; }
 .atelier .menu-mobile li a { display: block; padding: 14px 0; color: var(--blanc); font: 600 1rem var(--f-titre); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.14); }
 .atelier .menu-mobile li a[aria-current] { box-shadow: inset 3px 0 0 var(--cyan); padding-left: 14px; }
-@media (max-width: 1100px) {
+@media (max-width: 1240px) {
   .atelier .bar { flex-wrap: wrap; }
   .atelier .site-nav { display: none; }
   .atelier .menu-mobile { display: block; order: 2; }
-  .atelier .who { order: 3; width: 100%; justify-content: flex-start; margin-left: 0; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); }
+  .atelier .who { order: 3; width: 100%; flex-wrap: wrap; justify-content: flex-start; margin-left: 0; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); }
 }
 @media (max-width: 480px) {
-  .atelier .who .me-name { max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .atelier .who .me-name { max-width: 10em; }
 }
 
 /* ---------- Forms (shared) ---------- */
