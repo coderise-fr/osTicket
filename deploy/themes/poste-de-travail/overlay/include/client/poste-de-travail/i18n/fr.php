@@ -45,7 +45,7 @@ return array(
     'Ticket number or subject' => 'Numéro ou mot du sujet',
     'No open ticket. All good.' => 'Aucun ticket ouvert. Tout roule.',
     // Ticket view
-    '%1$d messages · %2$d attachments' => '%1$d messages · %2$d pièces jointes',
+    'Messages: %1$d · attachments: %2$d' => "Messages\u{a0}: %1\$d · pièces jointes\u{a0}: %2\$d",
     'Priority first response' => 'Délai Priority',
     'First response within 4 h (Priority, 24/7)' => "Premier retour sous 4\u{a0}h (Priority, 24\u{a0}h/24)",
     '%d%% of the time elapsed' => '%d %% du délai écoulé',

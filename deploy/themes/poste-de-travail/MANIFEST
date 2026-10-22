@@ -29,6 +29,7 @@ include/client/open.inc.php
 include/client/poste-de-travail/i18n/fr.php
 include/client/poste-de-travail/theme.php
 include/client/templates/thread-entry.tmpl.php
+include/client/templates/thread-event.tmpl.php
 include/client/tickets.inc.php
 include/client/view.inc.php
 index.php

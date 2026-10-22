@@ -216,7 +216,7 @@ if ($nav) {
     ob_start();
     foreach ($ptdt_items as $ptdt_key => $I) {
         printf('<li><a class="%s" href="%s"%s%s>%s<span>%s</span>%s</a></li>'."\n",
-            Format::htmlchars($ptdt_key), $I['href'],
+            'nav-'.Format::htmlchars($ptdt_key), $I['href'],
             $I['active'] ? ' aria-current="page"' : '',
             $I['title'] ? ' title="'.Format::htmlchars($I['title']).'"' : '',
             ptdt_icon($I['icon'], 20), $I['label'],

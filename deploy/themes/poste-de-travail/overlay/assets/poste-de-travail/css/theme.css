@@ -127,7 +127,7 @@ body.ptdt {
 .ptdt .r-views { display: grid; gap: 1px; margin: 0 -12px !important; }
 .ptdt .rail .r-views a { display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 6px; color: rgba(255, 255, 255, .88); text-decoration: none; font-size: .875rem; }
 .ptdt .rail .r-views a:hover { background: rgba(255, 255, 255, .1); color: var(--blanc); }
-.ptdt .rail .r-views .count { margin-left: auto; font-size: .75rem; font-weight: 600; color: var(--blanc); }
+.ptdt .rail .r-views .count { margin-left: auto; font-size: .75rem; font-weight: 600; color: var(--blanc); background: rgba(255, 255, 255, .14); }
 .ptdt .rail-foot { margin-top: auto; padding-top: 32px; display: grid; gap: 10px; font-size: .84375rem; }
 .ptdt .plan-box { margin: 0 0 6px; padding: 12px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 8px; line-height: 1.4; }
 .ptdt .plan-box .k { display: flex; gap: 6px; align-items: center; font: 600 .84375rem var(--f-titre); margin-bottom: 2px; }
@@ -234,6 +234,7 @@ body.ptdt {
 .ptdt .stats .hot dd { box-shadow: inset 0 -3px 0 var(--cyan); align-self: flex-start; }
 .ptdt .landing h1, .ptdt .landing h2 { font-size: 1.125rem; margin: 0 0 .5em; line-height: 1.3; }
 .ptdt .landing > :last-child { margin-bottom: 0; }
+.ptdt .pad.thread-body { padding: 16px !important; }
 
 /* Property lists: alternate grey rows */
 .ptdt .props { display: grid; margin: 0; }
@@ -425,8 +426,8 @@ body.ptdt {
 /* Phone field: number, "Ext:" text node and extension stay on one line */
 .ptdt form table:not(.data) td[colspan] > label:has(> input[type=tel]) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; grid-column: 1 / -1; }
 .ptdt form table:not(.data) td[colspan] > label:has(> input[type=tel]) > span:first-child { flex: 1 0 100%; padding-top: 0; }
-.ptdt form table:not(.data) input[type=tel] { width: 16rem; max-width: 100%; }
-.ptdt form table:not(.data) input[name$="-ext"] { width: 6rem; }
+.ptdt form table:not(.data) input[type=tel] { width: 12rem; max-width: 100%; }
+.ptdt form table:not(.data) input[name$="-ext"] { width: 5rem; }
 @media (min-width: 760px) {
   .ptdt form table:not(.data) td[colspan] > label:has(> input[type=tel]) > span:first-child { flex: 0 0 calc(170px + 8px); }
 }
@@ -476,7 +477,10 @@ body.ptdt {
 .ptdt .filedrop .dropzone a { color: var(--cyan-profond); }
 .ptdt .filedrop .dropzone .icon-upload { color: var(--cyan-profond); }
 .ptdt .filedrop .files { border: 0; padding: 0; }
-.ptdt .filedrop .file { border: 0; border-radius: 5px; background: var(--gris); padding: 5px 8px; margin-top: 6px; }
+.ptdt .filedrop .files .file { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; height: auto; border: 0; border-radius: 5px; background: var(--gris); padding: 5px 8px; margin: 0 0 6px; color: var(--nuit); overflow-wrap: anywhere; }
+.ptdt .filedrop .files .file a { color: var(--nuit); }
+.ptdt .filedrop .files .file .trash { order: 9; margin-left: auto; color: var(--nuit); }
+.ptdt .filedrop .files:not(:empty) + .dropzone { border-top: 1.5px dashed var(--ardoise); border-radius: var(--r); }
 .ptdt .filedrop .file .filesize { color: #4f5968; }
 .ptdt .filedrop .progress { border-radius: 99px; }
 

@@ -59,7 +59,10 @@ if (!empty($ptdt_auth)) { ?>
     <p><?php echo __('Please wait... it will take a second!');?></p>
 </div>
 <?php
-if (($lang = Internationalization::getCurrentLanguage()) && $lang != 'en_US') { ?>
+// Offline, ajax.php answers with the offline page (HTML), which the browser
+// refuses as a script: the strings are not needed on that page.
+if (($lang = Internationalization::getCurrentLanguage()) && $lang != 'en_US'
+        && !$cfg->isHelpDeskOffline()) { ?>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>ajax.php/i18n/<?php
         echo $lang; ?>/js"></script>
 <?php } ?>

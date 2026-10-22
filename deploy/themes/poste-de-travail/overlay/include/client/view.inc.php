@@ -84,7 +84,7 @@ $ptdt_is_open = $ticket->isOpen();
 <div class="col-main">
 <section class="panel thread-panel" aria-labelledby="thread-t">
     <div class="panel-h"><h2 id="thread-t"><?php echo __('Ticket Thread'); ?></h2>
-        <span class="muted"><?php echo Format::htmlchars(sprintf(ptdt__('%1$d messages · %2$d attachments'),
+        <span class="muted"><?php echo Format::htmlchars(sprintf(ptdt__('Messages: %1$d · attachments: %2$d'),
             $ptdt_n_entries, $ptdt_n_files)); ?></span></div>
   <?php
     $email = $thisclient->getUserName();
