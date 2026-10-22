@@ -413,6 +413,24 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
 }
 .p-tickets #content > br, .p-view #content > br { display: none; }
 
+/* Niveau de contrat (plugin sla_first_response facultatif, voir otdc_contract()) :
+   une ligne de relevé en tête du ticket de papier, « Libellé ....... NIVEAU », puis
+   l'engagement. Priority : tampon prune sur lilas, cadre et ombre dure prune ;
+   Standard : imprimé simplement, en encre atténuée. Pas de surligneur (réservé). */
+.otdc-contract { margin: 0 0 26px; padding: 0 0 14px; border-bottom: 2px dashed var(--fade); font-family: var(--mono); font-size: .9375rem; line-height: 1.5; color: var(--ink); }
+.otdc-contract > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px .55em; }
+.otdc-contract dt { flex: 1 1 14em; display: flex; align-items: baseline; gap: .55em; min-width: 0; color: var(--ink-soft); font-weight: 500; }
+.otdc-contract dt::after { content: ""; flex: 1 1 1.5em; min-width: 1.5em; border-bottom: 2px dotted var(--fade); }
+.otdc-contract dd { margin: 0; }
+.otdc-contract__level { flex: none; max-width: 100%; overflow-wrap: anywhere; font-weight: 600; }
+.otdc-contract__terms { flex: 1 0 100%; text-align: right; font-size: .875rem; color: var(--ink-soft); }
+.otdc-contract--priority .otdc-contract__level {
+  margin: 2px 4px 4px 0; padding: 1px 10px; border: 2px solid var(--plum); background: var(--plum-light); color: var(--plum);
+  box-shadow: 3px 3px 0 var(--plum); text-transform: uppercase; letter-spacing: .06em; transform: rotate(-2deg);
+}
+.otdc-contract--priority .otdc-contract__terms { color: var(--ink); font-weight: 500; }
+.otdc-contract--standard .otdc-contract__level { color: var(--ink-soft); font-weight: 500; }
+
 /* Fil du ticket : messages du client sur le papier, réponses de l'équipe décalées et teintées */
 #ticketThread { margin-top: 30px; padding: 0; border: 0; background: none; }
 #ticketThread::before { display: none; }
@@ -593,4 +611,6 @@ h1 .states { float: right; margin-top: 10px; }
   #content .attachment-info a::after, .thread-body pre a::after { content: ""; }
   #msg_error, #msg_notice, #msg_warning, #msg_info { display: none !important; }
   .thread-body pre { background: #fff !important; border: 1px solid #000; }
+  .otdc-contract, .otdc-contract dt, .otdc-contract dd { color: #000 !important; }
+  .otdc-contract--priority .otdc-contract__level { background: #fff; border-color: #000; box-shadow: none; transform: none; }
 }

@@ -7,7 +7,9 @@
  * print.css and flags.css; the Ownalytics logotype (unless a client logo is
  * uploaded); a skip link; the menu in a labelled <nav> with aria-current;
  * language links as text; page classes on <body> for the stylesheet; the
- * content area is a <main> (closed by the theme's footer.inc.php). */
+ * content area is a <main> (closed by the theme's footer.inc.php); on the
+ * ticket list and on a ticket, the support contract level as a receipt line
+ * (only with the optional sla_first_response plugin, see theme.php). */
 require_once(INCLUDE_DIR . 'client/ownalytics-ticket-de-caisse/theme.php');
 
 $title=($cfg && is_object($cfg) && $cfg->getTitle())
@@ -225,4 +227,19 @@ if (($all_langs = Internationalization::getConfiguredSystemLanguages())
             <div id="msg_notice" role="status"><?php echo $msg; ?></div>
          <?php }elseif($warn) { ?>
             <div id="msg_warning" role="alert"><?php echo $warn; ?></div>
-         <?php } ?>
+         <?php }
+// Support contract level, printed once at the top of the receipt (optional
+// sla_first_response plugin, see otdc_contract()): on the ticket list, the
+// signed-in client's level (not one per row); on a ticket, the level of its
+// OWNER (requester), also for a collaborator or a guest. Variables set by
+// tickets.php before it includes this header.
+if (isset($inc) && $inc === 'tickets.inc.php' && $otdc_signed_in) {
+    echo otdc_contract_line(otdc_contract(), otdc__('Your support contract'));
+}
+elseif (isset($inc, $ticket) && $inc === 'view.inc.php' && $ticket instanceof Ticket
+        && $thisclient && $thisclient->isValid()) {
+    echo otdc_contract_line(otdc_contract($ticket),
+        ((int) $ticket->getOwnerId() === (int) $thisclient->getId())
+            ? otdc__('Your current support contract')
+            : otdc__("Requester's current support contract"));
+} ?>

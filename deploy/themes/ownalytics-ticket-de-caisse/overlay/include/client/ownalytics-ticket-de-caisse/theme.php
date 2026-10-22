@@ -16,6 +16,9 @@
     - otdc_strip_avatars()  removes avatar images from HTML built by the
                         core (Gravatar is osTicket's default avatar source:
                         the portal must not call it).
+    - otdc_contract(), otdc_contract_line()  support contract level
+                        (Priority / Standard) read from the optional
+                        sla_first_response plugin, printed as a receipt line.
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
@@ -26,7 +29,7 @@ if (!defined('INCLUDE_DIR')) die('Access Denied');
 
 if (!defined('OTDC_VERSION')) {
     // Bumped with every change of the stylesheet (cache busting).
-    define('OTDC_VERSION', '1.0.0');
+    define('OTDC_VERSION', '1.1.0');
     define('OTDC_SLUG', 'ownalytics-ticket-de-caisse');
     // Brand shown next to the pictogram when no custom logo is uploaded.
     // A proper noun: never translated.
@@ -78,5 +81,70 @@ if (!defined('OTDC_VERSION')) {
     function otdc_strip_avatars($html) {
         return preg_replace('/<img\b[^>]*\bclass\s*=\s*["\'][^"\']*\bavatar\b[^"\']*["\'][^>]*>/i',
             '', (string) $html);
+    }
+
+    /**
+     * Support contract level ("priority" / "standard") of a client, or
+     * null when nothing reliable can be shown.
+     *
+     * Read from coderise_contract_level() of the OPTIONAL sla_first_response
+     * plugin (contrib/sla-first-response, README sections 9 and 10). The
+     * function only exists while the plugin and its instance are enabled:
+     * without it, null (no level, no 24/7 commitment anywhere). A level
+     * whose source is "default" (guest for null, Priority organisation not
+     * configured or deleted, unknown user, error) is not shown either.
+     * $subject: null (the signed-in client) or a Ticket (its OWNER, never a
+     * collaborator). It is the CURRENT level of that person, not the one at
+     * the time the ticket was opened. Memoised per person and per page.
+     */
+    function otdc_contract($subject=null) {
+        static $memo = array();
+        if (!function_exists('coderise_contract_level'))
+            return null;
+        if ($subject === null)
+            $key = 'me';
+        elseif ($subject instanceof Ticket)
+            $key = 'u' . (int) $subject->getOwnerId();
+        else
+            return null;
+        if (!array_key_exists($key, $memo)) {
+            $memo[$key] = null;
+            try {
+                $l = coderise_contract_level($subject);
+            }
+            catch (Throwable $t) {
+                $l = null;
+            }
+            if (is_array($l) && isset($l['level'], $l['source'])
+                    && $l['source'] === 'organisation'
+                    && in_array($l['level'], array('priority', 'standard'), true)) {
+                $label = isset($l['label']) ? trim((string) $l['label']) : '';
+                if ($label === '')
+                    $label = $l['level'] == 'priority' ? 'Priority' : 'Standard';
+                $memo[$key] = array('level' => $l['level'], 'label' => $label);
+            }
+        }
+        return $memo[$key];
+    }
+
+    /**
+     * Receipt line of a contract level (result of otdc_contract()), or ''.
+     * "Caption ........ LEVEL" with dot leaders, then the commitment of the
+     * level. Priority is stamped (plum on lilac, plum frame); Standard is
+     * printed plainly. The label is typed by an administrator: escaped.
+     */
+    function otdc_contract_line($contract, $caption) {
+        if (!$contract)
+            return '';
+        $priority = ($contract['level'] == 'priority');
+        return sprintf('<dl class="otdc-contract otdc-contract--%s"><div>'
+                . '<dt>%s</dt><dd class="otdc-contract__level">%s</dd>'
+                . '<dd class="otdc-contract__terms">%s</dd></div></dl>',
+            $priority ? 'priority' : 'standard',
+            Format::htmlchars($caption),
+            Format::htmlchars($contract['label']),
+            Format::htmlchars($priority
+                ? otdc__('First reply within 4 hours, 24/7')
+                : otdc__('Reply on business days')));
     }
 }
