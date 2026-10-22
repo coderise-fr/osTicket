@@ -17,6 +17,7 @@ reverse proxy TLS, par exemple `support.coderise.fr`.
 | `scripts/gen-secrets.sh` | Génère les mots de passe de la base |
 | `scripts/backup.sh`, `scripts/restore.sh` | Sauvegarde (SQL + volume de configuration) et restauration sur une pile vierge |
 | `overlay/` | Thème, packs de langue et plugins superposés à osTicket (voir son `README.md`) |
+| `scripts/local-demo.sh`, `local-demo/` | Environnement local de **démonstration** (jamais en production) : voir la section du même nom |
 | `plugins.env` (non versionné) | Variables d'environnement des plugins, par exemple le secret du webhook Stripe |
 
 ## Prérequis
@@ -525,6 +526,89 @@ page de statut, et le délai de réaction contractuel que les seuils ci-dessus d
 `plugins.env` (même dossier, facultatif, non versionné) : variables passées à `web` seulement, une
 `NOM=valeur` par ligne, par exemple `STRIPE_SYNC_WEBHOOK_SECRET_FILE=/etc/osticket/stripe-sync-webhook-secret`
 (voir « Plugins »).
+
+## Environnement local de démonstration
+
+Pour **voir** les thèmes et le portail en fonctionnement sur son poste, avec des données fictives.
+Jamais pour la production : HTTP, cookies non `Secure`, identifiants de démonstration.
+
+```sh
+deploy/docker/scripts/local-demo.sh up [--theme <slug>] [--rebuild]
+deploy/docker/scripts/local-demo.sh theme <slug>    # change de thème, données conservées
+deploy/docker/scripts/local-demo.sh status          # conteneurs, adresses, thème, commit
+deploy/docker/scripts/local-demo.sh logs [-f] [web] # journaux
+deploy/docker/scripts/local-demo.sh down            # arrête, garde les volumes
+deploy/docker/scripts/local-demo.sh reset [--yes]   # supprime tout (confirmation « oui »)
+```
+
+Thèmes : `atelier`, `poste-de-travail`, `sommet` (défaut), `parcours`, `ownalytics-atelier`,
+`ownalytics-ticket-de-caisse`. Shell POSIX : Git Bash sous Windows ou Linux ; il faut Docker
+(Compose v2), `git` et `curl`.
+
+**Ce que fait `up`** (la première fois ; ensuite il redémarre simplement la pile, et reconstruit
+l'image si le commit `HEAD` ou le thème a changé) :
+
+1. choisit deux ports libres sur `127.0.0.1` (portail à partir de 8480, Mailpit à partir de 8425 ;
+   jamais 80, 443, 3306, 8025, 8026, 8080 ni un port déjà publié par un autre conteneur) et les fixe
+   dans le dossier d'état : ils restent les mêmes entre `down` et `up` ;
+2. construit l'image depuis le **commit** (`git archive`, comme `build.sh`), cibles `install` et
+   `runtime` : sur la copie exportée, retire le thème committé dans `overlay/`, applique
+   `deploy/themes/<slug>/apply.sh` et ajoute le plugin `contrib/sla-first-response/plugin/sla_first_response/`
+   dans `include/plugins/` (copie seulement : rien n'est écrit dans `deploy/docker/overlay/`) ;
+3. installe osTicket par l'**assistant web** (requêtes HTTP, image `install`), puis repasse sur l'image
+   de production (configuration en lecture seule) ;
+4. démarre `web`, `cron`, la base et **Mailpit**, puis peuple la base (`local-demo/seed.php`, exécuté
+   dans un conteneur ponctuel de l'image) ;
+5. affiche les adresses et le **chemin** du fichier d'identifiants (jamais un mot de passe).
+
+**Isolation.** Projet Compose fixe `ostdemo` (conteneurs `ostdemo-*`, volumes `ostdemo_ost-db`,
+`ostdemo_ost-config`, `ostdemo_mail-data`), images `ostdemo/osticket:demo` et `:demo-install`. Les
+fichiers de production (`compose.yaml`, `compose.install.yaml`) sont **copiés tels quels** dans le
+dossier d'état, avec la surcouche `local-demo/compose.demo.yaml` (Mailpit et un réseau interne `mail`) ;
+les ports, le tag d'image et `OSTICKET_COOKIE_SECURE=0` sont passés par `state.env`. Rien de la démo
+(port publié, Mailpit, mot de passe) n'est dans les fichiers de production, et `deploy/` n'est jamais
+copié dans l'image.
+
+**Dossier d'état** (`OST_DEMO_DIR`, par défaut `<dépôt principal>/.local-demo/`, même lancé depuis
+un worktree ; ignoré par Git) : `state.env` (ports, thème, commit, sans secret), copies des fichiers
+Compose, `secrets/` (base), `credentials.txt` (droits `600`, ACL réservée à l'utilisateur sous Windows),
+journaux du peuplement (`seed-*.log`). `down`, `status`, `logs` et `theme` n'utilisent que ce dossier
+pour la pile ; `theme` et `up` ont besoin du dépôt pour reconstruire l'image.
+
+**`credentials.txt`** : adresses du portail client, du panneau agent (`/scp/`), de l'administration
+et de Mailpit, puis, pour chaque compte, rôle, identifiant et mot de passe **générés aléatoirement**
+à la création de l'environnement (jamais de mot de passe par défaut). Comptes (adresses fictives en
+`.test`) :
+
+| Compte | Rôle |
+|---|---|
+| `camille.durand` | Administrateur (panneau agent et administration) |
+| `theo.martin` | Agent, département Support |
+| `lea.moreau@lumen-studio.test` | Cliente de l'organisation **Priority** (environ 40 tickets) |
+| `hugo.bernard@acme.test` | Client de l'organisation **Acme** (Standard), demandeur du ticket partagé |
+| `nina.petit@mail-perso.test` | Cliente sans organisation (Standard) |
+| `marc.lefevre@acme.test` | Client Acme, collaborateur du ticket partagé |
+| `gina.roux@lumen-studio.test` | Invitée sans compte (organisation Priority) : « Check Ticket Status » avec l'e-mail et le numéro noté dans le fichier |
+
+**Données** (toutes fictives) : vérification MX des adresses désactivée, fuseau Europe/Paris,
+anglais (aucun pack de langue n'est téléchargé), inscription des clients ouverte, accusés de
+réception activés ; SMTP de toutes les adresses système vers Mailpit (aucun e-mail ne sort de la
+machine) ; plans de SLA « Priority 4h » (actif, calendrier 24/7) et « Priority 4h - 1re reponse faite »
+(désactivé, non transitoire) ; filtre « Organisation / Nom = Priority » qui pose le plan ; plugin
+`sla_first_response` installé, actif, instance réglée sur ces deux plans et sur l'organisation Priority ;
+rubriques « Incident en production » (avec le formulaire « Contexte technique » : listes, texte, date,
+case à cocher), « Question sur l'utilisation », « Demande d'évolution », « Facturation et abonnement » ;
+10 articles en 5 catégories ; pages d'accueil, de remerciement et hors ligne avec les textes proposés
+par le README du thème Sommet. Tickets : 40 pour Léa (14 fermés, réponses d'agent qui ont fait basculer
+le plan par le plugin, messages de suivi, pièces jointes, deux tickets en attente du premier retour
+pour l'indicateur Priority, un en retard), tickets de Hugo, Nina et Marc, un ticket partagé, un ticket
+de l'invitée. Le plugin `stripe-sync` n'est pas installé.
+
+**Limites.** HTTP seulement (`OSTICKET_COOKIE_SECURE=0`) ; les échéances de SLA continuent de courir :
+les tickets en attente passent « en retard » quelques heures après le peuplement (`cron` envoie alors
+les alertes, visibles dans Mailpit) ; changer de commit puis relancer `up` reconstruit l'image mais ne
+migre pas la base (`reset` puis `up` pour repartir de zéro) ; les images de démonstration occupent
+environ 1 Go (supprimées par `reset`).
 
 ## Droplet DigitalOcean
 
