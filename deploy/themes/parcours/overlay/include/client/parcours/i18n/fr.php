@@ -34,6 +34,7 @@ return array(
     'By email and on this portal' => 'Par e-mail et sur ce portail',
     'You confirm' => 'Vous validez',
     'The ticket is closed' => 'Le ticket est fermé',
+    'Follow this ticket' => 'Suivre ce ticket',
     'Already have a ticket?' => 'Vous avez déjà un ticket ?',
     'Before you write, two minutes' => "Avant d'écrire, deux minutes",
     '%d min' => '%d min',

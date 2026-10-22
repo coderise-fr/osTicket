@@ -5,7 +5,29 @@
  * page as the core template: #overlay, #loading, i18n script, getConfig(). */
 if (!function_exists('pcrs__'))
     require_once INCLUDE_DIR . 'client/parcours/parcours.inc.php';
-?>
+
+// Thank-you page (open.php after a successful POST, $ticket set by open.php):
+// where the new ticket stands, from real data (number, account access)
+if (basename($_SERVER['SCRIPT_NAME']) == 'open.php' && isset($ticket) && $ticket instanceof Ticket) { ?>
+<section class="how done-route" aria-labelledby="done-title">
+  <h2 id="done-title"><?php echo pcrs__('Your request, step by step'); ?></h2>
+  <ol class="route">
+    <li class="done"><span class="node" aria-hidden="true"><?php echo pcrs_icon('check'); ?></span><span class="txt"><strong><?php
+        echo pcrs__('You describe'); ?></strong><small><?php echo pcrs__('done'); ?></small></span></li>
+    <li class="done"><span class="node" aria-hidden="true"><?php echo pcrs_icon('check'); ?></span><span class="txt"><strong><?php
+        echo pcrs__('You get a number'); ?></strong><small>#<?php echo $ticket->getNumber(); ?></small></span></li>
+    <li class="current" aria-current="step"><span class="node" aria-hidden="true">3</span><span class="txt"><strong><?php
+        echo pcrs__('We reply'); ?></strong><small><?php echo pcrs__('By email and on this portal'); ?></small></span></li>
+    <li class="todo"><span class="node" aria-hidden="true">4</span><span class="txt"><strong><?php
+        echo pcrs__('You confirm'); ?></strong><small><?php echo pcrs__('The ticket is closed'); ?></small></span></li>
+  </ol>
+<?php if ($thisclient && $thisclient->isValid() && !$thisclient->isGuest()) { ?>
+  <p class="actions"><a class="btn btn-primary" href="<?php echo ROOT_PATH; ?>tickets.php?id=<?php echo $ticket->getId(); ?>"><?php
+    echo pcrs__('Follow this ticket'); ?></a></p>
+<?php } ?>
+</section>
+<?php
+} ?>
 </div>
 </main>
 <footer class="site-foot on-dark" id="footer">

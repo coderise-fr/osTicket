@@ -166,8 +166,8 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 .pcrs .route.vert { grid-auto-flow: row; }
 .pcrs .route.vert > li { grid-template-columns: 1fr; padding: 0 0 22px; }
 .pcrs .route.vert > li:not(:last-child)::after { top: 42px; bottom: 2px; left: 17px; right: auto; width: 3px; height: auto; }
-.pcrs .progress { height: 10px; border-radius: 999px; background: rgba(0,15,38,.14); overflow: hidden; margin-top: 8px; max-width: 520px; }
-.pcrs .progress span { display: block; height: 100%; width: 0; background: var(--cyan); border-radius: 999px; transition: width .2s; }
+.pcrs .overall .progress { height: 10px; border-radius: 999px; background: rgba(0,15,38,.14); overflow: hidden; margin-top: 8px; max-width: 520px; }
+.pcrs .overall .progress span { display: block; height: 100%; width: 0; background: var(--cyan); border-radius: 999px; transition: width .2s; }
 .pcrs .overall { margin-top: 24px; }
 .pcrs .overall p { margin: 0; font-weight: 600; }
 
@@ -560,4 +560,12 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 .pcrs .filedrop .files .file { display: flex; align-items: center; gap: 10px; color: var(--nuit); }
 .pcrs .filedrop .files .file .filesize { margin-left: 4px; }
 .pcrs .filedrop .files .file .trash { margin-left: auto; color: var(--nuit); }
-.pcrs .page #topicId { width: 100%; }
+.pcrs .page select:not([multiple]) { width: 100% !important; }
+.pcrs .filedrop .files .file { height: auto; flex-wrap: wrap; padding: 8px 12px; }
+.pcrs .filedrop .files .file > span { padding: 0; display: inline; overflow-wrap: anywhere; }
+.pcrs .filedrop .progress { width: 100%; }
+.pcrs .thread-entry .attachment-info a.filename { color: var(--nuit) !important; }
+/* js/osticket.js paints the submit button text red (inline style) when the form
+   changes: unreadable on cyan. Keep the charte colours (the leave-page warning stays). */
+.pcrs .page input[type=submit] { color: var(--nuit) !important; }
+.pcrs .page input[type=submit]:hover { color: var(--blanc) !important; }
