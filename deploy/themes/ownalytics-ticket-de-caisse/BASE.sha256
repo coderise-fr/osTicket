@@ -1,0 +1,5 @@
+# Thème Ticket de caisse : fichiers du cœur remplacés par overlay/, empreintes au commit 2c9292efe11ac421127e91ae3615e501a559c3a2
+78d5a3647ccb12ceecad169bfe84bc62bcd02c4a180fe04b22e5f6965188efc5  include/client/footer.inc.php
+fb02c43f400165d14a21c32f58f6e1b380e3c7912b6e293922f5f4931f4ceada  include/client/header.inc.php
+cb7706c68692c9cb718ca386c5ca427b815bf3d996cc7028d78f6d27db45a799  include/client/templates/thread-entry.tmpl.php
+e4e446d798bd4dfe5d21599baeead319ec171741f55568baad10e03f374d3b1a  include/client/templates/thread-event.tmpl.php

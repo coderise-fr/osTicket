@@ -1,0 +1,15 @@
+# Fichiers installés par apply.sh dans deploy/docker/overlay/ (chemins relatifs à la racine d'osTicket).
+# Un chemin par ligne. À tenir à jour avec overlay/ (apply.sh refuse sinon).
+assets/ownalytics-ticket-de-caisse/css/theme.css
+assets/ownalytics-ticket-de-caisse/fonts/OFL.txt
+assets/ownalytics-ticket-de-caisse/fonts/archivo-100-900-latin.woff2
+assets/ownalytics-ticket-de-caisse/fonts/ibm-plex-mono-400-latin.woff2
+assets/ownalytics-ticket-de-caisse/fonts/ibm-plex-mono-500-latin.woff2
+assets/ownalytics-ticket-de-caisse/fonts/ibm-plex-mono-600-latin.woff2
+assets/ownalytics-ticket-de-caisse/img/favicon.svg
+include/client/footer.inc.php
+include/client/header.inc.php
+include/client/ownalytics-ticket-de-caisse/i18n/fr.php
+include/client/ownalytics-ticket-de-caisse/theme.php
+include/client/templates/thread-entry.tmpl.php
+include/client/templates/thread-event.tmpl.php

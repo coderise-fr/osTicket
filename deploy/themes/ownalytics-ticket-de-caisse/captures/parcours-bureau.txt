@@ -1,0 +1,74 @@
+OK   accueil: articles à la une 
+OK   clavier: lien d'évitement en premier skip
+OK   clavier: focus sur le contenu 
+OK   clavier: contour de focus visible solid 3px
+OK   ouverture: champs dynamiques rechargés en AJAX 
+OK   ouverture: erreurs affichées 
+OK   ouverture: pièce jointe ajoutée 
+OK   ouverture: page de remerciement 688784
+OK   connexion: erreur affichée 
+OK   accès: e-mail reçu avec lien http://127.0.0.1:60820/view.php?auth=o1xamaaaaahaaaaaOfz%2BEI8h9Fn72Q%3D%3D
+OK   accès: fil visible pour l'invité 
+OK   accès: réponse de l'invité publiée 
+OK   inscription: e-mail de confirmation http://127.0.0.1:60820/pwreset.php?token=26DiorXSY23pO8phjD56G1d5o4rjCnwG6Rnh8mr9ZNiC0Gb5
+OK   inscription: compte confirmé 
+OK   mot de passe: e-mail de réinitialisation http://127.0.0.1:60820/pwreset.php?token=5G62owiuu2wzF29NhhdzXrqRL4VFtB6v1vttpIx=eOTuaOS2
+OK   mot de passe: formulaire du nouveau mot de passe http://127.0.0.1:60820/index.php
+OK   mot de passe: changé http://127.0.0.1:60820/tickets.php  Open a New Ticket Please fill in the form below to open a new ticket. Email:nora.petit@studio-nord.test Client:Nora Petit Help Topic — Select a Help Topic — He
+OK   liste: client sans ticket -> formulaire d'ouverture (comportement d'osTicket) http://127.0.0.1:60820/tickets.php
+OK   kb: fiche article 
+OK   kb: résultats de recherche 
+OK   kb: filtre par thème 
+OK   connexion: liste des tickets http://127.0.0.1:60820/tickets.php
+OK   isolation: ticket d'un autre client absent 
+OK   pagination: plusieurs pages 
+OK   pagination: page 2 
+OK   liste: recherche 
+OK   liste: état vide (recherche sans résultat) 
+OK   isolation: accès direct refusé 
+OK   suivi: réponse publiée 
+OK   suivi: pièce jointe dans le fil 
+OK   collaborateur: ticket d'un collègue visible 
+OK   hors ligne: page affichée 
+
+accueil: débordement=0px contraste min=6.4 (53 textes) échecs=0
+ouverture-vide: débordement=0px contraste min=7.6 (25 textes) échecs=0
+ouverture-erreurs: débordement=0px contraste min=6.4 (52 textes) échecs=0
+ouverture-ticket: débordement=0px contraste min=6.4 (56 textes) échecs=0
+remerciement: débordement=0px contraste min=7.55 (20 textes) échecs=0
+connexion: débordement=0px contraste min=7.6 (23 textes) échecs=0
+connexion-erreur: débordement=0px contraste min=7.6 (25 textes) échecs=0
+acces-par-numero: débordement=0px contraste min=7.6 (25 textes) échecs=0
+acces-lien-envoye: débordement=0px contraste min=7.55 (26 textes) échecs=0
+suivi-invite: débordement=0px contraste min=5.77 (68 textes) échecs=0
+inscription: débordement=0px contraste min=7.6 (31 textes) échecs=0
+inscription-a-confirmer: débordement=0px contraste min=7.6 (17 textes) échecs=0
+inscription-confirmee: débordement=0px contraste min=7.6 (24 textes) échecs=0
+mot-de-passe-oublie: débordement=0px contraste min=7.6 (20 textes) échecs=0
+mot-de-passe-envoye: débordement=0px contraste min=7.6 (19 textes) échecs=0
+mot-de-passe-lien: débordement=0px contraste min=7.6 (20 textes) échecs=0
+mot-de-passe-nouveau: débordement=0px contraste min=7.6 (37 textes) échecs=0
+mot-de-passe-change: débordement=0px contraste min=7.6 (27 textes) échecs=0
+mes-tickets-aucun: débordement=0px contraste min=7.6 (27 textes) échecs=0
+base-de-connaissances: débordement=0px contraste min=6.4 (33 textes) échecs=0
+kb-categorie: débordement=0px contraste min=5.77 (21 textes) échecs=0
+kb-article: débordement=0px contraste min=5.77 (27 textes) échecs=0
+kb-recherche: débordement=0px contraste min=5.77 (29 textes) échecs=0
+kb-recherche-vide: débordement=0px contraste min=5.77 (26 textes) échecs=0
+page-ressource: débordement=0px contraste min=6.4 (24 textes) échecs=0
+mes-tickets: débordement=0px contraste min=6.4 (158 textes) échecs=0
+mes-tickets-page-2: débordement=0px contraste min=6.4 (68 textes) échecs=0
+mes-tickets-fermes: débordement=0px contraste min=6.4 (67 textes) échecs=0
+mes-tickets-recherche: débordement=0px contraste min=6.4 (43 textes) échecs=0
+mes-tickets-vide: débordement=0px contraste min=6.4 (34 textes) échecs=0
+suivi-ticket: débordement=0px contraste min=5.77 (101 textes) échecs=0
+suivi-reponse-envoyee: débordement=0px contraste min=5.77 (109 textes) échecs=0
+suivi-ticket-ferme: débordement=0px contraste min=5.77 (73 textes) échecs=0
+suivi-collaborateur: débordement=0px contraste min=5.77 (71 textes) échecs=0
+modifier-ticket: débordement=0px contraste min=6.4 (38 textes) échecs=0
+profil: débordement=0px contraste min=7.6 (37 textes) échecs=0
+hors-ligne: débordement=0px contraste min=7.6 (10 textes) échecs=0
+
+console (erreurs/avertissements): 0
+requêtes externes: 0
+réponses HTTP >= 400: 0
