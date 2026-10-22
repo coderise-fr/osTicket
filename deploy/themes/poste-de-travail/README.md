@@ -2,7 +2,7 @@
 
 Mise en œuvre de la proposition 02 des maquettes Coderise (`docs/theme-mockups-coderise/02-poste-de-travail/`,
 charte graphique Coderise v1.0) : portail dense, **rail latéral bleu nuit pleine hauteur** (logo, signature,
-navigation, rappel Priority, téléphone), barre haute blanche (fil d'Ariane, recherche, « Ouvrir un ticket »,
+navigation, encadré du niveau de contrat réel du client, téléphone), barre haute blanche (fil d'Ariane, recherche, « Ouvrir un ticket »,
 compte), tableaux serrés à **en-têtes bleu nuit et lignes alternées gris clair**, panneau de propriétés collant à
 côté du fil d'un ticket. Seul le **portail client** est concerné ; le panneau agent (`scp/`) n'est pas touché.
 
@@ -32,11 +32,11 @@ Un fichier de l'overlay **remplace** celui du cœur : chacun est à revoir à ch
 
 | Fichier | Pourquoi il est surchargé |
 |---|---|
-| `include/client/header.inc.php` | Rail bleu nuit (logo, signature, navigation, vues ouverts/fermés, pages « Autres ressources », rappel Priority, téléphone, connexion/déconnexion), menu mobile (`<details>`, sans JavaScript), barre haute (fil d'Ariane, recherche, bouton, compte, langues) ; mise en page « authentification » (bandeau bleu nuit, sans rail) pour la connexion, l'inscription, le mot de passe oublié et l'accès par numéro d'un visiteur. Ne charge plus `assets/default/css/theme.css`, `print.css` ni `flags.css`. Même prélude PHP, mêmes en-têtes (CSP), mêmes scripts, mêmes messages. |
+| `include/client/header.inc.php` | Rail bleu nuit (logo, signature, navigation, vues ouverts/fermés, pages « Autres ressources », encadré du niveau de contrat (voir « Niveau de contrat »), téléphone, connexion/déconnexion), menu mobile (`<details>`, sans JavaScript), barre haute (fil d'Ariane, recherche, bouton, compte, langues) ; mise en page « authentification » (bandeau bleu nuit, sans rail) pour la connexion, l'inscription, le mot de passe oublié et l'accès par numéro d'un visiteur. Ne charge plus `assets/default/css/theme.css`, `print.css` ni `flags.css`. Même prélude PHP, mêmes en-têtes (CSP), mêmes scripts, mêmes messages. |
 | `include/client/footer.inc.php` | Pied de page Coderise (contact, délais de réponse, liens) ; mêmes scripts (`getConfig()`, i18n JS), même `#loading`. |
-| `index.php` | Accueil en tableau de bord (fichier prévu pour être adapté, d'après son en-tête). |
-| `include/client/tickets.inc.php` | Liste « mes tickets » : filtres segmentés, tri, pagination, cartes sur mobile. Logique PHP copiée telle quelle ; seul ajout : `topic__topic` dans `values()` (sujet d'aide sous le titre). |
-| `include/client/view.inc.php` | Suivi d'un ticket : fil + panneau de propriétés (infos, champs personnalisés, pièces jointes, coordonnées), indicateur Priority facultatif. |
+| `index.php` | Accueil en tableau de bord (fichier prévu pour être adapté, d'après son en-tête), panneau « Votre contrat ». |
+| `include/client/tickets.inc.php` | Liste « mes tickets » : filtres segmentés, tri, pagination, cartes sur mobile, colonne « Contrat ». Logique PHP copiée telle quelle ; seul ajout : `topic__topic` dans `values()` (sujet d'aide sous le titre). |
+| `include/client/view.inc.php` | Suivi d'un ticket : fil + panneau de propriétés (infos, niveau de contrat du demandeur, champs personnalisés, pièces jointes, coordonnées), indicateur Priority facultatif. |
 | `include/client/templates/thread-entry.tmpl.php` | Message du fil : initiales au lieu des avatars (pas de Gravatar), rôle « Vous » / « Équipe Coderise ». |
 | `include/client/templates/thread-event.tmpl.php` | Événements du fil : même balisage, mais les images d'avatar qu'osTicket insère dans la description (Gravatar par défaut, requête externe) sont retirées. |
 | `include/client/open.inc.php` | Ouverture de ticket en panneau avec colonne « Questions fréquentes ». Garde le tableau et `#dynamic-form`. |
@@ -64,7 +64,8 @@ la page de remerciement (`open.php`) et la page hors ligne (`offline.php`).
   le symbole sur carré bleu nuit), `favicon-32.png` et `favicon-180.png` (maquettes, même composition).
 - `assets/poste-de-travail/js/theme.js` (raccourci `/` vers la recherche).
 - `include/client/poste-de-travail/theme.php` (fonctions `ptdt__()`, `ptdt_icon()`, `ptdt_logo()`,
-  `ptdt_signature()`, `ptdt_initials()`, `ptdt_asset()`, `ptdt_priority_sla()` ; constantes de réglage) et
+  `ptdt_signature()`, `ptdt_initials()`, `ptdt_asset()`, `ptdt_priority_sla()`, `ptdt_contract()`,
+  `ptdt_contract_of_row()`, `ptdt_contract_pill()` ; constantes de réglage) et
   `include/client/poste-de-travail/i18n/fr.php` (voir « Traductions »).
 
 Aucune ressource externe au chargement : polices, logo, icônes (SVG en ligne, trait de 1,75 comme les maquettes)
@@ -117,8 +118,56 @@ désactivé (plus d'échéance), et le thème vérifie aussi l'absence de répon
 comme tel (la barre reste pleine) : la décision « montrer un dépassement au client » reste à prendre.
 
 Ce qui reste à valider : le libellé, l'affichage d'un dépassement, et le nom du plan (`PTDT_PRIORITY_SLA`) si un
-autre nom est retenu. Le niveau de contrat (Standard / Priority) n'est pas affiché ailleurs : osTicket ne le
-connaît pas comme donnée du client (voir les écarts).
+autre nom est retenu. Cet indicateur ne dépend pas du niveau de contrat ci-dessous (il lit le plan de SLA du
+ticket) : il reste affiché, inchangé, même sans le plugin.
+
+## Niveau de contrat (Priority / Standard)
+
+osTicket ne connaît pas le niveau de contrat d'un client. Le thème le lit, **facultativement**, dans le plugin
+`contrib/sla-first-response` (version 0.3 et suivantes) : `coderise_contract_level()` donne `priority` quand
+l'utilisateur appartient à l'organisation « Priority » configurée dans le plugin (organisation alimentée par
+le plugin `contrib/stripe-sync`), sinon `standard` (README du plugin, section 9). Tout passe par
+`ptdt_contract()` (`theme.php`) :
+
+- appel seulement si `function_exists('coderise_contract_level')` (plugin ou instance désactivés : la fonction
+  n'existe pas), dans un `try` ;
+- le niveau n'est **utilisé que si la source est `organisation`**. La valeur par défaut du plugin (source
+  `default` : visiteur, invité, organisation Priority non configurée ou supprimée, erreur) vaut `standard`, mais
+  rien ne dit alors que le client est standard : le thème n'affiche **aucun** niveau ;
+- libellé (`label`, configurable dans le plugin) échappé par `Format::htmlchars()` ;
+- un seul calcul pour le client connecté par page (mémorisé par le thème, et le plugin a son propre cache).
+
+| Où | Ce qui est affiché |
+|---|---|
+| Rail (bureau, au-dessus du téléphone) | Client **Priority** : encadré « Support Priority — Premier retour sous 4 h, 24 h/24 ». Client **Standard** (avec ou sans organisation) : encadré « Support Standard — Réponse les jours ouvrés », sans engagement 24/7. **Aucun encadré** pour un visiteur, un invité, ou si le niveau est inconnu (plugin absent ou non configuré). Le rail est replié en barre sous 900 px : l'encadré n'y est pas (le panneau de l'accueil donne l'information). |
+| Accueil, panneau « Votre contrat » (colonne de droite ; sous la colonne principale sur mobile) | Niveau (pastille), délais du niveau (Priority : « Premier retour sous 4 h, 24 h/24, 7 j/7 » ; Standard : « Jours ouvrés »), et pour un client Standard son **organisation** s'il en a une. L'organisation d'un client Priority n'est pas affichée : c'est le groupe technique « Priority », pas son entreprise. Rien d'autre (ni dates d'abonnement, ni produits couverts, ni heures incluses : osTicket et le plugin ne les fournissent pas). |
+| Accueil, « Tickets ouverts » | Pastille du niveau du **propriétaire** sous le sujet de chaque ticket (pas de colonne : avec la colonne de droite, une colonne de plus coupait la date à 1280 px). |
+| Liste « mes tickets » | Colonne « Contrat » (non triable), pastille du **propriétaire** de chaque ticket : un ticket d'un collègue dont le client est collaborateur porte le niveau du collègue. Colonne absente si le niveau du client connecté est inconnu. |
+| Suivi d'un ticket | Pastille à côté du statut (en-tête) et ligne « Contrat » du panneau de propriétés, niveau du **propriétaire** du ticket (jamais celui d'un collaborateur, même quand c'est lui qui consulte), infobulle « Niveau de contrat actuel du demandeur du ticket ». Aussi pour un invité (lien d'accès) : niveau du propriétaire. |
+
+Pastilles : Priority = fond bleu nuit, texte blanc, éclair cyan (19,2:1) ; Standard = contour et texte ardoise
+sur fond blanc propre (5,8:1, y compris sur les lignes grises).
+
+Dans la liste, les lignes sont des tableaux de valeurs : `ptdt_contract_of_row()` utilise le client connecté pour
+ses propres tickets et `User::lookup($T['user_id'])` pour les autres, soit au plus une recherche par
+propriétaire distinct (le reste vient des caches de l'ORM et du plugin). Mesuré sur l'instance de test (journal
+général de MariaDB, page HTML seule, cliente Priority avec 39 tickets) :
+
+| Page | Requêtes, plugin actif | Requêtes, plugin absent |
+|---|---|---|
+| Ouverts (9 lignes, 2 propriétaires) | 38 | 36 |
+| Fermés, page 1 (25 lignes, 2 propriétaires) | 38 | 34 |
+| Fermés, page 2 (5 lignes, 1 propriétaire) | 37 | 33 |
+| Accueil (8 tickets ouverts) | 51 | 48 |
+
+L'écart (2 à 4 requêtes, chargement du plugin compris) ne dépend pas du nombre de lignes.
+
+**Limites.** C'est le niveau **actuel** du propriétaire, pas celui qu'il avait à la création du ticket : après
+la fin d'un abonnement, ses anciens tickets s'affichent Standard (et inversement) ; l'indicateur « premier
+retour sous 4 h », lui, suit le plan de SLA posé à la création. Un collègue qui écrit depuis une autre adresse
+est un autre utilisateur, avec son propre niveau. Les délais affichés (4 h 24/7, jours ouvrés) sont ceux de la
+charte, écrits dans le thème : ils ne sont pas lus dans le plugin. Sans pack de langue contenant le libellé
+configuré, il est affiché tel quel (« Priority », « Standard »).
 
 ## Installation
 
@@ -185,7 +234,7 @@ de `MANIFEST` identiques à la copie du thème. Sans thème, osTicket reprend so
 ## Traductions
 
 Toutes les chaînes d'osTicket passent par `__()` et sont traduites par les packs de langue. Les chaînes propres
-au thème (signature, pied de page, accueil, indicateur Priority, rôles du fil…) passent par `ptdt__()`, qui
+au thème (signature, pied de page, accueil, indicateur Priority, niveau de contrat, rôles du fil…) passent par `ptdt__()`, qui
 appelle `__()` et, seulement si le pack de langue n'a pas la chaîne, cherche dans
 `include/client/poste-de-travail/i18n/<langue>.php` (fourni : `fr.php`, avec espaces insécables). Les msgids
 sont en anglais. Elles ne sont pas extraites par `manage.php i18n make-pot` (fonction différente de `__()`).
@@ -204,13 +253,13 @@ par une donnée réelle, ou omis.
 |---|---|
 | Statistiques « premier retour moyen, 90 jours », « tickets résolus ce trimestre » | Retirées. Trois compteurs réels : tickets ouverts, « attend votre réponse » (tickets ouverts dont la dernière réponse vient de l'équipe, champ `isanswered`), tickets fermés. |
 | Bandeau « 3 tickets ouverts. 1 attend votre réponse : #260397… » | « L'équipe a répondu, votre réponse est attendue : #n°, sujet » (ticket réel le plus récent) ou « Aucun ticket n'attend votre réponse. » |
-| Panneau « Votre contrat » (niveau, produits couverts) ; pastilles « Priority / Standard » dans les tableaux et le titre du ticket | Omis : le niveau de contrat n'est pas une donnée d'osTicket. Seul l'indicateur Priority du suivi existe, à partir du plan de SLA (voir plus haut). |
-| Colonnes « Produit », « Contrat », « Dernière activité » (« Réponse de Nora, il y a 3 h ») | Liste : N°, Sujet (+ sujet d'aide, pastille « Attend votre réponse »), Statut, Service, Date de création (colonnes triables d'origine). Accueil : « Dernière activité » = date de dernière mise à jour. |
-| Filtres « Produit » et « Contrat », filtre « Tous » | Filtres d'osTicket : Ouverts / Fermés (compteurs réels), recherche par numéro ou mot, sujet d'aide. |
+| Panneau « Votre contrat » (niveau, premier retour, standard, produits couverts) ; pastilles « Priority / Standard » dans les tableaux, le titre et les propriétés du ticket | Repris **avec le plugin `contrib/sla-first-response`** (voir « Niveau de contrat ») : niveau, délais du niveau, organisation d'un client Standard. Pas de « produits couverts » (aucune donnée). Sans le plugin : rien. |
+| Colonnes « Produit », « Contrat », « Dernière activité » (« Réponse de Nora, il y a 3 h ») | Liste : N°, Sujet (+ sujet d'aide, pastille « Attend votre réponse »), Contrat (avec le plugin), Statut, Service, Date de création (colonnes triables d'origine ; « Contrat » non triable). Accueil : pastille du contrat sous le sujet, « Dernière activité » = date de dernière mise à jour. Pas de « Produit ». |
+| Filtres « Produit » et « Contrat », filtre « Tous » | Filtres d'osTicket : Ouverts / Fermés (compteurs réels), recherche par numéro ou mot, sujet d'aide. Pas de filtre par contrat (le niveau n'est pas une colonne de la base). |
 | Recherche « ticket ou article » de la barre haute | Recherche dans la base de connaissances (le portail n'a pas de recherche commune) ; la liste des tickets garde sa propre recherche. Raccourci `/` conservé. |
 | « Articles recommandés » avec temps de lecture ; « Les plus lus » | Questions mises en avant (FAQ « featured ») avec leur catégorie ; pas de temps de lecture ni de statistique de lecture. |
 | Rail : « Mes tickets » | Lien d'osTicket (« Tickets »), pastille = tickets ouverts ; vues Ouverts / Fermés et pages « Autres ressources » en plus. Sur mobile, menu `<details>` comme la maquette. |
-| Rail : encadré « Support Priority – premier retour sous 4 h, 24 h/24 » | Repris (information commerciale de la charte, la même pour tous les clients). |
+| Rail : encadré « Support Priority – premier retour sous 4 h, 24 h/24 » | Repris pour un client Priority seulement ; « Support Standard – Réponse les jours ouvrés » pour un client Standard ; rien pour un visiteur, un invité ou sans le plugin. Les délais des deux niveaux restent au pied de page (offre commerciale, pour tous). |
 | Barre haute : nom + organisation | Prénom et organisation réels (l'organisation n'apparaît que si le client en a une). Lien vers le profil. |
 | Suivi : « Délai Priority » avec « Apporté en 44 min… Objectif tenu » | Indicateur affiché seulement **avant** la première réponse (échéance réelle, temps écoulé) ; après, il disparaît (pas de mesure « apporté en » : osTicket ne la stocke pas côté client). |
 | Suivi : ligne « Priorité Urgente » et événement « a passé la priorité à Urgente » | Champs et événements tels qu'osTicket les montre au client (la priorité n'est pas visible côté client par défaut). |
@@ -280,10 +329,52 @@ base) ; lecteur d'écran ; Firefox et Safari (Chromium seulement) ; connexion pa
 logo téléversé dans l'administration ; organisation affichée sous le nom (l'organisation de test n'a pas été
 rattachée par le script de données) ; modification de mot de passe imposée après le lien de réinitialisation.
 
+## Vérifications du niveau de contrat (22/10/2026, commit `fc40b689`)
+
+Nouvelle instance privée, même recette : `git archive` du commit, `apply.sh` sur l'overlay exporté, plugin
+`contrib/sla-first-response/plugin/sla_first_response/` copié (non committé) dans
+`include/plugins/sla_first_response/` de l'overlay exporté, cibles `install` puis `runtime` construites par
+`docker compose` comme `scripts/build.sh` (projet, images, volumes et réseaux à suffixe unique, port hôte libre),
+installation par l'assistant (requêtes HTTP), conteneur durci. Une seconde image `runtime` **sans le plugin**
+(même commit, même base) sert au cas « plugin absent ». Plugin installé et activé, une instance avec les plans
+`Priority 4h` (actif, 24/7) et `Priority 4h - 1re reponse faite` (désactivé) et l'organisation Priority, par
+l'API d'administration d'osTicket (comme le formulaire, pas par l'interface). Données fictives : Léa Marchand
+(organisation Priority, 37 tickets dont 1 ticket `Priority 4h` sans réponse, + 2 tickets d'un collègue où elle est
+collaboratrice = **39 tickets** dans sa liste), Paul Girard (Standard, organisation Maison Verdier, collaborateur
+d'un ticket de Léa), Nina Roche (Standard, sans organisation), Marc Dumas (organisation Priority, sans compte :
+invité par lien d'accès), 4 catégories et 9 articles. Catalogue de test français d'environ 90 chaînes d'osTicket
+(non livré, monté en lecture seule) ; les pages d'accueil et de remerciement de l'administration sont celles de
+l'installation (anglais). Chromium privé (`playwright-core` hors dépôt).
+
+| Contrôle | Résultat |
+|---|---|
+| Cliente Priority | Encadré Priority du rail, « Votre contrat » Priority sans organisation, pastilles Priority sur ses tickets et Standard sur ceux du collègue (liste ouverte, fermés pages 1 et 2, accueil), pastille dans l'en-tête et les propriétés du suivi ; indicateur « premier retour sous 4 h » toujours affiché sur le ticket sans réponse, absent sur un ticket répondu. |
+| Client Standard avec organisation | Encadré « Support Standard — Réponse les jours ouvrés » (ni 4 h ni 24/7), « Votre contrat » Standard + « Maison Verdier » ; ticket de Léa vu en collaborateur : Priority (niveau du propriétaire). |
+| Client Standard sans organisation | Encadré Standard, « Votre contrat » sans ligne Organisation ; liste vide (fermés) avec l'en-tête « Contrat ». |
+| Invité (lien d'accès, propriétaire Priority) | Pastilles Priority dans le suivi, aucun encadré dans le rail, aucun panneau à l'accueil. |
+| Visiteur | Aucun encadré, aucune pastille (accueil, base de connaissances, ouverture). |
+| Plugin **absent** (image sans le plugin, plugin encore actif en base), plugin **désactivé**, organisation Priority **non configurée** | Aucun encadré, aucune pastille, aucune colonne, aucun panneau ; indicateur SLA inchangé ; aucune erreur. |
+| Requêtes SQL | Voir le tableau de la section « Niveau de contrat » (écart constant de 2 à 4 requêtes). |
+| Console, requêtes réseau, HTTP | 0 erreur ni avertissement console, 0 requête vers un autre hôte, 0 réponse ≥ 400 (60 pages et variantes). |
+| Journaux Apache/PHP | Aucune erreur ni avertissement PHP ; seulement `sendmail: not found` (pas de messagerie sur l'instance de test). |
+| Débordement horizontal | Aucun à 390, 820 et 1280 px. |
+| Contrastes (chaque texte visible, fond composé) | Minimum 4,91:1 ; pastilles 19,2:1 (Priority) et 5,8:1 (Standard), encadrés du rail 19,2:1. |
+| Captures | 55 captures remplacées ou ajoutées dans `captures/` (accueil, listes, suivis, invité, impression, réponse envoyée, pages de visiteur sans l'encadré dont erreurs d'ouverture et remerciement, variantes `-standard`, `-sans-organisation`, `-sans-plugin`, `suivi-ticket-collegue-priority`). |
+| `apply.sh` / `remove.sh` | Simulation, installation (33 fichiers), relance (0 copié), retrait (33) sur `deploy/docker/overlay/` ; `git status` propre ensuite. |
+| `check-drift.sh` | 11 fichiers OK (ensemble des fichiers du cœur surchargés inchangé : `BASE.sha256` et `MANIFEST` inchangés). |
+| Test statique du dépôt | `php setup/test/run-tests.php` (php:8.3-cli, arbre du commit) : 0 échec. |
+
+**Non vérifié** : pack de langue officiel ; plugin installé par l'interface d'administration (fait par l'API) ;
+organisation Priority alimentée par le plugin Stripe (rattachement fait à la main) ; fin d'abonnement en direct
+(le changement d'organisation est lu à la requête suivante, d'après le README du plugin) ; Firefox, Safari,
+lecteur d'écran.
+
 ## Points à valider
 
 1. Indicateur Priority : libellés, nom du plan (`PTDT_PRIORITY_SLA`), affichage d'un dépassement.
 2. Couleurs d'état (erreur, succès, alerte) : extension de la charte.
 3. Logo : PNG horizontal détouré, faute de SVG horizontal officiel ; favicon composé (symbole sur carré bleu nuit).
-4. Encadré « Support Priority » du rail, montré à tous les clients (pas de niveau de contrat dans osTicket).
+4. Niveau de contrat : textes de l'encadré Standard (« Réponse les jours ouvrés ») et du panneau « Votre
+   contrat » ; afficher ou non le niveau **actuel** sur les anciens tickets (alternative : plan de SLA posé à la
+   création) ; organisation d'un client Standard affichée ; aucun niveau tant que le plugin n'est pas configuré.
 5. Police de code (pile système) et règle « liens bleu nuit soulignés sur fond teinté ».
