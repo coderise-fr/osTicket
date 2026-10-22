@@ -28,6 +28,7 @@ WATCH_FILES="
 index.php
 offline.php
 open.php
+tickets.php
 assets/default/css/theme.css
 css/osticket.css
 css/thread.css
