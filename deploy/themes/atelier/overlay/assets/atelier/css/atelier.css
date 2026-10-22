@@ -193,12 +193,10 @@ body.atelier {
 
 /* ---------- Buttons ---------- */
 
-.atelier .btn,
-.atelier #content input[type=submit],
-.atelier #content input[type=reset],
-.atelier #content input[type=button],
-.atelier #content button:not(.re-button):not([class*=redactor]):not(.ui-button):not(.ui-datepicker-trigger),
-.atelier .button {
+/* :where() keeps every button at the specificity of one class, so that the
+   variants below (.btn-primary, .btn-ghost...) always win. */
+.atelier :where(.btn, #content input[type=submit], #content input[type=reset], #content input[type=button],
+  #content button:not(.re-button, [class*=redactor], .ui-button, .ui-datepicker-trigger, .action-button), .button) {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: 48px; margin: 0; padding: .55em 1.4em;
   border: 2px solid var(--ink); border-radius: 99px;
@@ -208,30 +206,30 @@ body.atelier {
   transition: transform .12s ease, box-shadow .12s ease;
   -webkit-appearance: none; appearance: none;
 }
-.atelier .btn-primary,
-.atelier #content input[type=submit],
-.atelier .button.blue,
-.atelier .search-form .button {
+.atelier :where(#content input[type=submit], .button.blue),
+.atelier .btn-primary {
   background: var(--sun); color: var(--ink); box-shadow: 0 4px 0 var(--ink);
 }
-.atelier .btn-ghost, .atelier #content input.btn-ghost, .atelier .button.green { background: var(--white); color: var(--ink); box-shadow: 0 4px 0 var(--plum-light); }
-.atelier #content input.btn-link {
+.atelier .btn-ghost, .atelier .button.green { background: var(--white); color: var(--ink); box-shadow: 0 4px 0 var(--plum-light); }
+.atelier .search-form .button.green { background: var(--sun); box-shadow: 0 4px 0 var(--ink); }
+.atelier input.btn-link {
   min-height: 44px; border-color: transparent; background: transparent; box-shadow: none;
   color: var(--plum); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .22em; padding-inline: .8em;
 }
-.atelier #content input.btn-link:hover { color: var(--pink-deep); transform: none; box-shadow: none; }
-.atelier .btn-lg, .atelier #content input.btn-lg { min-height: 56px; padding-inline: 2em; font-size: 1.125rem; }
-.atelier .btn-sm, .atelier #content input.btn-sm { min-height: 40px; padding: .35em 1em; font-size: .9375rem; box-shadow: 0 3px 0 var(--plum-light); }
-.atelier .btn:hover, .atelier #content input[type=submit]:hover, .atelier #content input[type=reset]:hover,
-.atelier #content input[type=button]:not(.btn-link):hover, .atelier .button:hover {
+.atelier input.btn-link:hover { color: var(--pink-deep); transform: none; box-shadow: none; }
+.atelier .btn-lg { min-height: 56px; padding-inline: 2em; font-size: 1.125rem; }
+.atelier .btn-sm { min-height: 40px; padding: .35em 1em; font-size: .9375rem; box-shadow: 0 3px 0 var(--plum-light); }
+.atelier :where(.btn, #content input[type=submit], #content input[type=reset], .button):hover,
+.atelier :where(#content input[type=button]:not(.btn-link)):hover {
   transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); color: var(--ink);
 }
-.atelier .btn:active, .atelier #content input[type=submit]:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
-.atelier #content input[type=submit][disabled] { opacity: .65; cursor: progress; transform: none; }
+.atelier :where(.btn, #content input[type=submit]):active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+.atelier :where(#content input[type=submit])[disabled] { opacity: .65; cursor: progress; transform: none; }
 /* osticket.js paints the submit button text red once the form has changed:
    red on sun fails AA, so the cue becomes a pink underline instead. */
-.atelier #content input[type=submit][style*="red"] {
-  color: var(--ink) !important; text-decoration: underline; text-decoration-color: var(--pink-deep);
+.atelier #content input[type=submit][style*="color"] { color: var(--ink) !important; }
+.atelier #content form[method=post] input[type=submit][style*="color"] {
+  text-decoration: underline; text-decoration-color: var(--pink-deep);
   text-decoration-thickness: 3px; text-underline-offset: .25em;
 }
 .atelier .actions, .atelier p.buttons {
@@ -239,7 +237,8 @@ body.atelier {
 }
 .atelier .action-button {
   display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--line);
-  border-radius: 99px; background: var(--white); color: var(--plum); font-size: .9375rem; font-weight: 700; text-decoration: none;
+  border-radius: 99px; background: var(--white); color: var(--plum); font-family: inherit; font-size: .9375rem; font-weight: 700;
+  line-height: 1.3; text-decoration: none; cursor: pointer;
 }
 .atelier .action-button:hover { border-color: var(--plum); color: var(--plum); }
 
@@ -352,24 +351,31 @@ body.atelier {
 }
 .atelier .form-header > div { color: var(--ink-soft); font-size: .9375rem; }
 .atelier .form-header > div:empty { display: none; }
-.atelier .form-table label, .atelier table.padded label { display: block; }
-.atelier .form-table label > span.required, .atelier .form-table label > span:first-child,
-.atelier table.padded label > span:first-child { display: inline; font-weight: 700; }
-.atelier .form-table label > br:first-of-type { display: none; }
-.atelier .form-table label > br + * { margin-top: 6px; }
-.atelier .form-table em, .atelier table.padded em {
+.atelier :is(.form-table, table.padded, #dynamic-form) label, .atelier table.padded label { display: block; }
+.atelier :is(.form-table, table.padded, #dynamic-form) label > span:first-child:not(.req),
+.atelier table.padded label > span:first-child:not(.req) { display: block; font-weight: 700; }
+.atelier :is(.form-table, table.padded, #dynamic-form) label > span:first-child + br,
+.atelier :is(.form-table, table.padded, #dynamic-form) label > em + br { display: none; }
+.atelier :is(.form-table, table.padded, #dynamic-form) > tbody + tbody > tr:first-child { margin-top: 8px; padding-top: 22px; border-top: 2px dashed var(--line); }
+.atelier :is(.form-table, table.padded, #dynamic-form) em, .atelier table.padded em {
   display: block !important; margin: 2px 0 6px; color: var(--ink-soft) !important; font-style: normal; font-size: .875rem; font-weight: 400;
 }
-.atelier .form-table input[type=text], .atelier .form-table input[type=email], .atelier .form-table select,
-.atelier .form-table textarea, .atelier .form-table .redactor-box { margin-top: 6px; }
-.atelier .form-table input[size], .atelier table.padded input[size] { width: 100%; }
-.atelier .form-table div.error { margin-top: 6px; font-size: .9375rem; }
-.atelier .form-table label.checkbox, .atelier .form-table label.inline,
-.atelier .form-table .radio label, .atelier .form-table label[for$="_cb"] { display: inline-flex; align-items: center; font-weight: 500; margin: 4px 18px 4px 0; }
-.atelier .form-table .section-break { border-top: 2px dashed var(--line); padding-top: 14px !important; }
+.atelier :is(.form-table, table.padded, #dynamic-form) input[type=text], .atelier :is(.form-table, table.padded, #dynamic-form) input[type=email], .atelier :is(.form-table, table.padded, #dynamic-form) select,
+.atelier :is(.form-table, table.padded, #dynamic-form) textarea, .atelier :is(.form-table, table.padded, #dynamic-form) .redactor-box { margin-top: 6px; }
+.atelier :is(.form-table, table.padded, #dynamic-form) input[size], .atelier table.padded input[size] { width: 100%; }
+.atelier :is(.form-table, table.padded, #dynamic-form) div.error { margin-top: 6px; font-size: .9375rem; }
+.atelier :is(.form-table, table.padded, #dynamic-form) label.checkbox, .atelier :is(.form-table, table.padded, #dynamic-form) label.inline,
+.atelier :is(.form-table, table.padded, #dynamic-form) .radio label, .atelier :is(.form-table, table.padded, #dynamic-form) label[for$="_cb"] { display: inline-flex; align-items: center; font-weight: 500; margin: 4px 18px 4px 0; }
+.atelier :is(.form-table, table.padded, #dynamic-form) .section-break { border-top: 2px dashed var(--line); padding-top: 14px !important; }
 /* Account forms: label column then field */
 .atelier table.padded td[width] { font-weight: 700; margin-bottom: 6px; }
-.atelier table.padded td + td .error { display: block; margin-top: 6px; }
+/* Field cells hold stray "&nbsp;" text next to full-width inputs: hide the bare text,
+   keep every element (and the error messages) at normal size. */
+.atelier table.padded td + td, .atelier table.padded td[colspan] { font-size: 0; }
+.atelier table.padded td + td > *, .atelier table.padded td[colspan] > * { font-size: 1rem; }
+.atelier table.padded td + td > .error { display: block; margin-top: 4px; font-size: .875rem; line-height: 1.2; }
+.atelier #content table.padded td > button { font-size: 1rem !important; margin-top: 10px; }
+.atelier table.padded tr { margin-bottom: 12px; }
 .atelier table.padded .select2-container { width: 100% !important; }
 @supports selector(:has(a)) {
   @media (min-width: 640px) {
@@ -385,7 +391,9 @@ body.atelier {
     .atelier .form-table > tbody > tr:has(.section-break),
     .atelier .form-table > tbody > tr.topic-row,
     .atelier .form-table > tbody > tr.client-identity,
-    .atelier .form-table > tbody > tr:only-child { grid-column: 1 / -1; }
+    .atelier .form-table > tbody > tr:only-child,
+    .atelier .form-table > tbody > tr:has(+ tr textarea),
+    .atelier .form-table > tbody > tr:has(input[type=tel]) { grid-column: 1 / -1; }
   }
 }
 
@@ -463,14 +471,17 @@ body.atelier {
 .atelier .search-form .button, .atelier .ask .btn, .atelier #content .ask input[type=submit] { min-height: 58px; }
 .atelier .search-form button.button.green { background: var(--sun); box-shadow: 0 4px 0 var(--ink); }
 /* Phone field: number then a short extension box */
-.atelier .form-table input[type=tel] { width: calc(100% - 7.5em); display: inline-block; }
-.atelier .form-table input[name$="-ext"] { width: 5.5em; display: inline-block; margin-left: .4em; }
+.atelier :is(.form-table, table.padded, #dynamic-form) input[type=tel] { width: min(22rem, calc(100% - 8em)); display: inline-block; margin-right: .5em; }
+.atelier :is(.form-table, table.padded, #dynamic-form) input[name$="-ext"] { width: 5.5em; display: inline-block; margin-left: .3em; }
 /* Sidebar becomes the plum card: actions and featured questions */
 .atelier #landing_page .sidebar {
   float: none; width: auto; padding: 24px; border-radius: var(--r);
   background: var(--plum); color: var(--paper); box-shadow: 0 6px 0 var(--plum-deep); transform: rotate(1deg);
 }
-@media (max-width: 979px) { .atelier #landing_page .sidebar { transform: none; } }
+@media (max-width: 979px) {
+  .atelier #landing_page .sidebar { transform: none; }
+  .atelier #landing_page > .main-content { order: -1; }
+}
 .atelier #landing_page .front-page-button { display: grid; gap: 12px; text-align: left; }
 .atelier #landing_page .front-page-button p { margin: 0; }
 .atelier #landing_page .front-page-button .button { display: flex !important; width: 100%; min-height: 54px; font-size: 1.0625rem; }
@@ -513,17 +524,14 @@ body.atelier {
 .atelier .article-teaser { color: var(--ink-soft); font-size: .9375rem; }
 
 /* Offline and thank-you pages: admin content shown as one card */
-.atelier.p-offline #landing_page, .atelier.v-thanks .main {
-  display: block;
-}
+.atelier.p-offline #landing_page { display: block; max-width: 46rem; }
 .atelier.p-offline #landing_page,
-.atelier.v-thanks #content > :not(.alert) {
-  max-width: 46rem;
+.atelier.v-thanks #content {
+  margin: 6vh auto 72px; padding: 32px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
 }
-.atelier.p-offline #landing_page {
-  margin: 4vh auto 0; padding: 32px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
-}
-.atelier.v-thanks #content { max-width: calc(46rem + 2 * var(--gutter)); }
+.atelier.v-thanks #content { flex: 0 0 auto; width: calc(100% - 2 * var(--gutter)); max-width: 46rem; }
+.atelier.v-thanks #content > :last-child { margin-bottom: 0; }
+.atelier.v-thanks #content p { color: var(--ink-soft); font-size: 1.125rem; }
 
 /* ---------- Ticket view ---------- */
 
@@ -581,6 +589,8 @@ body.atelier {
 .atelier .attachment-info .filename { max-width: 22ch; font-weight: 600; }
 .atelier .attachment-info .filesize { color: var(--ink-soft); white-space: nowrap; }
 .atelier .thread-body pre a:not(.button) { color: var(--sun) !important; }
+/* thread.css pins every block of a message to 14px: follow the bubble instead */
+.atelier .thread-body :is(div, p, ul, ol, table, dl, blockquote) { font-size: inherit; line-height: inherit; }
 @media (max-width: 599px) {
   .atelier .thread-entry > .avatar { display: none; }
   .atelier .bubble { max-width: none; flex: 1; padding: 14px 16px 12px; }
@@ -711,11 +721,11 @@ body.atelier {
 .atelier #content > br { display: none; }
 
 /* Registration, profile, ticket edit: original tables inside a card */
-.atelier.p-account #content > form, .atelier.p-profile #content > form, .atelier.v-edit #content > form {
+.atelier.p-account #content > form, .atelier #content > form:has(> table.padded), .atelier.v-edit #content > form {
   max-width: 46rem; padding: 24px; border: 2px solid var(--line); border-radius: var(--r); background: var(--white); box-shadow: 0 5px 0 var(--line);
 }
-.atelier.p-account #content > form > hr, .atelier.p-profile #content > form > hr, .atelier.v-edit #content > form > hr { display: none; }
-.atelier.p-account #content > form > p[style], .atelier.p-profile #content > form > p[style], .atelier.v-edit #content > form > p[style] {
+.atelier.p-account #content > form > hr, .atelier #content > form:has(> table.padded) > hr, .atelier.v-edit #content > form > hr { display: none; }
+.atelier.p-account #content > form > p[style], .atelier #content > form:has(> table.padded) > p[style], .atelier.v-edit #content > form > p[style] {
   display: flex; flex-wrap: wrap; gap: 14px 18px; justify-content: flex-start; margin-top: 24px;
 }
 .atelier table.padded tr:has(h3) { margin-top: 26px; padding-top: 18px; border-top: 2px dashed var(--line); }
