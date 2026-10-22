@@ -3,7 +3,14 @@
  * include/client/templates/thread-event.tmpl.php.
  * Same markup; the avatar images that osTicket puts in event descriptions
  * are removed so that the portal never loads a remote avatar (Gravatar is
- * osTicket's default avatar source). */
+ * osTicket's default avatar source).
+ * Changes that only concern the SLA plan are not shown to the client: the
+ * plan names are internal, and the sla_first_response plugin switches the
+ * plan at the first reply ("Priority 4h" -> "... (Disabled)"). The agent
+ * panel still shows them. */
+if ($event->state == 'edited' && is_array($sommet_d = $event->getData())
+        && $sommet_d && !array_diff(array_keys($sommet_d), array('sla_id')))
+    return;
 $desc = $event->getDescription(ThreadEvent::MODE_CLIENT);
 if (!$desc)
     return;

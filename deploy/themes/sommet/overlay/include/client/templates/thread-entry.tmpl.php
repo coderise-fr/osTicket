@@ -37,7 +37,14 @@ else
         echo sprintf(__('Edited on %s by %s'), Format::datetime($entry->updated), 'You');
                 ?>"><?php echo __('Edited'); ?></span></span>
         <?php } ?>
-<?php if (trim((string) $entry->title) !== '') { ?>
+<?php
+// Title of the entry (often the e-mail subject): shown when it differs
+// from the ticket subject, which is already the title of the page.
+$sommet_title = trim((string) $entry->title);
+if ($sommet_title !== '' && isset($ticket) && is_object($ticket)
+        && strcasecmp($sommet_title, trim((string) $ticket->getSubject())) === 0)
+    $sommet_title = '';
+if ($sommet_title !== '') { ?>
         <span class="title"><?php echo Format::htmlchars($entry->title); ?></span>
 <?php } ?>
     </div>

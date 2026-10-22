@@ -74,6 +74,10 @@ if ($sommet_in_kb) {
     elseif (isset($_REQUEST['q']) || isset($_REQUEST['topicId']))
         $sommet_crumbs[] = array(Format::htmlchars(__('Search Results')), null);
 }
+elseif ($sommet_script == 'tickets' && isset($inc) && $inc == 'open.inc.php' && $sommet_cta) {
+    // No ticket yet: osTicket shows the "open a ticket" form instead of the list.
+    $sommet_crumbs[] = array($sommet_cta['desc'], null);
+}
 elseif ($sommet_script == 'tickets' && $sommet_signed_in) {
     $sommet_crumbs[] = array(Format::htmlchars(__('Tickets')), ROOT_PATH . 'tickets.php');
     if (isset($ticket) && is_object($ticket))
@@ -84,6 +88,18 @@ elseif (isset($ticket) && is_object($ticket) && $sommet_script != 'open') {
 }
 elseif ($sommet_script == 'profile') {
     $sommet_crumbs[] = array(Format::htmlchars(__('Profile')), null);
+}
+elseif (isset($inc) && is_string($inc) && in_array(basename($inc), array(
+        'login.inc.php', 'accesslink.inc.php', 'register.inc.php', 'register.confirm.inc.php',
+        'register.confirmed.inc.php', 'pwreset.request.php', 'pwreset.sent.php', 'pwreset.login.php'))) {
+    switch (basename($inc)) {
+    case 'login.inc.php': $sommet_label = __('Sign In'); break;
+    case 'accesslink.inc.php': $sommet_label = __('Check Ticket Status'); break;
+    case 'pwreset.request.php': case 'pwreset.sent.php': case 'pwreset.login.php':
+        $sommet_label = __('Forgot My Password'); break;
+    default: $sommet_label = __('Account Registration');
+    }
+    $sommet_crumbs[] = array(Format::htmlchars($sommet_label), null);
 }
 elseif ($sommet_active && isset($navs[$sommet_active]) && $sommet_active != 'home') {
     $sommet_crumbs[] = array(Format::htmlchars($navs[$sommet_active]['desc']), null);

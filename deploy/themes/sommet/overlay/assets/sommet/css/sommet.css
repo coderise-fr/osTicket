@@ -123,15 +123,20 @@ body.sommet {
 .sommet :where(.btn, #content input[type=submit], #content input[type=reset], #content input[type=button], .button):hover {
   background: var(--nuit); border-color: var(--nuit); color: var(--blanc);
 }
+/* Liens en forme de bouton : la couleur des liens (.sommet a) ne doit pas l'emporter. */
+.sommet a.btn, .sommet a.button { color: var(--nuit); }
+.sommet a.btn-primary, .sommet a.button.blue { color: var(--nuit); }
+.sommet a.btn:hover, .sommet a.button:hover { color: var(--blanc); }
 .sommet .btn-lg { min-height: 56px; padding: 0 30px; font-size: 1rem; }
-.sommet .btn-ghost { border-color: var(--blanc); color: var(--blanc); background: transparent; }
-.sommet .btn-ghost:hover { background: var(--blanc); border-color: var(--blanc); color: var(--nuit); }
-.sommet .site-head .btn-primary:hover, .sommet .hero .btn-primary:hover, .sommet .bandeau .btn-primary:hover { background: var(--blanc); border-color: var(--blanc); color: var(--nuit); }
+.sommet .btn-ghost, .sommet a.btn-ghost { border-color: var(--blanc); color: var(--blanc); background: transparent; }
+.sommet .btn-ghost:hover, .sommet a.btn-ghost:hover { background: var(--blanc); border-color: var(--blanc); color: var(--nuit); }
+.sommet .site-head a.btn-primary:hover, .sommet .hero a.btn-primary:hover, .sommet .bandeau .btn-primary:hover { background: var(--blanc); border-color: var(--blanc); color: var(--nuit); }
 .sommet :where(#content input[type=submit])[disabled] { opacity: .65; cursor: progress; }
 /* osticket.js colore en rouge le texte du bouton d'envoi dès que le formulaire change :
-   rouge sur cyan illisible (et le signal part aussi au démarrage de Redactor). On le
-   remplace par un filet bleu nuit ; l'avertissement « quitter la page ? » est conservé. */
-.sommet #content input[type=submit][style*="color"] { color: var(--nuit) !important; box-shadow: 0 0 0 3px var(--blanc), 0 0 0 5px var(--nuit); }
+   rouge sur cyan illisible (2,9:1), et le signal part aussi au démarrage de Redactor.
+   Le texte reste bleu nuit ; l'avertissement « quitter la page ? » est conservé. */
+.sommet #content input[type=submit][style*="color"] { color: var(--nuit) !important; }
+.sommet #content input[type=submit][style*="color"]:hover { color: var(--blanc) !important; }
 .sommet .actions, .sommet p.buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 24px 0 0; text-align: left !important; }
 .sommet .action-button {
   display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px;
@@ -160,18 +165,18 @@ body.sommet {
 
 /* ---------- En-tête ---------- */
 .sommet .site-head { position: relative; z-index: 5; background: var(--nuit); color: var(--blanc); --focus: var(--cyan); }
-.sommet .head-in { display: flex; align-items: center; gap: 16px 40px; padding-block: 28px; }
+.sommet .head-in { display: flex; align-items: center; gap: 16px 32px; padding-block: 28px; }
 .sommet .brand { display: block; flex: none; line-height: 0; }
 .sommet .brand .logo { display: block; height: 28px; width: auto; }  /* 166 px de large, minimum charte 120 px */
 .sommet .brand .custom-logo { height: auto; max-height: 48px; }
 .sommet .nav-desktop { flex: 1 1 auto; min-width: 0; }
-.sommet #nav { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 0; padding: 0; list-style: none; }
+.sommet #nav { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; padding: 0; list-style: none; }
 .sommet #nav a {
   display: block; padding: 6px 0; border-bottom: 3px solid transparent;
   color: var(--blanc); font: 600 1rem var(--f-titre); text-decoration: none; white-space: nowrap;
 }
 .sommet #nav a:hover, .sommet #nav a[aria-current] { border-bottom-color: var(--cyan); }
-.sommet .who { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 18px; margin-left: auto; font-size: .9375rem; }
+.sommet .who { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 18px; margin-left: auto; font-size: .9375rem; white-space: nowrap; }
 .sommet .who a { color: var(--blanc); text-decoration-color: var(--cyan); }
 .sommet .who .me { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; text-decoration: none; }
 .sommet .who .me:hover .me-name, .sommet .who .me[aria-current] .me-name { text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 2px; }
@@ -306,6 +311,9 @@ body.sommet {
 .sommet .form-header > b { display: block; margin-bottom: 14px; font: 700 1.25rem var(--f-titre); }
 .sommet .form-header a { color: var(--nuit); text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
 .sommet table.padded h3 { margin-top: 18px; padding-top: 22px; border-top: 5px solid var(--nuit); }
+.sommet table.padded .form-header h3 { margin-top: 0; padding-top: 0; border-top: 0; }
+.sommet #content form > p[style*="text-align"] { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; text-align: left !important; }
+.sommet #dynamic-form input[type=text]:not(.dp):not([name$="-ext"]) { width: 100% !important; }
 .sommet :is(#ticketForm, table.padded, #dynamic-form) label { display: block; font-weight: 600; }
 .sommet :is(#ticketForm, table.padded, #dynamic-form) label > span:first-child:not(.error) { display: block; font: 700 .9375rem var(--f-titre); }
 .sommet :is(#ticketForm, table.padded, #dynamic-form) label > span:first-child + br,
@@ -318,7 +326,8 @@ body.sommet {
 .sommet :is(#ticketForm, table.padded, #dynamic-form) div.error { margin-top: 8px; font-size: .9375rem; }
 .sommet :is(#ticketForm, table.padded, #dynamic-form) :is(label.checkbox, label.inline, .radio label, label[for$="_cb"]) { display: inline-flex; align-items: center; font-weight: 500; margin: 6px 22px 6px 0; }
 .sommet #ticketForm > table > tbody:nth-of-type(2) td > font.error { display: block; margin-top: 8px; }
-.sommet #ticketForm #topicId { max-width: 520px; }
+.sommet #ticketForm #topicId { max-width: 520px; display: inline-block; vertical-align: middle; }
+.sommet #ticketForm #topicId + font.error { display: inline-block; margin: 8px 0 0 10px; }
 /* Ligne de champs d'un compte (td[width] = libellé) */
 .sommet table.padded td[width] { font: 700 .9375rem var(--f-titre); margin-bottom: 8px; }
 /* Cellules qui contiennent des « &nbsp; » à côté des champs pleine largeur */
@@ -408,10 +417,9 @@ body.sommet {
 .sommet .guides { padding-block: 80px 104px; }
 .sommet .guides h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); margin: 56px 0 8px; }
 .sommet .search-form form { display: flex; align-items: center; gap: 12px; max-width: 760px; padding: 6px 6px 6px 18px; border: 2px solid var(--nuit); border-radius: var(--r); }
-.sommet .search-form form:focus-within { outline: 3px solid var(--cyan-profond); outline-offset: 2px; }
 .sommet .search-form .ic { color: var(--ardoise); }
-.sommet .search-form .search { flex: 1 1 auto; min-width: 0; border: 0; min-height: 46px; padding: 0 4px; }
-.sommet .search-form .search:focus-visible { outline: none; }
+.sommet .search-form .search { flex: 1 1 auto; min-width: 0; border: 0; min-height: 46px; padding: 0 8px; }
+.sommet .search-form .search:focus-visible { outline-offset: 0; }
 .sommet .guide-list { margin: 16px 0 24px; padding: 0; list-style: none; border-bottom: 1px solid var(--gris); }
 .sommet .guide-list a {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 6px 24px; align-items: baseline;
@@ -438,6 +446,7 @@ body.sommet {
   .sommet .statement { padding-block: 56px; }
   .sommet .hero .actions .btn { width: 100%; }
   .sommet .search-form form { flex-wrap: wrap; padding: 10px; }
+  .sommet .search-form .ic { display: none; }
   .sommet .search-form .btn { width: 100%; }
 }
 
@@ -498,7 +507,7 @@ body.sommet {
 .sommet #ticketTable tbody tr:hover td { background: var(--voile); }
 .sommet #ticketTable td:first-child { white-space: nowrap; }
 .sommet #ticketTable td:first-child a { color: var(--nuit); font: 800 1.25rem var(--f-titre); text-decoration-color: var(--cyan-profond); }
-.sommet #ticketTable td:nth-child(4) .link { font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); cursor: pointer; }
+.sommet #ticketTable td:nth-child(4) .link { max-width: 32em !important; max-height: none !important; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); cursor: pointer; }
 .sommet #ticketTable td:nth-child(4) .link:hover { text-decoration: underline; text-decoration-color: var(--cyan-profond); }
 .sommet #ticketTable td:nth-child(4) .link b, .sommet #ticketTable td:first-child a b { font-weight: 800; }
 .sommet #ticketTable td:nth-child(4) .link .icon-group { color: var(--cyan-profond); margin-right: 4px; }
@@ -529,6 +538,10 @@ body.sommet {
   .sommet #ticketTable td:nth-child(4) .link { max-width: none !important; max-height: none !important; white-space: normal; display: block; }
   .sommet #ticketTable td[colspan] { grid-column: 1 / -1; }
   .sommet #ticketSearchForm .pull-right { margin-left: 0; }
+  .sommet .search.well > .flush-left { min-width: 0; }
+  .sommet #ticketSearchForm input[name=keywords] { flex: 1 1 100%; max-width: none; min-width: 0; }
+  .sommet #ticketSearchForm .pull-right, .sommet #ticketSearchForm select { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .sommet #ticketTable caption { display: block; }
 }
 
 /* ---------- Suivi d'un ticket ---------- */
@@ -554,6 +567,9 @@ body.sommet {
   margin: 0; padding: 0 !important; border: 0; background: transparent !important;
   font-family: var(--f-texte) !important; font-size: 1rem !important; line-height: 1.65 !important; color: var(--nuit) !important; overflow-x: auto;
 }
+/* thread.css fige les blocs du texte à 14 px : ils suivent ici leur conteneur */
+.sommet .thread-body :is(div, p, ul, ol, table, dl, blockquote, pre) { font-size: inherit; line-height: inherit; }
+.sommet .thread-body pre, .sommet .thread-body code { font-size: .9em; }
 .sommet .thread-body p { margin: 0 0 .85em; }
 .sommet .thread-body a:not(.button) { color: var(--cyan-profond) !important; }
 .sommet .thread-entry.response .thread-body a:not(.button), .sommet .thread-body .attachment-info a { color: var(--nuit) !important; text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
@@ -567,7 +583,7 @@ body.sommet {
 .sommet .thread-body .attachment-info { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 6px 12px; border: 2px solid var(--nuit); border-radius: var(--r); background: var(--blanc); font-size: .9375rem; }
 .sommet .thread-body .attachment-info .filename { max-width: 22em; font-weight: 600; text-decoration: none; }
 .sommet .thread-body .attachment-info .filename:hover { text-decoration: underline; }
-.sommet .thread-body .attachment-info .filesize { color: var(--ardoise); margin: 0; }
+.sommet .thread-body .attachment-info .filesize { color: var(--ardoise); margin: 0; white-space: nowrap; }
 .sommet .thread-event { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 14px 8px; border-top: 1px solid var(--gris); background: none; color: var(--ardoise); font-size: .9375rem; }
 .sommet .thread-event .type-icon { position: static; width: auto; height: auto; padding: 0; border: 0; background: none; color: var(--ardoise); }
 .sommet .thread-event .type-icon::after { display: none; }
@@ -626,7 +642,7 @@ body.sommet {
 .sommet #kb .popular-faq { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
 .sommet #kb .popular-faq i, .sommet #kb .icon-folder-open { color: var(--cyan-profond); }
 .sommet #kb .popular-faq a { font-weight: 600; }
-.sommet.v-kb-categories .span8 > div:first-child { margin-bottom: 16px; color: var(--ardoise); }
+.sommet.v-knowledgebase .span8 > div:first-child { margin-bottom: 20px; color: var(--ardoise); }
 .sommet #faq { margin-top: 8px; }
 .sommet #faq ol { margin: 16px 0 0; padding: 0; list-style: none; border-top: 5px solid var(--nuit); counter-reset: none; }
 .sommet #faq ol li { margin: 0; padding: 0; border-bottom: 1px solid var(--gris); }
@@ -647,11 +663,13 @@ body.sommet {
 .sommet .faq-content .thread-body h2 { position: relative; margin: 1.8em 0 .6em; padding-top: 20px; font-size: 1.625rem; line-height: 1.2; }
 .sommet .faq-content .thread-body h2::before { content: ""; position: absolute; top: 0; left: 0; width: 56px; height: 5px; background: var(--cyan); }
 .sommet .faq-content .thread-body h3 { margin: 1.4em 0 .5em; font-size: 1.25rem; }
+/* Tableaux des articles et des messages (charte : en-têtes bleu nuit, lignes alternées
+   gris clair) ; thread.css impose un gris #f0f0f0 en !important aux en-têtes. */
 .sommet .faq-content .thread-body table { width: 100%; margin: 1.4em 0; font-size: 1rem; line-height: 1.5; }
-.sommet .faq-content .thread-body th, .sommet .faq-content .thread-body td { padding: 12px 16px; text-align: left; vertical-align: top; border: 0; }
-.sommet .faq-content .thread-body thead th { background: var(--nuit); color: var(--blanc); font: 700 .875rem var(--f-titre); }
-.sommet .faq-content .thread-body tbody tr:nth-child(even) { background: var(--gris); }
-.sommet .faq-content .thread-body tbody tr:nth-child(even) a { color: var(--nuit) !important; text-decoration-color: var(--cyan-profond); }
+.sommet .thread-body table :is(th, td) { padding: 12px 16px !important; text-align: left; vertical-align: top; border: 0 !important; }
+.sommet .thread-body table tr > th, .sommet .thread-body table thead > tr > :is(th, td) { background-color: var(--nuit) !important; color: var(--blanc); font: 700 .875rem/1.4 var(--f-titre); }
+.sommet .thread-body table tbody tr:nth-child(even) { background: var(--gris); }
+.sommet .thread-body table tbody tr:nth-child(even) a { color: var(--nuit) !important; text-decoration-color: var(--cyan-profond); }
 @media (max-width: 960px) {
   .sommet .row { grid-template-columns: minmax(0, 1fr); }
 }
