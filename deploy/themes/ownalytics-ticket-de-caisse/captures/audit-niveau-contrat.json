@@ -1,0 +1,1394 @@
+[
+ {
+  "phase": "active",
+  "scenario": "visiteur-accueil",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "visiteur-accueil",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 35,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 34,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-priority-page-2",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [
+   "Your support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 34,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-priority-page-2",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [
+   "Your support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 34,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "accueil-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "accueil-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [
+   "Your current support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [
+   "Your current support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-collaborateur",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [
+   "Requester's current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Requester's current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-collaborateur",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [
+   "Requester's current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Requester's current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [
+   "Your current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [
+   "Your current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "liste-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [
+   "Your support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [
+   "Your current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [
+   "Your current support contractStandardReply on business days"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Standard",
+    "ratio": 6.4
+   },
+   {
+    "text": "Reply on business days",
+    "ratio": 6.4
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-invite",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [
+   "Your current support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "active",
+  "scenario": "suivi-invite",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [
+   "Your current support contractPriorityFirst reply within 4 hours, 24/7"
+  ],
+  "contractContrast": [
+   {
+    "text": "Your current support contract",
+    "ratio": 6.4
+   },
+   {
+    "text": "Priority",
+    "ratio": 7.6
+   },
+   {
+    "text": "First reply within 4 hours, 24/7",
+    "ratio": 15.63
+   }
+  ],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "visiteur-accueil",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "visiteur-accueil",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 31,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 31,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-priority-page-2",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 30,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-priority-page-2",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 31,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "accueil-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "accueil-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-collaborateur",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-collaborateur",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "liste-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-invite",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "disabled",
+  "scenario": "suivi-invite",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "visiteur-accueil",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "visiteur-accueil",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 32,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 32,
+  "rows": 25,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-priority-page-2",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 32,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-priority-page-2",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?p=2",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": 32,
+  "rows": 16,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "accueil-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "accueil-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/index.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 7.6,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-priority",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-priority",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=41",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-collaborateur",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-collaborateur",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=45",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 2,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-standard",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-standard",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=42",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "liste-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 1,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-sans-organisation",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-sans-organisation",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=44",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-invite",
+  "width": 1280,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ },
+ {
+  "phase": "absent",
+  "scenario": "suivi-invite",
+  "width": 390,
+  "ok": true,
+  "url": "http://127.0.0.1:18431/tickets.php?id=46",
+  "contract": [],
+  "contractContrast": [],
+  "minContrast": 6.4,
+  "overflow": false,
+  "sqlQueries": null,
+  "rows": 0,
+  "consoleErrors": 0,
+  "http4xx5xx": 0,
+  "externalRequests": 0,
+  "phpErrorsInPage": false
+ }
+]

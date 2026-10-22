@@ -35,7 +35,7 @@ appels `__()` et échappements (`Format::htmlchars`…) que l'original.
 
 | Fichier | Pourquoi |
 |---|---|
-| `include/client/header.inc.php` | Logotype Ownalytics (pictogramme + « Ownalytics » + « Support ») à la place de l'image `logo.php` (sauf si un logo client est téléversé) ; feuille du thème et favicon à la place de `assets/default/css/theme.css`, `print.css` et `flags.css` ; lien d'évitement ; menu dans un `<nav>` étiqueté avec `aria-current` ; langues en texte (EN, FR) au lieu des drapeaux ; classes de page sur `<body>` (`p-*`, `v-*`, `is-landing`, `is-offline`) qui remplacent le recours à `:has()` prévu par la maquette ; `#content` devient `<main>` |
+| `include/client/header.inc.php` | Logotype Ownalytics (pictogramme + « Ownalytics » + « Support ») à la place de l'image `logo.php` (sauf si un logo client est téléversé) ; feuille du thème et favicon à la place de `assets/default/css/theme.css`, `print.css` et `flags.css` ; lien d'évitement ; menu dans un `<nav>` étiqueté avec `aria-current` ; langues en texte (EN, FR) au lieu des drapeaux ; classes de page sur `<body>` (`p-*`, `v-*`, `is-landing`, `is-offline`) qui remplacent le recours à `:has()` prévu par la maquette ; `#content` devient `<main>` ; **ligne « niveau de contrat »** en tête du papier sur la liste des tickets et le suivi (voir « Niveau de contrat ») |
 | `include/client/footer.inc.php` | Pied de page du site (logotype, pages « Autres ressources » actives, mention Matomo/InnoCraft du site, copyright et « propulsé par osTicket » d'origine) ; ferme le `<main>` ; mêmes scripts de fin |
 | `include/client/templates/thread-entry.tmpl.php` | **Pas d'avatar** : osTicket prend les avatars sur Gravatar par défaut (requête externe interdite) ; « (Ownalytics) » après le nom de l'agent dans les réponses (la maquette l'ajoutait en CSS) |
 | `include/client/templates/thread-event.tmpl.php` | Même balisage ; retire les images d'avatar des descriptions d'événements (Gravatar) |
@@ -45,7 +45,7 @@ Laissés d'origine et habillés par la feuille seule (listés dans `WATCH.sha256
 (non surchargé : il sert aussi au rechargement AJAX des champs et à certains écrans agent)**, connexion,
 accès par numéro, inscription et confirmations, mot de passe oublié, profil, modification, liste, suivi,
 fil (`thread-entries.tmpl.php`), base de connaissances (catégories, catégorie, article, recherche), page
-hors ligne. Plus `css/thread.css`, `css/redactor.css`, `css/filedrop.css`, `css/osticket.css`,
+hors ligne. Plus `tickets.php` (l'en-tête lit les variables `$inc` et `$ticket` qu'il pose), `css/thread.css`, `css/redactor.css`, `css/filedrop.css`, `css/osticket.css`,
 `js/osticket.js`, `js/redactor-osticket.js` et `include/class.forms.php`, dont la feuille contre les règles.
 
 ### Fichiers ajoutés
@@ -56,7 +56,8 @@ hors ligne. Plus `css/thread.css`, `css/redactor.css`, `css/filedrop.css`, `css/
   Bricolage Grotesque n'est pas reprise (la maquette 01 ne l'utilise pas).
 - `assets/ownalytics-ticket-de-caisse/img/favicon.svg` : favicon du site (ticket sur prune).
 - `include/client/ownalytics-ticket-de-caisse/theme.php` : `otdc__()` (traduction), `otdc_asset()`,
-  `otdc_mark()` (pictogramme SVG en ligne), `otdc_strip_avatars()`.
+  `otdc_mark()` (pictogramme SVG en ligne), `otdc_strip_avatars()`, `otdc_contract()` et
+  `otdc_contract_line()` (niveau de contrat, plugin facultatif).
 - `include/client/ownalytics-ticket-de-caisse/i18n/fr.php` : catalogue français de repli (voir « Traductions »).
 
 Aucune ressource externe au chargement : polices, pictogramme (SVG en ligne), icônes (Font Awesome
@@ -114,6 +115,75 @@ Rien n'est obligatoire. Pour retrouver la maquette :
 4. **Logo** : ne rien téléverser pour garder le logotype du thème ; un logo client téléversé le remplace.
 5. **Nom de l'entreprise** (Admin > Gérer > Formulaires > Company Information) : affiché dans le copyright.
 
+## Niveau de contrat « Priority / Standard » (dépendance facultative)
+
+Le support Ownalytics (Heatlens, Auditlens) passe par le même portail osTicket que Coderise. Le niveau
+de contrat vient de la fonction `coderise_contract_level()` du plugin `contrib/sla-first-response`
+(version 0.3 et plus, README du plugin, sections 9 et 10) : `priority` si le client est membre de
+l'organisation « Priority » configurée dans le plugin (celle qu'alimente le plugin `stripe-sync`), sinon
+`standard`. Le thème ne lit rien d'autre (ni le plan de SLA, ni le nom de l'organisation).
+
+**Rendu** : une **ligne de relevé** en tête du ticket de papier, comme l'en-tête d'un ticket de caisse,
+au-dessus d'un filet pointillé : « Votre contrat de support ……… PRIORITY », puis l'engagement du niveau
+sur la ligne suivante, aligné à droite. **Priority** est accentué en **tampon** (texte prune en capitales
+sur lilas, cadre et ombre dure prune, légèrement incliné) suivi de « Premier retour sous 4 h, 24 h/24 »
+en encre ; **Standard** est imprimé simplement, en encre atténuée, suivi de « Réponse les jours ouvrés »
+(aucune mention de 4 h ni de 24 h/24). Le surligneur jaune n'est pas utilisé (réservé). Balisage `<dl>`
+(intitulé `dt`, niveau et engagement `dd`) : lu dans l'ordre par un lecteur d'écran. Impression : noir
+sur blanc, cadre noir, sans inclinaison.
+
+| Où | Intitulé | Sujet passé à la fonction |
+|---|---|---|
+| Liste « Tickets » (`tickets.php`) | « Votre contrat de support » | `null` : le client connecté (une fois, pas une pastille par ligne) |
+| Suivi d'un ticket, propriétaire (y compris invité arrivé par le lien d'accès) | « Votre contrat de support actuel » | Le ticket : niveau de son **propriétaire** |
+| Suivi d'un ticket vu en **collaborateur** | « Contrat de support actuel du demandeur » | Le ticket : niveau du **propriétaire**, jamais du collaborateur |
+
+Rien n'est affiché ailleurs (accueil, ouverture, base de connaissances, profil) : l'accueil reste le
+contenu administrable « Landing » (relevé de présentation des deux offres, voir « Réglages conseillés »).
+
+**Pourquoi dans l'en-tête et pas dans la fiche ticket** (la maquette mettait « Support : Prioritaire,
+première réponse sous 4 h » dans « Informations sur le ticket ») : la fiche et la liste sont des
+gabarits du cœur **non surchargés** (`view.inc.php`, `tickets.inc.php`, niveau 1). Les surcharger pour
+une ligne ajouterait deux fichiers à rebaser à chaque mise à jour d'osTicket ; l'insérer en JavaScript
+ajouterait un script au thème (aucun aujourd'hui). L'en-tête, déjà remplacé, connaît la vue (`$inc`) et
+le ticket (`$ticket`) posés par `tickets.php` avant de l'inclure : la ligne est imprimée au début de
+`<main>`, après les messages. **Aucune nouvelle surcharge** ; `tickets.php` est ajouté à `WATCH.sha256`
+(si ces variables changent, `check-drift.sh` le signale). `dynamic-form.tmpl.php` n'est pas touché.
+
+**Repli** (`otdc_contract()` dans `include/client/ownalytics-ticket-de-caisse/theme.php`) :
+
+- la fonction n'existe pas (plugin absent de l'image, plugin ou instance désactivés, mise à jour
+  d'osTicket en attente) : **aucune ligne**, aucune promesse 24/7, aucune erreur ;
+- la fonction répond avec la source `default` (organisation Priority non configurée ou supprimée,
+  invité pour `null`, utilisateur inconnu, erreur) : rien non plus ; seule la source `organisation` est
+  affichée ;
+- toute exception est absorbée (la fonction n'en lève pas, le thème garde un `try` par prudence) ;
+- le libellé (saisi par l'administrateur dans le plugin) est toujours échappé (`Format::htmlchars`) ;
+  libellé vide : « Priority » / « Standard » ;
+- une valeur par personne et par page (mémo du thème, en plus du cache du plugin).
+
+**Limites.**
+
+- C'est le niveau **actuel** du propriétaire, pas celui du moment où le ticket a été ouvert : un ancien
+  ticket d'un client devenu Priority affiche Priority (et l'inverse après la fin de l'abonnement). D'où
+  « actuel » dans l'intitulé du suivi. Le délai réellement appliqué à un ticket reste celui de son plan
+  de SLA (posé par le filtre à la création).
+- **Pas de niveau par ligne dans la liste**, volontairement : il serait identique sur toutes les lignes
+  des tickets du client (niveau actuel), et trompeur sur les anciens tickets ; seuls les tickets où il
+  est collaborateur d'un demandeur d'une autre organisation diffèrent, et leur suivi l'affiche.
+- Invité (lien d'accès) : le suivi montre le niveau du propriétaire du ticket (un invité collaborateur
+  voit donc « Contrat de support actuel du demandeur »).
+- Les engagements affichés (« Premier retour sous 4 h, 24 h/24 », « Réponse les jours ouvrés ») sont
+  écrits dans le thème (`otdc__()`), pas lus dans le plugin : à modifier dans `theme.php` et `i18n/fr.php`
+  si l'offre change.
+- Le relevé de l'accueil proposé dans « Réglages conseillés » (« Support prioritaire 4 h, 24 h/24 ») est du
+  contenu administrable, identique pour tous : il présente les offres sans dire au lecteur qu'il y a droit,
+  et il reste affiché sans le plugin. Le retirer de la page « Landing » si on ne le souhaite pas.
+- Coût mesuré (journal général de MariaDB, page HTML seule, cliente Priority avec 41 tickets dans la
+  liste) : **34-35 requêtes** plugin actif, **30-31** plugin désactivé, **32** plugin absent ;
+  **identique pour la page 1 (25 lignes) et la page 2 (16 lignes)** : le coût ne dépend pas du nombre
+  de lignes (amorçage du plugin et lecture de l'organisation Priority, une fois).
+
 ## Désinstallation, bascule vers un autre thème
 
 ```sh
@@ -150,8 +220,11 @@ Un fichier remplacé ne suit plus les correctifs du cœur, et la feuille dépend
 ## Traductions
 
 Toutes les chaînes d'osTicket passent par `__()` et sont traduites par les packs officiels (`fr.phar` dans
-`deploy/docker/overlay/include/i18n/`, voir `deploy/docker/overlay/README.md`). Les **4 chaînes propres au
-thème** (« Skip to content », « Main menu », « Support », la mention Matomo/InnoCraft reprise du site) passent
+`deploy/docker/overlay/include/i18n/`, voir `deploy/docker/overlay/README.md`). Les **9 chaînes propres au
+thème** (« Skip to content », « Main menu », « Support », la mention Matomo/InnoCraft reprise du site, et
+les 5 chaînes du niveau de contrat : intitulés « Your support contract », « Your current support
+contract », « Requester's current support contract », engagements « First reply within 4 hours, 24/7 »
+et « Reply on business days ») passent
 par `otdc__()` : `__()` d'abord (si un pack connaît la chaîne), puis le catalogue du thème
 `include/client/ownalytics-ticket-de-caisse/i18n/<langue>.php` (fourni : `fr.php`), sinon l'anglais.
 Le catalogue n'est pas sous `include/i18n/` exprès (un dossier à cet endroit ferait apparaître une langue
@@ -212,11 +285,54 @@ test : vérification MX des adresses e-mail désactivée (domaines `.test`). Dé
   feuille (`text/css`), polices (`font/woff2`) et favicon (`image/svg+xml`) répondent 200. `php -l` sans
   erreur sur les 6 fichiers PHP.
 
+### Niveau de contrat (22/10/2026, seconde instance)
+
+Instance construite de la même façon depuis le commit du thème (`git archive`, `apply.sh` sur l'overlay
+exporté, plugin `sla_first_response` 0.3 copié dans `include/plugins/` de l'overlay exporté, **non
+committé**), cibles `install` puis `runtime`, **installation par l'assistant** (HTTP), MariaDB 11.4. Données :
+plans « Priority 4h » (actif) et « réponse faite » (désactivé) ; plugin installé, actif, une instance
+réglée sur l'organisation « Priority » ; clients : Léa (organisation Priority, 40 tickets, plus le ticket de
+Marc où elle est collaboratrice : 41 lignes, 2 pages), Sam (organisation Acme, standard), Nina (sans
+organisation), Marc (Acme), Gina (organisation Priority, sans compte : accès invité par le lien du
+ticket). Chromium privé (`playwright-core` hors dépôt), 1280 et 390 px, 66 rendus, **tous conformes**.
+Détail : `captures/audit-niveau-contrat.json`.
+
+- **Plugin actif** : Léa : « Votre contrat de support … PRIORITY » + « Premier retour sous 4 h, 24 h/24 »
+  sur la liste (pages 1 et 2) et sur son ticket ; Sam et Nina : Standard + « Réponse les jours ouvrés »,
+  **sans** 4 h ni 24 h/24 (vérifié sur le texte de la page) ; ticket de Marc vu par Léa en collaboratrice :
+  « Contrat de support actuel du demandeur … Standard » ; invitée Gina (lien d'accès) : Priority (niveau du
+  propriétaire). Une seule ligne par page. Accueil (visiteur et cliente connectée) : rien.
+- **Plugin désactivé** (en base) puis **absent** (image reconstruite sans le dossier du plugin, toujours
+  « installé » et actif en base) : aucune ligne, aucune mention 24/7, aucune erreur, sur les 11 scénarios.
+- **Console** : aucune erreur ni avertissement ; aucune réponse HTTP ≥ 400 ; aucune requête vers un autre
+  hôte ; aucune erreur PHP dans les pages, dans les journaux du conteneur ni dans le journal système
+  d'osTicket.
+- **Débordement horizontal** : aucun, à 390 et 1280 px.
+- **Contrastes** (chaque nœud de texte visible) : minimum 6,4:1 sur les 66 rendus. Ligne de contrat :
+  tampon Priority prune sur lilas **7,6:1**, engagement Priority encre sur papier 15,6:1, intitulé,
+  niveau Standard et engagement Standard encre atténuée sur papier 6,4:1.
+- **Requêtes SQL** : voir « Niveau de contrat », Limites (pas de requête par ligne).
+- **Scripts** : `apply.sh` (`--dry-run`, installation, relance idempotente) puis `remove.sh` sur
+  `deploy/docker/overlay/` du dépôt, `git status` propre ensuite ; `check-drift.sh` sans dérive sur `HEAD`
+  et sur l'arbre exporté (`tickets.php` compris). Correction : `check-drift.sh` lisait mal ses propres
+  fichiers d'empreintes extraits en CRLF (copie de travail Windows) et signalait à tort les 4 fichiers
+  remplacés « supprimés » ; le retour chariot est maintenant retiré. Suite statique du dépôt
+  (`php setup/test/run-tests.php`, php:8.3-cli, sur l'arbre exporté) : 0 échec.
+- **Captures** ajoutées (`-bureau` 1280 px, `-mobile` 390 px) : `contrat-liste-priority`,
+  `contrat-suivi-priority`, `contrat-liste-standard`, `contrat-suivi-standard`,
+  `contrat-suivi-sans-organisation`, `contrat-suivi-collaborateur`, `contrat-suivi-invite`,
+  `contrat-liste-sans-plugin`, `contrat-suivi-sans-plugin`. Les captures de la première recette
+  (`mes-tickets-*`, `suivi-ticket-*`…) restent valables : elles ont été faites sans le plugin, et le
+  rendu sans plugin n'a pas changé.
+
 ### Non vérifié
 
 Lecteur d'écran, Firefox et Safari (Chromium seulement), RTL (règles de base seulement), CAPTCHA (non
 activé), connexion par fournisseur externe, pack de langue français officiel, envoi réel des e-mails
-(Mailpit local), affichage avec un logo client téléversé.
+(Mailpit local), affichage avec un logo client téléversé. Niveau de contrat : rendu en français (pas de
+pack de langue ; le catalogue du thème contient les 5 chaînes), impression de la ligne (règles écrites,
+non capturées), changement de niveau en cours d'abonnement Stripe (plugin `stripe-sync` non installé :
+l'appartenance à l'organisation a été posée directement).
 
 ## Écarts avec la maquette 01
 
@@ -231,7 +347,7 @@ portail fournit réellement, ou omis.
 | « Articles à la une » avec descriptions inventées | Catégories et articles mis en avant d'osTicket, avec leur extrait réel |
 | Titre de connexion « Connexion » et bloc « Suivre un ticket sans compte » sur la même page | Gabarits d'origine : la connexion (titre de la page administrable « banner-client ») et l'accès par numéro (« Check Ticket Status ») restent deux pages |
 | Pastilles de statut colorées dans la liste | Statut en police à chasse fixe (pas de surcharge de `tickets.inc.php`) ; sur la fiche ticket, une pastille prune neutre (le texte porte l'état ; pas de couleur par état sans modifier le gabarit) |
-| « Support : Prioritaire, première réponse sous 4 h » dans la fiche | Absent : osTicket n'expose pas le niveau de support au client |
+| « Support : Prioritaire, première réponse sous 4 h » dans la fiche | Ligne de relevé en tête du papier, sur le suivi et la liste, avec le plugin `sla_first_response` seulement (voir « Niveau de contrat ») ; pas dans le tableau de la fiche (gabarit non surchargé) |
 | « Fichiers : 20 Mo par fichier, anonymisez vos données… » sous la zone de dépôt | Absent : texte non fourni par osTicket (la limite réelle est un réglage d'osTicket) |
 | Titres de sections « Vos coordonnées », « Détails de votre demande » | Titres des formulaires d'osTicket (administrables) |
 | Barre Redactor à 6 boutons | Barre d'origine d'osTicket (même nombre de boutons qu'osTicket), restylée ; comportement intact |
@@ -271,3 +387,7 @@ actif) et l'ombre du bouton d'envoi quand un formulaire a des modifications (sig
 4. La reprise dans le pied de page de la mention « Matomo est une marque déposée d'InnoCraft Ltd… » du site.
 5. Le pack de langue français officiel à ajouter à l'overlay, puis une relecture des écrans en français.
 6. Les pages « Autres ressources » à créer (politique de support, conditions, mentions légales).
+7. **Niveau de contrat** : textes des engagements (« Premier retour sous 4 h, 24 h/24 », « Réponse les
+   jours ouvrés »), place de la ligne (en tête du papier plutôt que dans la fiche, pour ne pas surcharger
+   `view.inc.php`), tampon incliné pour Priority, et affichage du niveau **actuel** (et non celui de la
+   création du ticket) sur les anciens tickets.
