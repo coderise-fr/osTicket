@@ -314,6 +314,13 @@ function demo_config($DEMO) {
     $ours = array();
     foreach ($topics as $t)
         $ours[] = topic_id($t[0]);
+    // Formulaire du ticket (sujet, message) en tête de chaque rubrique : constaté,
+    // Topic::update() ne l'associe pas à une rubrique créée hors de l'interface.
+    $tform = (int) demo_one('SELECT id FROM ' . FORM_SEC_TABLE . " WHERE type='T' ORDER BY id LIMIT 1");
+    foreach ($ours as $tid) {
+        if (!demo_one('SELECT COUNT(*) FROM ' . TOPIC_FORM_TABLE . " WHERE topic_id=$tid AND form_id=$tform"))
+            db_query('INSERT INTO ' . TOPIC_FORM_TABLE . " (topic_id, form_id, sort, extra) VALUES ($tid, $tform, 1, '{\"disable\":[]}')");
+    }
     db_query('UPDATE ' . TOPIC_TABLE . ' SET ispublic=0 WHERE topic_id NOT IN (' . implode(',', $ours) . ')');
     $cfg->set('default_help_topic', 0);
     demo_say('formulaire n° ' . $form->getId() . ' sur « Incident en production » ; 4 rubriques publiques');

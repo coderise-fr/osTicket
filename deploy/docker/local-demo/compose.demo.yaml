@@ -8,7 +8,8 @@
 # Ce qu'elle ajoute à la pile de production (compose.yaml, inchangé) :
 #   - Mailpit : serveur SMTP de test qui capte TOUS les e-mails envoyés par osTicket
 #     (interface web publiée sur 127.0.0.1 uniquement) ;
-#   - un réseau interne « mail » (sans accès Internet) entre web, cron et Mailpit.
+#   - un réseau interne « mail » (sans accès Internet) entre web, cron et Mailpit, et le réseau
+#     « mail-ui » (Mailpit seul) qui permet de publier son interface web.
 # Le reste (durcissement, volumes, secrets, base sans port publié) est celui de compose.yaml.
 
 services:
@@ -33,11 +34,12 @@ services:
       - mail-data:/data
     tmpfs:
       - /tmp:size=32m,mode=1777,noexec,nosuid,nodev
-    # Interface web seulement, sur la boucle locale ; le SMTP (1025) n'est joignable que
-    # depuis le réseau interne « mail ».
+    # Interface web seulement, sur la boucle locale ; le SMTP (1025) n'est pas publié.
+    # Docker ne publie aucun port d'un conteneur relié uniquement à des réseaux internes
+    # (constaté) : d'où le réseau « mail-ui », où Mailpit est seul.
     ports:
       - "127.0.0.1:${OST_DEMO_MAIL_PORT:?port Mailpit absent de state.env}:8025"
-    networks: [mail]
+    networks: [mail, mail-ui]
     logging:
       driver: json-file
       options: { max-size: "5m", max-file: "2" }
@@ -46,6 +48,7 @@ services:
 networks:
   mail:
     internal: true
+  mail-ui:
 
 volumes:
   mail-data:
