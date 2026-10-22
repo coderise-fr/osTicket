@@ -151,7 +151,7 @@ class SlaFirstResponseConfig extends PluginConfig {
         if (!$stripeId || $stripeId == $configuredId)
             return '';
         if ($stripeOrg)
-            return ' ' . sprintf(__('ATTENTION : le plugin Stripe rattache maintenant les clients Priority à l\'organisation « %1$s » (n° %2$d), pas à celle-ci : ils sont affichés « Standard ». Action recommandée : vérifier cette organisation (Utilisateurs > Organisations), saisir %2$d dans ce champ et enregistrer ; mettre aussi à jour le filtre de tickets « Organisation / Nom ».'),
+            return ' ' . sprintf(__('ATTENTION : le plugin Stripe rattache maintenant les clients Priority à l\'organisation « %1$s » (n° %2$d), et non à l\'organisation configurée ici : ces clients sont affichés « Standard ». Action recommandée : vérifier cette organisation (Utilisateurs > Organisations), saisir %2$d dans ce champ et enregistrer ; mettre aussi à jour le filtre de tickets « Organisation / Nom ».'),
                 $stripeOrg->getName(), $stripeOrg->getId());
         return ' ' . sprintf(__('ATTENTION : l\'organisation mémorisée par le plugin Stripe (n° %d) n\'existe plus ; il en créera une nouvelle au prochain abonnement Priority. Revenir ensuite sur ce formulaire pour la sélectionner.'),
             $stripeId);

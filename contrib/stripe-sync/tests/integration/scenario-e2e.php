@@ -37,6 +37,7 @@ function saveSlaInstance($contractOrg) {
     global $watch, $done;
     $p = Plugin::objects()->filter(array('install_path' => 'plugins/sla_first_response'))->one();
     $i = PluginInstance::objects()->filter(array('plugin_id' => $p->getId()))->one();
+    $i->_config = null; $i->_form = null;      // ORM cache: form of a previous save
     $vars = array('name' => 'SLA premiere reponse', 'isactive' => 1, 'notes' => '',
         'sla_watch' => $watch, 'sla_done' => $done, 'contract_org' => (string) $contractOrg,
         'contract_label_priority' => 'Priority', 'contract_label_standard' => 'Standard');
@@ -163,7 +164,8 @@ ok($f['stored'] === (string) $P, 'the SLA configuration is not changed automatic
 ok(level('gina@example.com') === 'standard/default', 'until the admin acts, the new subscriber shows standard (this is what the warning is for)');
 list($ok, $errors) = saveSlaInstance($P2);
 $f = probe('sla-form');
-ok($ok && strpos($f['hint'], 'ATTENTION') === false, 'admin follows the recommended action: warning gone');
+ok($ok && $f['stored'] === (string) $P2 && strpos($f['hint'], 'ATTENTION') === false,
+    'admin follows the recommended action (saves ' . $P2 . '): warning gone ' . json_encode($errors));
 ok(level('gina@example.com') === 'priority/organisation', 'new subscriber: priority (got ' . level('gina@example.com') . ')');
 list($c, $t) = post(ev('evt_e040', 'customer.subscription.updated', sub('sub_E2', 'cus_E2', 'active'), $now + 60));
 ok($c == 200 && userOrgId('fred@example.com') === $P2 && level('fred@example.com') === 'priority/organisation',

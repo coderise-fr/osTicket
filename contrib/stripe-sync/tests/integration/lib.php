@@ -30,6 +30,7 @@ function postParallel(array $bodies) {
             CURLOPT_HTTPHEADER => array("Stripe-Signature: t=$ts,v1=" . hash_hmac('sha256', "$ts.$body", $secret))));
         curl_multi_add_handle($mh, $h); $hs[] = $h;
     }
+    $run = 0;
     do { curl_multi_exec($mh, $run); curl_multi_select($mh); } while ($run);
     $out = array();
     foreach ($hs as $h) $out[] = curl_getinfo($h, CURLINFO_HTTP_CODE) . ':' . trim(curl_multi_getcontent($h));
