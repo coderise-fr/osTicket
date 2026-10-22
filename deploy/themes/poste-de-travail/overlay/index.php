@@ -33,7 +33,7 @@ $can_open = ($cfg->getClientRegistrationMode() != 'disabled'
 $member = ($thisclient && is_object($thisclient) && $thisclient->isValid()
     && !$thisclient->isGuest());
 // Contract level of the signed-in client (optional plugin, null if unknown):
-// "Your contract" panel and the contract column of the open tickets
+// "Your contract" panel and the contract pill of the open tickets
 $contract = $member ? ptdt_contract() : null;
 
 if ($member) {
@@ -126,9 +126,6 @@ if ($member) {
             <thead><tr>
                 <th scope="col" class="c-n"><?php echo __('Ticket #'); ?></th>
                 <th scope="col"><?php echo __('Subject'); ?></th>
-<?php if ($contract) { ?>
-                <th scope="col" class="c-plan"><?php echo ptdt__('Contract'); ?></th>
-<?php } ?>
                 <th scope="col"><?php echo __('Status'); ?></th>
                 <th scope="col" class="c-date"><?php echo __('Last Updated'); ?></th>
             </tr></thead>
@@ -146,11 +143,12 @@ if ($member) {
                         <small><?php
                         echo Format::htmlchars($T['topic__topic'] ?: $dept); ?></small><?php
                         if ($T['isanswered']) { ?><span class="await"><?php echo ptdt_icon('message', 14); ?><?php
-                            echo ptdt__('Awaiting your reply'); ?></span><?php } ?></td>
-<?php       if ($contract) { ?>
-                    <td class="c-plan" data-label="<?php echo ptdt__('Contract'); ?>"><?php
-                        echo ptdt_contract_pill(ptdt_contract_of_row($T)); ?></td>
-<?php       } ?>
+                            echo ptdt__('Awaiting your reply'); ?></span><?php }
+                        // Contract level of the ticket owner, under the subject (no
+                        // extra column: the dashboard table shares the width with the side column)
+                        if ($contract && ($ptdt_row_level = ptdt_contract_of_row($T))) { ?>
+                        <span class="visually-hidden"><?php echo ptdt__('Contract'); ?>:</span>
+                        <?php echo ptdt_contract_pill($ptdt_row_level); ?><?php } ?></td>
                     <td data-label="<?php echo __('Status'); ?>"><span class="status status-open"><?php echo ptdt_icon('open', 14); ?><?php echo $status; ?></span></td>
                     <td class="c-date" data-label="<?php echo __('Last Updated'); ?>"><?php echo Format::datetime($T['lastupdate'] ?: $T['created']); ?></td>
                 </tr>
