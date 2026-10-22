@@ -110,6 +110,20 @@ $h = $s->get('scp/tickets.php?id=' . $t->getId());
 check('agent : l\'événement est affiché dans le fil', strpos($h, 'première réponse adressée au client') !== false
     && strpos($h, '1re reponse faite') !== false, 'http=' . $s->status);
 check('agent : aucune erreur PHP', no_php_error($h));
+// Conversion facultative des événements écrits par la version 0.2 (sql/masquer-evenements-0.2.sql)
+$sql = preg_replace('/^--.*$/m', '', file_get_contents('/tmp/sql/masquer-evenements-0.2.sql'));
+$sql = str_replace('ost_', TABLE_PREFIX, $sql);
+$sql = preg_replace('/CONCAT\(\'\{"sla_id":\[\', \d+, \',\', \d+, \'\]\}\'\)/',
+    "CONCAT('{\"sla_id\":[', $watch, ',', $done, ']}')", $sql);
+$before = db_result(db_query('SELECT COUNT(*) FROM ' . THREAD_EVENT_TABLE . ' e JOIN ' . EVENT_TABLE . ' v ON v.id=e.event_id AND v.name="edited" WHERE e.data LIKE \'{"sla_id":%\''));
+check('script de conversion exécuté', (bool) db_query(trim($sql)), db_error());
+$after = db_result(db_query('SELECT COUNT(*) FROM ' . THREAD_EVENT_TABLE . ' e JOIN ' . EVENT_TABLE . ' v ON v.id=e.event_id AND v.name="edited" WHERE e.data LIKE \'{"sla_id":%\''));
+check('anciens événements « edited » sla_id convertis', $before >= 1 && $after == 0, "$before -> $after");
+$h = $c->get('tickets.php?id=' . $tc->getId());
+check('(témoin 0.2 converti) le client ne voit plus la bascule', strpos($h, '1re reponse faite') === false);
+$h = $s->get('scp/tickets.php?id=' . $tc->getId());
+check('(témoin 0.2 converti) l\'agent la voit toujours', strpos($h, 'première réponse adressée au client') !== false
+    && strpos($h, '1re reponse faite') !== false);
 
 echo "== H6 : fin d'abonnement sur l'instance réelle (une requête = un cache neuf)\n";
 $ca = login_client('cl-abo@example.com');
