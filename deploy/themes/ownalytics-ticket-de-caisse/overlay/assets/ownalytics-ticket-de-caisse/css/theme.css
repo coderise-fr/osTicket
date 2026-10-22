@@ -196,7 +196,8 @@ input[type=reset]:hover, input[type=button]:hover { background: var(--paper-2); 
 #content a.blue.button { color: var(--paper); }
 #content a.green.button { color: var(--ink); }
 /* osticket.js signale un formulaire modifié en colorant le bouton d'envoi : rendu dans la charte */
-input[type=submit].save.pending, input.save.pending { box-shadow: 5px 5px 0 var(--marker) !important; }
+/* (le texte du bouton passe en rouge par un style en ligne : le signal devient l'ombre jaune) */
+input[type=submit][style*="color"] { color: var(--paper) !important; box-shadow: 5px 5px 0 var(--marker); }
 @media (prefers-reduced-motion: reduce) { .btn, input[type=submit], a.button, button[type=submit] { transition: none; } }
 .buttons, #reply p[style*="center"], form > p[style*="center"] { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 8px; }
 p.buttons { text-align: center; }
@@ -290,7 +291,7 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
 .p-index #content :focus-visible, .p-offline #content :focus-visible { outline-color: var(--plum-light); }
 .p-index #content .sidebar :focus-visible, .p-index #content .featured-category :focus-visible { outline-color: var(--plum); }
 .p-index #content a, .p-offline #content a { color: var(--paper); }
-.p-index #content > div:last-of-type > br { display: none; }
+.p-index #landing_page > div:last-of-type > br { display: none; }
 #landing_page { display: grid; gap: 48px; align-items: start; }
 @media (min-width: 960px) {
   .p-index #landing_page { grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr); gap: 56px 64px; }
@@ -335,10 +336,11 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
 .sidebar section:has(> .header:only-child) { display: none; }
 
 /* Articles à la une */
-.p-index #content > div:last-of-type { display: grid; gap: 40px 32px; margin-top: 64px; }
-.p-index #content > div:last-of-type:empty { display: none; }
-@media (min-width: 760px) { .p-index #content > div:last-of-type { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.p-index #content > div:last-of-type > h1 { grid-column: 1 / -1; color: var(--paper); margin: 0; font-size: clamp(1.6rem, 1.1rem + 2vw, 2.4rem); }
+.p-index #landing_page > div:last-of-type { display: grid; gap: 40px 32px; margin-top: 16px; grid-column: 1 / -1; }
+@media (min-width: 960px) { .p-index #landing_page > div:last-of-type { grid-row: 2; } }
+.p-index #landing_page > div:last-of-type:empty { display: none; }
+@media (min-width: 760px) { .p-index #landing_page > div:last-of-type { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.p-index #landing_page > div:last-of-type > h1 { grid-column: 1 / -1; color: var(--paper); margin: 0; font-size: clamp(1.6rem, 1.1rem + 2vw, 2.4rem); }
 .featured-category {
   position: relative; float: none; width: auto; margin: 0; padding: 26px 24px 28px; background: var(--paper); color: var(--ink);
   filter: drop-shadow(0 14px 18px rgba(14, 4, 24, .35));
@@ -401,7 +403,7 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
 .custom-data { margin-top: 30px; }
 @media (min-width: 760px) { .custom-data { max-width: calc(50% - 28px); } }
 /* Statut : pastille (le texte porte l'information, la couleur ne fait que la souligner) */
-#ticketInfo .infoTable:first-of-type > tbody > tr:first-child > td {
+#ticketInfo > tbody > tr:nth-child(2) > td:first-child .infoTable > tbody > tr:first-child > td {
   flex: none; margin-left: auto; padding: 1px 10px; background: var(--plum); color: var(--paper);
   font-family: var(--mono); font-size: .875rem; font-weight: 600; letter-spacing: .02em;
 }
@@ -425,6 +427,10 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
   margin: 0; padding: 8px 0 0; border: 0; background: none !important; color: var(--ink);
   font-family: var(--sans); font-size: 1.0625rem !important; line-height: 1.6; overflow-x: auto; box-shadow: none;
 }
+/* css/thread.css fixe 14 px sur les blocs du fil : on revient à la taille du corps */
+.thread-body div, .thread-body p, .thread-body ul, .thread-body ol, .thread-body table, .thread-body dl, .thread-body blockquote { font-size: inherit; }
+.thread-body pre { font-size: .92em; }
+.thread-body pre a:not(.button) { color: var(--plum-light) !important; }
 .thread-body p { margin: 0 0 .8em; max-width: 72ch; }
 .thread-body a:not(.button) { color: var(--plum) !important; font-weight: 600; }
 .thread-body blockquote { margin: 0 0 1em; padding: 4px 0 4px 14px; border-left: 3px solid var(--fade); color: var(--ink-soft); }
@@ -459,7 +465,7 @@ label.inline, label.checkbox { display: inline-block; margin: 6px 22px 0 0; font
 .p-tickets #content > h1 { display: flow-root; margin: 0 0 10px !important; }
 .states { font-family: var(--mono); font-size: 1rem; letter-spacing: 0; }
 #content h1 .states small { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; font-size: 1rem; color: var(--ink); font-weight: 400; font-stretch: 100%; font-variation-settings: normal; }
-#content h1 .states small > span { color: var(--fade) !important; }
+#content h1 .states small > span { color: var(--ink-soft) !important; }
 .states a, #content .states a { padding: 4px 2px; font-weight: 500; text-decoration: none; color: var(--plum); }
 .states a.active, #content .states a.active { text-decoration: underline; text-decoration-color: var(--marker); text-decoration-thickness: 6px; text-underline-offset: -2px; text-decoration-skip-ink: none; color: var(--ink); font-weight: 600; }
 h1 .states { float: right; margin-top: 10px; }
@@ -485,11 +491,11 @@ h1 .states { float: right; margin-top: 10px; }
 }
 @media (max-width: 420px) { #ticketTable th:nth-child(3), #ticketTable td:nth-child(3) { display: none; } }
 /* Pagination « Page : [1] 2 3 » */
-.p-tickets #content > div:last-child { margin-top: 22px; font-family: var(--mono); font-size: .9375rem; }
-.p-tickets #content > div:last-child a, .p-tickets #content > div:last-child b {
+.p-tickets #ticketTable + div { margin-top: 22px; font-family: var(--mono); font-size: .9375rem; }
+.p-tickets #ticketTable + div a, .p-tickets #ticketTable + div b {
   display: inline-block; min-width: 2.2em; margin: 2px; padding: 4px 8px; border: 2px solid var(--ink); text-align: center; text-decoration: none;
 }
-.p-tickets #content > div:last-child b { background: var(--plum); color: var(--paper); border-color: var(--plum); }
+.p-tickets #ticketTable + div b { background: var(--plum); color: var(--paper); border-color: var(--plum); }
 #pagination { font-family: var(--mono); }
 
 /* ---------- Base de connaissances ---------- */
@@ -544,7 +550,7 @@ h1 .states { float: right; margin-top: 10px; }
 #footer .legal { display: flex; flex-wrap: wrap; gap: 4px 24px; margin: 0; padding: 0; list-style: none; }
 #footer .foot-inner > p:first-of-type { margin-top: 14px; padding-top: 22px; border-top: 2px dashed rgba(205, 182, 227, .3); }
 #footer a { color: var(--plum-light); text-underline-offset: .2em; padding-block: 6px; display: inline-block; }
-#footer a.foot-mark { color: var(--paper); }
+#footer a.foot-mark { display: inline-flex; color: var(--paper); }
 #footer a:hover { color: var(--paper); }
 #footer p { margin: 0; max-width: 72ch; }
 #footer #poweredBy { display: inline; padding: 0; background: none; text-indent: 0; width: auto; height: auto; overflow: visible; font-size: inherit; }
@@ -577,7 +583,7 @@ h1 .states { float: right; margin-top: 10px; }
   .thread-entry, .thread-event { break-inside: avoid; }
   .thread-entry.response { margin-left: 0; background: #fff !important; border-left: 4px solid #000; }
   .thread-body, .thread-body * { color: #000 !important; }
-  #ticketInfo .infoTable:first-of-type > tbody > tr:first-child > td { background: none; color: #000; border: 1px solid #000; }
+  #ticketInfo > tbody > tr:nth-child(2) > td:first-child .infoTable > tbody > tr:first-child > td { background: none; color: #000; border: 1px solid #000; }
   .row { display: block; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; }
   #content .attachment-info a::after { content: ""; }

@@ -25,14 +25,18 @@ if (($lang = Internationalization::getCurrentLanguage())) {
     header("Content-Language: ".implode(', ', $langs));
 }
 
-// Page identifiers for the stylesheet: script name (p-*), kb section, view (v-*).
+// Page identifiers for the stylesheet: script name (p-*, p-kb-* in kb/,
+// p-pages-* in pages/), section (p-kb, p-pages), view (v-*).
 $otdc_page = preg_replace('/[^a-z0-9]+/', '-',
     strtolower(basename($_SERVER['SCRIPT_NAME'], '.php')));
-$otdc_classes = array('otdc', 'p-' . $otdc_page);
+$otdc_section = '';
 if (strpos($_SERVER['SCRIPT_NAME'], '/kb/') !== false)
-    $otdc_classes[] = 'p-kb';
-if (strpos($_SERVER['SCRIPT_NAME'], '/pages/') !== false)
-    $otdc_classes[] = 'p-pages';
+    $otdc_section = 'kb';
+elseif (strpos($_SERVER['SCRIPT_NAME'], '/pages/') !== false)
+    $otdc_section = 'pages';
+$otdc_classes = array('otdc', 'p-' . ($otdc_section ? $otdc_section . '-' : '') . $otdc_page);
+if ($otdc_section)
+    $otdc_classes[] = 'p-' . $otdc_section;
 if (isset($inc) && is_string($inc))
     $otdc_classes[] = 'v-' . preg_replace('/[^a-z0-9]+/', '-',
         strtolower(preg_replace('/(\.inc)?\.php$/', '', basename($inc))));
