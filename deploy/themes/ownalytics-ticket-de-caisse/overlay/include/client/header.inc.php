@@ -40,6 +40,13 @@ if ($otdc_section)
 if (isset($inc) && is_string($inc))
     $otdc_classes[] = 'v-' . preg_replace('/[^a-z0-9]+/', '-',
         strtolower(preg_replace('/(\.inc)?\.php$/', '', basename($inc))));
+// The landing page and the offline page are printed on the plum background.
+// Not when another view is shown in their place (client.inc.php includes
+// profile.php from any script while a password change is required).
+elseif (!$otdc_section && $otdc_page == 'index')
+    $otdc_classes[] = 'is-landing';
+elseif (!$otdc_section && $otdc_page == 'offline')
+    $otdc_classes[] = 'is-offline';
 $otdc_signed_in = ($thisclient && is_object($thisclient)
     && $thisclient->isValid() && !$thisclient->isGuest());
 if ($otdc_signed_in)
