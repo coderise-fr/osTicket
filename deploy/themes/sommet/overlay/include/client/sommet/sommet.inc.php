@@ -161,6 +161,7 @@ if (!defined('SOMMET_THEME')) {
         $head = substr($html, 0, $at);
         $page = substr($html, $at + strlen($slot));
         $title = '';
+        $m = array();
         if (preg_match('#<!--sommet:bandeau-->(.*?)<!--/sommet:bandeau-->#s', $page, $m, PREG_OFFSET_CAPTURE)) {
             $title = $m[1][0];
             $page = substr_replace($page, '', $m[0][1], strlen($m[0][0]));

@@ -296,4 +296,3 @@ if ($total) {
     echo '<nav class="pager" aria-label="'.Format::htmlchars(__('Page')).'">'.__('Page').': '.$pageNav->getPageLinks().'</nav>';
 }
 ?>
-
