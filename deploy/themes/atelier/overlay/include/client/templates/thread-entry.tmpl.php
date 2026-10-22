@@ -20,9 +20,9 @@ $is_team = ($entry->type == 'R' || $entry->staff_id);
 $is_me = (!$is_team && $thisclient && $entry->user_id
     && $entry->user_id == $thisclient->getId());
 $side = $is_team ? 'from-team' : ($is_me ? 'from-me' : 'from-other');
-$tone = $is_me ? 'sun'
-    : ($is_team ? atelier_avatar_tone('staff-' . ($entry->staff_id ?: $name))
-        : 'plum');
+$tone = $is_me ? 'you'
+    : ($is_team ? 'team'
+        : 'other');
 ?>
 <div class="thread-entry <?php echo $type; ?> <?php echo $side; ?>">
     <span class="avatar av-<?php echo $tone; ?>" aria-hidden="true"><?php
@@ -33,7 +33,7 @@ $tone = $is_me ? 'sun'
 <?php if ($is_me) { ?>
         <span class="role me"><?php echo __a('You'); ?></span>
 <?php } elseif ($is_team) { ?>
-        <span class="role"><?php echo __a('Support team'); ?></span>
+        <span class="role"><?php echo sprintf(__a('%s team'), ATELIER_BRAND); ?></span>
 <?php } ?>
         <span class="textra">
 <?php if ($entry->flags & ThreadEntry::FLAG_EDITED) { ?>
@@ -64,7 +64,7 @@ $tone = $is_me ? 'sun'
                 $size = sprintf('<small class="filesize faded">%s</small>', Format::file_size($A->file->size));
 ?>
         <span class="attachment-info">
-        <i class="icon-paperclip icon-flip-horizontal" aria-hidden="true"></i>
+        <?php echo atelier_icon('clip', 15); ?>
         <a  class="no-pjax truncate filename"
             href="<?php echo $A->file->getDownloadUrl(['id' => $A->getId()]);
             ?>" download="<?php echo Format::htmlchars($A->getFilename()); ?>"

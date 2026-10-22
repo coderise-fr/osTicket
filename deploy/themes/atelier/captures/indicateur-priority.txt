@@ -1,0 +1,7 @@
+1. active plan, not answered, before due: 1 (expected 1)
+2. answered (isanswered=1): 0 (expected 0)
+3. plan switched to the disabled one (what the plugin does): 0 (expected 0)
+   Priority badge kept: 1 (expected 1)
+4. due date passed: 0 (expected 0)
+5. plan disabled: 0 (expected 0)
+6. restored: 1 (expected 1)

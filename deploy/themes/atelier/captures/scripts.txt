@@ -1,0 +1,77 @@
+== 1. drift on a modified copy (replaced file changed, replaced file removed, watched file changed, CRLF only)
+Référence du thème : 51112176a56ceb1054aaa77c3864a86d4ad02a2c ; comparé à : /c/Users/Julien/AppData/Local/Temp/claude/e--Sources-osTicket/4e5ba9fa-3c2c-4fb4-9aff-d66949d520de/scratchpad/atelier-atfbd47521/drift-tree
+Fichiers remplacés par le thème :
+  SUPPRIMÉ  include/client/templates/thread-event.tmpl.php
+  MODIFIÉ   include/client/view.inc.php
+  -> reporter les changements du cœur dans overlay/ (diff entre le fichier de 51112176a56ceb1054aaa77c3864a86d4ad02a2c et celui de /c/Users/Julien/AppData/Local/Temp/claude/e--Sources-osTicket/4e5ba9fa-3c2c-4fb4-9aff-d66949d520de/scratchpad/atelier-atfbd47521/drift-tree), puis ./check-drift.sh --write-base
+Fichiers habillés par la feuille de style :
+  MODIFIÉ   index.php
+  -> vérifier visuellement les pages concernées, ajuster atelier.css si besoin, puis ./check-drift.sh --write-base
+exit=1
+== 2. apply --dry-run
+copie     include/client/view.inc.php
+Simulation : 30 fichier(s) à copier ou retirer, rien n'a été écrit.
+== 3. apply
+Ensuite : git add -A deploy/docker/overlay && git commit, puis deploy/docker/scripts/build.sh (voir README.md).
+== 4. apply again (idempotent)
+Thème Atelier déjà à jour dans /e/Sources/osTicket/.claude/worktrees/agent-a9577cbf419dac2eb/deploy/docker/overlay.
+== 5. hand-edited theme file -> refusal, then --force
+apply.sh: ces fichiers de l'overlay seraient écrasés :
+  modifié   assets/atelier/css/atelier.css
+« étranger » : fichier qui n'appartient pas au thème (autre personnalisation) ; déplacez-le ou fusionnez-le à la main.
+« modifié » : fichier du thème modifié dans l'overlay ; relancez avec --force pour l'écraser.
+exit=1
+== 6. remove keeps the hand-edited file
+conservé  assets/atelier/css/atelier.css (modifié depuis l'installation ; --force pour le retirer)
+retrait   assets/atelier/fonts/OFL-inter.txt
+retrait   assets/atelier/fonts/OFL-montserrat.txt
+retrait   assets/atelier/fonts/inter-latin-400-normal.woff2
+retrait   assets/atelier/fonts/inter-latin-500-normal.woff2
+retrait   assets/atelier/fonts/inter-latin-600-normal.woff2
+retrait   assets/atelier/fonts/inter-latin-ext-400-normal.woff2
+retrait   assets/atelier/fonts/inter-latin-ext-500-normal.woff2
+retrait   assets/atelier/fonts/inter-latin-ext-600-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-600-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-700-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-800-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-ext-600-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-ext-700-normal.woff2
+retrait   assets/atelier/fonts/montserrat-latin-ext-800-normal.woff2
+retrait   assets/atelier/img/apple-touch-icon.png
+retrait   assets/atelier/img/favicon-32.png
+retrait   assets/atelier/img/favicon.svg
+retrait   assets/atelier/img/logo-coderise-horizontal.png
+retrait   include/client/atelier/atelier.inc.php
+retrait   include/client/atelier/i18n/fr/LC_MESSAGES/atelier.mo.php
+retrait   include/client/footer.inc.php
+retrait   include/client/header.inc.php
+retrait   include/client/kb-categories.inc.php
+retrait   include/client/login.inc.php
+retrait   include/client/open.inc.php
+retrait   include/client/templates/thread-entry.tmpl.php
+retrait   include/client/templates/thread-event.tmpl.php
+retrait   include/client/tickets.inc.php
+retrait   include/client/view.inc.php
+Thème Atelier retiré partiellement : 1 fichier(s) modifié(s) conservé(s), manifeste gardé.
+exit=1
+Thème Atelier retiré de /e/Sources/osTicket/.claude/worktrees/agent-a9577cbf419dac2eb/deploy/docker/overlay (1 fichier(s)).
+== 7. foreign file in the overlay -> refusal
+apply.sh: ces fichiers de l'overlay seraient écrasés :
+  étranger  include/client/header.inc.php
+« étranger » : fichier qui n'appartient pas au thème (autre personnalisation) ; déplacez-le ou fusionnez-le à la main.
+« modifié » : fichier du thème modifié dans l'overlay ; relancez avec --force pour l'écraser.
+exit=1
+== 8. another theme installed (manifest of each other slug) -> refusal
+apply.sh: le thème « poste-de-travail » est installé dans l'overlay ; retirez-le d'abord (deploy/themes/poste-de-travail/remove.sh).
+exit=0
+apply.sh: le thème « sommet » est installé dans l'overlay ; retirez-le d'abord (deploy/themes/sommet/remove.sh).
+exit=0
+apply.sh: le thème « parcours » est installé dans l'overlay ; retirez-le d'abord (deploy/themes/parcours/remove.sh).
+exit=0
+== 9. plugin present in the overlay is kept
+Ensuite : git add -A deploy/docker/overlay && git commit, puis deploy/docker/scripts/build.sh (voir README.md).
+Thème Atelier retiré de /e/Sources/osTicket/.claude/worktrees/agent-a9577cbf419dac2eb/deploy/docker/overlay (30 fichier(s)).
+/e/Sources/osTicket/.claude/worktrees/agent-a9577cbf419dac2eb/deploy/docker/overlay/include/plugins/fake/plugin.php
+== 10. git status after the round trip
+?? deploy/themes/atelier/captures/
+(end)

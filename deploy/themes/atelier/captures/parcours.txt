@@ -1,0 +1,58 @@
+OK   bureau home: landing h1
+OK   bureau focus visible (accueil)
+OK   bureau open: errors shown
+OK   bureau open: dynamic fields loaded by AJAX
+OK   bureau open: thanks page with ticket number ::  Support ticket request created Thank you, Sacha.Your ticket #695434 is open. A person from the team
+OK   bureau guest: ticket thread visible
+OK   bureau guest: reply posted
+OK   bureau login: error shown
+OK   bureau login: success -> tickets :: http://127.0.0.1:24180/tickets.php
+OK   bureau list: pagination present
+OK   bureau list: other customer ticket hidden
+OK   bureau list: Priority badge
+OK   bureau focus visible (mes-tickets)
+OK   bureau view: progress steps
+OK   bureau view: no Priority indicator once answered
+OK   bureau view: collaborator shown in thread or events
+OK   bureau focus visible (suivi-ticket)
+OK   bureau view: Priority indicator before first reply
+OK   bureau reply: success message
+OK   bureau reply: attachment listed
+OK   bureau access: other customer ticket refused
+OK   bureau register: confirmed page :: http://127.0.0.1:24180/account.php?confirmed
+OK   mobile home: landing h1
+OK   mobile mobile menu opens
+OK   mobile open: errors shown
+OK   mobile open: dynamic fields loaded by AJAX
+OK   mobile open: thanks page with ticket number ::  Support ticket request created Thank you, Sacha.Your ticket #337918 is open. A person from the team
+OK   mobile guest: ticket thread visible
+OK   mobile guest: reply posted
+OK   mobile login: error shown
+OK   mobile login: success -> tickets :: http://127.0.0.1:24180/tickets.php
+OK   mobile list: pagination present
+OK   mobile list: other customer ticket hidden
+OK   mobile list: Priority badge
+OK   mobile view: progress steps
+OK   mobile view: no Priority indicator once answered
+OK   mobile view: collaborator shown in thread or events
+OK   mobile view: Priority indicator before first reply
+OK   mobile reply: success message
+OK   mobile reply: attachment listed
+OK   mobile access: other customer ticket refused
+OK   mobile register: confirmed page :: http://127.0.0.1:24180/account.php?confirmed
+OK   bureau offline page
+OK   mobile offline page
+OK   http HTTP /include/client/atelier/atelier.inc.php :: 403 text/html; charset=iso-8859-1
+OK   http HTTP /include/client/header.inc.php :: 403 text/html; charset=iso-8859-1
+OK   http HTTP /include/client/atelier/i18n/fr/LC_MESSAGES/atelier.mo.php :: 403 text/html; charset=iso-8859-1
+OK   http HTTP /include/client/atelier/installed.manifest :: 403 text/html; charset=iso-8859-1
+OK   http HTTP /assets/atelier/css/atelier.css :: 200 text/css
+OK   http HTTP /assets/atelier/fonts/inter-latin-400-normal.woff2 :: 200 font/woff2
+OK   http HTTP /assets/atelier/img/favicon.svg :: 200 image/svg+xml
+OK   http HTTP /assets/atelier/img/logo-coderise-horizontal.png :: 200 image/png
+console errors 0 []
+http >=400 []
+external 0 []
+overflow []
+min contrast 4.91 pages with fails 
+checks failed 0 / 52

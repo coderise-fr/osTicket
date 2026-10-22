@@ -1,0 +1,796 @@
+{
+ "console": [],
+ "http": [],
+ "external": [],
+ "overflow": [],
+ "contrast": [
+  {
+   "vp": "bureau",
+   "page": "accueil",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "base-de-connaissances",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "kb-categorie",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "kb-article",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "kb-recherche",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "kb-recherche-vide",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "ouverture-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "ouverture-erreurs",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "ouverture-ticket-rempli",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "remerciement",
+   "min": 5.76,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "acces-par-numero",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-invite",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-invite-reponse",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "acces-lien-envoye",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "connexion",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "connexion-erreur",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mes-tickets",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mes-tickets-page-2",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mes-tickets-fermes",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mes-tickets-vide",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket-priority",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket-ferme",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket-reponse-envoyee",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket-reponse-erreur",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "modifier-ticket",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "profil",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "erreur-acces-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "erreur-article-introuvable",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "ouverture-ticket-connecte",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "inscription",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "inscription-a-confirmer",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "inscription-confirmee",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mot-de-passe-oublie",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mot-de-passe-envoye",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mot-de-passe-identifiant",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mot-de-passe-nouveau",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "accueil",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "base-de-connaissances",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "kb-categorie",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "kb-article",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "kb-recherche",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "kb-recherche-vide",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "ouverture-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "ouverture-erreurs",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "ouverture-ticket-rempli",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "remerciement",
+   "min": 5.76,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "acces-par-numero",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-invite",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-invite-reponse",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "acces-lien-envoye",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "connexion",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "connexion-erreur",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mes-tickets",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mes-tickets-page-2",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mes-tickets-fermes",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mes-tickets-vide",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-ticket-priority",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-ticket-ferme",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-ticket-reponse-envoyee",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "suivi-ticket-reponse-erreur",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "modifier-ticket",
+   "min": 5.83,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "profil",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "erreur-acces-ticket",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "erreur-article-introuvable",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "ouverture-ticket-connecte",
+   "min": 4.91,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "inscription",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "inscription-a-confirmer",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "inscription-confirmee",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mot-de-passe-oublie",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mot-de-passe-envoye",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mot-de-passe-identifiant",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "mot-de-passe-nouveau",
+   "min": 6.54,
+   "fails": []
+  },
+  {
+   "vp": "bureau",
+   "page": "hors-ligne",
+   "min": 9.52,
+   "fails": []
+  },
+  {
+   "vp": "mobile",
+   "page": "hors-ligne",
+   "min": 9.52,
+   "fails": []
+  }
+ ],
+ "minContrast": 4.91,
+ "focus": [
+  {
+   "vp": "bureau",
+   "page": "accueil",
+   "bad": []
+  },
+  {
+   "vp": "bureau",
+   "page": "mes-tickets",
+   "bad": []
+  },
+  {
+   "vp": "bureau",
+   "page": "suivi-ticket",
+   "bad": []
+  }
+ ],
+ "checks": [
+  {
+   "vp": "bureau",
+   "name": "home: landing h1",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "focus visible (accueil)",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "open: errors shown",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "open: dynamic fields loaded by AJAX",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "open: thanks page with ticket number",
+   "ok": true,
+   "info": " Support ticket request created Thank you, Sacha.Your ticket #695434 is open. A person from the team"
+  },
+  {
+   "vp": "bureau",
+   "name": "guest: ticket thread visible",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "guest: reply posted",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "login: error shown",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "login: success -> tickets",
+   "ok": true,
+   "info": "http://127.0.0.1:24180/tickets.php"
+  },
+  {
+   "vp": "bureau",
+   "name": "list: pagination present",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "list: other customer ticket hidden",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "list: Priority badge",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "focus visible (mes-tickets)",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "view: progress steps",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "view: no Priority indicator once answered",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "view: collaborator shown in thread or events",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "focus visible (suivi-ticket)",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "view: Priority indicator before first reply",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "reply: success message",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "reply: attachment listed",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "access: other customer ticket refused",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "bureau",
+   "name": "register: confirmed page",
+   "ok": true,
+   "info": "http://127.0.0.1:24180/account.php?confirmed"
+  },
+  {
+   "vp": "mobile",
+   "name": "home: landing h1",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "mobile menu opens",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "open: errors shown",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "open: dynamic fields loaded by AJAX",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "open: thanks page with ticket number",
+   "ok": true,
+   "info": " Support ticket request created Thank you, Sacha.Your ticket #337918 is open. A person from the team"
+  },
+  {
+   "vp": "mobile",
+   "name": "guest: ticket thread visible",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "guest: reply posted",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "login: error shown",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "login: success -> tickets",
+   "ok": true,
+   "info": "http://127.0.0.1:24180/tickets.php"
+  },
+  {
+   "vp": "mobile",
+   "name": "list: pagination present",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "list: other customer ticket hidden",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "list: Priority badge",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "view: progress steps",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "view: no Priority indicator once answered",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "view: collaborator shown in thread or events",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "view: Priority indicator before first reply",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "reply: success message",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "reply: attachment listed",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "access: other customer ticket refused",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "register: confirmed page",
+   "ok": true,
+   "info": "http://127.0.0.1:24180/account.php?confirmed"
+  },
+  {
+   "vp": "bureau",
+   "name": "offline page",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "mobile",
+   "name": "offline page",
+   "ok": true,
+   "info": ""
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /include/client/atelier/atelier.inc.php",
+   "ok": true,
+   "info": "403 text/html; charset=iso-8859-1"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /include/client/header.inc.php",
+   "ok": true,
+   "info": "403 text/html; charset=iso-8859-1"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /include/client/atelier/i18n/fr/LC_MESSAGES/atelier.mo.php",
+   "ok": true,
+   "info": "403 text/html; charset=iso-8859-1"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /include/client/atelier/installed.manifest",
+   "ok": true,
+   "info": "403 text/html; charset=iso-8859-1"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /assets/atelier/css/atelier.css",
+   "ok": true,
+   "info": "200 text/css"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /assets/atelier/fonts/inter-latin-400-normal.woff2",
+   "ok": true,
+   "info": "200 font/woff2"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /assets/atelier/img/favicon.svg",
+   "ok": true,
+   "info": "200 image/svg+xml"
+  },
+  {
+   "vp": "http",
+   "name": "HTTP /assets/atelier/img/logo-coderise-horizontal.png",
+   "ok": true,
+   "info": "200 image/png"
+  }
+ ]
+}

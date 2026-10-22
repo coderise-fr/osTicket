@@ -1,0 +1,14 @@
+bureau accueil overflow=0 lang=fr
+bureau connexion overflow=0 lang=fr
+bureau mes-tickets overflow=0 lang=fr
+bureau suivi-ticket overflow=0 lang=fr
+bureau suivi-ticket-priority overflow=0 lang=fr
+bureau base-de-connaissances overflow=0 lang=fr
+bureau footer FR: true | errors=0
+mobile accueil overflow=0 lang=fr
+mobile connexion overflow=0 lang=fr
+mobile mes-tickets overflow=0 lang=fr
+mobile suivi-ticket overflow=0 lang=fr
+mobile suivi-ticket-priority overflow=0 lang=fr
+mobile base-de-connaissances overflow=0 lang=fr
+mobile footer FR: true | errors=0

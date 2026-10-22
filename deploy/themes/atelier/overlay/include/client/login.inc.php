@@ -25,14 +25,14 @@ if ($cfg->isClientEmailVerificationRequired())
 else
     $atelier_access_button = __("View Ticket");
 ?>
-<div class="page-head center">
+<div class="page-head band">
     <h1 class="display"><?php echo Format::display($title); ?></h1>
     <div class="sub"><?php echo Format::display($body); ?></div>
 </div>
 <div class="duo">
 <form action="login.php" method="post" id="clientLogin" class="card login" aria-labelledby="login-title">
     <?php csrf_token(); ?>
-    <h2 class="card-title" id="login-title"><i class="icon-user" aria-hidden="true"></i> <?php echo __('Sign In'); ?></h2>
+    <h2 class="card-title" id="login-title"><?php echo atelier_icon('user', 20); ?><?php echo __('Sign In'); ?></h2>
 <?php if ($errors['login']) { ?>
     <p class="err" role="alert"><?php echo Format::htmlchars($errors['login']); ?></p>
 <?php } ?>
@@ -71,7 +71,7 @@ if (count($ext_bks)) {
 
 <form action="login.php" method="post" id="clientAccess" class="card login alt" aria-labelledby="access-title">
     <?php csrf_token(); ?>
-    <h2 class="card-title" id="access-title"><i class="icon-ticket" aria-hidden="true"></i> <?php echo __('Check Ticket Status'); ?></h2>
+    <h2 class="card-title" id="access-title"><?php echo atelier_icon('inbox', 20); ?><?php echo __('Check Ticket Status'); ?></h2>
     <p class="small"><?php
 echo __('Please provide your email address and a ticket number.');
 if ($cfg->isClientEmailVerificationRequired())

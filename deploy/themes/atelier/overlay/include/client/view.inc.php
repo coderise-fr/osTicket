@@ -39,32 +39,62 @@ if ($thisclient && $thisclient->isGuest()
 
 <?php } ?>
 
-<div id="ticketInfo" class="page-head ticket-head">
+<div id="ticketInfo" class="page-head band ticket-head">
 <?php if (!$thisclient->isGuest()) { ?>
-    <a class="back" href="tickets.php"><i class="icon-arrow-left" aria-hidden="true"></i> <?php
-        echo __('Show all tickets'); ?></a>
-<?php } ?>
+    <nav class="crumbs" aria-label="<?php echo Format::htmlchars(__a('Breadcrumb')); ?>"><ol>
+        <li><a href="tickets.php"><?php echo __('Tickets'); ?></a></li>
+        <li><span aria-current="page"><?php echo sprintf(__('Ticket #%s'), $ticket->getNumber()); ?></span></li>
+    </ol></nav>
+<?php } else { ?>
     <p class="num"><?php echo sprintf(__('Ticket #%s'), $ticket->getNumber()); ?></p>
+<?php } ?>
     <h1 class="display h-ticket"><?php echo $subject_field->display($ticket->getSubject()); ?></h1>
     <div class="meta">
-        <span class="pill pill-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
+        <span class="status status-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
+            echo atelier_icon($state == 'closed' ? 'lock' : 'inbox', 14);
             echo $S ? $S->getLocalName() : ''; ?></span>
-        <span class="muted"><i class="icon-calendar" aria-hidden="true"></i>
-            <span class="visually-hidden"><?php echo __('Create Date'); ?></span>
-            <?php echo Format::datetime($ticket->getCreateDate()); ?></span>
+<?php if (atelier_is_priority($ticket)) { ?>
+        <span class="plan plan-priority"><?php echo atelier_icon('bolt', 13); ?>Priority</span>
+<?php } ?>
+        <span class="when"><span class="visually-hidden"><?php echo __('Create Date'); ?> </span><?php
+            echo Format::datetime($ticket->getCreateDate()); ?></span>
     </div>
     <div class="ticket-actions">
-        <a class="action-button" href="tickets.php?id=<?php echo $ticket->getId(); ?>"><i class="icon-refresh" aria-hidden="true"></i> <?php echo __('Reload'); ?></a>
+        <a class="action-button" href="tickets.php?id=<?php echo $ticket->getId(); ?>"><?php echo atelier_icon('refresh', 16); ?> <?php echo __('Reload'); ?></a>
         <a class="action-button" href="tickets.php?a=print&id=<?php
-          echo $ticket->getId(); ?>"><i class="icon-print" aria-hidden="true"></i> <?php echo __('Print'); ?></a>
+          echo $ticket->getId(); ?>"><?php echo atelier_icon('print', 16); ?> <?php echo __('Print'); ?></a>
 <?php if ($ticket->hasClientEditableFields()
         // Only ticket owners can edit the ticket details (and other forms)
         && $thisclient->getId() == $ticket->getUserId()) { ?>
         <a class="action-button" href="tickets.php?a=edit&id=<?php
-             echo $ticket->getId(); ?>"><i class="icon-edit" aria-hidden="true"></i> <?php echo __('Edit'); ?></a>
+             echo $ticket->getId(); ?>"><?php echo atelier_icon('edit', 16); ?> <?php echo __('Edit'); ?></a>
 <?php } ?>
     </div>
 </div>
+
+<?php
+// Progress of the ticket, from real data only (see atelier_progress()).
+list($atelier_steps, $atelier_now) = atelier_progress($ticket); ?>
+<ol class="ascent-steps" aria-label="<?php echo Format::htmlchars(__a('Ticket progress')); ?>">
+<?php foreach ($atelier_steps as $i => $atelier_step) {
+    $cls = $atelier_step['done'] ? 'done' : ($i == $atelier_now ? 'now' : 'todo'); ?>
+    <li class="<?php echo $cls; ?>"<?php if ($i == $atelier_now) echo ' aria-current="step"'; ?>>
+        <?php echo atelier_sommet('mark'); ?>
+        <span class="t"><strong><?php echo Format::htmlchars($atelier_step['label']); ?></strong>
+        <small><?php
+        if ($atelier_step['done'] && $atelier_step['date'])
+            echo Format::datetime($atelier_step['date']);
+        elseif ($atelier_step['done'])
+            echo __a('Done');
+        elseif ($i == $atelier_now && $i == 1)
+            echo __a('We are reading your request');
+        elseif (!empty($atelier_step['wait']))
+            echo __a('In progress');
+        else
+            echo __a('To come'); ?></small></span>
+    </li>
+<?php } ?>
+</ol>
 
 <div class="split ticket-split">
 <div class="stack ticket-main">
@@ -95,7 +125,7 @@ if ((!$ticket->isClosed() || $ticket->isReopenable()) && !$blockReply) { ?>
 <form id="reply" class="card reply" action="tickets.php?id=<?php echo $ticket->getId();
 ?>#reply" name="reply" method="post" enctype="multipart/form-data">
     <?php csrf_token(); ?>
-    <h2 class="card-title"><span class="avatar av-sun sm" aria-hidden="true"><?php
+    <h2 class="card-title"><span class="avatar av-you sm" aria-hidden="true"><?php
         echo Format::htmlchars(atelier_initials($thisclient->getName())); ?></span> <?php echo __('Post a Reply');?></h2>
     <input type="hidden" name="id" value="<?php echo $ticket->getId(); ?>">
     <input type="hidden" name="a" value="reply">
@@ -134,11 +164,25 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
 </div>
 
 <aside class="side stack ticket-side" aria-label="<?php echo Format::htmlchars(__('Basic Ticket Information')); ?>">
+<?php
+// Optional "Priority" indicator (to be validated, see README.md): only for an
+// open, unanswered ticket on the active Priority plan, before its due date.
+if ($atelier_sla = atelier_priority($ticket)) { ?>
+    <div class="card sla" role="group" aria-labelledby="sla-title">
+        <p class="sla-title" id="sla-title"><?php echo atelier_icon('clock'); ?><span><?php
+            echo __a('Priority support: first reply within 4 h, 24/7'); ?></span></p>
+        <div class="sla-bar" role="img" aria-label="<?php echo Format::htmlchars(sprintf(
+            __a('%s%% of the time elapsed'), (int) round($atelier_sla['pct']))); ?>"><span class="sla-fill" style="width:<?php
+            echo $atelier_sla['pct']; ?>%"></span></div>
+        <p class="sla-text"><?php echo sprintf(__a('First reply expected by %s at the latest.'),
+            '<strong>' . Format::datetime($atelier_sla['due']) . '</strong>'); ?></p>
+    </div>
+<?php } ?>
     <div class="card">
         <h2 class="card-title"><?php echo __('Basic Ticket Information'); ?></h2>
         <dl class="kv">
             <div><dt><?php echo __('Ticket Status');?></dt>
-                <dd><span class="pill pill-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
+                <dd><span class="status status-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
                     echo $S ? $S->getLocalName() : ''; ?></span></dd></div>
             <div><dt><?php echo __('Department');?></dt>
                 <dd><?php echo Format::htmlchars($dept instanceof Dept ? $dept->getName() : ''); ?></dd></div>
@@ -219,7 +263,7 @@ if ($atelier_files->exists(true)) { ?>
             echo $atelier_files->count(); ?></span></h2>
         <ul class="files">
 <?php foreach ($atelier_files as $A) { ?>
-            <li><i class="icon-paperclip icon-flip-horizontal" aria-hidden="true"></i>
+            <li><?php echo atelier_icon('clip', 15); ?>
                 <a class="no-pjax filename" href="<?php echo $A->file->getDownloadUrl(['id' => $A->getId()]);
                     ?>" download="<?php echo Format::htmlchars($A->getFilename()); ?>" target="_blank"><?php
                     echo Format::htmlchars($A->getFilename()); ?></a>
@@ -231,6 +275,12 @@ if ($atelier_files->exists(true)) { ?>
         </ul>
     </div>
 <?php } ?>
+    <div class="card tip call-card">
+        <h2 class="card-title"><?php echo __a('A quick word?'); ?></h2>
+        <p><?php echo sprintf(__a('Call us and quote ticket #%s.'), $ticket->getNumber()); ?></p>
+        <a class="btn btn-ghost" href="tel:<?php echo ATELIER_PHONE_URI; ?>"><?php
+            echo atelier_icon('phone'); ?><?php echo ATELIER_PHONE; ?></a>
+    </div>
 </aside>
 </div>
 <script type="text/javascript">
