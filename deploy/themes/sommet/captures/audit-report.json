@@ -1,0 +1,455 @@
+{
+ "pages": {
+  "accueil-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "ouverture-bureau": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "connexion-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "acces-par-numero-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "inscription-bureau": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "mot-de-passe-oublie-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "base-de-connaissances-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-categorie-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-article-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-recherche-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-recherche-vide-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "connexion-erreur-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-fermes-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-page-2-bureau": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-priority-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-ferme-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-collaborateur-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "modifier-ticket-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "profil-bureau": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "accueil-connecte-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "erreur-ticket-inconnu-bureau": {
+   "min": 5.7,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "accueil-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "ouverture-mobile": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "connexion-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "acces-par-numero-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "inscription-mobile": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "mot-de-passe-oublie-mobile": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "base-de-connaissances-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-categorie-mobile": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-article-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-recherche-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "kb-recherche-vide-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "connexion-erreur-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-fermes-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-page-2-mobile": {
+   "min": 5.83,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-priority-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-ferme-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-collaborateur-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "modifier-ticket-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "profil-mobile": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "accueil-connecte-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "erreur-ticket-inconnu-mobile": {
+   "min": 5.7,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "accueil-tablette": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-tablette": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "ouverture-erreurs-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "ouverture-merci-bureau": {
+   "min": 5.76,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "acces-par-numero-erreur-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "acces-par-numero-resultat-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "inscription-confirmation-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "inscription-confirmee-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-vide-bureau": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-vide-mobile": {
+   "min": 6.54,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "mot-de-passe-envoye-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-reponse-envoyee-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "tickets-recherche-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-priority-apres-reponse-bureau": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "hors-ligne-bureau": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "hors-ligne-mobile": {
+   "min": 9.52,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  },
+  "suivi-reponse-envoyee-mobile": {
+   "min": 4.91,
+   "fails": [],
+   "nfail": 0,
+   "overflow": 0
+  }
+ },
+ "problems": [],
+ "checks": [
+  {
+   "label": "open: AJAX dynamic fields loaded after topic change",
+   "ok": true,
+   "detail": "Issue Summary                            * | Environnement                            * | Impact                        "
+  },
+  {
+   "label": "open: validation errors shown",
+   "ok": true,
+   "detail": "6 messages"
+  },
+  {
+   "label": "open: attachment queued in the drop zone",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "open: thank-you page",
+   "ok": true,
+   "detail": "http://127.0.0.1:49690/open.php "
+  },
+  {
+   "label": "open: attachment stored",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "access link: e-mail + number accepted (link sent, or guest view)",
+   "ok": true,
+   "detail": "http://127.0.0.1:49690/login.php Léa - access link sent to your email!"
+  },
+  {
+   "label": "registration: confirmation token created",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "reply: success message",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "reply: attachment in the thread",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "keyboard: skip link first",
+   "ok": true,
+   "detail": "Skip to content"
+  },
+  {
+   "label": "keyboard: visible outline (>= 2 px) on every focused element",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "priority: indicator shown while waiting for the first reply",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "label": "priority: indicator gone after the first agent reply",
+   "ok": true,
+   "detail": "sla_id=3"
+  },
+  {
+   "label": "priority: internal SLA change not shown to the client",
+   "ok": true,
+   "detail": ""
+  }
+ ]
+}

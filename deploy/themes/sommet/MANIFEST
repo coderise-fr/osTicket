@@ -1,0 +1,29 @@
+# Fichiers installés par apply.sh dans deploy/docker/overlay/ (chemins relatifs à la racine d'osTicket).
+# Un chemin par ligne. Doit correspondre exactement à overlay/ (apply.sh refuse sinon).
+assets/sommet/css/sommet.css
+assets/sommet/fonts/OFL-inter.txt
+assets/sommet/fonts/OFL-montserrat.txt
+assets/sommet/fonts/inter-latin-400-normal.woff2
+assets/sommet/fonts/inter-latin-500-normal.woff2
+assets/sommet/fonts/inter-latin-600-normal.woff2
+assets/sommet/fonts/inter-latin-ext-400-normal.woff2
+assets/sommet/fonts/inter-latin-ext-500-normal.woff2
+assets/sommet/fonts/inter-latin-ext-600-normal.woff2
+assets/sommet/fonts/montserrat-latin-600-normal.woff2
+assets/sommet/fonts/montserrat-latin-700-normal.woff2
+assets/sommet/fonts/montserrat-latin-800-normal.woff2
+assets/sommet/fonts/montserrat-latin-ext-600-normal.woff2
+assets/sommet/fonts/montserrat-latin-ext-700-normal.woff2
+assets/sommet/fonts/montserrat-latin-ext-800-normal.woff2
+assets/sommet/img/favicon-180.png
+assets/sommet/img/favicon-32.png
+assets/sommet/img/favicon.svg
+assets/sommet/img/logo-coderise-horizontal.png
+include/client/footer.inc.php
+include/client/header.inc.php
+include/client/sommet/i18n/fr/LC_MESSAGES/sommet.mo.php
+include/client/sommet/sommet.inc.php
+include/client/templates/thread-entry.tmpl.php
+include/client/templates/thread-event.tmpl.php
+include/client/view.inc.php
+index.php
