@@ -1,0 +1,1622 @@
+[
+  {
+    "mode": "plugin",
+    "page": "accueil-visiteur",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-visiteur",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-invite",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "accueil-connecte",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-page-2",
+    "width": 1280,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-fermes",
+    "width": 1280,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-tri",
+    "width": 1280,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket-priority",
+    "width": 1280,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket",
+    "width": 1280,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-collaborateur",
+    "width": 1280,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-etape-4-priority",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "accueil-visiteur",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-visiteur",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-invite",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "accueil-connecte",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-page-2",
+    "width": 390,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-fermes",
+    "width": 390,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-tri",
+    "width": 390,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket-priority",
+    "width": 390,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket",
+    "width": 390,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-collaborateur",
+    "width": 390,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-etape-4-priority",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "accueil-visiteur",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-visiteur",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-invite",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "accueil-connecte",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-page-2",
+    "width": 820,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-fermes",
+    "width": 820,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "mes-tickets-tri",
+    "width": 820,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket-priority",
+    "width": 820,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-ticket",
+    "width": 820,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "suivi-collaborateur",
+    "width": 820,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "ouverture-etape-4-priority",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "sam-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "plugin",
+    "page": "noe-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-visiteur",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-visiteur",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-invite",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-connecte",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-page-2",
+    "width": 1280,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-fermes",
+    "width": 1280,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-tri",
+    "width": 1280,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket-priority",
+    "width": 1280,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket",
+    "width": 1280,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-collaborateur",
+    "width": 1280,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-etape-4-priority",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-visiteur",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-visiteur",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-invite",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-connecte",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-page-2",
+    "width": 390,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-fermes",
+    "width": 390,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-tri",
+    "width": 390,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket-priority",
+    "width": 390,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket",
+    "width": 390,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-collaborateur",
+    "width": 390,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-etape-4-priority",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-visiteur",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-visiteur",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-invite",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "accueil-connecte",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-page-2",
+    "width": 820,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-fermes",
+    "width": 820,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "mes-tickets-tri",
+    "width": 820,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket-priority",
+    "width": 820,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-ticket",
+    "width": 820,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "suivi-collaborateur",
+    "width": 820,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "ouverture-etape-4-priority",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "sam-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "disabled",
+    "page": "noe-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-visiteur",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-visiteur",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-invite",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-connecte",
+    "width": 1280,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-page-2",
+    "width": 1280,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-fermes",
+    "width": 1280,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-tri",
+    "width": 1280,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket-priority",
+    "width": 1280,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket",
+    "width": 1280,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-collaborateur",
+    "width": 1280,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-etape-4-priority",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-liste",
+    "width": 1280,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-suivi",
+    "width": 1280,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-ouverture-etape-4",
+    "width": 1280,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-visiteur",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-visiteur",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-invite",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-connecte",
+    "width": 390,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-page-2",
+    "width": 390,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-fermes",
+    "width": 390,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-tri",
+    "width": 390,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket-priority",
+    "width": 390,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket",
+    "width": 390,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-collaborateur",
+    "width": 390,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-etape-4-priority",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-liste",
+    "width": 390,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-suivi",
+    "width": 390,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-ouverture-etape-4",
+    "width": 390,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-visiteur",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-visiteur",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-invite",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "accueil-connecte",
+    "width": 820,
+    "url": "/index.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-page-2",
+    "width": 820,
+    "url": "/tickets.php?p=2",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-fermes",
+    "width": 820,
+    "url": "/tickets.php?a=search&status=closed",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "mes-tickets-tri",
+    "width": 820,
+    "url": "/tickets.php?sort=subject&order=ASC",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket-priority",
+    "width": 820,
+    "url": "/tickets.php?id=41",
+    "overflow": 0,
+    "contrastMin": 4.91,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-ticket",
+    "width": 820,
+    "url": "/tickets.php?id=2",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "suivi-collaborateur",
+    "width": 820,
+    "url": "/tickets.php?id=42",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "ouverture-etape-4-priority",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=43",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "sam-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-liste",
+    "width": 820,
+    "url": "/tickets.php",
+    "overflow": 0,
+    "contrastMin": 5.83,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-suivi",
+    "width": 820,
+    "url": "/tickets.php?id=45",
+    "overflow": 0,
+    "contrastMin": 5.3,
+    "contrastFails": [],
+    "log": []
+  },
+  {
+    "mode": "absent",
+    "page": "noe-ouverture-etape-4",
+    "width": 820,
+    "url": "/open.php",
+    "overflow": 0,
+    "contrastMin": 9.52,
+    "contrastFails": [],
+    "log": []
+  }
+]
