@@ -262,7 +262,14 @@ Résultats détaillés : `captures/audit-report.json` ; voir la liste des captur
 - **Console du navigateur** : aucune erreur ni avertissement ; **aucune réponse HTTP ≥ 400** ; **aucune
   requête vers un autre hôte** (avatars activés exprès, source Gravatar par défaut) ; journaux
   Apache/PHP : aucune erreur PHP (seul message : `sendmail: not found`, attendu sans messagerie).
-- **Débordement horizontal** : aucun à 390, 820 et 1280 px (63 rendus).
+- **Débordement horizontal** : aucun à 390, 820 et 1280 px (63 rendus audités, plus 5 pages de
+  parcours capturées à 390 px : erreurs et remerciement de l'ouverture, accès refusé, mot de passe
+  envoyé, inscription envoyée ; menu mobile ouvert).
+- **Captures** (`captures/`) : `<page>-bureau.png` (1280 px), `<page>-mobile.png` (390 px),
+  `accueil-tablette.png` et `suivi-tablette.png` (820 px), `impression-suivi.png` (média print),
+  `clavier-*.png` (focus), `menu-mobile-ouvert.png`, `suivi-priority-*.png` (indicateur, puis après la
+  première réponse) ; prises sur l'image construite depuis le commit, après installation par
+  l'assistant. Libellés en anglais (pas de pack de langue).
 - **Contrastes** (WCAG, chaque texte visible, fonds composés) : **minimum 4,91:1**, aucun texte sous le
   seuil sur les 63 rendus.
 - **Clavier** : lien d'évitement en premier ; contour de focus d'au moins 2 px (3 px : cyan profond sur
