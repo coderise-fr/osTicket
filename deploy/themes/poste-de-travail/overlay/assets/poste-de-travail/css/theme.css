@@ -132,6 +132,7 @@ body.ptdt {
 .ptdt .plan-box { margin: 0 0 6px; padding: 12px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 8px; line-height: 1.4; }
 .ptdt .plan-box .k { display: flex; gap: 6px; align-items: center; font: 600 .84375rem var(--f-titre); margin-bottom: 2px; }
 .ptdt .plan-box .k .ic { color: var(--cyan); }
+.ptdt .plan-box-standard .k .ic { color: rgba(255, 255, 255, .8); }
 .ptdt .rail-link { display: flex; gap: 10px; align-items: center; color: var(--blanc) !important; text-decoration: none; padding: 4px 0; }
 .ptdt .rail-link:hover { text-decoration: underline; text-decoration-color: var(--cyan); }
 .ptdt .menu-mobile { display: none; }
@@ -296,9 +297,14 @@ body.ptdt {
 .ptdt .status { display: inline-flex; align-items: center; gap: 5px; font: 600 .78125rem var(--f-titre); white-space: nowrap; color: var(--nuit); }
 .ptdt .status-open .ic { color: var(--cyan-profond); }
 .ptdt .status-closed { color: var(--ardoise); }
-.ptdt .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 .75rem var(--f-titre); }
+/* Contract level pills (optional plugin contrib/sla-first-response): Priority = bleu nuit
+   chip with the cyan bolt; Standard = slate outline on its own white fill (also on grey rows) */
+.ptdt .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 .75rem var(--f-titre); white-space: nowrap; line-height: 1.6; vertical-align: middle; }
 .ptdt .plan-priority { background: var(--nuit); color: var(--blanc); }
 .ptdt .plan-priority .ic { color: var(--cyan); }
+.ptdt .plan-standard { box-shadow: inset 0 0 0 1px var(--ardoise); color: var(--ardoise); background: var(--blanc); }
+.ptdt .data .c-plan { white-space: nowrap; width: 1%; }
+.ptdt .data .c-subj .plan { margin-top: 3px; }
 .ptdt .await { display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; padding: 1px 8px; border-radius: 4px; background: var(--cyan); color: var(--nuit); font: 600 .75rem var(--f-titre); }
 
 /* ---------- Data tables: bleu nuit headers, alternate grey rows ---------- */
@@ -630,7 +636,8 @@ body.ptdt {
   .ptdt .data td { padding: 2px 0; display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; }
   .ptdt .data td::before { content: attr(data-label); color: var(--ardoise); }
   .ptdt .data tr:nth-child(even) td::before { color: #4f5968; }
-  .ptdt .data td.c-n { width: auto; }
+  .ptdt .data td.c-n, .ptdt .data td.c-plan { width: auto; }
+  .ptdt .data .c-plan .plan, .ptdt .data .c-subj .plan { justify-self: start; }
   .ptdt .data .c-subj { grid-template-columns: minmax(0, 1fr); min-width: 0; }
   .ptdt .data .c-subj::before, .ptdt .data .empty-row td::before { display: none; }
   .ptdt .data .c-subj .await { justify-self: start; }

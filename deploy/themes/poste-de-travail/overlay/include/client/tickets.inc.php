@@ -142,7 +142,10 @@ $tickets->values(
 /* Theme "Poste de travail" (Coderise): markup below this line replaces the
  * core list (same form, field names, filters, sort links and pagination).
  * The only change above is 'topic__topic' in values() (help topic shown
- * under the subject). */
+ * under the subject). The "Contract" column (level of each ticket's OWNER,
+ * optional plugin contrib/sla-first-response) is shown only when the level
+ * of the signed-in client is known (ptdt_contract()). */
+$ptdt_contract_on = (bool) ptdt_contract();
 $ptdt_sort = function($key, $label, $title, $class='') use ($sort, $negorder, $qstr, $order) {
     $active = ($sort == $key);
     $dir = $order == '-' ? 'descending' : 'ascending';
@@ -213,6 +216,9 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
         <tr>
             <?php echo $ptdt_sort('id', __('Ticket #'), __('Ticket ID'), 'c-n'); ?>
             <?php echo $ptdt_sort('subject', __('Subject'), __('Subject')); ?>
+<?php if ($ptdt_contract_on) { ?>
+            <th scope="col" class="c-plan"><?php echo ptdt__('Contract'); ?></th>
+<?php } ?>
             <?php echo $ptdt_sort('status', __('Status'), __('Status')); ?>
             <?php echo $ptdt_sort('dept', __('Department'), __('Department')); ?>
             <?php echo $ptdt_sort('date', __('Create Date'), __('Date'), 'c-date'); ?>
@@ -252,6 +258,10 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
                     <span class="await"><?php echo ptdt_icon('message', 14); ?><?php echo ptdt__('Awaiting your reply'); ?></span>
 <?php           } ?>
                 </td>
+<?php       if ($ptdt_contract_on) { ?>
+                <td class="c-plan" data-label="<?php echo ptdt__('Contract'); ?>"><?php
+                    echo ptdt_contract_pill(ptdt_contract_of_row($T)); ?></td>
+<?php       } ?>
                 <td data-label="<?php echo __('Status'); ?>"><span class="status status-<?php echo $ptdt_open ? 'open' : 'closed'; ?>"><?php
                     echo ptdt_icon($ptdt_open ? 'open' : 'closed', 14); ?><?php echo $status; ?></span></td>
                 <td data-label="<?php echo __('Department'); ?>"><?php echo Format::htmlchars($dept); ?></td>
@@ -261,7 +271,7 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
         }
 
      } else { ?>
-            <tr class="empty-row"><td colspan="5">
+            <tr class="empty-row"><td colspan="<?php echo $ptdt_contract_on ? 6 : 5; ?>">
                 <div class="empty">
                     <span class="sommet empty-mark" aria-hidden="true"></span>
                     <h2><?php echo __('Your query did not match any records'); ?></h2>

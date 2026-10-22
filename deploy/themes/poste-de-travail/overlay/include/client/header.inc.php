@@ -256,8 +256,23 @@ if ($nav) {
     } ?>
         </nav>
         <div class="rail-foot">
-            <p class="plan-box"><span class="k"><?php echo ptdt_icon('bolt', 16); ?><?php
-                echo ptdt__('Support Priority'); ?></span><?php echo ptdt__('First response within 4 h, 24/7'); ?></p>
+<?php
+    // Contract box: the client's REAL level only (optional plugin
+    // contrib/sla-first-response). Unknown level (plugin absent, visitor,
+    // guest, Priority organisation not configured): no box, never a 24/7
+    // commitment without a source.
+    $ptdt_level = $ptdt_member ? ptdt_contract() : null;
+    if ($ptdt_level && $ptdt_level['level'] == 'priority') { ?>
+            <p class="plan-box plan-box-priority"><span class="k"><?php echo ptdt_icon('bolt', 16); ?><?php
+                echo Format::htmlchars(sprintf(ptdt__('Support %s'), $ptdt_level['label'])); ?></span><?php
+                echo ptdt__('First response within 4 h, 24/7'); ?></p>
+<?php
+    } elseif ($ptdt_level) { ?>
+            <p class="plan-box plan-box-standard"><span class="k"><?php echo ptdt_icon('clock', 16); ?><?php
+                echo Format::htmlchars(sprintf(ptdt__('Support %s'), $ptdt_level['label'])); ?></span><?php
+                echo ptdt__('Answers on business days'); ?></p>
+<?php
+    } ?>
             <a class="rail-link" href="tel:<?php echo Format::htmlchars(PTDT_CONTACT_PHONE_URI); ?>"><?php
                 echo ptdt_icon('phone'); ?><span><?php echo Format::htmlchars(PTDT_CONTACT_PHONE); ?></span></a>
 <?php if ($ptdt_signed) { ?>

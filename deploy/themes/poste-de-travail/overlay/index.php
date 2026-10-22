@@ -7,8 +7,9 @@
     Theme "Poste de travail" (Coderise): dashboard layout. Same data as
     the core landing page (admin landing page content, knowledge base
     search, featured questions and categories, open / check status
-    buttons), plus the signed-in client's own open tickets and counts.
-    Only data that osTicket really has is shown.
+    buttons), plus the signed-in client's own open tickets and counts, and
+    their contract level when the optional plugin contrib/sla-first-response
+    provides it (ptdt_contract()). Only data that osTicket really has is shown.
 
     Peter Rotich <peter@osticket.com>
     Copyright (c)  2006-2013 osTicket
@@ -31,6 +32,9 @@ $can_open = ($cfg->getClientRegistrationMode() != 'disabled'
     || !$cfg->isClientLoginRequired());
 $member = ($thisclient && is_object($thisclient) && $thisclient->isValid()
     && !$thisclient->isGuest());
+// Contract level of the signed-in client (optional plugin, null if unknown):
+// "Your contract" panel and the contract pill of the open tickets
+$contract = $member ? ptdt_contract() : null;
 
 if ($member) {
     $org_tickets = $thisclient->canSeeOrgTickets();
@@ -139,7 +143,12 @@ if ($member) {
                         <small><?php
                         echo Format::htmlchars($T['topic__topic'] ?: $dept); ?></small><?php
                         if ($T['isanswered']) { ?><span class="await"><?php echo ptdt_icon('message', 14); ?><?php
-                            echo ptdt__('Awaiting your reply'); ?></span><?php } ?></td>
+                            echo ptdt__('Awaiting your reply'); ?></span><?php }
+                        // Contract level of the ticket owner, under the subject (no
+                        // extra column: the dashboard table shares the width with the side column)
+                        if ($contract && ($ptdt_row_level = ptdt_contract_of_row($T))) { ?>
+                        <span class="visually-hidden"><?php echo ptdt__('Contract'); ?>:</span>
+                        <?php echo ptdt_contract_pill($ptdt_row_level); ?><?php } ?></td>
                     <td data-label="<?php echo __('Status'); ?>"><span class="status status-open"><?php echo ptdt_icon('open', 14); ?><?php echo $status; ?></span></td>
                     <td class="c-date" data-label="<?php echo __('Last Updated'); ?>"><?php echo Format::datetime($T['lastupdate'] ?: $T['created']); ?></td>
                 </tr>
@@ -212,6 +221,24 @@ if ($kb_enabled && ($cats = Category::getFeatured()) && $cats->all()) { ?>
 } ?>
 </div>
 <div class="col-side">
+<?php if ($contract) {
+    // "Your contract": real data only (level, label, organisation of a
+    // standard client). The Priority organisation itself is not named: it is
+    // the technical group of all Priority clients, not the client's company.
+    $priority = ($contract['level'] == 'priority'); ?>
+    <section class="panel contract" aria-labelledby="dash-contract">
+        <div class="panel-h"><h2 id="dash-contract"><?php echo ptdt__('Your contract'); ?></h2></div>
+        <dl class="props">
+            <div><dt><?php echo ptdt__('Level'); ?></dt><dd><?php echo ptdt_contract_pill($contract); ?></dd></div>
+            <div><dt><?php echo ptdt__('Response times'); ?></dt><dd><?php
+                echo $priority ? ptdt__('First response within 4 h, 24 h a day, 7 days a week')
+                    : ptdt__('Business days'); ?></dd></div>
+<?php if (!$priority && $contract['org_name'] !== null && $contract['org_name'] !== '') { ?>
+            <div><dt><?php echo __('Organization'); ?></dt><dd><?php echo Format::htmlchars($contract['org_name']); ?></dd></div>
+<?php } ?>
+        </dl>
+    </section>
+<?php } ?>
 <?php if ($kb_enabled) { ?>
     <section class="panel" aria-labelledby="dash-search">
         <div class="panel-h"><h2 id="dash-search"><?php echo __('Knowledgebase'); ?></h2></div>

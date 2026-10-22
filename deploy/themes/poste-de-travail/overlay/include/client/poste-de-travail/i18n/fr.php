@@ -53,4 +53,13 @@ return array(
     'The team has not answered yet.' => "L'équipe n'a pas encore répondu.",
     'Coderise team' => 'Équipe Coderise',
     'You' => 'Vous',
+    // Contract level (optional plugin contrib/sla-first-response)
+    'Support %s' => 'Support %s',
+    'Answers on business days' => 'Réponse les jours ouvrés',
+    'Your contract' => 'Votre contrat',
+    'Level' => 'Niveau',
+    'Contract' => 'Contrat',
+    'First response within 4 h, 24 h a day, 7 days a week' => "Premier retour sous 4\u{a0}h, 24\u{a0}h/24, 7\u{a0}j/7",
+    'Business days' => 'Jours ouvrés',
+    "Current contract level of the ticket's requester" => 'Niveau de contrat actuel du demandeur du ticket',
 );

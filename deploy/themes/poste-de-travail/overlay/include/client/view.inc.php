@@ -4,8 +4,9 @@ if(!defined('OSTCLIENTINC') || !$thisclient || !$ticket || !$ticket->checkUserAc
  * Same data, form, field names and actions as the core template; the ticket
  * information tables become a sticky properties panel next to the thread.
  * Additions, all from real data: message / attachment counts, the list of
- * the attachments, and the optional "Support Priority" first response
- * indicator (ptdt_priority_sla(), to be validated). */
+ * the attachments, the optional "Support Priority" first response
+ * indicator (ptdt_priority_sla(), to be validated) and the contract level of
+ * the ticket owner (ptdt_contract(), optional plugin). */
 
 $info=($_POST && $errors)?Format::htmlchars($_POST):array();
 
@@ -56,12 +57,18 @@ $ptdt_sla = ptdt_priority_sla($ticket, $ptdt_n_responses);
 $blockReply = $ticket->isChild() && $ticket->getMergeType() != 'visual';
 $ptdt_can_reply = (!$ticket->isClosed() || $ticket->isReopenable()) && !$blockReply;
 $ptdt_is_open = $ticket->isOpen();
+// Contract level of the ticket OWNER (never a collaborator, even when a
+// collaborator or a guest is viewing): current level, optional plugin
+// contrib/sla-first-response; null (nothing shown) when unknown.
+$ptdt_contract = ptdt_contract($ticket);
+$ptdt_contract_title = ptdt__("Current contract level of the ticket's requester");
 ?>
 <div class="t-head" id="ticketInfo">
     <p class="idline"><span>#<?php echo $ticket->getNumber(); ?></span>
         <span class="status status-<?php echo $ptdt_is_open ? 'open' : 'closed'; ?>"><?php
             echo ptdt_icon($ptdt_is_open ? 'open' : 'closed', 14); ?><?php
             echo ($S = $ticket->getStatus()) ? $S->getLocalName() : ''; ?></span>
+        <?php echo ptdt_contract_pill($ptdt_contract, $ptdt_contract_title); ?>
     </p>
     <h1><?php echo $subject_field->display($ticket->getSubject()); ?></h1>
     <div class="t-actions">
@@ -168,6 +175,10 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
             <div><dt><?php echo __('Ticket #'); ?></dt><dd>#<?php echo $ticket->getNumber(); ?></dd></div>
             <div><dt><?php echo __('Ticket Status');?></dt><dd><?php
                 echo ($S = $ticket->getStatus()) ? $S->getLocalName() : ''; ?></dd></div>
+<?php if ($ptdt_contract) { ?>
+            <div><dt><?php echo ptdt__('Contract'); ?></dt><dd><?php
+                echo ptdt_contract_pill($ptdt_contract, $ptdt_contract_title); ?></dd></div>
+<?php } ?>
             <div><dt><?php echo __('Department');?></dt><dd><?php
                 echo Format::htmlchars($dept instanceof Dept ? $dept->getName() : ''); ?></dd></div>
 <?php if ($ptdt_topic = $ticket->getHelpTopic()) { ?>
