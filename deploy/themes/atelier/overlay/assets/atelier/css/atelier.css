@@ -226,12 +226,9 @@ body.atelier {
 .atelier :where(.btn, #content input[type=submit]):active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
 .atelier :where(#content input[type=submit])[disabled] { opacity: .65; cursor: progress; transform: none; }
 /* osticket.js paints the submit button text red once the form has changed:
-   red on sun fails AA, so the cue becomes a pink underline instead. */
+   red on sun fails AA (2.8:1) and the cue also fires when Redactor starts, so
+   the text keeps the ink colour. The "leave page?" warning is unchanged. */
 .atelier #content input[type=submit][style*="color"] { color: var(--ink) !important; }
-.atelier #content form[method=post] input[type=submit][style*="color"] {
-  text-decoration: underline; text-decoration-color: var(--pink-deep);
-  text-decoration-thickness: 3px; text-underline-offset: .25em;
-}
 .atelier .actions, .atelier p.buttons {
   display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin: 8px 0 0; text-align: left;
 }
@@ -588,6 +585,8 @@ body.atelier {
 .atelier .attachment-info .filename { max-width: 22ch; font-weight: 600; }
 .atelier .attachment-info .filesize { color: var(--ink-soft); white-space: nowrap; }
 .atelier .thread-body pre a:not(.button) { color: var(--sun) !important; }
+.atelier .thread-body a:focus, .atelier .attachments a:focus { outline: none; }
+.atelier .thread-body a:focus-visible, .atelier .attachments a:focus-visible { outline: 3px solid var(--plum); outline-offset: 2px; }
 /* thread.css pins every block of a message to 14px: follow the bubble instead */
 .atelier .thread-body :is(div, p, ul, ol, table, dl, blockquote) { font-size: inherit; line-height: inherit; }
 @media (max-width: 599px) {
