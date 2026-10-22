@@ -175,6 +175,7 @@ class PortalClient {
         $body = file_get_contents($this->base . ltrim($path, '/'), false,
             stream_context_create(array('http' => $opts)));
         $this->status = 0; $this->location = null;
+        $m = array();
         foreach ($http_response_header as $h) {
             if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) $this->status = (int) $m[1];
             elseif (stripos($h, 'Set-Cookie:') === 0) {
@@ -197,6 +198,7 @@ class PortalClient {
     }
     function post($path, $data, $formPath = null) {
         $page = $this->get($formPath ?: $path);
+        $m = array();
         if (preg_match('/name="__CSRFToken__" value="([^"]+)"/', $page, $m))
             $data['__CSRFToken__'] = $m[1];
         $body = $this->request($path, $data);
@@ -209,6 +211,7 @@ class PortalClient {
 }
 // Valeur sondée par le gabarit de test (voir phase4c) : <!--CL:{json}-->
 function probe($html, $tag = 'CL') {
+    $m = array();
     if (!preg_match('/<!--' . $tag . ':(.*?)-->/s', $html, $m)) return null;
     return $m[1] === 'none' ? 'none' : json_decode($m[1], true);
 }
