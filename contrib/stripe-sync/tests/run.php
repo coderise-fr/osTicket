@@ -18,6 +18,7 @@ require_once $inc . 'class.stripesync.signature.php';
 require_once $inc . 'class.stripesync.settings.php';
 require_once $inc . 'class.stripesync.mapper.php';
 require_once $inc . 'class.stripesync.service.php';
+require_once $inc . 'class.stripesync.priorityorg.php';
 
 class Counter {
     static $fail = 0;
@@ -500,6 +501,121 @@ $svc2 = new StripeSyncService($st2, $dir, new StripeSyncSettings(array('price_id
 throws('StripeSyncRetryableError', function () use ($svc2) {
     $svc2->handle(sub_event('evt_b', 'customer.subscription.created', 100, 'active', 'price_prio')); }, 'record write failure -> retry later');
 check(!isset($st2->events['evt_b']) && !isset($st2->customers['cus_A']['subs']['sub_1']), 'failed write: event released, state not saved');
+
+// ------------------------------------------------- Priority organization id
+
+class FakeOrgs implements StripeSyncOrgBackend {
+    public $orgs = array(); public $next = 100; public $created = 0; public $failCreate = false;
+    function orgExists($id) { return isset($this->orgs[$id]); }
+    function findOrgByName($name) { $id = array_search($name, $this->orgs, true); return $id === false ? null : $id; }
+    function createOrg($name) {
+        if ($this->failCreate) throw new StripeSyncRetryableError('db down');
+        $this->created++; $id = $this->next++; $this->orgs[$id] = $name; return $id;
+    }
+}
+class FakeOrgMemory implements StripeSyncOrgMemory {
+    public $id = null; public $name = null; public $locks = 0; public $held = false; public $failLock = false; public $writes = 0;
+    public $onLock = null;      // simulates another request finishing first
+    function getPriorityOrg() { return array($this->id, $this->name); }
+    function putPriorityOrg($id, $name) { $this->writes++; $this->id = $id; $this->name = $name; return true; }
+    function lockPriorityOrg() {
+        if ($this->failLock) return false;
+        $this->locks++; $this->held = true;
+        if ($this->onLock) { $f = $this->onLock; $this->onLock = null; $f($this); }
+        return true;
+    }
+    function unlockPriorityOrg() { $this->held = false; }
+}
+function resolver($orgName=null) {
+    $orgs = new FakeOrgs(); $mem = new FakeOrgMemory(); $log = new FakeLogger();
+    $cfg = new StripeSyncSettings($orgName === null ? array() : array('org_name' => $orgName), function ($n) { return false; });
+    return array(new StripeSyncPriorityOrgResolver($orgs, $mem, $cfg, $log), $orgs, $mem, $log);
+}
+function logged(FakeLogger $log, $level) {
+    return array_values(array_filter($log->lines, function ($l) use ($level) { return strpos($l, "$level ") === 0; }));
+}
+
+// creation -> id remembered
+list($r, $orgs, $mem, $log) = resolver();
+$id = $r->resolve();
+check($id === 100 && $orgs->orgs == array(100 => 'Priority') && $mem->id === 100 && $mem->name === 'Priority',
+    'org: created on first use with the configured name, id remembered');
+check(!$mem->held && !logged($log, 'warning') && count(logged($log, 'info')) == 1, 'org: creation logged as info, lock released');
+$locks = $mem->locks;
+check($r->resolve() === 100 && $mem->locks == $locks && $mem->writes == 1 && $orgs->created == 1,
+    'org: then found by id (fast path: no lock, no write, no creation)');
+
+// renamed in the admin panel -> same organization
+$orgs->orgs[100] = 'Priority (renamed)';
+check($r->resolve() === 100 && $orgs->created == 1 && count($orgs->orgs) == 1 && !logged($log, 'warning'),
+    'org: renamed organization still found by its id, nothing created, no warning');
+
+// an unrelated organization now carries the configured name: the remembered id wins
+$orgs->orgs[200] = 'Priority';
+check($r->resolve() === 100, 'org: another organization named "Priority" does not replace the remembered one');
+unset($orgs->orgs[200]);
+
+// deleted -> recreated, warning, new id remembered
+unset($orgs->orgs[100]);
+$id = $r->resolve();
+$w = logged($log, 'warning');
+check($id === 101 && $mem->id === 101 && $orgs->orgs == array(101 => 'Priority') && $orgs->created == 2,
+    'org: deleted organization recreated, new id remembered');
+check(count($w) == 1 && strpos($w[0], '#100') !== false && strpos($w[0], '#101') !== false && strpos($w[0], 'created') !== false,
+    'org: deletion reported as a warning with both ids (got '.implode(' / ', $w).')');
+check(!preg_match('/@|example/', implode("\n", $log->lines)), 'org: no e-mail address in the log lines');
+check($r->resolve() === 101 && count(logged($log, 'warning')) == 1, 'org: warning logged once, not at every event');
+
+// deleted, but an organization with the configured name exists: used (no creation)
+list($r, $orgs, $mem, $log) = resolver();
+$orgs->orgs = array(5 => 'Priority', 7 => 'Acme');
+$mem->id = 9; $mem->name = 'Priority';      // remembered #9 was deleted
+check($r->resolve() === 5 && $mem->id === 5 && $orgs->created == 0, 'org: deleted, replaced by the organization found by name');
+$w = logged($log, 'warning');
+check(count($w) == 1 && strpos($w[0], '#9') !== false && strpos($w[0], 'found by name') !== false, 'org: replacement reported as a warning');
+
+// installation of version 0.1 (no id remembered): found by name, id remembered (migration)
+list($r, $orgs, $mem, $log) = resolver();
+$orgs->orgs = array(12 => 'Priority');
+check($r->resolve() === 12 && $mem->id === 12 && $mem->name === 'Priority' && $orgs->created == 0,
+    'org: migration, existing organization found by name and its id remembered');
+check(!logged($log, 'warning') && strpos(implode("\n", logged($log, 'info')), '#12 (found by name)') !== false,
+    'org: migration logged as info, no warning');
+$orgs->orgs[12] = 'Priority Support';
+check($r->resolve() === 12 && $orgs->created == 0, 'org: after migration, a rename does not lose it');
+
+// the administrator changes the setting on purpose: the new name is followed
+list($r, $orgs, $mem, $log) = resolver('Gold');
+$orgs->orgs = array(12 => 'Priority', 13 => 'Gold');
+$mem->id = 12; $mem->name = 'Priority';
+check($r->resolve() === 13 && $mem->id === 13 && $mem->name === 'Gold', 'org: changed setting -> organization with the new name, remembered');
+check(!logged($log, 'warning') && strpos(implode("\n", logged($log, 'info')), 'Configured name changed') !== false,
+    'org: changed setting is logged as info, not as an incident');
+list($r, $orgs, $mem, $log) = resolver('Gold');
+$orgs->orgs = array(12 => 'Priority');
+$mem->id = 12; $mem->name = 'Priority';
+check($r->resolve() === 100 && $orgs->orgs[100] === 'Gold', 'org: changed setting, no such organization -> created');
+
+// leaving the organization (create=false) never creates anything
+list($r, $orgs, $mem, $log) = resolver();
+check($r->resolve(false) === null && !$orgs->orgs && $mem->id === null && !$log->lines, 'org: resolve(false) without organization -> null, nothing created');
+$orgs->orgs = array(3 => 'Priority');
+check($r->resolve(false) === 3 && $mem->id === 3, 'org: resolve(false) finds (and remembers) an existing one');
+unset($orgs->orgs[3]);
+check($r->resolve(false) === null && $mem->id === 3 && !logged($log, 'warning'), 'org: resolve(false) after a deletion -> null, memory and log untouched');
+
+// concurrency: another request remembered an id while we waited for the lock
+list($r, $orgs, $mem, $log) = resolver();
+$mem->onLock = function ($m) use ($orgs) { $orgs->orgs[50] = 'Priority'; $m->id = 50; $m->name = 'Priority'; };
+check($r->resolve() === 50 && $orgs->created == 0 && $mem->writes == 0, 'org: id remembered meanwhile by another request is reused (no second organization)');
+// lock not obtained / creation failure -> retry later, nothing remembered
+list($r, $orgs, $mem, $log) = resolver();
+$mem->failLock = true;
+throws('StripeSyncRetryableError', function () use ($r) { $r->resolve(); }, 'org: lock not obtained -> retry later');
+list($r, $orgs, $mem, $log) = resolver();
+$orgs->failCreate = true;
+throws('StripeSyncRetryableError', function () use ($r) { $r->resolve(); }, 'org: creation failure -> retry later');
+check($mem->id === null && !$mem->held, 'org: failure -> nothing remembered, lock released');
 
 printf("%d checks, %d failure(s)\n", Counter::$count, Counter::$fail);
 exit(Counter::$fail);

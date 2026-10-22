@@ -15,14 +15,21 @@
 **********************************************************************/
 
 require_once dirname(__FILE__) . '/class.stripesync.service.php';
+require_once dirname(__FILE__) . '/class.stripesync.priorityorg.php';
 
-class StripeSyncOsTicketDirectory implements StripeSyncDirectory {
+class StripeSyncOsTicketDirectory implements StripeSyncDirectory, StripeSyncOrgBackend {
 
     private $settings;
+    private $resolver;
     private $org;
 
-    function __construct($settings) {
+    /**
+     * $memory - where the id of the Priority organization is remembered
+     *           (StripeSyncDbStore)
+     */
+    function __construct($settings, StripeSyncOrgMemory $memory, StripeSyncLogger $log) {
         $this->settings = $settings;
+        $this->resolver = new StripeSyncPriorityOrgResolver($this, $memory, $settings, $log);
     }
 
     // --- users ---------------------------------------------------------------
@@ -98,26 +105,42 @@ class StripeSyncOsTicketDirectory implements StripeSyncDirectory {
             | Organization::SHARE_EVERYBODY;
     }
 
+    // StripeSyncOrgBackend (used by StripeSyncPriorityOrgResolver)
+
+    function orgExists($id) {
+        return (bool) Organization::lookup((int) $id);
+    }
+
+    function findOrgByName($name) {
+        $org = Organization::lookup(array('name' => $name));
+        return $org ? (int) $org->getId() : null;
+    }
+
+    function createOrg($name) {
+        $org = Organization::fromVars(array('name' => $name));
+        if (!$org)
+            throw new StripeSyncRetryableError('Unable to create the Priority organization');
+        // Organization::create() enables "primary contacts see the
+        // organization's tickets": not wanted for unrelated customers.
+        $org->set('status', 0);
+        $org->save();
+        return (int) $org->getId();
+    }
+
     /**
-     * The Priority organization, created on first use. Refuses (the event
-     * is redelivered later) to use an organization configured in a way
-     * that would mix the tickets or contacts of unrelated customers.
+     * The Priority organization: remembered by id, found by name the first
+     * time, created on first use (see StripeSyncPriorityOrgResolver).
+     * Refuses (the event is redelivered later) to use an organization
+     * configured in a way that would mix the tickets or contacts of
+     * unrelated customers, however it was found.
      */
     private function priorityOrg() {
         if ($this->org)
             return $this->org;
 
-        $name = $this->settings->getOrgName();
-        $org = Organization::lookup(array('name' => $name));
-        if (!$org) {
-            $org = Organization::fromVars(array('name' => $name));
-            if (!$org)
-                throw new StripeSyncRetryableError('Unable to create the Priority organization');
-            // Organization::create() enables "primary contacts see the
-            // organization's tickets": not wanted for unrelated customers.
-            $org->set('status', 0);
-            $org->save();
-        }
+        $org = Organization::lookup($this->resolver->resolve(true));
+        if (!$org)
+            throw new StripeSyncRetryableError('Priority organization not found');
 
         if ($org->get('status') & self::sharingFlags())
             throw new StripeSyncRetryableError(sprintf(
@@ -149,7 +172,9 @@ class StripeSyncOsTicketDirectory implements StripeSyncDirectory {
 
     function detachPriority($userId, $restoreOrgId) {
         // No isolation check here: leaving the organization is always safe.
-        $org = Organization::lookup(array('name' => $this->settings->getOrgName()));
+        // Same organization as attachPriority() (by id), never created here.
+        $orgId = $this->resolver->resolve(false);
+        $org = $orgId ? Organization::lookup($orgId) : null;
         if (!$org || !($user = User::lookup($userId)))
             return false;
         // Moved elsewhere by an agent in the meantime: leave it alone.
