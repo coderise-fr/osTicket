@@ -1,3 +1,16 @@
 # Shell scripts, configuration and Dockerfiles must keep LF line endings (the
 # images run on Linux even when this repository is cloned on Windows).
 * text eol=lf
+
+# Fichiers binaires (polices, images des thèmes de overlay/) : jamais de conversion de fins de ligne.
+# Placé APRÈS « * text eol=lf » : la dernière règle gagne.
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.phar binary
