@@ -15,3 +15,5 @@ deploy/docker/.env
 deploy/docker/plugins.env
 deploy/docker/backups
 setup/test
+docs
+contrib

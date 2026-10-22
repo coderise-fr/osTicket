@@ -92,7 +92,7 @@ FROM src AS pruned
 COPY deploy/docker/overlay/ /overlay/
 RUN set -eux; \
     cd /src; \
-    rm -rf setup deploy web.config README.md UPGRADING.txt WHATSNEW.md SECURITY.md ISSUE_TEMPLATE.md; \
+    rm -rf setup deploy docs contrib web.config README.md UPGRADING.txt WHATSNEW.md SECURITY.md ISSUE_TEMPLATE.md; \
     rm -f /overlay/.gitkeep /overlay/README.md; \
     cp -a /overlay/. /src/; \
     rm -rf /overlay

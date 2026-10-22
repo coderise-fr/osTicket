@@ -73,6 +73,7 @@ uniquement depuis les réseaux de `OSTICKET_TRUSTED_PROXIES`.
 | Image | Image de base épinglée par digest, paquets système mis à jour au build, outils de compilation retirés, aucun binaire `setuid` |
 | Contenu | Construit depuis `git archive` ; le build échoue si la signature du schéma SQL ne correspond pas à `core.sig` (fins de ligne CRLF) |
 | Installeur | `setup/` n'existe dans **aucune couche** de l'image `runtime` ; il n'est présent que dans l'image `install` |
+| Fichiers du dépôt | `docs/` (maquettes, documentation) et `contrib/` (code source des plugins) sont exclus du contexte de build (`Dockerfile.dockerignore`) et supprimés du stade final : ils ne sont jamais servis par Apache. Les plugins ne passent que par `overlay/` (voir « Plugins et personnalisation ») |
 | Processus | Utilisateur `www-data` (uid 33), port 8080, aucune capability Linux, `no-new-privileges` |
 | Système de fichiers | Racine en lecture seule, code appartenant à `root` ; seuls `/tmp` (tmpfs, `noexec`) et `/run/apache2` sont inscriptibles |
 | Configuration | `ost-config.php` (mot de passe de la base, `SECRET_SALT`) vit dans un volume dédié, monté **en lecture seule** en production ; le conteneur refuse de démarrer s'il est inscriptible |
