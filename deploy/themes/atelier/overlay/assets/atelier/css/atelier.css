@@ -365,7 +365,7 @@ body.atelier {
   }
 }
 /* Phone field: number then a short extension box */
-.atelier :is(.form-table, table.padded, #dynamic-form) input[type=tel] { width: min(22rem, calc(100% - 8em)); display: inline-block; margin-right: .5em; }
+.atelier :is(.form-table, table.padded, #dynamic-form) input[type=tel] { width: min(22rem, calc(100% - 10em)); display: inline-block; margin-right: .5em; }
 .atelier :is(.form-table, table.padded, #dynamic-form) input[name$="-ext"] { width: 5.5em; display: inline-block; margin-left: .3em; }
 
 /* Rich text editor (Redactor 3) and file drop zone: skinned, not rebuilt */
@@ -509,6 +509,9 @@ body.atelier {
 }
 .atelier.v-thanks #content { flex: 0 0 auto; width: calc(100% - 2 * var(--gutter)); max-width: 44rem; }
 .atelier.v-thanks #content > :last-child { margin-bottom: 0; }
+body.atelier.v-thanks #content > h1:nth-child(n), .atelier.p-offline #landing_page h1 {
+  margin: 18px 0 14px; padding: 0; background: none; box-shadow: none; clip-path: none; font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.1rem);
+}
 .atelier.v-thanks #content p, .atelier.p-offline #landing_page p { font-size: 1.125rem; }
 
 /* ---------- Ticket view ---------- */
@@ -896,7 +899,8 @@ body.atelier {
   .atelier #landing_page .sidebar, .atelier .search-form { display: none !important; }
   .atelier .main { padding: 0; }
   .atelier .wrap { max-width: none; padding: 0; }
-  .atelier .band, .atelier .kb-hero { background: none; box-shadow: none; clip-path: none; margin: 0 0 12pt; padding: 0; color: #000; }
+  .atelier .band, .atelier .kb-hero, .atelier .main > .band:first-child, .atelier #content > h1:first-child,
+  .atelier #content > .alert:first-child + h1 { background: none; box-shadow: none; clip-path: none; margin: 0 0 12pt; padding: 0; color: #000; }
   .atelier .kb-hero::after { content: none; }
   .atelier .split, .atelier .row { display: block; }
   .atelier .side { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; page-break-inside: avoid; }
