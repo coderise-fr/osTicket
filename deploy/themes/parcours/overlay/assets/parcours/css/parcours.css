@@ -545,6 +545,7 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 /* Overrides of css/thread.css (core) ---------------------------------------------------- */
 .pcrs .thread-body { font-family: var(--f-texte); font-size: 1rem !important; line-height: 1.6; color: var(--nuit); background: transparent; padding: 0; }
 .pcrs .thread-body.prose { font-size: 1.125rem !important; line-height: 1.7; }
+.pcrs .thread-body p, .pcrs .thread-body li, .pcrs .thread-body td, .pcrs .thread-body th { font-size: inherit !important; }
 .pcrs .thread-body h1, .pcrs .thread-body h2, .pcrs .thread-body h3, .pcrs .thread-body h4 { font-family: var(--f-titre); color: var(--nuit); }
 .pcrs .hero-text.thread-body h1 { font-size: clamp(2rem, 4.4vw, 3rem); }
 .pcrs .hero-text.thread-body p { font-size: 1.1875rem !important; }
