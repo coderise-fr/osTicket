@@ -1,0 +1,44 @@
+OK   état initial : overlay propre
+OK   apply --dry-run
+OK   dry-run n'écrit rien
+OK   apply
+OK   manifeste installé
+OK   13 fichiers notés
+OK   apply relancé (idempotent)
+OK   apply relancé : déjà à jour
+OK   apply refuse un fichier du thème modifié
+OK   remove garde un fichier modifié (code 1)
+OK   fichier modifié conservé
+OK   apply --force réinstalle
+OK   remove
+OK   fichiers et dossiers du thème retirés
+OK   plugin conservé
+OK   remove relancé (rien à faire)
+OK   apply refuse d'écraser un fichier étranger
+OK   apply refuse si include/client/sommet/installed.manifest existe
+OK   message cite le manifeste trouvé
+OK   apply refuse si ownalytics-atelier est installé
+OK   atelier installé (son apply.sh)
+OK   apply refuse si atelier est installé
+OK   atelier retiré
+OK   poste-de-travail installé (son apply.sh, sans manifeste)
+OK   apply refuse si poste-de-travail est installé
+OK   message cite poste-de-travail
+OK   poste-de-travail retiré
+OK   ticket de caisse installé
+OK   atelier refuse (fichiers étrangers)
+OK   poste-de-travail refuse
+OK   ticket de caisse retiré
+OK   apply refuse un MANIFEST désynchronisé
+OK   git status propre sur deploy/docker/overlay
+OK   git status propre (dépôt)
+OK   check-drift : aucune dérive sur HEAD
+OK   check-drift : arbre extrait identique
+OK   check-drift : dérive détectée (code 1)
+OK   remplacé modifié signalé
+OK   remplacé supprimé signalé
+OK   habillé modifié signalé
+OK   check-drift : fins de ligne CRLF ignorées
+OK   check-drift --rev origin/1.15.x : dérive
+  fichiers signalés sur 1.15.x : 10
+réussis: 42, échecs: 0
