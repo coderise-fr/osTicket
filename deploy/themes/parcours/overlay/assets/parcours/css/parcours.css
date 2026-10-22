@@ -527,6 +527,7 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 
 /* Print: ticket thread and information, black on white -------------------------------- */
 @media print {
+  @page { margin: 14mm; }
   .pcrs .site-head, .pcrs .site-foot, .pcrs .skip, .pcrs .ticket-actions, .pcrs #reply, .pcrs .reply-card, .pcrs .next-step .btn,
   .pcrs .error_bar, .pcrs .warning_bar, .pcrs .notice_bar, .pcrs #loading, .pcrs #overlay, .pcrs .alert { display: none !important; }
   body.pcrs { display: block; font-size: 11pt; color: #000; background: #fff; }
@@ -560,7 +561,8 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 .pcrs .filedrop .files .file { display: flex; align-items: center; gap: 10px; color: var(--nuit); }
 .pcrs .filedrop .files .file .filesize { margin-left: 4px; }
 .pcrs .filedrop .files .file .trash { margin-left: auto; color: var(--nuit); }
-.pcrs .page select:not([multiple]) { width: 100% !important; }
+.pcrs .page select:not([multiple]):not(.select2-hidden-accessible) { width: 100% !important; }
+.pcrs #msg_info a, .pcrs .recap a, .pcrs .step-note a { color: var(--nuit); text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
 .pcrs .filedrop .files .file { height: auto; flex-wrap: wrap; padding: 8px 12px; }
 .pcrs .filedrop .files .file > span { padding: 0; display: inline; overflow-wrap: anywhere; }
 .pcrs .filedrop .progress { width: 100%; }
