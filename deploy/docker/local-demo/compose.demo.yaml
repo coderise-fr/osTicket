@@ -1,0 +1,54 @@
+# Surcouche de l'ENVIRONNEMENT LOCAL DE DÉMONSTRATION (jamais en production).
+#
+# Utilisée uniquement par scripts/local-demo.sh, qui la copie dans le dossier d'état de la
+# démo (par défaut <dépôt principal>/.local-demo/) avec compose.yaml et compose.install.yaml,
+# et lance Compose sous le nom de projet fixe « ostdemo ». Aucune valeur secrète ici : les
+# ports, l'image et le dossier des secrets viennent de <état>/state.env, écrit par le script.
+#
+# Ce qu'elle ajoute à la pile de production (compose.yaml, inchangé) :
+#   - Mailpit : serveur SMTP de test qui capte TOUS les e-mails envoyés par osTicket
+#     (interface web publiée sur 127.0.0.1 uniquement) ;
+#   - un réseau interne « mail » (sans accès Internet) entre web, cron et Mailpit, et le réseau
+#     « mail-ui » (Mailpit seul) qui permet de publier son interface web.
+# Le reste (durcissement, volumes, secrets, base sans port publié) est celui de compose.yaml.
+
+services:
+  web:
+    networks: [mail]
+  cron:
+    networks: [mail]
+
+  mailpit:
+    image: axllent/mailpit:v1.29.7@sha256:757f22b56c1da03570afdb3d259effe5091018008a81bbedc8158cee7e16fdbc
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: "5000"
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    volumes:
+      - mail-data:/data
+    tmpfs:
+      - /tmp:size=32m,mode=1777,noexec,nosuid,nodev
+    # Interface web seulement, sur la boucle locale ; le SMTP (1025) n'est pas publié.
+    # Docker ne publie aucun port d'un conteneur relié uniquement à des réseaux internes
+    # (constaté) : d'où le réseau « mail-ui », où Mailpit est seul.
+    ports:
+      - "127.0.0.1:${OST_DEMO_MAIL_PORT:?port Mailpit absent de state.env}:8025"
+    networks: [mail, mail-ui]
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "2" }
+    mem_limit: 128m
+
+networks:
+  mail:
+    internal: true
+  mail-ui:
+
+volumes:
+  mail-data:
