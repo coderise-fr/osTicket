@@ -279,6 +279,10 @@ body.atelier {
 .atelier .menu-mobile ul { list-style: none; margin: 0; padding: 0; }
 .atelier .menu-mobile li a { display: block; padding: 14px 0; color: var(--blanc); font: 600 1rem var(--f-titre); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.14); }
 .atelier .menu-mobile li a[aria-current] { box-shadow: inset 3px 0 0 var(--cyan); padding-left: 14px; }
+@media (min-width: 1241px) and (max-width: 1440px) {
+  .atelier .who .me { padding-right: 4px; }
+  .atelier .who .me-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
 @media (max-width: 1240px) {
   .atelier .bar { flex-wrap: wrap; }
   .atelier .site-nav { display: none; }
