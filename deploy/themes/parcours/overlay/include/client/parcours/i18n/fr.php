@@ -100,6 +100,15 @@ return array(
     'Due %s at the latest.' => 'Échéance : %s au plus tard.',
     'The first reply was due %s.' => 'Le premier retour était attendu le %s.',
     'A quick word?' => 'Un point rapide ?',
+    // Support contract (optional sla_first_response plugin)
+    'Support contract' => 'Contrat de support',
+    'Your support contract' => 'Votre contrat de support',
+    // plain text (escaped at display): "\u{a0}" is a no-break space
+    'First reply within 4 h, 24/7.' => "Premier retour sous 4\u{a0}h, 24\u{a0}h/24, 7\u{a0}j/7.",
+    'We reply on business days.' => 'Nous vous répondons les jours ouvrés.',
+    'Expected within 4 h, 24/7' => "Attendu sous 4\u{a0}h, 24\u{a0}h/24, 7\u{a0}j/7",
+    'Expected on business days' => 'Attendu les jours ouvrés',
+    'Your ticket gets a first reply within 4 h, 24/7.' => "Votre ticket reçoit un premier retour sous 4\u{a0}h, 24\u{a0}h/24, 7\u{a0}j/7.",
     'Call us and quote #%s.' => 'Appelez-nous en citant le ticket #%s.',
     // Sign in
     'I have an account' => "J'ai un compte",

@@ -7,7 +7,9 @@
     Theme "Parcours" (Coderise, deploy/themes/parcours): "what do you want
     to do?" page. The choices are the public help topics (each opens the
     ticket wizard on that topic), the welcome text is the "Landing" page of
-    the admin panel, the reading list is the featured FAQs.
+    the admin panel, the reading list is the featured FAQs. For a signed-in
+    client whose support contract is known (optional sla_first_response
+    plugin), step 3 of the route gives the commitment of their level.
 
     Peter Rotich <peter@osticket.com>
     Copyright (c)  2006-2013 osTicket
@@ -78,7 +80,15 @@ $pcrs_max = 6;
     <li class="todo"><span class="node" aria-hidden="true">2</span><span class="txt"><strong><?php
         echo pcrs__('You get a number'); ?></strong><small><?php echo pcrs__('Your ticket is recorded'); ?></small></span></li>
     <li class="todo"><span class="node" aria-hidden="true">3</span><span class="txt"><strong><?php
-        echo pcrs__('We reply'); ?></strong><small><?php echo pcrs__('By email and on this portal'); ?></small></span></li>
+        echo pcrs__('We reply'); ?></strong><small><?php
+        // Signed-in client with a known contract (optional plugin): the
+        // commitment of their level; otherwise no promise of delay.
+        $pcrs_contract = $pcrs_member ? pcrs_contract(null) : null;
+        if ($pcrs_contract)
+            echo pcrs_contract_pill($pcrs_contract) . ' ' . Format::htmlchars($pcrs_contract['level'] == 'priority'
+                ? pcrs__('First reply within 4 h, 24/7.') : pcrs__('We reply on business days.'));
+        else
+            echo pcrs__('By email and on this portal'); ?></small></span></li>
     <li class="todo"><span class="node" aria-hidden="true">4</span><span class="txt"><strong><?php
         echo pcrs__('You confirm'); ?></strong><small><?php echo pcrs__('The ticket is closed'); ?></small></span></li>
   </ol>

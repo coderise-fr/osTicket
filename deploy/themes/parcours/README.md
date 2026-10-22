@@ -37,7 +37,8 @@ et « Personnalisation du thème »).
   horizontal officiel), utilisé sur les zones bleu nuit ; `favicon.svg` : copie de
   `deploy/themes/_shared/coderise/symbole-sur-bleu-nuit.svg` (symbole sur carré bleu nuit).
 - `include/client/parcours/parcours.inc.php` : fonctions du thème (`pcrs__()`, icônes, motif
-  « Sommet », prochain pas, première réponse, jauge du délai Priority, temps de lecture, fil d'Ariane).
+  « Sommet », prochain pas, première réponse, jauge du délai Priority, niveau de contrat, temps de
+  lecture, fil d'Ariane).
 - `include/client/parcours/i18n/fr.php` : catalogue français des chaînes propres au thème.
 
 Aucune ressource externe : polices, icônes (SVG en ligne), images et script sont servis par osTicket. La
@@ -126,7 +127,8 @@ pièces jointes demandent JavaScript.
 | « Votre prochain pas » rédigé par l'équipe | Déduit de l'état réel : ouvert sans réponse → « Nous revenons vers vous » ; dernière action = réponse de l'équipe (`isanswered`) → « À vous de jouer » avec un lien vers la réponse ; fermé → « Encore un souci ? Répondez ci-dessous » si le ticket peut être rouvert. |
 | Altimètre « Priority : premier retour sous 4 h » | Jauge affichée **seulement** pour un ticket ouvert dont le plan de SLA s'appelle `PARCOURS_SLA_PRIORITY` (défaut `Priority 4h`, le plan surveillé de `contrib/sla-first-response`) **et** est actif, avec une échéance lisible (`est_duedate`). Graduée de 0 au délai de grâce du plan, temps écoulé depuis la création (ou la réouverture), calculé au chargement de la page. Après la première réponse, le plugin bascule le ticket sur un plan désactivé : **la jauge disparaît seule** (vérifié avec ce scénario). **À valider.** |
 | Regroupement « À vous de jouer / Chez Coderise / Terminées » | Vue par défaut des tickets ouverts : groupes « À vous de jouer » (`isanswered`) et « Chez Coderise », tri par `isanswered` puis date pour que les groupes tiennent sur plusieurs pages. Les fermés ont leur onglet. Un tri choisi donne une liste à plat dans l'ordre demandé. |
-| Mini-frise « Étape 2 sur 4 » par ticket, contrat Standard/Priority | Retirées (pas de donnée) ; une pastille d'état et le prochain pas les remplacent. |
+| Mini-frise « Étape 2 sur 4 » par ticket | Retirée (pas de donnée) ; une pastille d'état et le prochain pas la remplacent. |
+| Pastille de contrat Standard / Priority par ticket | **Réelle si le plugin `sla_first_response` est actif** (section « Niveau de contrat » ci-dessous) : niveau **actuel** du propriétaire du ticket, sur les tickets **ouverts** seulement. Rien sans le plugin. |
 | « Répondre à Nora », réponse « il y a 3 h » | « Répondre » (chaîne d'osTicket) ; la date de création est affichée. |
 | Bibliothèque « Démarrer / Livrer / Opérer » | Les **catégories de premier niveau** (et leurs sous-catégories) : le parcours est celui que l'administrateur crée. |
 | « Les plus lus » | « Questions à la une » (articles mis en avant) : osTicket n'a pas de statistiques de lecture côté client. |
@@ -135,11 +137,53 @@ pièces jointes demandent JavaScript.
 | Liens LinkedIn, GitHub du pied de page | Non repris (non fournis dans la charte) ; `www.coderise.fr` et les pages « Autres ressources » actives. |
 | Barre Redactor à 6 boutons, zone de dépôt | Redactor et dépôt de fichiers d'osTicket, restylés. |
 
+## Niveau de contrat (Priority / Standard)
+
+**Dépendance facultative** : la fonction `coderise_contract_level()` du plugin
+`contrib/sla-first-response` (version 0.3 ou plus, README du plugin, sections 9 et 10). Le niveau est
+l'appartenance du **propriétaire** du ticket à l'organisation « Priority » configurée dans le plugin
+(celle qu'alimente le plugin Stripe). Le thème n'appelle la fonction qu'au travers de `pcrs_contract()`
+(`parcours.inc.php`), qui :
+
+- vérifie `function_exists('coderise_contract_level')` : plugin ou instance **désactivés**, ou fichiers du
+  plugin **absents** de l'image → **aucun niveau, aucune promesse**, aucune erreur ;
+- n'affiche rien quand la source est `default` (visiteur non connecté, invité pour son propre niveau,
+  organisation Priority non configurée ou supprimée) : on ne promet rien sans niveau connu. Un client
+  sans organisation, l'organisation Priority étant configurée, est **Standard** ;
+- mémorise le résultat par propriétaire pour la requête (en plus du cache du plugin) ; libellés du plugin
+  (configurables) échappés par `Format::htmlchars`.
+
+Où il apparaît :
+
+| Page | Affichage |
+|---|---|
+| Liste des tickets (groupes « À vous de jouer » / « Chez Coderise », liste triée, page 2…) | Pastille du niveau du **propriétaire** sur chaque ticket **ouvert** : le client connecté pour ses tickets (`coderise_contract_level()` sans argument), sinon le propriétaire (`User::lookup($T['user_id'])`, une recherche par propriétaire distinct). Pas de pastille sur les tickets fermés. |
+| Suivi d'un ticket (client, collaborateur, invité) | Pastille du propriétaire (`coderise_contract_level($ticket)`) à côté de l'état ; dans la frise, tant que le premier retour est attendu : « Attendu sous 4 h, 24 h/24, 7 j/7 » (Priority) ou « Attendu les jours ouvrés » (Standard) ; dans « Votre prochain pas » (ticket ouvert) : « Contrat de support » + pastille, avec « Premier retour sous 4 h, 24 h/24, 7 j/7. » tant que le premier retour est attendu (Priority) ou « Nous vous répondons les jours ouvrés. » (Standard). Un ticket d'un collègue vu en collaborateur montre le niveau **du collègue**. |
+| Assistant d'ouverture, étape 4 « L'envoi » | Encadré « Votre contrat de support » + pastille : « Votre ticket reçoit un premier retour sous 4 h, 24 h/24, 7 j/7. » (Priority) ou « Nous vous répondons les jours ouvrés. » (Standard). Client connecté seulement ; rien pour un visiteur ou un invité. Hors des champs : aucun nom de champ, aucune donnée postée, pas de `div.error` (l'assistant ne le compte pas comme une erreur) ; sans JavaScript il s'affiche dans le bloc d'envoi. |
+| Accueil (client connecté) | Étape 3 « Nous répondons » de la frise : pastille + engagement (maquette : « Premier retour sous 4 h avec Priority »). Visiteur : texte neutre inchangé. |
+
+Engagements affichés : ceux de la charte (« Support standard : jours ouvrés. Support Priority : premier
+retour sous 4 h, 24 h/24, 7 j/7 »), textes fixes du thème. Aucun engagement Priority n'est affiché à un
+client Standard, et aucun délai n'est promis après le premier retour d'un ticket Priority. La **jauge**
+« premier retour sous 4 h » est **inchangée** (plan `PARCOURS_SLA_PRIORITY` actif, ticket ouvert sans
+réponse, échéance lisible).
+
+Limites et écarts :
+
+- **Niveau actuel**, pas celui du moment de la création du ticket : un ticket ouvert avant l'abonnement
+  Priority s'affiche Priority (sa jauge n'apparaît pas si son plan de SLA n'est pas `Priority 4h`) ; après la
+  fin de l'abonnement, un ancien ticket Priority s'affiche Standard. C'est pour cela que la pastille n'est
+  pas mise sur les tickets fermés (écart avec la maquette, qui la montre aussi sur les tickets terminés).
+- Le « 4 h » des textes est fixe (charte) ; la jauge, elle, lit le délai de grâce du plan.
+- Un invité qui consulte un ticket voit le niveau du **propriétaire** de ce ticket (souvent lui-même), pas
+  le sien.
+- Accueil : pas de pastille « Priority : réponse sous 4 h » par sujet d'aide (aucune donnée par sujet).
+
 ## Chaînes et langues
 
 - Les chaînes d'osTicket passent par `__()` (traduites par les packs de langue officiels, à déposer dans
   `deploy/docker/overlay/include/i18n/`, voir `deploy/docker/overlay/README.md`).
-- Les 132 utilisations de chaînes propres au thème passent par `pcrs__()` : `__()` d'abord (le pack gagne s'il
+- Les 144 utilisations de chaînes propres au thème passent par `pcrs__()` : `__()` d'abord (le pack gagne s'il
   connaît la chaîne), puis le catalogue `include/client/parcours/i18n/<langue>.php` (fourni : `fr.php`),
   sinon l'anglais. Même mécanisme que « Poste de travail ». Le catalogue n'est pas sous `include/i18n/`
   (un dossier là ferait apparaître une langue de plus dans osTicket).
@@ -271,8 +315,8 @@ Exécuté :
   `check-drift.sh` : HEAD et `origin/1.18.x` sans dérive ; sur une copie modifiée, un gabarit remplacé
   modifié, un supprimé et deux fichiers suivis modifiés détectés (code 1).
 - **Traductions** : sur l'instance, langue forcée à `fr` en session : `pcrs__()` renvoie le catalogue du
-  thème (« À vous de jouer », « Étape %1$d sur %2$d »…) ; les 132 utilisations de chaînes du thème ont une
-  entrée dans `fr.php`.
+  thème (« À vous de jouer », « Étape %1$d sur %2$d »…) ; les chaînes du thème ont une entrée dans `fr.php`
+  (144 utilisations, contrôle refait le 22/10/2026 après l'ajout du niveau de contrat).
 
 Non vérifié :
 
@@ -282,6 +326,57 @@ Non vérifié :
 - Envoi réel des e-mails, lien d'accès envoyé par e-mail (instance réglée sans vérification par e-mail),
   lecteur d'écran, Firefox et Safari, CAPTCHA (désactivé), connexion par fournisseur externe, RTL, le plugin
   `sla_first_response` lui-même (le basculement de plan a été simulé par le jeu de données).
+
+### Niveau de contrat (22/10/2026, commit `c8cfdad9`)
+
+Instance : image construite comme en production (`git archive` du commit, `apply.sh` sur l'overlay
+exporté, cible `runtime`, conteneur durci), installation par l'assistant d'osTicket, MariaDB 11.4. Plugin
+`contrib/sla-first-response/plugin/sla_first_response/` copié dans l'overlay exporté
+(`include/plugins/sla_first_response/`, **non committé**), installé, activé, instance configurée avec les
+plans « Priority 4h » (actif, 24/7) / « Priority 4h - 1re reponse faite » (désactivé) et l'organisation
+« Priority ». Données : Léa (organisation Priority, 40 tickets puis 42, dont 26 ouverts, réponses d'agent :
+le plugin a bien basculé les tickets Priority répondus), Paul (Acme, Standard) dont un ticket la met en
+collaboratrice, Sam (Acme), Noé (sans organisation), Marc (organisation Priority, sans compte : invité),
+sujet « Report a Problem » avec un formulaire (un champ requis). Chromium privé (`playwright-core`, image
+`mcr.microsoft.com/playwright`), pages servies en `localhost`.
+
+Exécuté (`captures/contrat.json` : 162 rendus, 1280 / 390 / 820 px, dans les trois modes) :
+
+- **Plugin actif** (201 contrôles, tous passés) : visiteur (accueil neutre, assistant sans encadré ni
+  « 4 h » dans le formulaire) ; invité Marc (pastille Priority du propriétaire, jauge présente ; assistant
+  sans encadré) ; Léa (accueil : Priority + engagement ; liste : pastille Priority sur chacun de ses
+  tickets ouverts, **Standard** sur le ticket de Paul ; onglet Fermés sans pastille ; page 2 ; liste
+  triée ; suivi Priority sans réponse : pastille, frise « Expected within 4 h, 24/7 », prochain pas avec
+  l'engagement, jauge inchangée ; suivi répondu : pastille sans promesse de délai, pas de jauge ; ticket de
+  Paul en collaboratrice : **Standard**, « jours ouvrés », aucun « 4 h » ; étape 4 : encadré Priority) ;
+  Sam et Noé : Standard partout, jamais « 4 h » ni « 24/7 ».
+- **Plugin désactivé** (fonction absente ; 174 contrôles) et **plugin absent** (image reconstruite sans
+  ses fichiers, plugin toujours actif en base ; 174 contrôles) : aucune pastille, aucun encadré, frise et
+  accueil d'origine, jauge inchangée, **aucune erreur PHP** dans les journaux, aucune réponse ≥ 400.
+- **Assistant, non-régression** (48 contrôles par mode, plugin actif, désactivé et absent, 1280 et 390 px) :
+  avec JavaScript (Léa) étape 1 seule, champs du sujet chargés dans l'étape 2, changement de sujet depuis
+  l'étape 3 et retour (résumé et message conservés, encadré inchangé, mêmes noms de champs), récapitulatif,
+  envoi avec le champ requis vide → **étape 2 ré-ouverte**, 1 erreur listée (l'encadré n'est pas compté),
+  focus sur la liste, `aria-invalid`, puis correction → ticket créé ; sans JavaScript (Sam) formulaire
+  d'un bloc, encadré Standard visible dans le bloc d'envoi, ticket créé ; visiteur avec JavaScript, étape 4
+  sans encadré, ticket créé. Tickets vérifiés en base (sujet, sujet d'aide, champs du formulaire, message).
+- **Requêtes SQL** (journal général de MariaDB, une requête `tickets.php` de Léa, 25 lignes dont un ticket
+  d'un autre propriétaire) : 37 requêtes plugin actif contre 32 plugin désactivé ; l'écart (5) comprend
+  le démarrage du plugin et **une** recherche du propriétaire distinct : coût constant, pas une requête par
+  ligne.
+- Débordement horizontal : aucun ; contrastes : minimum **4,91:1** (pastille Standard, ardoise sur gris),
+  Priority 19,16:1, aucun échec ; console : aucune erreur ni avertissement ; aucune requête vers un autre
+  hôte. `apply.sh` / `remove.sh` aller-retour sur `deploy/docker/overlay/` (`git status` propre),
+  `check-drift.sh` sans dérive ; test statique du dépôt : 0 échec.
+
+Captures : `accueil-connecte`, `mes-tickets` (et `-page-2`, `-tri`, `-standard`), `suivi-ticket`,
+`suivi-ticket-priority`, `suivi-ticket-standard`, `suivi-collaborateur`, `suivi-invite`,
+`ouverture-etape-4-priority`, `ouverture-etape-4-standard`, `ouverture-erreur`, `ouverture-sans-js`, et
+`sans-plugin-*` (liste, suivi Priority, étape 4). Elles proviennent de ce jeu de données (différent de celui
+des autres captures).
+
+Non vérifié : écrans en français (aucun pack de langue ; catalogue du thème contrôlé : 144 utilisations,
+toutes traduites), lecteur d'écran, Firefox et Safari, bascule réelle de l'organisation par le plugin Stripe.
 
 ## Limites connues
 
@@ -318,3 +413,6 @@ Non vérifié :
 5. Les textes Coderise du pied de page (délais, horaires) et les accroches proposées pour les pages
    administrables.
 6. Le pack de langue français officiel, puis une relecture des écrans en français.
+7. **Niveau de contrat** : afficher le niveau actuel (et non celui de la création) ; pastille absente des
+   tickets fermés ; textes d'engagement (« premier retour sous 4 h, 24 h/24, 7 j/7 », « jours ouvrés »)
+   et leur absence après le premier retour d'un ticket Priority ; niveau du propriétaire montré à un invité.

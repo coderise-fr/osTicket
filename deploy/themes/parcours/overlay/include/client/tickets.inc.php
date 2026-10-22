@@ -8,7 +8,9 @@ if(!defined('OSTCLIENTINC') || !is_object($thisclient) || !$thisclient->isValid(
  * used only for the default view of open tickets (no sort chosen, no
  * search): the list is then ordered by isanswered, then by creation date,
  * so that the groups hold across pages. Any explicit sort shows a flat
- * list in the chosen order. */
+ * list in the chosen order. Open tickets carry the support contract pill
+ * (Priority / Standard) of their OWNER when the optional sla_first_response
+ * plugin provides it (pcrs_contract()); nothing without the plugin. */
 
 $settings = &$_SESSION['client:Q'];
 
@@ -225,6 +227,7 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
      $defaultDept=Dept::getDefaultDeptName(); //Default public dept.
      if ($tickets->exists(true)) {
          $pcrs_group = null;
+         $pcrs_owners = array();
          foreach ($tickets as $T) {
             $dept = $T['dept__ispublic']
                 ? Dept::getLocalById($T['dept_id'], 'name', $T['dept__name'])
@@ -236,6 +239,20 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
             $pcrs_open = !strcasecmp($T['status__state'], 'open');
             $pcrs_turn_row = ($T['isanswered'] && $pcrs_open);
             $isCollab = ($thisclient->getId() != $T['user_id']);
+            // Support contract of the OWNER of the ticket (current level),
+            // open tickets only: the signed-in client for their own
+            // tickets, else the owner (one lookup per distinct owner).
+            $pcrs_plan = '';
+            if ($pcrs_open && function_exists('coderise_contract_level')) {
+                if (!$isCollab)
+                    $pcrs_plan = pcrs_contract_pill(pcrs_contract(null));
+                elseif (array_key_exists($T['user_id'], $pcrs_owners))
+                    $pcrs_plan = $pcrs_owners[$T['user_id']];
+                else
+                    $pcrs_plan = $pcrs_owners[$T['user_id']]
+                        = ($pcrs_u = User::lookup((int) $T['user_id']))
+                            ? pcrs_contract_pill(pcrs_contract($pcrs_u)) : '';
+            }
             // Group heading
             $g = $pcrs_grouped ? ($pcrs_turn_row ? 'turn' : 'team') : 'all';
             if ($g !== $pcrs_group) {
@@ -262,7 +279,8 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
           <span class="step-tag <?php echo $pcrs_k; ?>"><?php
             if ($pcrs_k == 'you') echo pcrs_icon('reply', 14);
             echo pcrs_next_label($T['status__state'], $T['isanswered']); ?></span>
-<?php       } ?>
+<?php       }
+            echo $pcrs_plan; ?>
         </span>
       </a></li>
 <?php

@@ -7,7 +7,8 @@ if(!defined('OSTCLIENTINC')) die('Access Denied!');
  *   1. your request: contact (guest) or account, help topic
  *   2. context: the forms of the help topic (tbody#dynamic-form)
  *   3. your message: subject, message, attachments (ticket details form)
- *   4. submission: priority, CAPTCHA, summary, buttons
+ *   4. submission: priority, CAPTCHA, summary, reminder of the support
+ *      contract of the signed-in client (optional plugin, no field), buttons
  * Without JavaScript the fieldsets show one after the other and the help
  * topic forms all stay in step 2 (as in the core template). With
  * assets/parcours/js/parcours.js the form becomes a step-by-step wizard: the
@@ -221,6 +222,21 @@ $pcrs_wizard = array(
     </tbody>
     </table>
     <div class="recap" id="pcrs-recap" hidden></div>
+<?php
+    // Support contract of the signed-in client (optional plugin): a
+    // reminder only, outside the form fields. Nothing for a visitor, a
+    // guest, or without the plugin: no promise without a known level.
+    if ($pcrs_contract = pcrs_contract(null)) { ?>
+    <div class="contract-note <?php echo $pcrs_contract['level'] == 'priority' ? 'is-priority' : 'is-standard'; ?>">
+      <span class="cn-ic"><?php echo pcrs_icon($pcrs_contract['level'] == 'priority' ? 'bolt' : 'shield', 22); ?></span>
+      <div>
+        <p class="cn-title"><?php echo pcrs__('Your support contract'); ?> <?php echo pcrs_contract_pill($pcrs_contract); ?></p>
+        <p><?php echo Format::htmlchars($pcrs_contract['level'] == 'priority'
+            ? pcrs__('Your ticket gets a first reply within 4 h, 24/7.')
+            : pcrs__('We reply on business days.')); ?></p>
+      </div>
+    </div>
+<?php } ?>
     <p class="buttons actions">
         <button class="btn btn-primary btn-lg" type="submit"><?php echo pcrs_icon('arrow', 20);
             ?><span><?php echo __('Create Ticket');?></span></button>
