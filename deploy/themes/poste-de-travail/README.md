@@ -141,6 +141,37 @@ La maquette montre des données que le portail n'a pas ; elles sont remplacées 
 | Barre d'outils Redactor à 6 boutons, zone de dépôt | Redactor et la zone de dépôt d'osTicket, restylés (même nombre de boutons qu'osTicket). |
 | Fiche d'article, résultats de recherche, catégorie | Gabarits d'origine habillés en panneaux (non maquettés). |
 
+## Vérifications (22/10/2026)
+
+Instance de test : image construite comme en production (`git archive` du commit, `apply.sh` sur l'overlay
+exporté, `Dockerfile` cibles `install` puis `runtime`), conteneur durci (racine en lecture seule, `cap_drop ALL`,
+configuration montée en lecture seule), MariaDB 11.4, installation par l'assistant, données réalistes (clients,
+organisation, tickets ouverts, résolus et fermés, réponses d'agent, pièces jointes, collaborateur, 28 tickets
+pour la pagination, formulaire « Contexte technique » sur deux rubriques, 12 articles en 5 catégories).
+
+- **Parcours réels** : ouverture de ticket par un visiteur (champs rechargés en AJAX au changement de rubrique,
+  erreurs de validation, pièce jointe, page de remerciement) ; connexion (erreur puis succès) ; réponse avec pièce
+  jointe ; ticket fermé (bandeau de réouverture) ; ticket d'un collègue vu en collaborateur ; modification d'un
+  ticket ; filtres ouverts/fermés, tri, pagination ; recherche dans la base de connaissances depuis la barre
+  (raccourci `/`) ; inscription puis confirmation par le lien ; mot de passe oublié, lien, changement imposé dans
+  le profil ; accès par e-mail et numéro (envoi du lien, erreur, accès invité direct) ; page hors ligne ; impression.
+- **Captures** : `captures/` (bureau 1280 px, mobile 390 px), prises sur l'image finale.
+- **Console du navigateur** : aucune erreur ni avertissement sur ces parcours. **Journaux Apache/PHP** : aucune
+  erreur PHP ; seuls refus : deux 403 provoqués exprès (accès direct aux fichiers PHP du thème, refusé).
+- **Débordement horizontal à 390 px** : aucun, sur toutes les pages capturées.
+- **Contrastes** mesurés sur la page rendue (tous les nœuds de texte visibles, calcul WCAG) : minimum 5,87:1,
+  aucun texte sous 4,5:1, sur 11 pages (visiteur et client connecté).
+- **Clavier** : lien d'évitement en premier, ordre de tabulation logique, contour de focus visible sur tous les
+  éléments atteints (les boutons de la barre Redactor ont `tabindex=-1` dans osTicket).
+- **Scripts** : `apply.sh`/`remove.sh` aller-retour sur `deploy/docker/overlay/` (`git status` propre ensuite),
+  refus si « atelier » est installé, refus sur fichier modifié, conservation d'un plugin présent, `MANIFEST`
+  désynchronisé refusé ; `check-drift.sh` : arbre courant OK, copie modifiée (CHANGED et MISSING détectés,
+  code 1), `--rev origin/1.15.x` (4 fichiers changés détectés).
+- **Non vérifié** : français (aucun pack de langue disponible sans téléchargement externe, voir « Traductions » ;
+  toutes les chaînes passent par `__()`/`ptdt__()`), envoi réel des e-mails (pas de SMTP), lecteur d'écran,
+  Firefox et Safari (Chromium seulement), connexion par fournisseur externe (bouton présent dans le gabarit, non testé),
+  CAPTCHA (gabarit conservé, non activé).
+
 ## Limites connues
 
 - **Logo** : pas de logo vectoriel autonome dans la charte ; le pictogramme « ticket » des maquettes est redessiné
