@@ -1,0 +1,34 @@
+# Files installed by apply.sh (paths relative to the osTicket root). One path per line.
+# Keep in sync with overlay/ (apply.sh refuses otherwise).
+assets/parcours/css/parcours.css
+assets/parcours/fonts/OFL-inter.txt
+assets/parcours/fonts/OFL-montserrat.txt
+assets/parcours/fonts/inter-latin-400-normal.woff2
+assets/parcours/fonts/inter-latin-500-normal.woff2
+assets/parcours/fonts/inter-latin-600-normal.woff2
+assets/parcours/fonts/inter-latin-ext-400-normal.woff2
+assets/parcours/fonts/inter-latin-ext-500-normal.woff2
+assets/parcours/fonts/inter-latin-ext-600-normal.woff2
+assets/parcours/fonts/montserrat-latin-600-normal.woff2
+assets/parcours/fonts/montserrat-latin-700-normal.woff2
+assets/parcours/fonts/montserrat-latin-800-normal.woff2
+assets/parcours/fonts/montserrat-latin-ext-600-normal.woff2
+assets/parcours/fonts/montserrat-latin-ext-700-normal.woff2
+assets/parcours/fonts/montserrat-latin-ext-800-normal.woff2
+assets/parcours/img/favicon.svg
+assets/parcours/img/logo-horizontal-sombre.png
+assets/parcours/js/parcours.js
+include/client/accesslink.inc.php
+include/client/faq.inc.php
+include/client/footer.inc.php
+include/client/header.inc.php
+include/client/kb-categories.inc.php
+include/client/login.inc.php
+include/client/open.inc.php
+include/client/parcours/i18n/fr.php
+include/client/parcours/parcours.inc.php
+include/client/templates/thread-entry.tmpl.php
+include/client/templates/thread-event.tmpl.php
+include/client/tickets.inc.php
+include/client/view.inc.php
+index.php

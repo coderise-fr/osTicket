@@ -1,0 +1,731 @@
+[
+ {
+  "page": "accueil",
+  "width": 1280,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion",
+  "width": 1280,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion-erreur",
+  "width": 1280,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "inscription",
+  "width": 1280,
+  "url": "/account.php?do=create",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-oublie",
+  "width": 1280,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-envoye",
+  "width": 1280,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "acces-par-numero",
+  "width": 1280,
+  "url": "/view.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "base-de-connaissances",
+  "width": 1280,
+  "url": "/kb/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-categorie",
+  "width": 1280,
+  "url": "/kb/faq.php?cid=2",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "article",
+  "width": 1280,
+  "url": "/kb/faq.php?id=1",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche",
+  "width": 1280,
+  "url": "/kb/faq.php?a=search&q=cl%C3%A9",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche-vide",
+  "width": 1280,
+  "url": "/kb/faq.php?a=search&q=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-invite",
+  "width": 1280,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets",
+  "width": 1280,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-page-2",
+  "width": 1280,
+  "url": "/tickets.php?p=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-fermes",
+  "width": 1280,
+  "url": "/tickets.php?a=search&status=closed",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-tri",
+  "width": 1280,
+  "url": "/tickets.php?sort=subject&order=ASC&a=search&status=open",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-recherche-vide",
+  "width": 1280,
+  "url": "/tickets.php?a=search&keywords=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket",
+  "width": 1280,
+  "url": "/tickets.php?id=2",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-priority",
+  "width": 1280,
+  "url": "/tickets.php?id=3",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-ferme",
+  "width": 1280,
+  "url": "/tickets.php?id=5",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-collaborateur",
+  "width": 1280,
+  "url": "/tickets.php?id=7",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "modification-ticket",
+  "width": 1280,
+  "url": "/tickets.php?a=edit&id=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "profil",
+  "width": 1280,
+  "url": "/profile.php",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "ouverture-connecte",
+  "width": 1280,
+  "url": "/open.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "accueil-connecte",
+  "width": 1280,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-vide",
+  "width": 1280,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "accueil",
+  "width": 390,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion",
+  "width": 390,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion-erreur",
+  "width": 390,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "inscription",
+  "width": 390,
+  "url": "/account.php?do=create",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-oublie",
+  "width": 390,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-envoye",
+  "width": 390,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "acces-par-numero",
+  "width": 390,
+  "url": "/view.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "base-de-connaissances",
+  "width": 390,
+  "url": "/kb/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-categorie",
+  "width": 390,
+  "url": "/kb/faq.php?cid=2",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "article",
+  "width": 390,
+  "url": "/kb/faq.php?id=1",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche",
+  "width": 390,
+  "url": "/kb/faq.php?a=search&q=cl%C3%A9",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche-vide",
+  "width": 390,
+  "url": "/kb/faq.php?a=search&q=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-invite",
+  "width": 390,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets",
+  "width": 390,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-page-2",
+  "width": 390,
+  "url": "/tickets.php?p=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-fermes",
+  "width": 390,
+  "url": "/tickets.php?a=search&status=closed",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-tri",
+  "width": 390,
+  "url": "/tickets.php?sort=subject&order=ASC&a=search&status=open",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-recherche-vide",
+  "width": 390,
+  "url": "/tickets.php?a=search&keywords=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket",
+  "width": 390,
+  "url": "/tickets.php?id=2",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-priority",
+  "width": 390,
+  "url": "/tickets.php?id=3",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-ferme",
+  "width": 390,
+  "url": "/tickets.php?id=5",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-collaborateur",
+  "width": 390,
+  "url": "/tickets.php?id=7",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "modification-ticket",
+  "width": 390,
+  "url": "/tickets.php?a=edit&id=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "profil",
+  "width": 390,
+  "url": "/profile.php",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "ouverture-connecte",
+  "width": 390,
+  "url": "/open.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "accueil-connecte",
+  "width": 390,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-vide",
+  "width": 390,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "accueil",
+  "width": 820,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion",
+  "width": 820,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "connexion-erreur",
+  "width": 820,
+  "url": "/login.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "inscription",
+  "width": 820,
+  "url": "/account.php?do=create",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-oublie",
+  "width": 820,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mot-de-passe-envoye",
+  "width": 820,
+  "url": "/pwreset.php",
+  "overflow": 0,
+  "contrastMin": 9.52,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "acces-par-numero",
+  "width": 820,
+  "url": "/view.php",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "base-de-connaissances",
+  "width": 820,
+  "url": "/kb/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-categorie",
+  "width": 820,
+  "url": "/kb/faq.php?cid=2",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "article",
+  "width": 820,
+  "url": "/kb/faq.php?id=1",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche",
+  "width": 820,
+  "url": "/kb/faq.php?a=search&q=cl%C3%A9",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "kb-recherche-vide",
+  "width": 820,
+  "url": "/kb/faq.php?a=search&q=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-invite",
+  "width": 820,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets",
+  "width": 820,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-page-2",
+  "width": 820,
+  "url": "/tickets.php?p=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-fermes",
+  "width": 820,
+  "url": "/tickets.php?a=search&status=closed",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-tri",
+  "width": 820,
+  "url": "/tickets.php?sort=subject&order=ASC&a=search&status=open",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-recherche-vide",
+  "width": 820,
+  "url": "/tickets.php?a=search&keywords=zzzz",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket",
+  "width": 820,
+  "url": "/tickets.php?id=2",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-priority",
+  "width": 820,
+  "url": "/tickets.php?id=3",
+  "overflow": 0,
+  "contrastMin": 4.91,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-ticket-ferme",
+  "width": 820,
+  "url": "/tickets.php?id=5",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "suivi-collaborateur",
+  "width": 820,
+  "url": "/tickets.php?id=7",
+  "overflow": 0,
+  "contrastMin": 5.3,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "modification-ticket",
+  "width": 820,
+  "url": "/tickets.php?a=edit&id=2",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "profil",
+  "width": 820,
+  "url": "/profile.php",
+  "overflow": 0,
+  "contrastMin": 6.54,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "ouverture-connecte",
+  "width": 820,
+  "url": "/open.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "accueil-connecte",
+  "width": 820,
+  "url": "/index.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ },
+ {
+  "page": "mes-tickets-vide",
+  "width": 820,
+  "url": "/tickets.php",
+  "overflow": 0,
+  "contrastMin": 5.83,
+  "contrastFails": [],
+  "log": []
+ }
+]

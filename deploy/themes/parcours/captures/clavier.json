@@ -1,0 +1,32 @@
+{
+ "accueil": {
+  "tabbed": 24,
+  "first": "Skip to content",
+  "invisible": [],
+  "footerReached": true
+ },
+ "ouverture-visiteur": {
+  "tabbed": 9,
+  "first": "",
+  "invisible": [],
+  "footerReached": true
+ },
+ "mes-tickets": {
+  "tabbed": 37,
+  "first": "— All Help Topics —\nIncident e",
+  "invisible": [],
+  "footerReached": true
+ },
+ "suivi-ticket": {
+  "tabbed": 25,
+  "first": "Skip to content",
+  "invisible": [],
+  "footerReached": true
+ },
+ "base-de-connaissances": {
+  "tabbed": 52,
+  "first": "Skip to content",
+  "invisible": [],
+  "footerReached": true
+ }
+}
