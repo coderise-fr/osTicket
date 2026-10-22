@@ -1,6 +1,6 @@
 <?php
 if(!defined('OSTCLIENTINC')) die('Access Denied');
-/* Theme "Poste de travail" (Ownalytics) - overrides include/client/login.inc.php.
+/* Theme "Poste de travail" (Coderise) - overrides include/client/login.inc.php.
  * Same form (#clientLogin, luser, lpasswd, CSRF), external backends,
  * registration and agent links. A second panel posts lemail / lticket to
  * login.php, which already handles ticket access (core accesslink form). */
@@ -28,7 +28,7 @@ if ($content) {
     <?php csrf_token(); ?>
     <h2 class="f-sec" id="login-t"><?php echo __('Sign In'); ?></h2>
 <?php if ($errors['login']) { ?>
-    <p class="err-box" role="alert"><strong><?php echo Format::htmlchars($errors['login']); ?></strong></p>
+    <p class="err-box" role="alert"><?php echo ptdt_icon('alert'); ?><strong><?php echo Format::htmlchars($errors['login']); ?></strong></p>
 <?php } ?>
     <div class="stackf">
         <label for="username"><?php echo __('Email or Username'); ?></label>

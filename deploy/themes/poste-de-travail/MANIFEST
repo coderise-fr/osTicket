@@ -1,11 +1,24 @@
 # Files installed by apply.sh into deploy/docker/overlay/ (paths relative to the osTicket root).
 # One path per line. Keep in sync with overlay/ (apply.sh refuses otherwise).
 assets/poste-de-travail/css/theme.css
-assets/poste-de-travail/fonts/OFL.txt
-assets/poste-de-travail/fonts/archivo-100-900-latin.woff2
-assets/poste-de-travail/fonts/ibm-plex-mono-400-latin.woff2
-assets/poste-de-travail/fonts/ibm-plex-mono-500-latin.woff2
+assets/poste-de-travail/fonts/OFL-inter.txt
+assets/poste-de-travail/fonts/OFL-montserrat.txt
+assets/poste-de-travail/fonts/inter-latin-400-normal.woff2
+assets/poste-de-travail/fonts/inter-latin-500-normal.woff2
+assets/poste-de-travail/fonts/inter-latin-600-normal.woff2
+assets/poste-de-travail/fonts/inter-latin-ext-400-normal.woff2
+assets/poste-de-travail/fonts/inter-latin-ext-500-normal.woff2
+assets/poste-de-travail/fonts/inter-latin-ext-600-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-600-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-700-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-800-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-ext-600-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-ext-700-normal.woff2
+assets/poste-de-travail/fonts/montserrat-latin-ext-800-normal.woff2
+assets/poste-de-travail/img/favicon-180.png
+assets/poste-de-travail/img/favicon-32.png
 assets/poste-de-travail/img/favicon.svg
+assets/poste-de-travail/img/logo-horizontal-sur-bleu-nuit.png
 assets/poste-de-travail/js/theme.js
 include/client/accesslink.inc.php
 include/client/footer.inc.php

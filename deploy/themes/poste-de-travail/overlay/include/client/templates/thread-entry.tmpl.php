@@ -1,8 +1,9 @@
 <?php
-/* Theme "Poste de travail" (Ownalytics) - overrides
+/* Theme "Poste de travail" (Coderise) - overrides
  * include/client/templates/thread-entry.tmpl.php. Same data; initials instead
- * of avatar images (no external avatar service), compact header. */
-global $cfg;
+ * of avatar images (no external avatar service), compact header with a role
+ * label ("You", "Coderise team"). */
+global $cfg, $thisclient;
 $entryTypes = ThreadEntry::getTypes();
 $user = $entry->getUser() ?: $entry->getStaff();
 if ($entry->staff && $cfg->hideStaffName())
@@ -14,22 +15,27 @@ $ptdt_time = sprintf('<time datetime="%s" title="%s">%s</time>',
     date(DateTime::W3C, Misc::db2gmtime($entry->created)),
     Format::daydatetime($entry->created),
     Format::datetime($entry->created));
+$ptdt_role = '';
+if ($entry->staff)
+    $ptdt_role = ptdt__('Coderise team');
+elseif ($thisclient && $entry->user_id && $entry->user_id == $thisclient->getId())
+    $ptdt_role = ptdt__('You');
 ?>
 <article class="thread-entry entry <?php echo $type; ?>" aria-label="<?php
     echo Format::htmlchars(strip_tags(sprintf('%s, %s', $name, Format::datetime($entry->created)))); ?>">
-    <span class="e-av <?php echo $type; ?>" aria-hidden="true"><?php echo ptdt_initials($name); ?></span>
+    <span class="avatar <?php if ($entry->staff) echo 'av-team'; ?>" aria-hidden="true"><?php echo ptdt_initials($name); ?></span>
     <div class="e-main">
     <header class="header">
-        <b><?php echo Format::htmlchars($name); ?></b>
-<?php if ($entry->staff) { ?>
-        <span class="tag"><?php echo __('Staff'); ?></span>
+        <strong><?php echo Format::htmlchars($name); ?></strong>
+<?php if ($ptdt_role) { ?>
+        <span class="role"><?php echo Format::htmlchars($ptdt_role); ?></span>
 <?php } ?>
-        <?php echo $ptdt_time; ?>
 <?php if ($entry->flags & ThreadEntry::FLAG_EDITED) { ?>
         <span class="label label-bare" title="<?php
         echo sprintf(__('Edited on %s by %s'), Format::datetime($entry->updated), 'You');
                 ?>"><?php echo __('Edited'); ?></span>
 <?php } ?>
+        <?php echo $ptdt_time; ?>
 <?php if ($entry->title) { ?>
         <span class="faded title"><?php echo Format::htmlchars($entry->title); ?></span>
 <?php } ?>
@@ -47,7 +53,7 @@ $ptdt_time = sprintf('<time datetime="%s" title="%s">%s</time>',
                 $size = sprintf('<small class="filesize faded">%s</small>', Format::file_size($A->file->size));
 ?>
         <span class="attachment-info">
-        <?php echo ptdt_icon('clip', 13); ?>
+        <?php echo ptdt_icon('clip', 15); ?>
         <a  class="no-pjax truncate filename"
             href="<?php echo $A->file->getDownloadUrl(['id' => $A->getId()]);
             ?>" download="<?php echo Format::htmlchars($A->getFilename()); ?>"
