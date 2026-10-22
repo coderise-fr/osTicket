@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ouvrir un ticket | Ownalytics Support</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#3B1E54">
+<link rel="icon" href="../_shared/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../_shared/fonts.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body class="p-open">
+<a class="mockup-back" href="../index.html">Retour à la comparaison des maquettes</a>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="site-header">
+  <div class="wrap hd">
+    <a class="brand" href="index.html" aria-label="Ownalytics Support, accueil"><svg class="mark" width="20" height="26" viewBox="0 0 20 26" aria-hidden="true" focusable="false"><path d="M1 1h18v21l-3 3-3-3-3 3-3-3-3 3-3-3z" fill="#FBFBF6"/><path d="M5 7h10M5 11h6M5 15h10" stroke="#3B1E54" stroke-width="2"/></svg><span class="wm">Ownalytics</span><span class="wm-sub">Support</span></a>
+    <nav aria-label="Menu principal"><ul class="menu"><li><a href="index.html">Accueil</a></li><li><a href="base-de-connaissances.html">Base de connaissances</a></li><li><a href="ouvrir-un-ticket.html" aria-current="page">Ouvrir un nouveau ticket</a></li><li><a href="connexion.html">Suivre un ticket</a></li></ul></nav>
+    <p class="acct"><a href="connexion.html">Se connecter</a> <span class="lang"><a href="#" aria-current="true">FR</a> / <a href="#" hreflang="en">EN</a></span></p>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+
+<div class="split">
+  <section class="split-l"><div class="sticky">
+    <h1 class="mega sm">Dites-nous tout.</h1>
+    <p class="lede">Plus votre ticket est précis, plus la première réponse est utile.</p>
+    <ul class="rules"><li><b>Ce que vous attendiez</b> et ce que vous voyez à la place.</li><li><b>Vos versions</b> de Matomo et du plugin.</li><li><b>Les journaux d'erreurs</b>, sans données de visiteurs.</li></ul>
+    <p class="note">Prioritaire&nbsp;? Ajoutez votre numéro de licence&nbsp;: la première réponse arrive sous 4&nbsp;h.</p>
+  </div></section>
+  <section class="split-r">
+    <p class="alert" role="alert"><b>Il manque un sujet.</b> Remplissez-le, puis envoyez à nouveau.</p>
+    <form id="ticketForm" method="post" action="suivi-ticket.html" novalidate>
+      <fieldset><legend>Vous</legend>
+        <div class="fld"><label for="email">Adresse e-mail *</label><input id="email" type="email" value="camille.roux@atelier-lumen.fr" autocomplete="email"></div>
+        <div class="two"><div class="fld"><label for="name">Nom complet *</label><input id="name" type="text" value="Camille Roux" autocomplete="name"></div><div class="fld"><label for="phone">Téléphone</label><input id="phone" type="text" autocomplete="tel"></div></div>
+      </fieldset>
+      <fieldset><legend>Votre demande</legend>
+        <div class="fld"><label for="topicId">Thème d'aide *</label><select id="topicId"><option selected>Installation et compatibilité</option><option>Heatlens</option><option>Auditlens</option><option>Licences et facturation</option><option>Autre question</option></select></div>
+        <div class="fld has-error"><label for="subject">Sujet *</label><input id="subject" type="text" aria-invalid="true" aria-describedby="subject-help subject-err"><p class="help" id="subject-help">En une phrase&nbsp;: ce qui se passe, et sur quel plugin.</p><p class="err" id="subject-err"><span>Indiquez un sujet pour votre demande.</span></p></div>
+        <div class="fld"><label for="message">Message *</label><div class="redactor-box">
+  <div class="redactor-toolbar" role="toolbar" aria-label="Mise en forme"><button type="button" class="re-button re-bold" aria-label="Gras"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M7 4h6a3.5 3.5 0 0 1 0 7H7zM7 11h7a3.5 3.5 0 0 1 0 7H7z"/></svg></button><button type="button" class="re-button re-italic" aria-label="Italique"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M10 4h8M6 20h8M14 4 10 20"/></svg></button><button type="button" class="re-button re-list" aria-label="Liste"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button><button type="button" class="re-button re-link" aria-label="Lien"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button type="button" class="re-button re-image" aria-label="Image"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg></button><button type="button" class="re-button re-code" aria-label="Code"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="m8 8-5 4 5 4m8-8 5 4-5 4M14 5l-4 14"/></svg></button></div>
+  <div class="redactor-editor" id="message" role="textbox" aria-multiline="true" aria-label="Message" contenteditable="true" style="min-height:11.200000000000001em"><p>Bonjour,</p><p>Depuis hier soir, l'archivage des rapports s'arrête avant la fin…</p></div>
+</div></div>
+        <div class="fld"><span class="lab">Pièces jointes</span><div class="filedrop">
+  <div class="dropzone"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></svg> <span>Déposez des fichiers ici ou <a href="#" class="manual">choisissez-les</a>.</span></div>
+  <p class="file-hint">Captures, journaux, exports. Anonymisez toujours les données de vos visiteurs avant l'envoi. Taille maximale&nbsp;: 20&nbsp;Mo par fichier.</p>
+</div></div>
+      </fieldset>
+      <fieldset><legend>Contexte</legend>
+        <div class="two"><div class="fld"><label for="plugin">Plugin concerné *</label><select id="plugin"><option selected>Heatlens</option><option>Auditlens</option><option>Autre</option></select></div><div class="fld"><label for="mver">Version de Matomo *</label><select id="mver"><option>5.14.1</option><option selected>5.14.2</option><option>6.0.0-b6</option></select></div></div>
+        <div class="fld"><label for="url">Adresse de votre Matomo</label><input id="url" type="text" value="https://matomo.atelier-lumen.fr"><p class="help" id="url-help">Aucun accès ne vous sera demandé.</p></div>
+        <fieldset class="fld rad"><legend class="lab">Hébergement</legend><label class="opt"><input type="radio" name="host" checked> Serveur dédié</label><label class="opt"><input type="radio" name="host"> Mutualisé</label><label class="opt"><input type="radio" name="host"> Conteneur Docker</label></fieldset>
+        <div class="fld"><label for="lic">Numéro de licence</label><input id="lic" type="text" placeholder="OWN-…"><p class="help" id="lic-help">Sur votre facture. Il donne accès au support prioritaire si vous y avez souscrit.</p></div>
+        <label class="opt chk"><input type="checkbox" checked> J'ai consulté le journal d'erreurs de PHP et celui de Matomo.</label>
+      </fieldset>
+      <div class="cta-row"><button class="btn btn-marker" type="submit">Envoyer le ticket</button><button class="btn btn-line dark" type="reset">Tout effacer</button><a class="textlink" href="index.html">Annuler</a></div>
+    </form>
+  </section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap ft">
+    <p class="ft-big">Ownalytics</p>
+    <ul class="legal"><li><a href="#">Mentions légales</a></li><li><a href="#">Conditions</a></li><li><a href="#">Confidentialité</a></li><li><a href="#">Politique de support</a></li></ul>
+    <p class="small">Matomo est une marque déposée d'InnoCraft Ltd. Ownalytics est un éditeur indépendant, sans lien avec InnoCraft.</p>
+    <p class="small">© 2026 Coderise SAS - Tous droits réservés. <a href="https://osticket.com">Logiciel de support propulsé par osTicket</a></p>
+  </div>
+</footer>
+</body>
+</html>

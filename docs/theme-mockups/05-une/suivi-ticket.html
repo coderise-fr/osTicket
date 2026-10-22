@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket #482913 | Ownalytics Support</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#3B1E54">
+<link rel="icon" href="../_shared/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../_shared/fonts.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body class="p-ticket">
+<a class="mockup-back" href="../index.html">Retour à la comparaison des maquettes</a>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="site-header">
+  <div class="wrap hd">
+    <a class="brand" href="index.html" aria-label="Ownalytics Support, accueil"><svg class="mark" width="20" height="26" viewBox="0 0 20 26" aria-hidden="true" focusable="false"><path d="M1 1h18v21l-3 3-3-3-3 3-3-3-3 3-3-3z" fill="#FBFBF6"/><path d="M5 7h10M5 11h6M5 15h10" stroke="#3B1E54" stroke-width="2"/></svg><span class="wm">Ownalytics</span><span class="wm-sub">Support</span></a>
+    <nav aria-label="Menu principal"><ul class="menu"><li><a href="index.html">Accueil</a></li><li><a href="base-de-connaissances.html">Base de connaissances</a></li><li><a href="ouvrir-un-ticket.html">Ouvrir un nouveau ticket</a></li><li><a href="mes-tickets.html" aria-current="page">Tickets (3)</a></li></ul></nav>
+    <p class="acct">Camille Roux <a href="connexion.html">Se déconnecter</a> <span class="lang"><a href="#" aria-current="true">FR</a> / <a href="#" hreflang="en">EN</a></span></p>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+
+<section class="mast" aria-labelledby="t1"><div class="wrap">
+  <p class="back"><a href="mes-tickets.html">Mes tickets</a></p>
+  <p class="tnum">#482913</p>
+  <h1 id="t1" class="headline">Heatlens&nbsp;: les heatmaps restent vides après la mise à jour vers Matomo 5.14.2</h1>
+  <dl class="strip"><div><dt>Statut</dt><dd>Ouvert</dd></div><div><dt>Support</dt><dd>Prioritaire, 4&nbsp;h</dd></div><div><dt>Service</dt><dd>Support Ownalytics</dd></div><div><dt>Création</dt><dd class="mono">14/10/2026 09:12</dd></div></dl>
+</div></section>
+<div class="wrap t-grid">
+  <div>
+    <h2 class="sec">Correspondance</h2>
+    <div class="corr"><article class="ent message" aria-label="Camille Roux, 14/10/2026 09:12">
+  <div class="when"><span class="d">14</span><span class="m">oct.</span><time>09:12</time></div>
+  <div class="what"><p class="who"><b>Camille Roux</b> <span class="tag you">Vous</span></p>
+    <p>Bonjour,</p><p>Depuis la mise à jour de notre Matomo en 5.14.2 hier soir, plus aucune heatmap ne se remplit sur le site de notre client. Le suivi des sessions, lui, continue de fonctionner&nbsp;: les enregistrements apparaissent bien.</p><p>Le code de suivi est toujours en place et nous n'avons rien changé côté Heatlens. Vous trouverez en pièces jointes une capture d'une heatmap vide et un extrait du journal de Matomo.</p><p>Merci d'avance,<br>Camille</p><div class="attachments"><span class="attachment-info"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M14.5 7.5 8 14a2.5 2.5 0 0 0 3.5 3.5l7-7a4.5 4.5 0 0 0-6.4-6.4l-7 7a6.5 6.5 0 0 0 9.2 9.2"/></svg> <a class="filename" href="#">capture-heatmap-vide.png</a> <small class="filesize faded">84&nbsp;Ko</small></span><span class="attachment-info"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M14.5 7.5 8 14a2.5 2.5 0 0 0 3.5 3.5l7-7a4.5 4.5 0 0 0-6.4-6.4l-7 7a6.5 6.5 0 0 0 9.2 9.2"/></svg> <a class="filename" href="#">matomo-extrait.log</a> <small class="filesize faded">12&nbsp;Ko</small></span></div></div></article><article class="ent response" aria-label="Inès Moreau, 14/10/2026 10:03">
+  <div class="when"><span class="d">14</span><span class="m">oct.</span><time>10:03</time></div>
+  <div class="what"><p class="who"><b>Inès Moreau</b> <span class="tag">Équipe Ownalytics</span></p>
+    <p>Bonjour Camille,</p><p>Merci pour les captures, elles nous aident beaucoup. Dans l'extrait de journal, la tâche d'archivage des heatmaps s'arrête avec une erreur de mémoire juste après la mise à jour&nbsp;: c'est la cause la plus probable.</p><p>Pouvez-vous lancer l'archivage à la main depuis le serveur, puis nous dire ce qu'il affiche&nbsp;?</p><pre>php console core:archive --force-all-websites --url=https://matomo.atelier-lumen.fr</pre><p>Pensez à anonymiser les adresses IP dans ce que vous nous envoyez.</p><p>Inès, support Ownalytics</p></div></article><article class="ent message" aria-label="Camille Roux, 14/10/2026 14:40">
+  <div class="when"><span class="d">14</span><span class="m">oct.</span><time>14:40</time></div>
+  <div class="what"><p class="who"><b>Camille Roux</b> <span class="tag you">Vous</span></p>
+    <p>Merci pour la piste. J'ai lancé la commande&nbsp;: elle va jusqu'au bout cette fois, après avoir passé la limite de mémoire PHP à 512&nbsp;Mo. Les nouvelles visites remplissent les heatmaps depuis 13&nbsp;h, mais les données d'avant la mise à jour restent vides.</p><p>La sortie de la commande est en pièce jointe.</p><div class="attachments"><span class="attachment-info"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M14.5 7.5 8 14a2.5 2.5 0 0 0 3.5 3.5l7-7a4.5 4.5 0 0 0-6.4-6.4l-7 7a6.5 6.5 0 0 0 9.2 9.2"/></svg> <a class="filename" href="#">sortie-archivage.txt</a> <small class="filesize faded">3&nbsp;Ko</small></span></div></div></article><article class="ent response" aria-label="Inès Moreau, 15/10/2026 09:20">
+  <div class="when"><span class="d">15</span><span class="m">oct.</span><time>09:20</time></div>
+  <div class="what"><p class="who"><b>Inès Moreau</b> <span class="tag">Équipe Ownalytics</span></p>
+    <p>Bonne nouvelle, et merci pour ce retour précis. Les données d'avant la mise à jour ne sont pas perdues&nbsp;: elles sont dans votre base, mais il faut les archiver de nouveau. Le guide joint explique comment relancer l'archivage sur la période du 1er au 13 octobre.</p><p>Dites-nous si les anciennes heatmaps réapparaissent. Sans nouvelle de votre part, nous garderons le ticket ouvert jusqu'à lundi.</p><p>Inès</p><div class="attachments"><span class="attachment-info"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M14.5 7.5 8 14a2.5 2.5 0 0 0 3.5 3.5l7-7a4.5 4.5 0 0 0-6.4-6.4l-7 7a6.5 6.5 0 0 0 9.2 9.2"/></svg> <a class="filename" href="#">guide-reprise-archivage.pdf</a> <small class="filesize faded">212&nbsp;Ko</small></span></div></div></article></div>
+    <form id="reply" class="reply" action="suivi-ticket.html#reply" method="post">
+      <h2 class="big dark">Répondre.</h2>
+      <p class="help">Soyez précis et détaillé. Joignez journaux et captures, sans données de visiteurs.</p>
+      <div class="redactor-box">
+  <div class="redactor-toolbar" role="toolbar" aria-label="Mise en forme"><button type="button" class="re-button re-bold" aria-label="Gras"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M7 4h6a3.5 3.5 0 0 1 0 7H7zM7 11h7a3.5 3.5 0 0 1 0 7H7z"/></svg></button><button type="button" class="re-button re-italic" aria-label="Italique"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M10 4h8M6 20h8M14 4 10 20"/></svg></button><button type="button" class="re-button re-list" aria-label="Liste"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button><button type="button" class="re-button re-link" aria-label="Lien"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button type="button" class="re-button re-image" aria-label="Image"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg></button><button type="button" class="re-button re-code" aria-label="Code"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="m8 8-5 4 5 4m8-8 5 4-5 4M14 5l-4 14"/></svg></button></div>
+  <div class="redactor-editor" id="reply-message" role="textbox" aria-multiline="true" aria-label="Votre réponse" contenteditable="true" style="min-height:9.600000000000001em"></div>
+</div>
+      <div class="filedrop">
+  <div class="dropzone"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></svg> <span>Déposez des fichiers ici ou <a href="#" class="manual">choisissez-les</a>.</span></div>
+  <p class="file-hint">Captures, journaux, exports. Anonymisez toujours les données de vos visiteurs avant l'envoi. Taille maximale&nbsp;: 20&nbsp;Mo par fichier.</p>
+</div>
+      <div class="cta-row"><button class="btn btn-plum" type="submit">Envoyer la réponse</button><button class="btn btn-line dark" type="reset">Effacer</button></div>
+    </form>
+  </div>
+  <aside class="facts" aria-label="Détails du ticket">
+    <h2 class="sec">Détails</h2>
+    <dl><div><dt>Plugin concerné</dt><dd>Heatlens</dd></div><div><dt>Version de Matomo</dt><dd>5.14.2</dd></div><div><dt>Adresse de votre Matomo</dt><dd>https://matomo.atelier-lumen.fr</dd></div><div><dt>Hébergement</dt><dd>Serveur dédié</dd></div><div><dt>Nom</dt><dd>Camille Roux</dd></div><div><dt>E-mail</dt><dd>camille.roux@atelier-lumen.fr</dd></div><div><dt>Téléphone</dt><dd class="mono">04 42 00 00 00</dd></div></dl>
+    <h2 class="sec">Pièces jointes</h2>
+    <ul class="files"><li><a href="#">capture-heatmap-vide.png</a><small>84&nbsp;Ko</small></li><li><a href="#">matomo-extrait.log</a><small>12&nbsp;Ko</small></li><li><a href="#">sortie-archivage.txt</a><small>3&nbsp;Ko</small></li><li><a href="#">guide-reprise-archivage.pdf</a><small>212&nbsp;Ko</small></li></ul>
+    <p class="acts"><a class="textlink" href="#">Imprimer</a> <a class="textlink" href="#">Modifier</a></p>
+  </aside>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap ft">
+    <p class="ft-big">Ownalytics</p>
+    <ul class="legal"><li><a href="#">Mentions légales</a></li><li><a href="#">Conditions</a></li><li><a href="#">Confidentialité</a></li><li><a href="#">Politique de support</a></li></ul>
+    <p class="small">Matomo est une marque déposée d'InnoCraft Ltd. Ownalytics est un éditeur indépendant, sans lien avec InnoCraft.</p>
+    <p class="small">© 2026 Coderise SAS - Tous droits réservés. <a href="https://osticket.com">Logiciel de support propulsé par osTicket</a></p>
+  </div>
+</footer>
+</body>
+</html>

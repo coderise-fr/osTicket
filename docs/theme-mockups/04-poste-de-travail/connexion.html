@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexion | Ownalytics Support</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#3B1E54">
+<link rel="icon" href="../_shared/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../_shared/fonts.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body class="p-login">
+<a class="mockup-back" href="../index.html">Retour à la comparaison des maquettes</a>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="Ownalytics Support, accueil"><svg class="mark" width="20" height="26" viewBox="0 0 20 26" aria-hidden="true" focusable="false"><path d="M1 1h18v21l-3 3-3-3-3 3-3-3-3 3-3-3z" fill="#FBFBF6"/><path d="M5 7h10M5 11h6M5 15h10" stroke="#3B1E54" stroke-width="2"/></svg><span class="wm">Ownalytics</span><span class="wm-sub">Support</span></a>
+  <form class="gsearch" role="search" action="base-de-connaissances.html"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input type="search" name="q" placeholder="Rechercher un ticket ou un article" aria-label="Rechercher un ticket ou un article"><kbd aria-hidden="true">/</kbd></form>
+  <div class="user"><a href="connexion.html">Se connecter</a><span class="lang"><a href="#" aria-current="true">FR</a><a href="#" hreflang="en">EN</a></span></div>
+</header>
+<div class="shell">
+  <nav class="rail" aria-label="Menu principal">
+    <ul class="r-main">
+      <li><a href="index.html"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></svg><span>Accueil</span></a></li>
+      <li><a href="mes-tickets.html"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M4 6h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg><span>Mes tickets</span><b class="badge">3</b></a></li>
+      <li><a href="ouvrir-un-ticket.html"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg><span>Ouvrir un ticket</span></a></li>
+      <li><a href="base-de-connaissances.html"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM8 20a3 3 0 0 1-3-3"/></svg><span>Base de connaissances</span></a></li>
+      <li><a href="connexion.html" aria-current="page"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Suivre un ticket</span></a></li>
+    </ul>
+    
+    <p class="r-title">Aide</p>
+    <ul class="r-views small"><li><a href="#"><span>Politique de support</span></a></li><li><a href="#"><span>Conditions de licence</span></a></li><li><a href="#"><span>État du service</span></a></li></ul>
+  </nav>
+  <main id="main" tabindex="-1">
+
+<div class="ph"><h1>Connexion</h1><p class="ph-sub">Connectez-vous à votre compte, ou suivez un ticket avec son numéro.</p></div>
+<div class="cols-two">
+<form class="panel form compact" action="mes-tickets.html" method="post" aria-labelledby="l1"><h2 id="l1" class="f-sec">Compte</h2>
+  <div class="stackf"><label for="username">E-mail ou identifiant</label><input id="username" type="text" autocomplete="username"></div>
+  <div class="stackf"><label for="passwd">Mot de passe</label><input id="passwd" type="password" autocomplete="current-password"></div>
+  <div class="f-actions"><button class="btn btn-primary" type="submit">Se connecter</button><a href="#">Mot de passe oublié</a></div>
+  <p class="foot-note">Pas encore de compte&nbsp;? <a href="#">Créer un compte</a>. Agent&nbsp;? <a href="#">Connexion agents</a>.</p></form>
+<form class="panel form compact" action="suivi-ticket.html" method="post" aria-labelledby="l2"><h2 id="l2" class="f-sec">Suivre un ticket sans compte</h2>
+  <div class="stackf"><label for="email">E-mail</label><input id="email" type="text" placeholder="camille@exemple.fr"></div>
+  <div class="stackf"><label for="ticketno">N° de ticket</label><input id="ticketno" type="text" class="short" placeholder="482913"></div>
+  <div class="f-actions"><button class="btn" type="submit">Envoyer le lien d'accès</button></div>
+  <p class="foot-note">Première demande, ou numéro perdu&nbsp;? <a href="ouvrir-un-ticket.html">Ouvrir un ticket</a>.</p></form>
+</div>
+  </main>
+</div>
+<footer class="foot"><span>© 2026 Coderise SAS - Tous droits réservés.</span><a href="#">Mentions légales</a><a href="#">Conditions</a><a href="#">Confidentialité</a><span class="grow">Matomo est une marque déposée d'InnoCraft Ltd. Ownalytics est un éditeur indépendant, sans lien avec InnoCraft.</span><a href="https://osticket.com">Propulsé par osTicket</a></footer>
+</body>
+</html>
