@@ -1,0 +1,218 @@
+{
+ "accueil-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "ouverture-ticket-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "connexion-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "inscription-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mot-de-passe-oublie-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "acces-par-numero-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "base-de-connaissances-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-categorie-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-vide-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-article-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": []
+ },
+ "mes-tickets-fermes-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-vide-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-ferme-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "profil-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "modifier-ticket-fr-bureau": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 6.59,
+  "lowContrast": []
+ },
+ "accueil-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "ouverture-ticket-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "connexion-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "inscription-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mot-de-passe-oublie-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "acces-par-numero-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "base-de-connaissances-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-categorie-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 7.6,
+  "lowContrast": []
+ },
+ "kb-recherche-vide-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "kb-article-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.37,
+  "lowContrast": []
+ },
+ "mes-tickets-fermes-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "mes-tickets-vide-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "suivi-ticket-ferme-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "profil-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 5.98,
+  "lowContrast": []
+ },
+ "modifier-ticket-fr-mobile": {
+  "overflow": 0,
+  "wide": [],
+  "minContrast": 6.59,
+  "lowContrast": []
+ }
+}

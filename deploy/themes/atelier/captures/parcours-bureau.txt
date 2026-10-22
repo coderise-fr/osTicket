@@ -1,0 +1,28 @@
+OK   ouverture: erreurs affichées 
+OK   ouverture: champs dynamiques rechargés en AJAX 
+OK   ouverture: page de remerciement avec numéro 331803
+OK   accès: message "lien envoyé" 
+OK   accès: e-mail reçu avec lien http://127.0.0.1:18951/view.php?auth=o1xbuaaaaamaaaaacFFEcoBq1CIOcA%3D%3D
+OK   accès: fil visible pour l’invité 
+OK   accès: pièce jointe dans le fil 
+OK   accès: champs dynamiques en colonne 
+OK   accès: réponse de l’invité publiée 
+OK   connexion: erreur affichée 
+OK   connexion: liste des tickets 
+OK   liste: onglet Fermés 
+OK   liste: recherche 1
+OK   liste: état vide 
+OK   isolation: ticket d’un autre client absent 
+OK   suivi: réponse publiée avec pièce jointe 
+OK   suivi: message de succès 
+OK   inscription: page de confirmation 
+OK   inscription: e-mail de confirmation http://127.0.0.1:18951/pwreset.php?token=9T_swiegLZVlfgZJeWm9Ur_8esJQWHVS9L6dn09i7CpFVfRe
+OK   inscription: compte confirmé 
+OK   mot de passe: demande envoyée 
+OK   mot de passe: e-mail de réinitialisation http://127.0.0.1:18951/pwreset.php?token=1Lb9LJ2on_AYFwjexKIi769R8TkzUqEExD3ArwNamEGdt3qI
+OK   mot de passe: formulaire du nouveau mot de passe http://127.0.0.1:18951/index.php
+FAIL mot de passe: changé  Tickets Showing 1 - 3 of 3 Open Tickets 
+OK   kb: résultats de recherche 
+OK   kb: fiche article 
+OK   kb: filtre par thème 
+
