@@ -118,7 +118,7 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 
 | Composant | Testé | Remarques |
 |---|---|---|
-| PHP | 8.2 (image par défaut), 8.3 | **PHP 8.2 n'est plus maintenu après le 31/12/2026** (fin du support de sécurité amont selon le calendrier de php.net, à reverifier) : prévoir le passage à 8.3 avant cette date (une reconstruction avec `--build-arg PHP_IMAGE=php:8.3-apache-bookworm@sha256:...` suffit, à épingler par digest). **PHP 8.4 échoue à la construction** : l'extension `imap` n'est plus livrée avec PHP 8.4 (il faudrait la compiler depuis PECL). |
+| PHP | **8.3 (image par défaut, décision du 22/10/2026)**, 8.2 testé | On reste en 8.3. **PHP 8.4 et 8.5 échouent à la construction** : les sources de PHP n'embarquent plus l'extension `imap` (le dossier `ext/imap` est vide, sans `config.m4`, constaté le 22/10/2026 sur 8.4 et 8.5) ; il faudrait la compiler depuis PECL. Ne passer à 8.5 que si `imap` y est de nouveau livrée ou si la compilation PECL est validée. PHP 8.2 n'est plus maintenu après le 31/12/2026 (à reverifier sur php.net). |
 | MariaDB | 11.4 | Base de données de la pile (LTS). MySQL non testé. |
 | osTicket | v1.18.x (tête de `develop`) ; migration depuis v1.17.8 | La version affichée est `1.18-git` (les builds ne portent pas le numéro de release). |
 | Debian | bookworm | trixie : `libc-client-dev` n'existe plus, la construction échoue. |
@@ -462,9 +462,9 @@ Rien de ceci n'a été exécuté. À faire sur une instance de test, pas sur la 
 | Scan de l'image en service et d'une image reconstruite à neuf | Chaque semaine, et à chaque annonce de sécurité Apache/PHP/openssl | Un référent technique + un suppléant | `./scripts/build.sh build --pull --no-cache` sous un tag candidat, puis `docker scout cves --only-severity critical,high local://coderise/osticket:<tag>` ; comparer au scan de l'image en service |
 | Reconstruction et déploiement de routine | Chaque mois au minimum, même sans alerte | idem | Procédure « Mises à jour » (sans migration : `up -d`) |
 | Reconstruction d'urgence | Sous 48 h pour une faille critique corrigée et exploitable (Apache, PHP, osTicket) ; sous 7 jours pour une faille élevée corrigée | idem | idem, avec validation de l'étape 7 |
-| Rafraîchir les digests `PHP_IMAGE` (Dockerfile) et `mariadb` (compose.yaml) | À chaque reconstruction de routine | idem | `docker buildx imagetools inspect php:8.2-apache-bookworm` (le digest amont a déjà changé depuis l'épinglage du 20/10/2026) |
+| Rafraîchir les digests `PHP_IMAGE` (Dockerfile) et `mariadb` (compose.yaml) | À chaque reconstruction de routine | idem | `docker buildx imagetools inspect php:8.3-apache-bookworm` (le digest amont a déjà changé depuis l'épinglage du 20/10/2026) |
 | Suivre les versions d'osTicket | Chaque semaine | idem | Liste des versions du dépôt amont (releases GitHub d'osTicket) et avis de sécurité ; fusionner les tags dans la branche du fork |
-| Fin de vie PHP | Décision d'ici fin novembre 2026 | Responsable technique | PHP 8.2 sort du support de sécurité le 31/12/2026 : basculer sur 8.3 (testé, voir « Versions supportées ») |
+| Fin de vie PHP | Décidé le 22/10/2026 : rester en 8.3 | Responsable technique | Surveiller `imap` pour 8.4/8.5 (voir « Versions supportées ») ; ne pas prendre la dernière version de PHP sans raison |
 | Test de restauration | Chaque trimestre | idem | `restore.sh` sur une pile jetable, comparer l'empreinte et ouvrir un ticket avec pièce jointe |
 
 À savoir : (a) sans `--no-cache`, la reconstruction réutilise la couche `apt-get upgrade` du cache et ne

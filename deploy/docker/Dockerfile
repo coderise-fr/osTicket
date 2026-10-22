@@ -20,9 +20,9 @@
 #   - setup/ never present in the runtime image (not even in a lower layer)
 #   - ost-config.php lives in a dedicated volume that must be mounted read-only
 #
-# To refresh the base image: pick the new digest of php:8.2-apache-bookworm
-#   (docker buildx imagetools inspect php:8.2-apache-bookworm) and update PHP_IMAGE.
-ARG PHP_IMAGE=php:8.2-apache-bookworm@sha256:6d6e8fa0373692f588cf9f871f141eb6eba14a9260c346ffe7c93c51646a633f
+# To refresh the base image: pick the new digest of php:8.3-apache-bookworm
+#   (docker buildx imagetools inspect php:8.3-apache-bookworm) and update PHP_IMAGE.
+ARG PHP_IMAGE=php:8.3-apache-bookworm@sha256:cbd3b3d9011668443d54ab40ec31db56c73d91b4c8198935d639aa80d2d815c1
 ARG APCU_VERSION=5.1.28
 
 
