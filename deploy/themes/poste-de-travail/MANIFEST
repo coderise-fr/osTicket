@@ -1,0 +1,21 @@
+# Files installed by apply.sh into deploy/docker/overlay/ (paths relative to the osTicket root).
+# One path per line. Keep in sync with overlay/ (apply.sh refuses otherwise).
+assets/poste-de-travail/css/theme.css
+assets/poste-de-travail/fonts/OFL.txt
+assets/poste-de-travail/fonts/archivo-100-900-latin.woff2
+assets/poste-de-travail/fonts/ibm-plex-mono-400-latin.woff2
+assets/poste-de-travail/fonts/ibm-plex-mono-500-latin.woff2
+assets/poste-de-travail/img/favicon.svg
+assets/poste-de-travail/js/theme.js
+include/client/accesslink.inc.php
+include/client/footer.inc.php
+include/client/header.inc.php
+include/client/kb-categories.inc.php
+include/client/login.inc.php
+include/client/open.inc.php
+include/client/poste-de-travail/i18n/fr.php
+include/client/poste-de-travail/theme.php
+include/client/templates/thread-entry.tmpl.php
+include/client/tickets.inc.php
+include/client/view.inc.php
+index.php

@@ -129,8 +129,9 @@ body.ptdt {
 
 /* ---------- Layout: rail + main ---------- */
 
-.shell { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 900px) { .has-rail .shell { grid-template-columns: 214px minmax(0, 1fr); } }
+.shell { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; }
+.has-rail .shell { grid-template-rows: auto 1fr; }
+@media (min-width: 900px) { .has-rail .shell { grid-template-columns: 214px minmax(0, 1fr); grid-template-rows: 1fr; } }
 .rail { background: var(--plum-deep); color: var(--plum-light); padding: 12px 10px 20px; }
 .ptdt .rail ul { list-style: none; margin: 0; padding: 0; }
 .ptdt .rail a { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: var(--r); color: var(--plum-light); text-decoration: none; font-weight: 500; font-stretch: 100%; }
@@ -158,6 +159,17 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
    a bare <h1> followed by an introduction paragraph */
 .ptdt main#content > h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.01em; margin: 0 0 6px; overflow-wrap: anywhere; }
 .ptdt main#content > h1 + p { color: var(--ink-soft); margin-bottom: 16px; max-width: 72ch; }
+/* Offline page (offline.php: no navigation, admin HTML in #landing_page) */
+.no-rail #landing_page { background: #fff; border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; max-width: 720px; margin: 24px auto 0; }
+.no-rail #landing_page h1 { font-size: 1.375rem; font-weight: 800; margin-bottom: 8px; }
+/* Thank-you page (open.php after creation): the admin HTML is printed straight
+   into <main> after the notice; its blocks are drawn as one white panel */
+.p-open main#content:not(:has(#ticketForm)) > :not(.alert) {
+  margin: 0; padding: 6px 18px; background: #fff; border: 1px solid var(--line); border-block: 0; max-width: 880px;
+}
+.p-open main#content:not(:has(#ticketForm)) > :not(.alert):first-child,
+.p-open main#content:not(:has(#ticketForm)) > .alert + * { border-top: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; padding-top: 16px; }
+.p-open main#content:not(:has(#ticketForm)) > :not(.alert):last-child { border-bottom: 1px solid var(--line); border-radius: 0 0 var(--r) var(--r); padding-bottom: 16px; }
 .ptdt main#content > form#clientLogin { background: #fff; border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px 18px; max-width: 560px; }
 .ptdt main#content > form#clientLogin > div[style] { width: 100% !important; }
 .ptdt main#content > form#clientLogin label { display: block; font-weight: 600; margin: 12px 0 4px; }
@@ -205,6 +217,11 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
 .ptdt #msg_warning, .ptdt .warning-banner { border-color: #E8CF8A; border-left-color: #B07A00; background: var(--warn-bg); color: var(--warn); }
 .ptdt #msg_info { border-color: #B9C6EA; border-left-color: var(--cobalt); background: var(--cobalt-bg); }
 .ptdt .alert a, .ptdt #msg_error a, .ptdt #msg_warning a { color: inherit; font-weight: 700; }
+/* view.inc.php repeats the page message above the reply form (core behaviour):
+   keep that one, next to where the visitor lands (#reply), hide the copy on top */
+.ptdt main#content:has(.main-col > #msg_notice) > #msg_notice,
+.ptdt main#content:has(.main-col > #msg_error) > #msg_error,
+.ptdt main#content:has(.main-col > #msg_warning) > #msg_warning { display: none; }
 .ptdt .err-box { margin: 12px 18px 0; }
 .ptdt .warning-banner { margin: 12px 18px 0; }
 
@@ -212,11 +229,11 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
 
 .ptdt .btn, .ptdt input[type=submit], .ptdt input[type=reset], .ptdt input[type=button], .ptdt button.button, .ptdt a.button, .ptdt .action-button {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px;
-  border: 1px solid var(--line-strong); border-radius: var(--r); background: #fff; color: var(--ink);
+  border: 1px solid var(--line-strong); border-radius: var(--r); background: #fff; color: var(--ink); --btn-fg: var(--ink);
   font: inherit; font-stretch: 100%; font-weight: 600; line-height: 1.2; text-decoration: none; cursor: pointer; box-shadow: none; text-shadow: none; width: auto; height: auto;
 }
 .ptdt .btn:hover, .ptdt input[type=submit]:hover, .ptdt input[type=reset]:hover, .ptdt input[type=button]:hover, .ptdt .action-button:hover { background: var(--head); color: var(--ink); }
-.ptdt .btn-primary, .ptdt input[type=submit].btn-primary, .ptdt form .buttons input[type=submit], .ptdt #clientLogin input[type=submit] { background: var(--plum); border-color: var(--plum); color: var(--paper); }
+.ptdt .btn-primary, .ptdt input[type=submit].btn-primary, .ptdt form .buttons input[type=submit], .ptdt #clientLogin input[type=submit] { background: var(--plum); border-color: var(--plum); color: var(--paper); --btn-fg: var(--paper); }
 .ptdt .btn-primary:hover, .ptdt input[type=submit].btn-primary:hover, .ptdt form .buttons input[type=submit]:hover { background: var(--plum-deep); color: #fff; }
 .ptdt .btn-link, .ptdt input[type=button].btn-link { border-color: transparent; background: none; color: var(--cobalt); }
 .ptdt .btn-link:hover { background: var(--cobalt-bg); color: var(--plum); }
@@ -372,6 +389,17 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
   .ptdt form table:not(.grid) td[colspan] > div:only-child { grid-column: 1 / -1; }
   .ptdt form table:not(.grid) > tbody > tr:not(.f-static) > td:first-child:not([colspan]) { padding-top: 7px; }
 }
+.ptdt form table:not(.grid) td:has(> div.error) input:not([type=checkbox]):not([type=radio]),
+.ptdt form table:not(.grid) td:has(> div.error) select,
+.ptdt form table:not(.grid) td:has(> div.error) .redactor-box { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+/* Phone field: number, "Ext:" text node and extension stay on one line */
+.ptdt form table:not(.grid) td[colspan] > label:has(> input[type=tel]) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; grid-column: 1 / -1; }
+.ptdt form table:not(.grid) td[colspan] > label:has(> input[type=tel]) > span:first-child { flex: 1 0 100%; padding-top: 0; }
+.ptdt form table:not(.grid) input[type=tel] { width: 16rem; max-width: 100%; }
+.ptdt form table:not(.grid) input[name$="-ext"] { width: 6rem; }
+@media (min-width: 760px) {
+  .ptdt form table:not(.grid) td[colspan] > label:has(> input[type=tel]) > span:first-child { flex: 0 0 calc(10rem + 12px); }
+}
 /* Block-level fields (section breaks) have no label */
 .ptdt form table:not(.grid) .section-break { grid-column: 1 / -1; }
 /* Panel look for the forms that keep osTicket's table markup */
@@ -380,7 +408,7 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
 .ptdt form:has(> table.padded) > p:last-child, .ptdt form:has(> table > #dynamic-form) > p:last-child {
   display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start !important; text-align: left !important; margin: 0; padding: 16px 18px 0;
 }
-.ptdt form:has(> table.padded) > p:last-child input[type=submit], .ptdt form:has(> table > #dynamic-form) > p:last-child input[type=submit] { background: var(--plum); border-color: var(--plum); color: var(--paper); }
+.ptdt form:has(> table.padded) > p:last-child input[type=submit], .ptdt form:has(> table > #dynamic-form) > p:last-child input[type=submit] { background: var(--plum); border-color: var(--plum); color: var(--paper); --btn-fg: var(--paper); }
 .ptdt form table.padded > tbody > tr > td:not([colspan]) > div > hr { display: none; }
 .ptdt #timezone-dropdown + .select2, .ptdt .select2-container { max-width: 34rem; }
 .ptdt .select2-container .select2-selection--single { height: 34px; border-color: var(--line-strong); border-radius: var(--r); }
@@ -397,7 +425,7 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
 .ptdt .redactor-placeholder::before { color: #6B7080 !important; font-family: var(--sans); }
 /* js/osticket.js colours the submit button red (inline style) once a form has
    unsaved changes: keep the cue, but readable on the plum button */
-.ptdt input[type=submit][style*="color"] { color: var(--paper) !important; box-shadow: inset 0 -3px 0 var(--sun); }
+.ptdt input[type=submit][style*="color"] { color: var(--btn-fg, var(--ink)) !important; text-decoration: underline; text-decoration-color: var(--hot); text-underline-offset: .25em; }
 .ptdt .redactor-box:focus-within { outline: 2px solid var(--cobalt); outline-offset: 1px; border-color: var(--cobalt); }
 .ptdt .draft-saved { font-size: .75rem; color: var(--ink-soft); background: var(--head); border-radius: var(--r); }
 .ptdt .filedrop { margin-top: 8px; }
@@ -491,6 +519,7 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
 .ptdt .grid.kb h3 { font-size: .9375rem; }
 .ptdt .grid.kb h3 a { display: inline-flex; gap: 6px; align-items: center; }
 .ptdt .grid.kb .sub p { margin: 2px 0 0; }
+.ptdt .grid.kb .sub > :last-child { margin-bottom: 0; }
 .ptdt .grid.kb .arts a { display: block; font-size: .875rem; padding: 1px 0; font-weight: 400; }
 .ptdt .grid.kb .num { font-size: .875rem; color: var(--ink-soft); }
 .ptdt ul.subcats { list-style: none; margin: 4px 0 0; padding: 0; font-size: .875rem; }
@@ -547,6 +576,7 @@ main#content { display: block; padding: 18px 16px 40px; min-width: 0; max-width:
   .ptdt .entry { break-inside: avoid; margin-bottom: 6pt; background: #fff !important; }
   .ptdt .entry.response { border-left: 3pt solid #000; }
   .ptdt .thread-body pre { background: #fff; color: #000; border: 1px solid #999; }
-  .ptdt a { color: #000 !important; text-decoration: none; }
+  .ptdt a, .ptdt .thread-body a, .ptdt .thread-body pre a { color: #000 !important; text-decoration: none; }
+  .ptdt .crumbs { display: none; }
   .ptdt .st, .ptdt .tag, .ptdt .e-av { border: 1px solid #000; background: #fff !important; color: #000 !important; }
 }

@@ -223,6 +223,7 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
             );
             $status = TicketStatus::getLocalById($T['status_id'], 'value', $T['status__name']);
             $answered = ($T['isanswered'] && !strcasecmp($T['status__state'], 'open'));
+            if ($answered) $ptdt_answered = true;
             $isCollab = ($thisclient->getId() != $T['user_id']);
             ?>
             <tr id="<?php echo $T['ticket_id']; ?>" class="<?php if ($answered) echo 'answered'; ?>">
@@ -263,4 +264,6 @@ if ($total) { ?>
 <?php
 } ?>
 </div>
+<?php if (!empty($ptdt_answered)) { ?>
 <p class="legend"><span class="dot" aria-hidden="true"></span> <?php echo ptdt__('Answered, awaiting your reply'); ?></p>
+<?php } ?>

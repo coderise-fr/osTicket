@@ -1,0 +1,5 @@
+# LF everywhere (shell scripts run on Linux and in Git Bash; PHP templates are
+# copied into the Docker image). Binary assets untouched.
+* text=auto eol=lf
+*.woff2 binary
+*.png binary
