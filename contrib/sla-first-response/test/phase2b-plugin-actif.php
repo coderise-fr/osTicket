@@ -31,8 +31,12 @@ Ticket::checkOverdue();
 $f = fresh($id);
 check('cron à +5 h : PAS en retard', $f['isoverdue'] == 0, json_encode($f));
 check('aucun événement overdue', nb_overdue_events($id) == 0);
-$ev = db_result(db_query('SELECT COUNT(*) FROM ' . THREAD_EVENT_TABLE . ' e JOIN ' . EVENT_TABLE . ' v ON v.id=e.event_id AND v.name="edited" JOIN ' . THREAD_TABLE . ' th ON th.id=e.thread_id WHERE th.object_id=' . $id . ' AND e.data LIKE \'%sla_id%\''));
-check('événement « edited » sla_id journalisé dans l\'historique', $ev == 1, $ev);
+// Depuis la version 0.3 : événement propre au plugin (« sla_first_response »),
+// que le portail client n'affiche pas ; plus d'événement « edited ».
+$ev = db_result(db_query('SELECT COUNT(*) FROM ' . THREAD_EVENT_TABLE . ' e JOIN ' . EVENT_TABLE . ' v ON v.id=e.event_id AND v.name="sla_first_response" JOIN ' . THREAD_TABLE . ' th ON th.id=e.thread_id AND th.object_type="T" WHERE th.object_id=' . $id . ' AND e.data = \'{"sla_id":[' . $watch . ',' . $done . ']}\''));
+check('événement « sla_first_response » (sla_id watch -> done) journalisé dans l\'historique', $ev == 1, $ev);
+$ev = db_result(db_query('SELECT COUNT(*) FROM ' . THREAD_EVENT_TABLE . ' e JOIN ' . EVENT_TABLE . ' v ON v.id=e.event_id AND v.name="edited" JOIN ' . THREAD_TABLE . ' th ON th.id=e.thread_id AND th.object_type="T" WHERE th.object_id=' . $id . ' AND e.data LIKE \'%sla_id%\''));
+check('plus d\'événement « edited » sla_id (que le portail client affichait)', $ev == 0, $ev);
 
 echo "== P2 : modification / réouverture / transfert ensuite : l'échéance ne revient pas\n";
 $t = reload($id);

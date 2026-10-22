@@ -26,6 +26,15 @@
     première réponse et le comptage des dépassements se font en SQL
     (contrib/sla-first-response/sql/), indépendamment du plugin.
 
+    Depuis la version 0.3 :
+    - la bascule est tracée par un événement propre au plugin
+      (« sla_first_response », classe SlaFirstResponseEvent dans
+      event.php), visible des agents mais pas du client, au lieu de
+      l'événement « edited » que le portail client affichait ;
+    - le plugin expose le niveau de contrat d'un client (organisation
+      « Priority ») aux thèmes du portail : coderise_contract_level(),
+      voir contract_level.php.
+
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     See LICENSE.TXT for details.
 
@@ -37,6 +46,22 @@ require_once INCLUDE_DIR . 'class.signal.php';
 class SlaFirstResponseConfig extends PluginConfig {
 
     function getOptions() {
+        return $this->buildOptions(false);
+    }
+
+    // Champs du formulaire d'administration uniquement : on y ajoute l'état
+    // actuel de l'organisation Priority et la proposition du plugin Stripe.
+    // getOptions() (appelé à chaque requête par le constructeur) ne fait
+    // aucune requête SQL.
+    function getFields() {
+        return $this->buildOptions(true);
+    }
+
+    private function buildOptions($forForm) {
+        $orgHint = __('Organisation dont les membres ont le niveau « Priority » : la même organisation que celle utilisée par le plugin Stripe (stripe-sync). Identifiant (organizations.php?id=…) ou nom exact ; enregistrée sous forme d\'identifiant. Vide = niveau « Standard » pour tous.');
+        if ($forForm)
+            $orgHint .= self::orgFormHint($this->get('contract_org'));
+
         return array(
             'sla_watch' => new TextboxField(array(
                 'label' => __('Plan de SLA surveillé (identifiant)'),
@@ -52,10 +77,69 @@ class SlaFirstResponseConfig extends PluginConfig {
                 'configuration' => array(
                     'size' => 8, 'length' => 10, 'validator' => 'number'),
             )),
+            'contract_section' => new SectionBreakField(array(
+                'label' => __('Niveau de contrat (thèmes du portail client)'),
+                'hint' => __('Utilisé par la fonction coderise_contract_level() que les thèmes appellent pour afficher « Priority » ou « Standard ».'),
+            )),
+            'contract_org' => new TextboxField(array(
+                'label' => __('Organisation Priority'),
+                'hint' => $orgHint,
+                'required' => false,
+                'configuration' => array('size' => 40, 'length' => 128),
+            )),
+            'contract_label_priority' => new TextboxField(array(
+                'label' => __('Libellé du niveau Priority'),
+                'hint' => __('Texte affiché par les thèmes, traduit par le catalogue de langue s\'il y figure.'),
+                'default' => 'Priority',
+                'required' => false,
+                'configuration' => array('size' => 30, 'length' => 60),
+            )),
+            'contract_label_standard' => new TextboxField(array(
+                'label' => __('Libellé du niveau Standard'),
+                'default' => 'Standard',
+                'required' => false,
+                'configuration' => array('size' => 30, 'length' => 60),
+            )),
         );
     }
 
+    /**
+     * Organisation désignée par un identifiant ou par un nom exact, ou null.
+     * Un nom fait uniquement de chiffres est d'abord pris pour un identifiant.
+     */
+    static function lookupOrg($value) {
+        $value = trim((string) $value);
+        if ($value === '')
+            return null;
+        if (ctype_digit($value) && ($org = Organization::lookup((int) $value)))
+            return $org;
+        return Organization::lookup(array('name' => $value)) ?: null;
+    }
+
+    private static function orgFormHint($current) {
+        $hint = '';
+        if (trim((string) $current) !== '') {
+            $org = self::lookupOrg($current);
+            $hint .= ' ' . ($org
+                ? sprintf(__('Actuellement : « %1$s » (n° %2$d).'), $org->getName(), $org->getId())
+                : __('Attention : l\'organisation enregistrée n\'existe plus, tous les clients sont au niveau « Standard ».'));
+        }
+        elseif (($stripe = SlaFirstResponsePlugin::stripeSyncOrgName()) !== null) {
+            $hint .= ' ' . sprintf(__('Proposition (configuration du plugin Stripe) : « %s ».'), $stripe);
+        }
+        return $hint;
+    }
+
     function pre_save(&$config, &$errors) {
+        // Niveau de contrat : organisation résolue une fois, ici, puis
+        // enregistrée par son identifiant (indépendant d'un renommage).
+        if (trim((string) $config['contract_org']) !== '') {
+            if (!($org = self::lookupOrg($config['contract_org'])))
+                $errors['contract_org'] = __('Organisation introuvable');
+            else
+                $config['contract_org'] = (string) $org->getId();
+        }
+
         $watch = SLA::lookup((int) $config['sla_watch']);
         $done = SLA::lookup((int) $config['sla_done']);
 
@@ -85,8 +169,66 @@ class SlaFirstResponsePlugin extends Plugin {
         return false;
     }
 
+    /**
+     * Valeurs proposées pour une nouvelle instance (écran « Add New
+     * Instance ») : l'organisation Priority du plugin Stripe s'il est
+     * installé et configuré. Lecture seule, sans dépendance au plugin.
+     */
+    function getNewInstanceDefaults($options) {
+        $defaults = array();
+        if (($org = self::stripeSyncOrgName()) !== null)
+            $defaults['contract_org'] = $org;
+        return $defaults;
+    }
+
+    /**
+     * Nom de l'organisation Priority du plugin contrib/stripe-sync, ou null
+     * s'il n'est pas installé ou n'a pas d'instance. Reprend son ordre de
+     * lecture (StripeSyncSettings::getOrgName()) : variable d'environnement
+     * STRIPE_SYNC_PRIORITY_ORG, puis champ « org_name » de son instance,
+     * puis « Priority ». Ne charge aucune classe du plugin Stripe : lit sa
+     * configuration dans la table de configuration d'osTicket.
+     */
+    static function stripeSyncOrgName() {
+        try {
+            foreach (PluginManager::allInstalled() as $p) {
+                if (!($p instanceof Plugin)
+                        || !is_array($p->info)
+                        || @$p->info['id'] != 'coderise:stripe-sync')
+                    continue;
+                foreach ($p->getInstances() as $i) {
+                    $env = getenv('STRIPE_SYNC_PRIORITY_ORG');
+                    if (is_string($env) && trim($env) !== '')
+                        return trim($env);
+                    $c = new Config($i->getNamespace());
+                    $name = trim((string) $c->get('org_name'));
+                    return $name !== '' ? $name : 'Priority';
+                }
+            }
+        }
+        catch (Throwable $t) {
+            // Proposition seulement : ne jamais bloquer le formulaire.
+        }
+        return null;
+    }
+
     function bootstrap() {
         $config = $this->getConfig();
+
+        // Niveau de contrat (API des thèmes) : indépendant des plans de SLA,
+        // disponible dès que l'instance est active, même si les plans ne
+        // sont pas (encore) configurés.
+        require_once dirname(__FILE__) . '/contract_level.php';
+        SlaContractLevel::configure(
+            (int) $config->get('contract_org'),
+            $config->get('contract_label_priority'),
+            $config->get('contract_label_standard'));
+
+        // Événement « première réponse » : la classe doit être déclarée
+        // avant l'affichage d'un fil (ThreadEvent::getTypedEvent()).
+        require_once INCLUDE_DIR . 'class.thread.php';
+        require_once dirname(__FILE__) . '/event.php';
+
         $watch = (int) $config->get('sla_watch');
         $done = (int) $config->get('sla_done');
         if (!$watch || !$done || $watch == $done)
@@ -170,8 +312,9 @@ class SlaFirstResponsePlugin extends Plugin {
             // moins création) et par l'événement `overdue` déjà écrit.
             $ticket->updateEstDueDate();
 
-            // Trace dans l'historique du ticket : « SLA modifié de … à … ».
-            $ticket->logEvent('edited', array('sla_id' => array($watch, $done)));
+            // Trace dans l'historique du ticket, visible des agents mais pas
+            // du client (voir SlaFirstResponseEvent, event.php).
+            SlaFirstResponseEvent::log($ticket, $watch, $done);
         }
         catch (Throwable $t) {
             // Ne jamais empêcher l'envoi d'une réponse à cause du plugin.

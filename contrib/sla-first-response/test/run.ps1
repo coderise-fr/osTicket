@@ -13,6 +13,10 @@
 #   2. phase2a-installation-plugin   installation et refus de configurations invalides
 #   3. phase2b-plugin-actif.php      comportement du plugin (réponse avec / sans e-mail)
 #   4. phase3-sql.php                requêtes sql/ sur des tickets et des lignes sub: factices
+#   5. phase4a-niveau-contrat-config niveau de contrat : configuration, validation, proposition Stripe
+#   6. phase4b-niveau-contrat-api    coderise_contract_level() : règles, cache, fin d'abonnement, libellés
+#   7. phase4c-portail-client.php    portail client réel en HTTP (sonde dans un gabarit de la copie
+#                                    de test), événement de bascule invisible au client, visible agent
 # Aucun fichier du dépôt n'est modifié ; rien n'est envoyé hors de la machine
 # (à part le téléchargement des images Docker et des paquets Debian du build).
 # Lancer le script une fois par moteur : mariadb:10.11 ET mysql:8.0.
@@ -29,6 +33,7 @@ $net = "ostsla$suffix"; $db = "ostsla-db-$suffix"; $web = "ostsla-web-$suffix"
 $phpImage = "ost-sla-test-php:$suffix"
 $tmp = Join-Path ([IO.Path]::GetTempPath()) "ostsla-$suffix"
 $failed = $false
+$phase4 = @('phase4a-niveau-contrat-config.php', 'phase4b-niveau-contrat-api.php', 'phase4c-portail-client.php')
 $isMysql = $MariaDbImage -like 'mysql*'
 $client = if ($isMysql) { 'mysql' } else { 'mariadb' }
 
@@ -38,6 +43,10 @@ try {
     tar -xf "$tmp\src.tar" -C "$tmp\app"
     New-Item -ItemType Directory -Force "$tmp\app\include\plugins\sla_first_response" | Out-Null
     Copy-Item "$here\..\plugin\sla_first_response\*" "$tmp\app\include\plugins\sla_first_response\"
+    # Plugin Stripe tel qu'il est committé (sans ses tests), pour la phase 4a :
+    # lecture de son organisation Priority, sans dépendance du plugin SLA.
+    New-Item -ItemType Directory -Force "$tmp\app\include\plugins\stripe-sync" | Out-Null
+    Copy-Item "$tmp\app\contrib\stripe-sync\*" "$tmp\app\include\plugins\stripe-sync\" -Recurse -Exclude 'tests'
     Copy-Item "$tmp\app\include\ost-sampleconfig.php" "$tmp\app\include\ost-config.php"
 
     docker build -q -t $phpImage $here | Out-Null
@@ -58,7 +67,7 @@ try {
     }
     "Moteur : " + (docker exec $db $client -h 127.0.0.1 -uroot -prootpw -N -e 'select version(), @@global.time_zone, @@global.sql_mode' | Out-String).Trim()
     docker exec $web sh -c 'chmod 666 /app/include/ost-config.php'
-    foreach ($f in 'common.php', 'phase1-sans-plugin.php', 'phase2a-installation-plugin.php', 'phase2b-plugin-actif.php', 'phase3-sql.php', 'install-http.php') {
+    foreach ($f in @('common.php', 'phase1-sans-plugin.php', 'phase2a-installation-plugin.php', 'phase2b-plugin-actif.php', 'phase3-sql.php', 'install-http.php') + $phase4) {
         docker cp "$here\$f" "${web}:/tmp/$f"
     }
     docker cp "$here\..\sql" "${web}:/tmp/sql"
@@ -67,7 +76,7 @@ try {
     $out = docker exec $web php /tmp/install-http.php 2>&1 | Out-String
     if ($out -notmatch 'INSTALL OK') { throw "Installation d'osTicket échouée : $out" }
 
-    foreach ($f in 'phase1-sans-plugin.php', 'phase2a-installation-plugin.php', 'phase2b-plugin-actif.php', 'phase3-sql.php') {
+    foreach ($f in @('phase1-sans-plugin.php', 'phase2a-installation-plugin.php', 'phase2b-plugin-actif.php', 'phase3-sql.php') + $phase4) {
         "===== $f"
         $res = docker exec $web php -d date.timezone=UTC -d memory_limit=512M "/tmp/$f" 2>&1 |
             Where-Object { $_ -notmatch 'sendmail' }
