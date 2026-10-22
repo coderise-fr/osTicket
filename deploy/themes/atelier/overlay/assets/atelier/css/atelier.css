@@ -640,10 +640,10 @@ body.atelier {
 .atelier .tab { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border-radius: 999px; color: var(--nuit); font: 600 .9375rem var(--f-titre); text-decoration: none; }
 .atelier .tab:hover { background: var(--blanc); }
 .atelier .tab.on { background: var(--nuit); color: var(--blanc); }
-.atelier .tsearch-form { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; flex: 1 1 420px; }
-.atelier .tsearch { position: relative; display: flex; align-items: center; gap: 8px; flex: 1 1 260px; max-width: 440px; }
+.atelier .tsearch-form { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; flex: 1 1 20rem; min-width: 0; }
+.atelier .tsearch { position: relative; display: flex; align-items: center; gap: 8px; flex: 1 1 16rem; min-width: 0; max-width: 440px; }
 .atelier .tsearch > .ic { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--ardoise); pointer-events: none; }
-.atelier .tsearch input[type=search] { padding-left: 44px; border-radius: 999px; }
+.atelier .tsearch input[type=search] { flex: 1 1 auto; min-width: 0; padding-left: 44px; border-radius: 999px; }
 .atelier .tsearch-form select { width: auto; flex: 0 1 17rem; max-width: 100%; border-radius: 999px; padding-left: 18px; }
 .atelier .sortbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0 0 18px; font-size: .9375rem; }
 .atelier .sortbar .muted { margin-right: 4px; }
@@ -679,7 +679,7 @@ body.atelier {
   .atelier .t-side { grid-column: 1 / -1; justify-items: start; }
   .atelier .t-badges { justify-content: flex-start; }
   .atelier .chev { display: none; }
-  .atelier .tsearch-form select { flex: 1 1 100%; }
+  .atelier .tsearch-form, .atelier .tsearch-form select { flex: 1 1 100%; min-width: 0; }
   .atelier .tsearch { max-width: none; }
 }
 .atelier .empty { max-width: 640px; margin: 24px auto; text-align: center; padding: 48px 32px; }
