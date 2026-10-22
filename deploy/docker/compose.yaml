@@ -35,7 +35,7 @@ services:
   web:
     <<: *hardened
     build: *osticket-build
-    image: coderise/osticket:${OST_VERSION:-1.18.4}
+    image: ${OST_IMAGE:-coderise/osticket}:${OST_VERSION:-1.18.4}
     command: ["web"]
     depends_on:
       db: { condition: service_healthy }
@@ -49,6 +49,7 @@ services:
         required: false
     environment:
       OSTICKET_COOKIE_SECURE: ${OSTICKET_COOKIE_SECURE:-1}
+      OSTICKET_MAX_WORKERS: ${OSTICKET_MAX_WORKERS:-40}
       OSTICKET_TRUSTED_PROXIES: ${OSTICKET_TRUSTED_PROXIES:-10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1}
     volumes:
       - ost-config:/etc/osticket:ro
@@ -62,7 +63,7 @@ services:
   # osTicket's scheduler: fetches mail, marks overdue tickets, purges old data.
   cron:
     <<: *hardened
-    image: coderise/osticket:${OST_VERSION:-1.18.4}
+    image: ${OST_IMAGE:-coderise/osticket}:${OST_VERSION:-1.18.4}
     command: ["cron"]
     depends_on:
       db: { condition: service_healthy }

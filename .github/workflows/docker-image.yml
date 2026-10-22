@@ -1,0 +1,73 @@
+name: docker-image
+
+# Builds the hardened osTicket images (deploy/docker/Dockerfile) and pushes them to the
+# GitHub Container Registry. Tags are immutable commit tags (sha-<7 chars>); deploy one
+# with deploy/docker/droplet/update.sh <tag>.
+#   ghcr.io/<owner>/osticket:sha-abc1234            runtime image (production)
+#   ghcr.io/<owner>/osticket:sha-abc1234-install    + setup wizard (first install only)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: docker-image
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name and tag
+        id: meta
+        run: |
+          owner="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
+          echo "image=ghcr.io/${owner}/osticket" >> "$GITHUB_OUTPUT"
+          echo "tag=sha-$(echo "${{ github.sha }}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The Dockerfile fails the build if install-mysql.sql does not match core.sig
+      # (corrupted line endings), so a bad checkout can never produce an image.
+      - name: Runtime image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile
+          target: runtime
+          build-args: |
+            OST_REVISION=${{ github.sha }}
+          tags: ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+          cache-from: type=gha,scope=runtime
+          cache-to: type=gha,scope=runtime,mode=max
+          push: true
+
+      - name: Install image (setup wizard)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile
+          target: install
+          build-args: |
+            OST_REVISION=${{ github.sha }}
+          tags: ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}-install
+          cache-from: type=gha,scope=runtime
+          push: true
+
+      - name: Summary
+        run: |
+          echo "Deploy with: ./droplet/update.sh ${{ steps.meta.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"

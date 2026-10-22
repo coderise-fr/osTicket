@@ -65,6 +65,7 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --chown=root:root --chmod=0644 deploy/docker/conf/osticket.ini "$PHP_INI_DIR/conf.d/zz-osticket.ini"
 
 ENV OSTICKET_COOKIE_SECURE=1 \
+    OSTICKET_MAX_WORKERS=40 \
     OSTICKET_TRUSTED_PROXIES="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.1"
 
 

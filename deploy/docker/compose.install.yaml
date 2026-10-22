@@ -11,7 +11,7 @@ services:
   web:
     build:
       target: install
-    image: coderise/osticket:${OST_VERSION:-1.18.4}-install
+    image: ${OST_IMAGE:-coderise/osticket}:${OST_VERSION:-1.18.4}-install
     command: ["install"]
     volumes:
       - ost-config:/etc/osticket

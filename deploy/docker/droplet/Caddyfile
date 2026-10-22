@@ -1,0 +1,21 @@
+# TLS reverse proxy for the osTicket stack. Installed by provision.sh as
+# /etc/caddy/Caddyfile (the domain placeholder is replaced). Caddy obtains and renews the
+# Let's Encrypt certificate by itself: the DNS record must already point to this Droplet
+# and ports 80/443 must be open.
+SUPPORT_DOMAIN {
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        -Server
+    }
+
+    # Matches Apache LimitRequestBody (12 MB) and the PHP upload limits of the image.
+    request_body {
+        max_size 13MB
+    }
+
+    # Caddy adds X-Forwarded-For / X-Forwarded-Proto. The container trusts them from
+    # the Docker bridge (OSTICKET_TRUSTED_PROXIES).
+    reverse_proxy 127.0.0.1:8080
+}

@@ -514,7 +514,8 @@ page de statut, et le délai de réaction contractuel que les seuils ci-dessus d
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `OST_PROJECT` | `osticket` | Nom du projet Compose (préfixe des conteneurs et volumes) |
-| `OST_VERSION` | `1.18.4` | Tag de l'image |
+| `OST_IMAGE`, `OST_VERSION` | `coderise/osticket`, `1.18.4` | Dépôt et tag de l'image (Droplet : `ghcr.io/…`, `sha-xxxxxxx`) |
+| `OSTICKET_MAX_WORKERS` | `40` | Processus Apache (8 sur le Droplet 1 Go) |
 | `OST_BIND`, `OST_PORT` | `127.0.0.1`, `8080` | Adresse et port publiés |
 | `OSTICKET_COOKIE_SECURE` | `1` | `0` uniquement pour un test en HTTP local |
 | `OSTICKET_TRUSTED_PROXIES` | réseaux privés | Proxys autorisés à fournir `X-Forwarded-For` |
@@ -524,19 +525,7 @@ page de statut, et le délai de réaction contractuel que les seuils ci-dessus d
 `NOM=valeur` par ligne, par exemple `STRIPE_SYNC_WEBHOOK_SECRET_FILE=/etc/osticket/stripe-sync-webhook-secret`
 (voir « Plugins »).
 
-## App Platform (DigitalOcean)
+## Droplet DigitalOcean
 
-No volumes there, so `OSTICKET_CONFIG_FROM_ENV=1` makes the entrypoint render `ost-config.php`
-from `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASS/DB_PREFIX/DB_SSL/DB_SSL_CA/SECRET_SALT/ADMIN_EMAIL`
-at start (the `/etc/osticket` read-only check does not apply in that mode). The default (last) Dockerfile
-stage is `production` = `runtime`, because App Platform cannot select a target. See `app-spec.yaml`.
-
-1. Create a MySQL cluster (not PostgreSQL). 2. Run the `install` target locally against it (allow your IP in
-the cluster's trusted sources) and keep the generated `SECRET_SALT`. 3. Set `SECRET_SALT` as an encrypted env
-var and deploy. Never change the salt afterwards. Not verified on App Platform: TLS to the managed database
-(`DB_SSL=1`, mysqlnd without a CA file does not verify the server).
-
-Upgrades there (not tested on App Platform): the `production` image already contains the upgrader, so after a
-deploy of the new commit open `https://<app>/scp/upgrade.php` as an administrator when the schema signature changed
-(see "Mises à jour"); `ost-config.php` is re-rendered from the environment at each start, so no `install` target is
-needed. Plugin secrets are encrypted environment variables of the `web` component (no volume for a secret file).
+Déploiement sur un Droplet (Caddy sur l'hôte, image GHCR construite par GitHub Actions,
+sauvegardes locales, UFW, réglages 1 Go de RAM) : voir [droplet/README.md](droplet/README.md).
