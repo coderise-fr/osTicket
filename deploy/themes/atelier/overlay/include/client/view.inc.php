@@ -53,9 +53,11 @@ if ($thisclient && $thisclient->isGuest()
         <span class="status status-<?php echo $state == 'closed' ? 'closed' : 'open'; ?>"><?php
             echo atelier_icon($state == 'closed' ? 'lock' : 'inbox', 14);
             echo $S ? $S->getLocalName() : ''; ?></span>
-<?php if (atelier_is_priority($ticket)) { ?>
-        <span class="plan plan-priority"><?php echo atelier_icon('bolt', 13); ?>Priority</span>
-<?php } ?>
+<?php
+// Contract level of the ticket's OWNER (never a collaborator), current
+// level, from the sla-first-response plugin; nothing without it.
+echo atelier_contract_badge(atelier_contract($ticket)); ?>
+
         <span class="when"><span class="visually-hidden"><?php echo __('Create Date'); ?> </span><?php
             echo Format::datetime($ticket->getCreateDate()); ?></span>
     </div>
