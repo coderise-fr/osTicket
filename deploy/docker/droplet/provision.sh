@@ -23,6 +23,7 @@ export DEBIAN_FRONTEND=noninteractive
 . /etc/os-release
 case "$ID" in ubuntu|debian) ;; *) echo "unsupported OS: $ID" >&2; exit 1 ;; esac
 
+echo 'DPkg::Lock::Timeout "600";' > /etc/apt/apt.conf.d/99-lock-timeout   # first boot: cloud-init may hold the lock
 echo "== packages"
 apt-get update
 apt-get -y upgrade
@@ -80,13 +81,15 @@ fi
 
 echo "== application checkout"
 install -d -o deploy -g deploy "$APP"
-if [ ! -d "$APP/.git" ]; then
+if [ -d "$APP/.git" ]; then
+    sudo -u deploy git -C "$APP" pull --ff-only || echo "WARNING: git pull failed in $APP"
+else
     sudo -u deploy git clone --depth 1 --branch "$BRANCH" --filter=blob:none --sparse "$REPO_URL" "$APP" \
         && sudo -u deploy git -C "$APP" sparse-checkout set deploy/docker \
         || echo "WARNING: clone failed (private repository? use a deploy key or a token). Clone $REPO_URL into $APP as deploy."
 fi
 STACK="$APP/deploy/docker"
-if [ -d "$STACK" ]; then
+if [ -f "$STACK/droplet/env.example" ]; then
     [ -f "$STACK/.env" ] || sudo -u deploy cp "$STACK/droplet/env.example" "$STACK/.env"
     install -d -m 700 -o deploy -g deploy "$APP/secrets" /var/backups/osticket
     sudo -u deploy "$STACK/scripts/gen-secrets.sh" "$APP/secrets"
