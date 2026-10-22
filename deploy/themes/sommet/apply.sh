@@ -22,6 +22,12 @@ here="$(cd "$(dirname "$0")" && pwd)"
 src="$here/overlay"
 list="$here/MANIFEST"
 manifest_rel="include/client/$THEME/installed.manifest"
+# Tout autre dossier de deploy/themes/ est aussi un thème alternatif (ownalytics-*, etc.).
+for d in "$here"/../*/; do
+    n="$(basename "$d")"
+    case "$n" in "$THEME"|_*) continue ;; esac
+    case " $OTHERS " in *" $n "*) ;; *) OTHERS="$OTHERS $n" ;; esac
+done
 
 dry=0; force=0; dst=""
 for a in "$@"; do
