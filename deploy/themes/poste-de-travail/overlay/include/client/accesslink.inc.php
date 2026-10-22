@@ -1,6 +1,6 @@
 <?php
 if(!defined('OSTCLIENTINC')) die('Access Denied');
-/* Theme "Poste de travail" (Ownalytics) - overrides include/client/accesslink.inc.php.
+/* Theme "Poste de travail" (Coderise) - overrides include/client/accesslink.inc.php.
  * Same form (#clientLogin, lemail, lticket, CSRF) and links as the core template. */
 
 $email=Format::input($_POST['lemail']?$_POST['lemail']:$_GET['e']);
@@ -26,7 +26,7 @@ else
     <?php csrf_token(); ?>
     <h2 class="f-sec" id="access-t"><?php echo __('Ticket Number'); ?></h2>
 <?php if ($errors['login']) { ?>
-    <p class="err-box" role="alert"><strong><?php echo Format::htmlchars($errors['login']); ?></strong></p>
+    <p class="err-box" role="alert"><?php echo ptdt_icon('alert'); ?><strong><?php echo Format::htmlchars($errors['login']); ?></strong></p>
 <?php } ?>
     <div class="stackf">
         <label for="email"><?php echo __('Email Address'); ?></label>

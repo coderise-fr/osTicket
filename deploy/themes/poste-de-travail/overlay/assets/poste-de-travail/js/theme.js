@@ -1,4 +1,4 @@
-/* Theme "Poste de travail" (Ownalytics) for the osTicket client portal.
+/* Theme "Poste de travail" (Coderise) for the osTicket client portal.
  * Keyboard shortcut: "/" moves the focus to the knowledge base search of the
  * top bar, unless the visitor is typing in a field or editor. */
 (function () {

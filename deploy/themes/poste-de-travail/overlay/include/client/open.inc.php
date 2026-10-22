@@ -1,6 +1,6 @@
 <?php
 if(!defined('OSTCLIENTINC')) die('Access Denied!');
-/* Theme "Poste de travail" (Ownalytics) - overrides include/client/open.inc.php.
+/* Theme "Poste de travail" (Coderise) - overrides include/client/open.inc.php.
  * Same logic, fields, names, AJAX reload of #dynamic-form, CAPTCHA and buttons
  * as the core template. The form keeps its table rows (they are produced by
  * templates/dynamic-form.tmpl.php, shared with other pages); the stylesheet
@@ -37,11 +37,11 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
 }
 
 ?>
-<div class="ph">
+<div class="title-row"><div>
     <h1><?php echo __('Open a New Ticket');?></h1>
-    <p class="ph-sub"><?php echo __('Please fill in the form below to open a new ticket.');?></p>
-</div>
-<div class="cols-form">
+    <p class="sub"><?php echo __('Please fill in the form below to open a new ticket.');?></p>
+</div></div>
+<div class="cols cols-form"><div class="col-main">
 <form id="ticketForm" class="panel form tform" method="post" action="open.php" enctype="multipart/form-data">
   <?php csrf_token(); ?>
   <input type="hidden" name="a" value="open">
@@ -124,7 +124,7 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
     } ?>
     </tbody>
   </table>
-  <p class="buttons f-actions">
+  <p class="buttons form-actions">
         <input type="submit" class="btn btn-primary" value="<?php echo __('Create Ticket');?>">
         <input type="reset" class="btn" name="reset" value="<?php echo __('Reset');?>">
         <input type="button" class="btn btn-link" name="cancel" value="<?php echo __('Cancel'); ?>" onclick="javascript:
@@ -136,17 +136,18 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
             window.location.href='index.php';">
   </p>
 </form>
+</div>
 <?php
 if ($cfg->isKnowledgebaseEnabled()
     && ($faqs = FAQ::getFeatured()->select_related('category')->limit(5))
     && $faqs->all()) { ?>
-<aside class="side">
+<aside class="col-side">
     <section class="panel" aria-labelledby="open-faq">
-        <div class="p-head"><h2 id="open-faq"><?php echo __('Featured Questions'); ?></h2></div>
-        <ul class="faq">
+        <div class="panel-h"><h2 id="open-faq"><?php echo __('Featured Questions'); ?></h2></div>
+        <ul class="kb-rows">
 <?php   foreach ($faqs as $F) { ?>
             <li><a href="<?php echo ROOT_PATH; ?>kb/faq.php?id=<?php echo urlencode($F->getId());
-                ?>" target="_blank"><?php echo ptdt_icon('doc', 14); ?> <span><?php echo $F->getLocalQuestion(); ?></span></a></li>
+                ?>" target="_blank"><?php echo ptdt_icon('doc'); ?><span><?php echo $F->getLocalQuestion(); ?></span></a></li>
 <?php   } ?>
         </ul>
     </section>
