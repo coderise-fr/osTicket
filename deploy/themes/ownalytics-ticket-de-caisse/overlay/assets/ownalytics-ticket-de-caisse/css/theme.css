@@ -22,8 +22,8 @@
   --ink-soft: #5F5C59;   /* texte secondaire sur papier : 6,4:1 */
   --fade: #8A8784;       /* décoratif : filets et pointillés, jamais du texte */
   --marker: #F4E04D;
-  --danger: #9E1B2E;     /* extension proposée (à valider) : 7,6:1 sur papier */
-  --success: #17603F;    /* extension proposée (à valider) : 7,3:1 sur papier */
+  --danger: #9E1B2E;     /* extension proposée (à valider) : 7,9:1 sur blanc */
+  --success: #17603F;    /* extension proposée (à valider) : 7,6:1 sur blanc */
   --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --gutter: 16px;
