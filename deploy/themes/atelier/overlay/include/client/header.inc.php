@@ -29,6 +29,9 @@ if (strpos($_SERVER['SCRIPT_NAME'], '/kb/') !== false)
 if (isset($inc) && is_string($inc))
     $atelier_classes[] = 'v-' . preg_replace('/[^a-z0-9]+/', '-',
         strtolower(preg_replace('/(\.inc)?\.php$/', '', basename($inc))));
+// offline.php is included by client.inc.php under the name of the page asked for
+if (is_object($ost) && !$ost->isSystemOnline())
+    $atelier_classes[] = 'p-offline';
 if ($atelier_page == 'open' && isset($ticket) && $ticket)
     $atelier_classes[] = 'v-thanks';
 $atelier_signed_in = ($thisclient && is_object($thisclient)
