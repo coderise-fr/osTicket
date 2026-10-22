@@ -272,11 +272,34 @@ renvoie le lien (action « Register » de la liste des utilisateurs, `scp/users.
 - Identification de l'abonnement Priority : ids de prix (`price_…`) et/ou de produit
   (`prod_…`) configurés. Sans configuration, les événements d'abonnement répondent 503 plutôt
   que d'être ignorés en silence.
-- Organisation : retrouvée par nom (« Priority » par défaut) ; créée si absente avec **tous les
-  drapeaux de partage à zéro**. Si elle existe avec un drapeau de partage/collaboration, ou un
-  domaine mappé, le plugin **refuse** de l'utiliser (503 + erreur au journal système) : des
-  clients sans lien ne doivent pas voir les tickets les uns des autres, ni s'inscrire
-  automatiquement via un domaine. L'événement est rejoué une fois l'organisation corrigée (vérifié).
+- Organisation (version 0.2 du plugin) : retrouvée par son **identifiant mémorisé** (`ost_config`,
+  espace `stripesync`, clé `priority_org_id`, publiée pour les autres modules, §5.10). Le nom
+  configuré (« Priority » par défaut) ne sert qu'à la **première** résolution : premier usage
+  (création), installation 0.1 sans identifiant mémorisé (**migration** : retrouvée par nom, son
+  identifiant est mémorisé), organisation mémorisée **supprimée**, ou nom configuré modifié par
+  l'administrateur. Ordre exact :
+  1. identifiant mémorisé, si l'organisation existe et que le nom configuré n'a pas changé depuis
+     (clé interne `priority_org_name`) ;
+  2. sinon organisation portant le nom configuré ;
+  3. sinon création (jamais lors d'un détachement) ; l'identifiant obtenu en 2 ou 3 est mémorisé.
+
+  Une organisation **renommée** dans l'administration est donc toujours trouvée et aucune autre
+  n'est créée (vérifié). Une organisation mémorisée **supprimée** est remplacée (retrouvée par nom
+  ou recréée), le nouvel identifiant est mémorisé et un **avertissement** est écrit au journal
+  système (« Stripe sync: Priority organization replaced », ancien et nouvel identifiant, aucune
+  donnée personnelle ; vérifié). Les étapes 2 et 3 sont sérialisées par `GET_LOCK` : des premiers
+  abonnements simultanés ne créent qu'une organisation (vérifié, 6 requêtes parallèles).
+- Organisation créée avec **tous les drapeaux de partage à zéro**. Si l'organisation retenue
+  (par identifiant ou par nom) a un drapeau de partage/collaboration, ou un domaine mappé, le
+  plugin **refuse** de l'utiliser (503 + erreur au journal système) : des clients sans lien ne
+  doivent pas voir les tickets les uns des autres, ni s'inscrire automatiquement via un domaine.
+  L'événement est rejoué une fois l'organisation corrigée (vérifié, y compris pour une
+  organisation retrouvée par identifiant).
+- Organisation supprimée, **non traité** : osTicket retire l'organisation de ses membres
+  (`org_id = 0`) ; le plugin ne les déplace pas d'office vers la nouvelle. Chacun y est rattaché au
+  prochain événement de son abonnement, sans organisation d'origine à restaurer à la fin (elle a
+  été perdue). Le filtre de tickets compare le **nom** : le mettre à jour après un renommage ou une
+  recréation (vérifié : il ne correspond plus tant qu'il n'est pas mis à jour).
 - Organisation précédente : l'utilisateur n'a qu'une organisation. Son organisation d'origine
   (par exemple celle de son entreprise, attribuée par domaine) est mémorisée et **restaurée à la fin**.
 - Le plugin ne retire que ce qu'il a ajouté : un utilisateur placé dans Priority à la main, ou
@@ -309,6 +332,11 @@ défaut du filtre (support inclus). Rien n'est supprimé.
 
 - Journal système (Admin > Tableau de bord > Journaux) : erreurs de configuration, paiements
   échoués, événements rejetés. Niveau « info » (octroi/fin de Priority) si le niveau de journalisation l'inclut.
+- Avertissement « Stripe sync: Priority organization replaced » : l'organisation Priority mémorisée
+  a été supprimée et remplacée (§5.6). À faire : mettre à jour la valeur du filtre de tickets si le
+  nom diffère, enregistrer la nouvelle organisation dans le formulaire du plugin
+  `sla_first_response` (il affiche l'écart et l'identifiant à saisir), ranger à la main (ou
+  attendre le prochain événement de leur abonnement pour) les anciens membres.
 - Rejeu : le Dashboard Stripe permet de renvoyer un événement ; l'idempotence le rend sûr.
 - Sauvegarde/restauration de la base : l'état (`cus:…`, `evt:…`) suit la base. Après une restauration, rejouer les
   événements récents depuis Stripe.
@@ -360,6 +388,34 @@ Règles :
 - Après une restauration de la base ou un nouveau déploiement, rejouer les événements récents depuis
   Stripe reconstitue les lignes (§5.9).
 
+**Identifiant de l'organisation Priority** (version 0.2 du plugin). Second contrat d'interface, lu
+par le plugin `contrib/sla-first-response` (niveau de contrat affiché par les thèmes) :
+
+| Colonne | Valeur |
+|---|---|
+| `namespace` | `stripesync` |
+| `key` | `priority_org_id` |
+| `value` | identifiant de l'organisation (`ost_organization.id`), entier décimal |
+
+- Absente tant que le plugin n'a rattaché ni détaché aucun client (ou en version 0.1).
+- Écrite à la première résolution (§5.6), réécrite seulement si l'organisation mémorisée a été
+  supprimée ou si le nom configuré a changé ; jamais à chaque événement.
+- Peut désigner une organisation supprimée depuis (le remplacement n'a lieu qu'au prochain
+  événement) : vérifier qu'elle existe.
+- `priority_org_name` (même espace) est **interne** : ne pas la lire.
+- Lecture sans charger les classes du plugin (c'est ce que fait `sla_first_response`) :
+
+  ```sql
+  SELECT `value` FROM ost_config
+   WHERE `namespace` = 'stripesync' AND `key` = 'priority_org_id';
+  ```
+
+  Dans le plugin : `StripeSyncDbStore::readPriorityOrgId()` (entier ou `null`).
+- Ce que fait le plugin `sla_first_response` (0.4) de cette valeur : il la **propose** comme
+  organisation Priority (avant l'ancien ordre variable → `org_name` → « Priority ») et **avertit**
+  dans son formulaire d'administration si l'organisation qu'il a enregistrée en diffère (action
+  recommandée affichée). Il ne modifie jamais sa configuration de lui-même.
+
 ## 6. Mise en place
 
 **Stripe** (sandbox d'abord) : créer une destination webhook vers
@@ -373,10 +429,23 @@ Règles :
    Admin > Gérer > Plugins : installer, ajouter une instance, activer.
 2. Renseigner les ids de prix. Laisser « Accepter les événements de test » décoché en production.
 3. Créer l'organisation « Priority » : le plugin la crée au premier besoin ; si on la crée à la main,
-   décocher partage des tickets et collaborateurs automatiques, et ne mettre aucun domaine.
+   décocher partage des tickets et collaborateurs automatiques, et ne mettre aucun domaine. Son
+   identifiant est mémorisé au premier événement : elle peut ensuite être renommée sans casser le
+   plugin (mais voir le filtre, point 4).
 4. Plan SLA 4 h / planning 24/7, puis filtre de tickets : « Organisation / Nom » égal à
    « Priority » → action « Set SLA Plan ». (Le plan SLA lui-même dépend de l'issue sur le SLA de première réponse.)
-5. Adapter le modèle d'e-mail `registration-client`.
+   Le filtre compare le **nom** : le mettre à jour si l'organisation est renommée.
+5. Plugin `sla_first_response` (niveau de contrat des thèmes) : dans son formulaire, enregistrer
+   l'organisation proposée (identifiant mémorisé par ce plugin) ; aucun avertissement ne doit
+   s'afficher.
+6. Adapter le modèle d'e-mail `registration-client`.
+
+**Mise à jour du plugin 0.1 → 0.2** : remplacer les fichiers (nouveau fichier
+`include/class.stripesync.priorityorg.php`). Ne pas renommer l'organisation avant le premier
+événement traité par la 0.2 (elle est alors retrouvée par son nom et son identifiant mémorisé) ;
+pour mémoriser tout de suite, rejouer un événement d'abonnement récent depuis Stripe ou insérer les
+lignes `priority_org_id` / `priority_org_name` à la main (requête dans le README du plugin). Puis
+ouvrir le formulaire du plugin `sla_first_response` et vérifier l'absence d'avertissement.
 
 ## 7. Menaces considérées
 
@@ -398,7 +467,9 @@ Le plugin appelle uniquement : `User::lookupByEmail`, `User::fromVars`, `User::l
 `User::getAccount/getOrgId/setOrganization`, `UserAccount::register`, `ClientAccount::isLocked/isConfirmed/sendConfirmEmail`,
 `Organization::lookup/fromVars/removeUser`, `Signal::send('object.edited')`, `Validator::is_email`,
 `$cfg->getDefaultEmail()`, le signal `api`, `url_post()`, `db_query/db_input/db_affected_rows`,
-`PluginConfig`, `CONFIG_TABLE`.
+`PluginConfig`, `CONFIG_TABLE`, `GET_LOCK/RELEASE_LOCK`. Le scénario de bout en bout dépend aussi du
+plugin `sla_first_response` (`coderise_contract_level()`, formulaire) et de `Organization::delete()`
+(qui remet `org_id = 0` aux membres).
 
 Après chaque mise à jour : `php contrib/stripe-sync/tests/run.php`, puis le scénario d'intégration (voir le
 README du dossier), puis relire le changelog pour ces symboles.
@@ -424,6 +495,37 @@ README du dossier), puis relire le changelog pour ces symboles.
   fin d'abonnement → retour au support inclus, restauration de l'organisation d'origine, événements hors ordre, différés,
   organisation non sûre refusée puis rejeu, 8 requêtes simultanées, relance d'invitation limitée, compte verrouillé,
   secret absent (503), corps trop gros (413), aucune adresse e-mail dans le journal système.
+- Version 0.2 (organisation par identifiant), le 22/10/2026 :
+  - 153 tests unitaires (PHP 8.3), dont 24 sur `StripeSyncPriorityOrgResolver` : création → identifiant
+    mémorisé, chemin normal sans verrou ni écriture, renommage, autre organisation portant le nom,
+    suppression → remplacement + avertissement (une seule fois), suppression avec organisation
+    trouvée par nom, migration 0.1, nom configuré modifié, détachement sans création, identifiant
+    mémorisé entre-temps par une autre requête, verrou refusé, échec de création. Cinq mutations
+    volontaires du résolveur (organisation supprimée crue, changement de réglage ignoré,
+    avertissement rétrogradé, création au détachement, pas de relecture sous verrou) font chacune
+    échouer 2 à 6 tests.
+  - Intégration, même instance que ci-dessus (exécutée une fois, tout passé) : 59 + 12 contrôles
+    existants, plus `scenario-org.php` (23 contrôles : création et `priority_org_id`, renommage →
+    même organisation et détachement correct, organisation non sûre **retrouvée par identifiant** →
+    503 (partage puis domaine) puis rejeu accepté, suppression → recréation, avertissement au journal
+    avec les deux identifiants, nouveaux clients dans la nouvelle, anciens membres sans organisation
+    puis rattachés à leur prochain événement, migration 0.1 → trouvée par nom et mémorisée,
+    6 premiers abonnements simultanés → une seule organisation, aucune adresse au journal).
+  - **Bout en bout des deux plugins** (`scenario-e2e.php`, 34 contrôles, `stripe-sync` et
+    `sla_first_response` 0.4 installés sur la même instance) : proposition du plugin SLA avant tout
+    événement (nom) puis après (identifiant) ; événement d'abonnement signé → organisation Priority →
+    `coderise_contract_level($user)` = `priority` ; ticket créé par l'API → plan `Priority 4h` par le
+    filtre et `coderise_contract_level($ticket)` = `priority` ; **renommage de l'organisation →
+    niveau toujours `priority`** (utilisateur, ticket, nouvel abonné), aucune organisation créée, le
+    filtre par nom ne correspond plus jusqu'à sa mise à jour ; fin d'abonnement → organisation
+    d'origine restaurée → `standard` (le ticket garde son plan) ; suppression → `standard` /
+    `default`, avertissement au journal, recréation, **écart signalé dans le formulaire du plugin
+    SLA** avec l'action recommandée, configuration SLA inchangée tant que l'administrateur n'agit
+    pas, puis `priority` une fois l'identifiant enregistré. Le niveau est lu dans un nouveau processus
+    à chaque contrôle.
+  - `contrib/sla-first-response/test/run.ps1` (phase 4d ajoutée) : voir le README de ce dossier.
+  - `php setup/test/run-tests.php` (PHP 8.3) : aucun échec dans `contrib/stripe-sync/` ni
+    `contrib/sla-first-response/` (le binaire `jsl` est absent du conteneur).
 
 **Non vérifié** :
 
@@ -434,6 +536,12 @@ README du dossier), puis relire le changelog pour ces symboles.
 - Le formulaire de configuration du plugin n'a pas été affiché dans un navigateur (l'instance a été
   créée par `Plugin::addInstance`).
 - Pas de test de charge, ni de montée de version d'osTicket.
+- Version 0.2 : le changement volontaire du nom configuré n'est testé qu'en unitaire ; la mise à
+  jour réelle d'une instance 0.1 en service (remplacement des fichiers) n'a pas été jouée, seule sa
+  situation (aucun identifiant mémorisé, organisation existante) l'a été ; renommage et suppression
+  faits par les appels du modèle (`Organization::save()` / `delete()`), pas dans le navigateur ;
+  l'avertissement du plugin SLA est lu dans l'aide du champ (`getForm()`), pas à l'écran ; MySQL
+  n'a pas été utilisé pour ce harnais (MariaDB 11.4 seulement).
 - Les messages d'e-mail en français et le comportement d'un client de messagerie réel.
 
 ## 10. Questions ouvertes
