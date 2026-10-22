@@ -57,7 +57,7 @@ if (osTicket::is_ie())
     <meta name="description" content="customer support platform">
     <meta name="keywords" content="osTicket, Customer support system, support ticket system">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#3B1E54">
+    <meta name="theme-color" content="#000F26">
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css" media="screen">
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/typeahead.css"
          media="screen" />
@@ -72,7 +72,8 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/select2.min.css">
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>assets/atelier/css/atelier.css?v=<?php echo ATELIER_VERSION; ?>" media="all">
     <link rel="icon" type="image/svg+xml" href="<?php echo ROOT_PATH; ?>assets/atelier/img/favicon.svg">
-    <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="<?php echo ROOT_PATH; ?>assets/atelier/img/favicon-32.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="<?php echo ROOT_PATH; ?>assets/atelier/img/apple-touch-icon.png">
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-3.7.0.min.js"></script>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-1.13.2.custom.min.js"></script>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-timepicker-addon.js"></script>
@@ -119,51 +120,55 @@ if (osTicket::is_ie())
         elseif($ost->getNotice())
             echo sprintf('<div class="notice_bar sysbar" role="status">%s</div>', $ost->getNotice());
         ?>
-        <header id="header" class="site-header">
+        <header id="header" class="site-header on-dark">
           <div class="wrap bar">
             <a class="brand" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
                 title="<?php echo __('Support Center'); ?>"><?php
             if ($cfg->getClientLogoId()) { ?>
                 <img class="brand-logo" src="<?php echo ROOT_PATH; ?>logo.php" alt="<?php
                     echo Format::htmlchars($ost->getConfig()->getTitle()); ?>"><?php
-            } else { ?>
-                <svg class="mark" width="20" height="26" viewBox="0 0 20 26" aria-hidden="true" focusable="false"><path d="M1 1h18v21l-3 3-3-3-3 3-3-3-3 3-3-3z" fill="#FBFBF6"/><path d="M5 7h10M5 11h6M5 15h10" stroke="#3B1E54" stroke-width="2"/></svg><span class="wm"><?php
-                    echo Format::htmlchars(ATELIER_BRAND); ?></span><span class="wm-sub"><?php
-                    echo __a('Support'); ?></span><span class="visually-hidden"> &mdash; <?php
+            } else {
+                // Official horizontal logo (cut out from the brand files, never
+                // redrawn): 24 px high = X, 142 px wide (minimum 120 px).
+                ?><img class="logo" src="<?php echo ROOT_PATH; ?>assets/atelier/img/logo-coderise-horizontal.png"
+                    width="142" height="24" alt="<?php echo Format::htmlchars(ATELIER_BRAND); ?>"><span class="visually-hidden"> &mdash; <?php
                     echo Format::htmlchars($ost->getConfig()->getTitle()); ?></span><?php
             } ?></a>
 <?php
-        if ($nav && ($navs = $nav->getNavLinks()) && is_array($navs)) { ?>
+        $atelier_navs = ($nav && ($navs = $nav->getNavLinks()) && is_array($navs)) ? $navs : array();
+        $atelier_nav_html = '';
+        foreach ($atelier_navs as $atelier_nav_name => $atelier_nav_item) {
+            $atelier_nav_html .= sprintf('<li><a class="%s %s" href="%s"%s>%s</a></li>%s',
+                $atelier_nav_item['active'] ? 'active' : '', Format::htmlchars($atelier_nav_name),
+                ROOT_PATH . $atelier_nav_item['href'],
+                $atelier_nav_item['active'] ? ' aria-current="page"' : '',
+                $atelier_nav_item['desc'], "\n");
+        }
+        if ($atelier_navs) { ?>
             <nav class="site-nav" aria-label="<?php echo Format::htmlchars(__a('Main menu')); ?>">
             <ul id="nav" class="menu">
-<?php       foreach ($navs as $atelier_nav_name => $atelier_nav_item) {
-                echo sprintf('<li><a class="%s %s" href="%s"%s>%s</a></li>%s',
-                    $atelier_nav_item['active'] ? 'active' : '', Format::htmlchars($atelier_nav_name),
-                    ROOT_PATH . $atelier_nav_item['href'],
-                    $atelier_nav_item['active'] ? ' aria-current="page"' : '',
-                    $atelier_nav_item['desc'], "\n");
-            } ?>
+<?php echo $atelier_nav_html; ?>
             </ul>
             </nav>
 <?php   } ?>
             <div class="who">
 <?php
             if ($atelier_signed_in) { ?>
-                <a class="me" href="<?php echo ROOT_PATH; ?>profile.php" title="<?php echo __('Profile'); ?>"><span class="avatar av-sun sm" aria-hidden="true"><?php
+                <a class="me" href="<?php echo ROOT_PATH; ?>profile.php" title="<?php echo __('Profile'); ?>"><span class="avatar sm" aria-hidden="true"><?php
                     echo Format::htmlchars(atelier_initials($thisclient->getName())); ?></span><span class="me-name"><?php
                     echo Format::htmlchars($thisclient->getName()); ?></span><span class="visually-hidden"> (<?php
                     echo __('Profile'); ?>)</span></a>
-                <a class="out" href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a>
+                <a class="out" href="<?php echo $signout_url; ?>"><?php echo atelier_icon('logout', 16); ?><span><?php echo __('Sign Out'); ?></span></a>
 <?php
             } elseif ($nav) {
                 if ($cfg->getClientRegistrationMode() == 'public') { ?>
                 <span class="guest"><?php echo __('Guest User'); ?></span>
 <?php           }
                 if ($thisclient && $thisclient->isValid() && $thisclient->isGuest()) { ?>
-                <a class="out" href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a>
+                <a class="out" href="<?php echo $signout_url; ?>"><?php echo atelier_icon('logout', 16); ?><span><?php echo __('Sign Out'); ?></span></a>
 <?php           }
                 elseif ($cfg->getClientRegistrationMode() != 'disabled') { ?>
-                <a class="out" href="<?php echo $signin_url; ?>"><?php echo __('Sign In'); ?></a>
+                <a class="signin" href="<?php echo $signin_url; ?>"><?php echo atelier_icon('login', 18); ?><span><?php echo __('Sign In'); ?></span></a>
 <?php           }
             }
 
@@ -190,6 +195,16 @@ if (($all_langs = Internationalization::getConfiguredSystemLanguages())
                 </span>
 <?php } ?>
             </div>
+<?php if ($atelier_navs) {
+            // Small screens: the same links in a disclosure (no script).
+            // The desktop list above is hidden there, this one on desktop. ?>
+            <details class="menu-mobile">
+                <summary><?php echo atelier_icon('menu', 20); ?><span><?php echo __a('Menu'); ?></span></summary>
+                <nav aria-label="<?php echo Format::htmlchars(__a('Main menu')); ?>"><ul>
+<?php echo $atelier_nav_html; ?>
+                </ul></nav>
+            </details>
+<?php } ?>
           </div>
         </header>
         <main id="content" class="wrap main" tabindex="-1">

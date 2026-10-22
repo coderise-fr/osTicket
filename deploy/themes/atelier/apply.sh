@@ -40,12 +40,19 @@ recorded() { # hash recorded in our manifest for a path, or nothing
     [ -f "$manifest" ] && awk -v p="$1" '$2 == p { print $1 }' "$manifest" || true
 }
 
-# 1. Another theme already installed?
-for other in "$repo"/deploy/themes/*/; do
-    name="$(basename "$other")"
-    [ "$name" = atelier ] && continue
-    if ls "$dst"/include/client/"$name"/installed.manifest >/dev/null 2>&1; then
-        echo "apply.sh: le thème « $name » est installé dans l'overlay ; retirez-le d'abord ($other""remove.sh)." >&2
+# 1. Another theme already installed? The four Coderise themes are alternatives
+#    (atelier, poste-de-travail, sommet, parcours): only one at a time. Any other
+#    theme folder found in deploy/themes/ is checked the same way.
+others="poste-de-travail sommet parcours"
+for d in "$repo"/deploy/themes/*/; do
+    n="$(basename "$d")"
+    case "$n" in _*|atelier|poste-de-travail|sommet|parcours) continue ;; esac
+    others="$others $n"
+done
+for name in $others; do
+    other="$repo/deploy/themes/$name/"
+    if [ -f "$dst/include/client/$name/installed.manifest" ]; then
+        echo "apply.sh: le thème « $name » est installé dans l'overlay ; retirez-le d'abord (deploy/themes/$name/remove.sh)." >&2
         exit 1
     fi
     [ -d "$other/overlay" ] || continue

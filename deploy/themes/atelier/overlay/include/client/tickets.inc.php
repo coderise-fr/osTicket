@@ -137,10 +137,13 @@ $tickets->order_by($order.$order_by);
 $tickets->values(
     'ticket_id', 'number', 'created', 'isanswered', 'source', 'status_id',
     'status__state', 'status__name', 'cdata__subject', 'dept_id',
-    'dept__name', 'dept__ispublic', 'user__default_email__address', 'user_id'
+    'dept__name', 'dept__ispublic', 'user__default_email__address', 'user_id',
+    // Atelier theme: plan name (Priority badge) and close date.
+    'sla__name', 'closed'
 );
 
-// ---- Atelier theme: everything above is the original query logic, verbatim.
+// ---- Atelier theme: everything above is the original query logic, verbatim
+// (except the two extra columns of values() marked above).
 require_once(INCLUDE_DIR . 'client/atelier/atelier.inc.php');
 $atelier_sorts = array(
     'id' => array(__('Ticket #'), __('Ticket ID')),
@@ -150,7 +153,7 @@ $atelier_sorts = array(
     'dept' => array(__('Department'), __('Department')),
 );
 ?>
-<div class="page-head list-head">
+<div class="page-head band list-head">
     <h1 class="display"><a href="<?php echo Http::refresh_url(); ?>" title="<?php
         echo Format::htmlchars(__('Reload')); ?>"><?php echo __('Tickets'); ?></a></h1>
     <p class="sub" id="ticket-count"><?php echo $showing; ?></p>
@@ -178,7 +181,7 @@ if ($closedTickets) { ?>
 <form action="tickets.php" method="get" id="ticketSearchForm" class="tsearch-form" role="search">
     <input type="hidden" name="a"  value="search">
     <div class="tsearch">
-        <i class="icon-search" aria-hidden="true"></i>
+        <?php echo atelier_icon('search'); ?>
         <label class="visually-hidden" for="ticket-keywords"><?php echo __('Search'); ?></label>
         <input id="ticket-keywords" type="search" name="keywords" size="30" value="<?php echo Format::htmlchars($settings['keywords']); ?>">
         <input class="btn btn-ghost btn-sm" type="submit" value="<?php echo __('Search');?>">
@@ -242,8 +245,8 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
         <a class="tcard<?php if ($has_reply) echo ' unread'; if (!$is_open) echo ' is-closed'; ?>"
             href="tickets.php?id=<?php echo $T['ticket_id']; ?>"
             title="<?php echo Format::htmlchars($T['user__default_email__address']); ?>">
-            <span class="t-ic <?php echo Format::htmlchars(strtolower($T['source'])); ?>Ticket" aria-hidden="true"><i class="<?php
-                echo $is_open ? 'icon-comments-alt' : 'icon-ok'; ?>"></i></span>
+            <span class="t-ic <?php echo Format::htmlchars(strtolower($T['source'])); ?>Ticket" aria-hidden="true"><?php
+                echo atelier_icon($is_open ? ($has_reply ? 'message' : 'inbox') : 'lock', 18); ?></span>
             <span class="t-main">
                 <span class="t-subj"><?php if ($isCollab) { ?><i class="icon-group" aria-hidden="true"></i>
                     <span class="visually-hidden"><?php echo __('Collaborator'); ?>:</span> <?php } ?><?php echo $subject; ?></span>
@@ -254,12 +257,23 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
                 </span>
             </span>
             <span class="t-side">
-<?php if ($has_reply) { ?>
-                <span class="pill pill-new"><?php echo __a('New reply'); ?></span>
+                <span class="t-badges">
+                <span class="status status-<?php echo $is_open ? 'open' : 'closed'; ?>"><?php
+                    echo atelier_icon($is_open ? 'inbox' : 'lock', 14); echo $status; ?></span>
+<?php if ($T['sla__name'] && ATELIER_PRIORITY_PREFIX !== ''
+        && stripos($T['sla__name'], ATELIER_PRIORITY_PREFIX) === 0) { ?>
+                <span class="plan plan-priority"><?php echo atelier_icon('bolt', 13); ?>Priority</span>
 <?php } ?>
-                <span class="pill pill-<?php echo $is_open ? 'open' : 'closed'; ?>"><?php echo $status; ?></span>
-                <i class="chev icon-chevron-right" aria-hidden="true"></i>
+                </span>
+                <span class="t-last"><?php
+                if (!$is_open && $T['closed'])
+                    echo sprintf(__a('Closed on %s'), Format::date($T['closed']));
+                elseif ($has_reply)
+                    echo '<span class="pill pill-new">' . __a('New reply') . '</span>';
+                elseif ($is_open)
+                    echo __a('Waiting for our reply'); ?></span>
             </span>
+            <span class="chev"><?php echo atelier_icon('chevr', 20); ?></span>
         </a>
         </li>
 <?php
@@ -268,9 +282,10 @@ foreach (Topic::getHelpTopics(true) as $id=>$name) {
 <?php
  } else { ?>
     <div class="card empty">
-        <p><?php echo __('Your query did not match any records'); ?></p>
+        <?php echo atelier_sommet('empty-mark'); ?>
+        <h2><?php echo __('Your query did not match any records'); ?></h2>
 <?php if ($cfg->getClientRegistrationMode() != 'disabled' || !$cfg->isClientLoginRequired()) { ?>
-        <p class="actions"><a class="btn btn-primary" href="open.php"><?php echo __('Open a New Ticket'); ?></a></p>
+        <p class="actions"><a class="btn btn-primary" href="open.php"><?php echo atelier_icon('plus', 20); ?><?php echo __('Open a New Ticket'); ?></a></p>
 <?php } ?>
     </div>
 <?php

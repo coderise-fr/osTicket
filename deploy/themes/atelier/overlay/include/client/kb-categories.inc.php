@@ -6,7 +6,7 @@
  * pages: GET kb/faq.php?a=search&q=) and shows categories as cards. */
 require_once(INCLUDE_DIR . 'client/atelier/atelier.inc.php');
 ?>
-<section class="kb-hero">
+<section class="kb-hero on-dark">
     <h1 class="display"><?php echo __('Frequently Asked Questions'); ?></h1>
     <form class="ask" method="get" action="faq.php" role="search">
         <input type="hidden" name="a" value="search"/>
@@ -76,7 +76,7 @@ if ($topics->exists(true)) { ?>
             $count = $C->faq_count + $C->children_faq_count;
             ?>
         <li class="topic t<?php echo ($atelier_i++ % 4); ?>">
-            <span class="t-ic" aria-hidden="true"><i class="icon-folder-open"></i></span>
+            <span class="t-ic" aria-hidden="true"><?php echo atelier_icon('folder', 22); ?></span>
             <h3 class="t-name"><?php echo sprintf('<a href="faq.php?cid=%d">%s</a>',
                 $C->getId(), Format::htmlchars($C->getLocalName())); ?>
 <?php if ($count) { ?>
@@ -90,7 +90,7 @@ if ($topics->exists(true)) { ?>
             if (($subs=$C->getPublicSubCategories())) {
                 echo '<ul class="subs">';
                 foreach ($subs as $c) {
-                    echo sprintf('<li><i class="icon-folder-open" aria-hidden="true"></i>
+                    echo sprintf('<li>' . atelier_icon('folder', 16) . '
                             <a href="faq.php?cid=%d">%s (%d)</a></li>',
                             $c->getId(),
                             $c->getLocalName(),

@@ -39,7 +39,7 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
 }
 
 ?>
-<div class="page-head">
+<div class="page-head band">
     <h1 class="display"><?php echo __('Open a New Ticket');?></h1>
     <p class="sub"><?php echo __('Please fill in the form below to open a new ticket.');?></p>
 </div>
@@ -145,7 +145,7 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
 </form>
 <aside class="side stack" aria-label="<?php echo Format::htmlchars(__a('Tips')); ?>">
     <div class="card tip">
-        <p class="tip-head"><i class="icon-comments-alt" aria-hidden="true"></i>
+        <p class="tip-head"><?php echo atelier_icon('message', 20); ?>
             <b><?php echo __a('A person from the team reads every ticket.'); ?></b></p>
         <p class="small"><?php echo __a('What helps us most: what you expected, what you see instead, and since when.'); ?></p>
     </div>
