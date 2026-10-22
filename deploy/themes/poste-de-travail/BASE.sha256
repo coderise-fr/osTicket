@@ -1,0 +1,13 @@
+# SHA-256 of the osTicket core files that this theme overrides, as in the base commit
+# (git blobs, LF line endings). Checked by check-drift.sh.
+# base commit: 51112176a56ceb1054aaa77c3864a86d4ad02a2c
+512d6676452f46f3ddfa6589748ddcf6ed7925b4e150e95a58c785c073585456  include/client/accesslink.inc.php
+78d5a3647ccb12ceecad169bfe84bc62bcd02c4a180fe04b22e5f6965188efc5  include/client/footer.inc.php
+fb02c43f400165d14a21c32f58f6e1b380e3c7912b6e293922f5f4931f4ceada  include/client/header.inc.php
+5b069cf16b370940018dc0947eb7f752d80db7e45b226802e6a0a32c7055817c  include/client/kb-categories.inc.php
+b7bfb8189d05e9f33867af85b77dbfe5beda1b1c8013324531bf6dc04ff03845  include/client/login.inc.php
+5898b57d7dfaaccdcf5ab9307edaeb2cce6d545db0ca6b71487d4029c4c1a9e7  include/client/open.inc.php
+cb7706c68692c9cb718ca386c5ca427b815bf3d996cc7028d78f6d27db45a799  include/client/templates/thread-entry.tmpl.php
+c0a44f4896eeda4cff66225bfef5246449e51c9b99466ce4e7ddae4783e5a1ed  include/client/tickets.inc.php
+ec1134a7fcf11cf59be29a14b83d11a00a256cd67bafcfcffc298cca1a029fe5  include/client/view.inc.php
+28b309e14060baf876fb134f7df51313389856a4c2111c0570151ee36150ef8b  index.php
