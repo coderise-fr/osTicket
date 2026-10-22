@@ -151,8 +151,10 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
                 <dd><?php echo Format::datetime($ticket->getCreateDate()); ?></dd></div>
 <?php
 // Expected first reply under the owner's contract level, while the ticket is
-// open and not answered yet. No level (no plugin, unknown level): no promise.
-if ($oa_atelier_contract && $state != 'closed' && !$ticket->isAnswered()) { ?>
+// open and the team has never replied (no response in the thread: a later
+// message of the client clears "answered" but the first reply was made).
+// No level (no plugin, unknown level): no promise.
+if ($oa_atelier_contract && $state != 'closed' && !$ticket->getLastResponseDate()) { ?>
             <div class="first-reply"><dt><?php echo __oa('First reply'); ?></dt>
                 <dd><?php echo Format::htmlchars(oa_atelier_contract_promise($oa_atelier_contract)); ?></dd></div>
 <?php } ?>
