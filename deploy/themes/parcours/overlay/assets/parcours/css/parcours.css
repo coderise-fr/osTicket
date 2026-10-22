@@ -330,6 +330,20 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 .pcrs .step-tag.you { background: var(--nuit); color: var(--blanc); }
 .pcrs .step-tag.you .ic { color: var(--cyan); }
 .pcrs .collab { color: var(--ardoise); }
+/* Support contract pill (optional sla_first_response plugin): Priority on
+   bleu nuit with a cyan mark, Standard on gris in ardoise (4.9:1) */
+.pcrs .plan { display: inline-flex; align-items: center; gap: 4px; padding: 3px 12px; border-radius: 999px; font: 600 .8125rem/1.4 var(--f-titre); white-space: nowrap; vertical-align: middle; }
+.pcrs .plan-priority { background: var(--nuit); color: var(--blanc); padding-left: 9px; }
+.pcrs .plan-priority .ic { color: var(--cyan); }
+.pcrs .plan-standard { background: var(--gris); color: var(--ardoise); }
+.pcrs .route small .plan { margin-right: 4px; }
+.pcrs .ns-contract { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px !important; font-size: .9375rem; }
+.pcrs .ns-label { font-weight: 600; }
+.pcrs .contract-note { display: flex; gap: 14px; align-items: flex-start; padding: 16px 20px; margin: 8px 0 16px; border-radius: 14px; border: 2px solid var(--gris); background: var(--blanc); }
+.pcrs .contract-note.is-priority { border-color: var(--cyan); }
+.pcrs .contract-note p { margin: 0; }
+.pcrs .contract-note .cn-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 700 1rem var(--f-titre); margin-bottom: 4px; }
+.pcrs .cn-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--nuit); color: var(--cyan); }
 .pcrs .pager-row { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; justify-content: space-between; margin-top: 24px; color: var(--ardoise); font-size: .9375rem; }
 .pcrs .pages { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .pcrs .pages a, .pcrs .pages b { display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 10px; border-radius: 10px; border: 2px solid var(--gris); color: var(--nuit); text-decoration: none; font: 600 .9375rem var(--f-titre); }
@@ -537,6 +551,8 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
   .pcrs .side { display: block; margin-top: 16pt; }
   .pcrs .card, .pcrs .next-step { border: 1pt solid #999; break-inside: avoid; background: #fff; }
   .pcrs .thread-entry { break-inside: avoid; }
+  .pcrs .plan { background: #fff; color: #000; box-shadow: inset 0 0 0 1pt #000; }
+  .pcrs .plan .ic { color: #000; }
   .pcrs a { color: #000; }
   .pcrs .route > li.current .node { box-shadow: none; }
   .pcrs .gauge-card { display: none; }

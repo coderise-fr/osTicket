@@ -32,12 +32,20 @@ list($pcrs_k, $pcrs_title, $pcrs_text) = pcrs_next_step($pcrs_state, $ticket->is
     $ticket->isReopenable() && !$blockReply);
 $pcrs_first = pcrs_first_response($ticket);
 $pcrs_gauge = pcrs_sla_gauge($ticket);
+// Support contract of the ticket OWNER (current level, optional plugin):
+// null without the plugin or when the level is unknown -> nothing shown.
+$pcrs_contract = pcrs_contract($ticket);
+$pcrs_waiting = ($pcrs_state == 'open' && !$pcrs_first);
 $pcrs_subject_field = TicketForm::getInstance()->getField('subject');
 $pcrs_subject = $pcrs_subject_field->display($ticket->getSubject());
 // Progress line: received -> first reply -> closed (dates from the ticket)
 $pcrs_steps = array(
     array(__('Created'), Format::datetime($ticket->getCreateDate()), 'done'),
-    array(pcrs__('First reply'), $pcrs_first ? Format::datetime($pcrs_first) : pcrs__('Waiting for the team'),
+    array(pcrs__('First reply'), $pcrs_first ? Format::datetime($pcrs_first)
+        : ($pcrs_waiting && $pcrs_contract
+            ? ($pcrs_contract['level'] == 'priority' ? pcrs__('Expected within 4 h, 24/7')
+                : pcrs__('Expected on business days'))
+            : pcrs__('Waiting for the team')),
         $pcrs_first ? 'done' : ($pcrs_state == 'open' ? 'current' : 'todo')),
     array(__('Closed'), $ticket->isClosed() ? Format::datetime($ticket->getCloseDate()) : pcrs__('When the request is solved'),
         $ticket->isClosed() ? 'done' : ($pcrs_first ? 'current' : 'todo')),
@@ -51,6 +59,7 @@ $pcrs_steps = array(
     <span class="status <?php echo $pcrs_state == 'open' ? 'status-open' : 'status-closed'; ?>"><?php
         echo pcrs_icon($pcrs_state == 'open' ? 'inbox' : 'lock', 14);
         echo ($S = $ticket->getStatus()) ? $S->getLocalName() : ''; ?></span>
+    <?php echo pcrs_contract_pill($pcrs_contract); ?>
     <span>#<?php echo $ticket->getNumber(); ?> · <?php echo sprintf(pcrs__('opened %s'), Format::datetime($ticket->getCreateDate())); ?></span>
   </p>
   <p class="ticket-actions">
@@ -97,6 +106,15 @@ if ($thisclient && $thisclient->isGuest()
       <div>
         <h2 id="next-title"><?php echo pcrs__('Your next step'); ?> · <?php echo $pcrs_title; ?></h2>
         <p><?php echo $pcrs_text; ?></p>
+<?php if ($pcrs_contract && $pcrs_state == 'open') {
+    // Commitment: the first reply while it is awaited; standard support
+    // replies on business days; no other Priority promise is made.
+    $pcrs_promise = ($pcrs_waiting || $pcrs_contract['level'] != 'priority')
+        ? pcrs_contract_promise($pcrs_contract) : ''; ?>
+        <p class="ns-contract"><span class="ns-label"><?php echo pcrs__('Support contract'); ?></span>
+          <?php echo pcrs_contract_pill($pcrs_contract);
+          if ($pcrs_promise) echo ' <span>' . Format::htmlchars($pcrs_promise) . '</span>'; ?></p>
+<?php } ?>
       </div>
 <?php if ($pcrs_can_reply && $pcrs_k != 'us') { ?>
       <a class="btn btn-primary" href="#reply"><?php echo pcrs_icon('reply'); echo __('Post a Reply'); ?></a>

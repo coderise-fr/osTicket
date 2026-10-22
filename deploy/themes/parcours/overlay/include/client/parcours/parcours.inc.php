@@ -15,6 +15,9 @@
     - pcrs_next_step()    "your next step", derived from the ticket state
     - pcrs_first_response() date of the first staff reply of a ticket
     - pcrs_sla_gauge()    first-response gauge of the Priority SLA plan
+    - pcrs_contract()     support contract level (Priority / Standard) of
+                          a client, from the optional sla_first_response
+                          plugin; pcrs_contract_pill(), _promise()
     - pcrs_reading_time() minutes of reading of an article
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
@@ -95,6 +98,8 @@ if (!defined('PCRS_VERSION')) {
             'prev'    => '<path d="m15 6-6 6 6 6"/>',
             'sort'    => '<path d="m8 9 4-4 4 4M8 15l4 4 4-4"/>',
             'x'       => '<path d="m6 6 12 12M18 6 6 18"/>',
+            'bolt'    => '<path d="m13 3-8 11h6l-1 7 8-11h-6z"/>',
+            'shield'  => '<path d="M12 3 5 6v5.5c0 4.4 3 8.2 7 9.5 4-1.3 7-5.1 7-9.5V6z"/>',
             'logout'  => '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
             'question'=> '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>',
         );
@@ -217,6 +222,77 @@ if (!defined('PCRS_VERSION')) {
             'due' => $due,
             'late' => $now > $end,
         );
+    }
+
+    /**
+     * Support contract level ("priority" / "standard") of a client, from
+     * the sla_first_response plugin (contrib/sla-first-response, README
+     * section 9: coderise_contract_level()). $subject: null (the signed-in
+     * client), a User or a Ticket (its OWNER, never a collaborator).
+     *
+     * Returns array('level' => 'priority'|'standard', 'label' => raw text)
+     * or null when nothing may be shown: plugin absent or disabled (the
+     * function does not exist), or level unknown (source "default":
+     * visitor, guest, Priority organisation not configured...). No level,
+     * no promise. This is the CURRENT level of the owner, not the level
+     * at the creation of the ticket. Memoised per owner for the request.
+     */
+    function pcrs_contract($subject=null) {
+        static $memo = array();
+        if (!function_exists('coderise_contract_level'))
+            return null;
+        if ($subject instanceof Ticket)
+            $key = 'u' . (int) $subject->getOwnerId();
+        elseif ($subject instanceof User)
+            $key = 'u' . (int) $subject->getId();
+        elseif ($subject === null)
+            $key = 'me';
+        else
+            return null;
+        if (!array_key_exists($key, $memo)) {
+            $memo[$key] = null;
+            try {
+                $l = coderise_contract_level($subject);
+                if (is_array($l) && isset($l['level'], $l['source'])
+                        && $l['source'] != 'default'
+                        && in_array($l['level'], array('priority', 'standard'), true))
+                    $memo[$key] = array(
+                        'level' => $l['level'],
+                        'label' => trim((string) $l['label']) !== ''
+                            ? (string) $l['label']
+                            : ($l['level'] == 'priority' ? 'Priority' : 'Standard'),
+                    );
+            }
+            catch (Throwable $t) {
+                $memo[$key] = null;
+            }
+        }
+        return $memo[$key];
+    }
+
+    /** Pill of a contract level (pcrs_contract() result), HTML; '' if none. */
+    function pcrs_contract_pill($c) {
+        if (!$c)
+            return '';
+        $p = ($c['level'] == 'priority');
+        return sprintf('<span class="plan %s">%s<span class="sr-only">%s</span>%s</span>',
+            $p ? 'plan-priority' : 'plan-standard',
+            $p ? pcrs_icon('bolt', 13) : '',
+            Format::htmlchars(pcrs__('Support contract') . pcrs__(': ')),
+            Format::htmlchars($c['label']));
+    }
+
+    /**
+     * Commitment of a contract level for the first reply (plain text), or
+     * '' when the level is unknown. Priority: first reply within 4 h, 24/7;
+     * standard: business days. Never a Priority promise without a level.
+     */
+    function pcrs_contract_promise($c) {
+        if (!$c)
+            return '';
+        return $c['level'] == 'priority'
+            ? pcrs__('First reply within 4 h, 24/7.')
+            : pcrs__('We reply on business days.');
     }
 
     /** "44 min", "2 h 05", in the language-neutral short form. */
