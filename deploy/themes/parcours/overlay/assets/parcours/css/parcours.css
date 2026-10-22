@@ -394,7 +394,6 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
 .pcrs .thread-event b, .pcrs .thread-event strong { color: var(--nuit); }
 .pcrs .reply-card h2 { font-size: 1.25rem; }
 .pcrs .reply-card textarea { min-height: 10em; }
-.pcrs #reply .error { display: block; margin-top: 6px; }
 
 /* Knowledge base ------------------------------------------------------------------ */
 .pcrs .bigsearch { display: flex; align-items: center; gap: 12px; max-width: 760px; margin-top: 28px; padding: 8px 8px 8px 18px; background: var(--blanc); border: 2px solid var(--nuit); border-radius: 14px; }
@@ -541,3 +540,24 @@ body.pcrs { margin: 0; font-family: var(--f-texte); font-size: 1.0625rem; line-h
   .pcrs .route > li.current .node { box-shadow: none; }
   .pcrs .gauge-card { display: none; }
 }
+
+/* Overrides of css/thread.css (core) ---------------------------------------------------- */
+.pcrs .thread-body { font-family: var(--f-texte); font-size: 1rem !important; line-height: 1.6; color: var(--nuit); background: transparent; padding: 0; }
+.pcrs .thread-body.prose { font-size: 1.125rem !important; line-height: 1.7; }
+.pcrs .thread-body h1, .pcrs .thread-body h2, .pcrs .thread-body h3, .pcrs .thread-body h4 { font-family: var(--f-titre); color: var(--nuit); }
+.pcrs .hero-text.thread-body h1 { font-size: clamp(2rem, 4.4vw, 3rem); }
+.pcrs .hero-text.thread-body p { font-size: 1.1875rem !important; }
+.pcrs .route.vert.mini > li { grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding-bottom: 14px; }
+.pcrs .route.vert.mini .node { width: 30px; height: 30px; font-size: .8125rem; }
+.pcrs .route.vert.mini > li:not(:last-child)::after { top: 34px; left: 13.5px; }
+.pcrs .route.vert.mini .txt { padding-top: 4px; font-size: .9375rem; }
+.pcrs .route.vert.mini a { color: var(--nuit); text-decoration-color: var(--cyan-profond); }
+.pcrs #reply span.error { display: inline; margin: 0; }
+.pcrs .pages .cur { display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 10px; border-radius: 10px; background: var(--nuit); color: var(--blanc); font: 600 .9375rem var(--f-titre); }
+.pcrs .topic-browse { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 14px; }
+.pcrs .topic-browse select { max-width: 22em; min-height: 44px !important; }
+.pcrs .filedrop .files { border: 0 !important; padding: 0 !important; background: none !important; }
+.pcrs .filedrop .files .file { display: flex; align-items: center; gap: 10px; color: var(--nuit); }
+.pcrs .filedrop .files .file .filesize { margin-left: 4px; }
+.pcrs .filedrop .files .file .trash { margin-left: auto; color: var(--nuit); }
+.pcrs .page #topicId { width: 100%; }

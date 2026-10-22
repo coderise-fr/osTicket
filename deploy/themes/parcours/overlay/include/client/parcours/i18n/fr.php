@@ -107,6 +107,7 @@ return array(
     // Knowledge base
     'Find the answer, step by step' => 'Trouvez la réponse, étape par étape',
     'Search, or follow a path from start to finish.' => 'Cherchez, ou suivez un parcours du début à la fin.',
+    '1 article' => '1 article',
     '%d articles' => '%d articles',
     'article %1$d of %2$d' => 'article %1$d sur %2$d',
     'In this category' => 'Dans cette catégorie',

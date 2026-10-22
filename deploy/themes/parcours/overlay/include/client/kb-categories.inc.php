@@ -42,7 +42,7 @@ $topics = Topic::objects()
     <input id="kb-q" type="search" name="q" placeholder="<?php echo __('Search our knowledge base'); ?>">
     <button class="btn btn-primary" type="submit"><?php echo __('Search'); ?></button>
   </form>
-<?php if ($topics->count()) { ?>
+<?php if ($topics = $topics->all()) { ?>
   <form class="topic-browse" method="get" action="faq.php">
     <input type="hidden" name="a" value="search"/>
     <label for="kb-topic"><?php echo __("Browse by Topic"); ?></label>
@@ -80,7 +80,7 @@ $topics = Topic::objects()
                 foreach ($subs as $c) { ?>
       <li><a href="faq.php?cid=<?php echo $c->getId(); ?>"><?php echo pcrs_icon('folder', 20); ?><span><strong><?php
                     echo Format::htmlchars($c->getLocalName()); ?></strong><small><?php
-                    echo sprintf(pcrs__('%d articles'), $c->faq_count); ?></small></span></a></li>
+                    echo pcrs_articles($c->faq_count); ?></small></span></a></li>
 <?php           }
             }
             foreach ($C->faqs
@@ -91,7 +91,7 @@ $topics = Topic::objects()
 <?php       } ?>
     </ul>
 <?php if (!$subs && $count) { ?>
-    <p class="meta"><?php echo sprintf(pcrs__('%d articles'), $count); ?></p>
+    <p class="meta"><?php echo pcrs_articles($count); ?></p>
 <?php } ?>
   </section>
 <?php   } ?>

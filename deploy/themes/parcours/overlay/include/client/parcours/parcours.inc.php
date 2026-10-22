@@ -234,6 +234,11 @@ if (!defined('PCRS_VERSION')) {
         return max(1, (int) round($words / 200));
     }
 
+    /** "1 article" / "N articles". */
+    function pcrs_articles($n) {
+        return ((int) $n == 1) ? pcrs__('1 article') : sprintf(pcrs__('%d articles'), (int) $n);
+    }
+
     /** Breadcrumb trail: array of array(label, href|null). Labels are HTML-safe. */
     function pcrs_crumbs($items) {
         $out = '<nav class="crumbs" aria-label="' . Format::htmlchars(pcrs__('Breadcrumb')) . '"><ol>';

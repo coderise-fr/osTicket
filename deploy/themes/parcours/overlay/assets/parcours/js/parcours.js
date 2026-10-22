@@ -16,8 +16,11 @@
 (function () {
     'use strict';
 
+    // jQuery's ready queue when present: runs after js/osticket.js, which
+    // focuses the first empty field on load (the wizard then sets the focus)
     function ready(fn) {
-        if (document.readyState !== 'loading') fn();
+        if (window.jQuery) window.jQuery(fn);
+        else if (document.readyState !== 'loading') fn();
         else document.addEventListener('DOMContentLoaded', fn);
     }
 
@@ -133,7 +136,8 @@
         function rowsOf(step) { return step.querySelector('tbody.pcrs-rows'); }
 
         function hasName(row, name) {
-            return !!(name && row.querySelector('[name="' + name + '"]'));
+            // choice fields are posted as name[]
+            return !!(name && row.querySelector('[name="' + name + '"], [name="' + name + '[]"]'));
         }
 
         function isFormHeader(row) {
@@ -191,7 +195,14 @@
         }
 
         function labelOf(row) {
-            var l = row && row.querySelector('label .required, label, .lbl');
+            if (!row) return '';
+            // the label of dynamic-form.tmpl.php wraps the field: take its
+            // .required span (label text and star) when there is one
+            var l = row.querySelector('label .required') || row.querySelector('.lbl');
+            if (!l) {
+                l = row.querySelector('label');
+                if (l && l.querySelector('input, select, textarea')) l = l.firstChild;
+            }
             return l ? text(l).replace(/\s*\*$/, '') : '';
         }
 
