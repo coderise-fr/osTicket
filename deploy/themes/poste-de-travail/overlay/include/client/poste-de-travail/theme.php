@@ -14,6 +14,10 @@
     - ptdt_asset()        URL of a theme asset with a cache-busting version
     - ptdt_priority_sla() data of the "Support Priority" first response
                           indicator of a ticket, or null
+    - ptdt_contract()     contract level (Priority / Standard) of a client or
+                          of a ticket owner, from the optional plugin
+                          contrib/sla-first-response, or null
+    - ptdt_contract_of_row(), ptdt_contract_pill()  same, for list rows; pill
 
     Settings (define them before this file is loaded to change them, e.g. in
     include/ost-config.php; otherwise the defaults below apply):
@@ -28,7 +32,7 @@
 if (!defined('INCLUDE_DIR')) die('Access Denied');
 
 if (!defined('PTDT_VERSION')) {
-    define('PTDT_VERSION', '2.0.0');
+    define('PTDT_VERSION', '2.1.0');
 
     foreach (array(
         'PTDT_PRIORITY_SLA' => 'Priority 4h',
@@ -178,5 +182,80 @@ if (!defined('PTDT_VERSION')) {
             return null;
         $ratio = (time() - $t0) / ($t1 - $t0);
         return array($start, $due, max(0, min(1, $ratio)), time() > $t1);
+    }
+
+    /**
+     * Contract level (Priority / Standard) of a client, from the optional
+     * plugin contrib/sla-first-response (coderise_contract_level(), version
+     * 0.3 and later). $subject: null (signed-in client), User, Ticket (its
+     * OWNER, never a collaborator) or false (unknown user).
+     *
+     * Returns array('level' => 'priority'|'standard', 'label' => raw label,
+     * 'org_id' => int|null, 'org_name' => string|null) or null when the level
+     * is not known for sure:
+     *   - the plugin is absent or disabled (the function does not exist);
+     *   - the plugin answered with its default value (source "default": no
+     *     client, guest, Priority organisation not configured or deleted,
+     *     error). Its default is "standard", but nothing says the client is
+     *     standard: the theme then shows no level at all.
+     * The level is the CURRENT one of the user (membership of the Priority
+     * organisation), not the one at the time a ticket was opened.
+     * The plugin caches its answers per request; the result for the signed-in
+     * client is also kept here, so a page computes it once.
+     */
+    function ptdt_contract($subject=null) {
+        static $mine = false;
+        if (!function_exists('coderise_contract_level'))
+            return null;
+        if ($subject === null && $mine !== false)
+            return $mine;
+        $level = null;
+        try {
+            $l = coderise_contract_level($subject);
+            if (is_array($l) && isset($l['level'], $l['source'])
+                    && $l['source'] == 'organisation'
+                    && in_array($l['level'], array('priority', 'standard'), true)) {
+                $label = trim((string) (isset($l['label']) ? $l['label'] : ''));
+                $level = array(
+                    'level' => $l['level'],
+                    'label' => $label !== '' ? $label : ucfirst($l['level']),
+                    'org_id' => !empty($l['org_id']) ? (int) $l['org_id'] : null,
+                    'org_name' => isset($l['org_name']) ? (string) $l['org_name'] : null,
+                );
+            }
+        }
+        catch (Throwable $t) {
+            $level = null;
+        }
+        if ($subject === null)
+            $mine = $level;
+        return $level;
+    }
+
+    /** Contract level of the owner of a ticket row of a list (arrays of
+     *  values, not Ticket objects): the signed-in client for their own
+     *  tickets, otherwise the owner looked up by id (one lookup per distinct
+     *  owner, then the ORM and plugin caches). */
+    function ptdt_contract_of_row($row) {
+        global $thisclient;
+        if (!function_exists('coderise_contract_level'))
+            return null;
+        $uid = isset($row['user_id']) ? (int) $row['user_id'] : 0;
+        if ($thisclient && $uid && $uid == $thisclient->getId())
+            return ptdt_contract();
+        $owner = $uid ? User::lookup($uid) : null;
+        return ptdt_contract($owner ?: false);
+    }
+
+    /** Contract pill (escaped label); '' when the level is unknown. */
+    function ptdt_contract_pill($level, $title='') {
+        if (!$level)
+            return '';
+        $p = ($level['level'] == 'priority');
+        return sprintf('<span class="plan plan-%s"%s>%s%s</span>',
+            $p ? 'priority' : 'standard',
+            $title !== '' ? ' title="'.Format::htmlchars($title).'"' : '',
+            $p ? ptdt_icon('bolt', 13) : '',
+            Format::htmlchars($level['label']));
     }
 }
