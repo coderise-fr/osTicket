@@ -110,3 +110,108 @@ function set_entry_created($entry_id, $datetime) {
 function reload($id) {
     return Ticket::lookup($id);
 }
+
+// --- Niveau de contrat (phases 4) ---------------------------------------
+
+define('CLIENT_PASSWD', 'Cl1ent!Pass#2026');
+
+// Instance du plugin SLA (le plugin Stripe a aussi la sienne à partir de la phase 4a).
+function sla_instance() {
+    $p = Plugin::objects()->filter(array('install_path' => 'plugins/sla_first_response'))->one();
+    return PluginInstance::objects()->filter(array('plugin_id' => $p->getId()))->one();
+}
+
+// Organisation (créée si absente).
+function org($name) {
+    require_once INCLUDE_DIR . 'class.organization.php';
+    $org = Organization::fromVars(array('name' => $name));
+    if (!$org) { echo "org failed: $name\n"; exit(2); }
+    return $org;
+}
+// Client avec compte portail (mot de passe CLIENT_PASSWD) rangé dans $org (ou aucune).
+function client_user($email, $name, $org = null) {
+    $user = User::fromVars(array('name' => $name, 'email' => $email));
+    if (!$user) { echo "user failed: $email\n"; exit(2); }
+    $user->setOrganization($org);
+    if (!$user->getAccount()) {
+        $errors = array();
+        $acct = UserAccount::register($user, array('passwd1' => CLIENT_PASSWD, 'passwd2' => CLIENT_PASSWD,
+            'timezone' => 'UTC', 'backend' => 'client'), $errors);
+        if (!$acct) { echo "account failed: " . json_encode($errors) . "\n"; exit(2); }
+    }
+    return $user;
+}
+function uid_by_email($email) {
+    return (int) User::lookupByEmail($email)->getId();
+}
+// Nombre de requêtes envoyées par cette connexion (compteur MySQL/MariaDB
+// « Questions », la lecture du compteur comptant elle-même pour une).
+function nb_questions() {
+    $r = db_fetch_row(db_query("SHOW SESSION STATUS LIKE 'Questions'"));
+    return (int) $r[1];
+}
+
+// Client HTTP minimal vers le serveur `php -S` du conteneur (cookies, CSRF).
+class PortalClient {
+    var $base = 'http://127.0.0.1:8000/';
+    var $cookies = array();
+    var $status = 0;
+    var $location = null;
+
+    function request($path, $post = null) {
+        $headers = '';
+        if ($this->cookies) {
+            $c = array();
+            foreach ($this->cookies as $k => $v) $c[] = "$k=$v";
+            $headers .= 'Cookie: ' . implode('; ', $c) . "\r\n";
+        }
+        $opts = array('method' => $post === null ? 'GET' : 'POST',
+            'ignore_errors' => true, 'follow_location' => 0, 'timeout' => 60);
+        if ($post !== null) {
+            $headers .= "Content-Type: application/x-www-form-urlencoded\r\n";
+            $opts['content'] = http_build_query($post);
+        }
+        $opts['header'] = $headers;
+        $body = file_get_contents($this->base . ltrim($path, '/'), false,
+            stream_context_create(array('http' => $opts)));
+        $this->status = 0; $this->location = null;
+        $m = array();
+        foreach ($http_response_header as $h) {
+            if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) $this->status = (int) $m[1];
+            elseif (stripos($h, 'Set-Cookie:') === 0) {
+                list($kv) = explode(';', trim(substr($h, 11)));
+                list($k, $v) = array_pad(explode('=', $kv, 2), 2, '');
+                $this->cookies[$k] = $v;
+            }
+            elseif (stripos($h, 'Location:') === 0) $this->location = trim(substr($h, 9));
+        }
+        return $body;
+    }
+    // GET en suivant les redirections (au plus 5).
+    function get($path) {
+        $body = $this->request($path);
+        for ($i = 0; $i < 5 && $this->location; $i++) {
+            $loc = preg_replace('#^https?://[^/]+/#', '', $this->location);
+            $body = $this->request($loc);
+        }
+        return $body;
+    }
+    function post($path, $data, $formPath = null) {
+        $page = $this->get($formPath ?: $path);
+        $m = array();
+        if (preg_match('/name="__CSRFToken__" value="([^"]+)"/', $page, $m))
+            $data['__CSRFToken__'] = $m[1];
+        $body = $this->request($path, $data);
+        if ($this->location) {
+            $loc = preg_replace('#^https?://[^/]+/#', '', $this->location);
+            $body = $this->get($loc);
+        }
+        return $body;
+    }
+}
+// Valeur sondée par le gabarit de test (voir phase4c) : <!--CL:{json}-->
+function probe($html, $tag = 'CL') {
+    $m = array();
+    if (!preg_match('/<!--' . $tag . ':(.*?)-->/s', $html, $m)) return null;
+    return $m[1] === 'none' ? 'none' : json_decode($m[1], true);
+}

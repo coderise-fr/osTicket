@@ -12,7 +12,8 @@ Contenu :
 | --- | --- |
 | `sql/premiere-reponse.sql` | Première réponse d'un agent **au client** par ticket Priority (minutes, respecté / dépassé). Contient la définition unique de « première réponse » |
 | `sql/depassements-par-client-periode.sql` | Comptage des dépassements **par client et par période d'abonnement à date anniversaire**, signalement des prolongations dues, tickets « sans abonnement connu », recoupement avec l'événement `overdue` |
-| `plugin/sla_first_response/` | Plugin : après la première réponse adressée au client, le ticket n'est plus jamais « en retard » |
+| `sql/masquer-evenements-0.2.sql` | Facultatif, une fois : convertit les événements « SLA modifié » écrits par la version 0.2 du plugin pour que le client ne les voie plus (section 10) |
+| `plugin/sla_first_response/` | Plugin (version 0.3) : après la première réponse adressée au client, le ticket n'est plus jamais « en retard » ; expose aussi le **niveau de contrat** d'un client aux thèmes du portail (section 9) |
 | `test/` | Test d'intégration jetable (Docker), MariaDB et MySQL : `pwsh contrib/sla-first-response/test/run.ps1` |
 
 ## 0. Décisions prises (à refléter dans la clause)
@@ -120,7 +121,8 @@ Il n'existe **aucun** signal dédié « réponse d'agent » ni « ticket en reta
 ### Risques lors des mises à jour d'osTicket
 
 - Le plugin dépend du signal **non documenté** `threadentry.created`, de quelques méthodes
-  (`setSLAId`, `updateEstDueDate`, `logEvent`, `isSystem`, `ThreadEntry::FLAG_*`) et du format
+  (`setSLAId`, `updateEstDueDate`, `ThreadEvent::forTicket`, `ThreadEvent::getTypedEvent`, `isSystem`,
+  `ThreadEntry::FLAG_*`), du gabarit client des fils (section 10) et du format
   JSON de `thread_entry.recipients` (clés `to` / `cc`). Rejouer `test/run.ps1` après chaque
   mise à jour : il échoue si l'un d'eux change.
 - Le plan « réponse faite » doit rester **désactivé et non transitoire** : sinon osTicket le
@@ -274,7 +276,8 @@ osTicket (voir 2.3) ; le 29 février (section 5, « Calcul », point 2) ; la pro
    puis Admin > Manage > Plugins > Add New Plugin > Install, activer, ajouter l'instance avec
    les deux identifiants de plan (visibles dans l'URL `slas.php?id=…`). La configuration
    refuse deux plans identiques, un plan inexistant, un plan « réponse faite » actif ou
-   transitoire.
+   transitoire. Pour les thèmes du portail, renseigner aussi l'**organisation Priority** et,
+   si besoin, les libellés (section 9).
 7. **SQL** : adapter le préfixe `ost_` et les noms de plans (un seul endroit par requête), puis
    les exécuter en lecture seule sur la base (testé sur MariaDB 10.11 et MySQL 8.0). Exécuter
    avec le même fuseau de session que osTicket (voir « Fuseau » ci-dessous).
@@ -350,7 +353,7 @@ le même que osTicket (par défaut celui du serveur). Les dates du résultat son
 ## 6. Vérifié / non vérifié
 
 Vérifié par exécution (instance osTicket du dépôt, schéma d'installation, PHP 8.2 CLI en
-conteneur ; `test/run.ps1`, 164 contrôles par moteur) sur **MariaDB 10.11** et sur **MySQL 8.0**
+conteneur ; `test/run.ps1`, 256 contrôles par moteur en version 0.3) sur **MariaDB 10.11** et sur **MySQL 8.0**
 (`-MariaDbImage mysql:8.0`), tous passés :
 
 - constats de l'issue (S0, S1) et échec des contournements par statut et `updateEstDueDate`
@@ -375,9 +378,32 @@ conteneur ; `test/run.ps1`, 164 contrôles par moteur) sur **MariaDB 10.11** et 
   ticket perdu ni compté deux fois, cohérence plugin <-> SQL sur les 41 tickets de la phase 2
   et 3 ;
 - test de sensibilité : en neutralisant le critère (plugin et SQL), 14 contrôles échouent ;
+- version 0.3, **niveau de contrat** (phases 4a à 4c, section 9) : fonction définie au
+  bootstrap ; propriétaire dans l'organisation Priority → `priority` ; autre organisation, sans
+  organisation → `standard` ; ticket au propriétaire Priority avec collaborateur d'une autre
+  organisation → `priority` (et l'inverse → `standard`) ; client connecté (`null`,
+  `ClientSession`, `EndUser`) ; invité → `standard` / `default` ; sujets non pris en charge sans
+  exception ; 0 requête SQL sur 150 appels répétés ; fin d'abonnement simulée comme
+  `stripe-sync` (rangé dans Priority puis organisation d'origine restaurée) → `standard`, en CLI
+  et sur le portail ; organisation non configurée, inexistante, puis réellement supprimée →
+  `standard` / `default` sans erreur ; libellés configurés et traduits par `__()` (catalogue
+  `fr` factice) ; formulaire : organisation inexistante refusée (nom et identifiant), nom
+  résolu et enregistré en identifiant, proposition de l'organisation du plugin Stripe (installé
+  depuis le dépôt sans modification, variable d'environnement prioritaire), aucune proposition
+  sans lui ; **portail client réel en HTTP** (sonde dans un gabarit de `include/client/` de la
+  copie de test) : non connecté, client Priority et client Acme connectés sur `index.php`,
+  `tickets.php`, `open.php`, `tickets.php?id=…`, `view.php?id=…`, invité par lien d'accès ;
+- version 0.3, **événement de bascule** (section 10) : événement `sla_first_response` écrit
+  (plus d'événement `edited`) ; invisible dans le suivi du ticket côté client alors que la
+  réponse de l'agent y est ; visible dans le fil côté agent (`scp/tickets.php`) ; témoin : un
+  événement `edited` de la 0.2 est bien affiché au client ; `sql/masquer-evenements-0.2.sql` le
+  convertit, le client ne le voit plus, l'agent si ;
 - suite de tests statiques du dépôt (`php setup/test/run-tests.php`, PHP 8.2 en conteneur) avec
-  ce dossier inclus : code de sortie 0. Les contrôles `jslint` ne tournent pas (binaire `jsl`
-  absent du conteneur) ; ils ne concernent pas du JavaScript de ce dossier.
+  ce dossier inclus : **aucun échec dans `contrib/sla-first-response/`**. Au 22/10/2026, la
+  suite signale 11 échecs, tous dans `deploy/themes/` (espaces en fin de ligne dans
+  `atelier` et `ownalytics-atelier`, `$m` non initialisé dans `sommet/sommet.inc.php`), hors
+  de ce dossier. Les contrôles `jslint` ne tournent pas (binaire `jsl` absent du conteneur) ;
+  ils ne concernent pas du JavaScript de ce dossier.
 
 **Non vérifié** :
 
@@ -395,6 +421,13 @@ conteneur ; `test/run.ps1`, 164 contrôles par moteur) sur **MariaDB 10.11** et 
 - aucun essai en conditions de charge ni de concurrence (deux réponses simultanées) ;
 - le comportement de la relève des messages (`created` vs date d'envoi) est lu dans le code,
   pas mesuré ;
+- niveau de contrat : aucun thème de `deploy/themes/` ne l'utilise encore (non intégré, non
+  testé dans un thème) ; le formulaire du plugin a été rendu et enregistré par les mêmes appels
+  que l'interface (`getForm()`, `PluginInstance::update()` en POST), pas dans un navigateur ;
+  aucun vrai webhook Stripe : la fin d'abonnement est simulée par les mêmes appels que
+  `StripeSyncOsTicketDirectory` (`setOrganization`, `removeUser`) ;
+- événement de bascule : graphique d'activité du tableau de bord agent non regardé ; plugin
+  désactivé après des bascules (texte générique côté agent) lu dans le code, non testé ;
 - l'interface d'administration (écrans plugin et plans de SLA) n'a pas été ouverte dans un
   navigateur : l'installation du plugin a été faite par les mêmes appels que l'interface.
 
@@ -429,3 +462,226 @@ php setup/test/run-tests.php
 (`php` n'est pas dans le PATH de la machine de développement : j'ai utilisé l'image
 `php:8.2-cli`. Les tests `jslint` échouent à trouver `jsl` hors de leur environnement ; sans
 rapport avec ce dossier. Ils n'influencent pas le code de sortie.)
+
+## 9. Niveau de contrat : API pour les thèmes
+
+osTicket n'a pas de notion de niveau de contrat. Chez nous, le niveau est porté par
+l'**appartenance à l'organisation « Priority »**, créée et alimentée par le plugin
+`contrib/stripe-sync` (un utilisateur n'a qu'une organisation ; à la fin de l'abonnement, le
+plugin Stripe restaure l'organisation d'origine). Le nom du plan de SLA du ticket ne convient pas
+pour l'affichage : après la première réponse, ce plugin le remplace par un plan désactivé.
+Le plugin expose donc cette règle, en un seul endroit, à tous les thèmes du portail client
+(fichier `plugin/sla_first_response/contract_level.php`).
+
+### 9.1 Signature et retour
+
+```php
+coderise_contract_level($subject = null): array
+```
+
+| `$subject` | Utilisateur dont on donne le niveau |
+| --- | --- |
+| `null` | Le **client connecté** du portail (`$thisclient`). Non connecté ou **invité** (lien d'accès reçu par e-mail, numéro de ticket) : `standard`, source `default` |
+| `User` | Cet utilisateur |
+| `Ticket` | Le **propriétaire** du ticket (`user_id`), **jamais** un collaborateur |
+| `ClientSession` / `EndUser` | L'utilisateur du compte ; invité : `standard`, source `default` |
+| autre (entier, chaîne, agent, …) | `standard`, source `default` |
+
+```php
+array(
+    'level'    => 'priority',           // ou 'standard'
+    'label'    => 'Priority',           // libellé configuré, passé par __()
+    'org_id'   => 12,                   // organisation du propriétaire, ou null
+    'org_name' => 'Priority',           // son nom, ou null
+    'source'   => 'organisation',       // ou 'default'
+)
+```
+
+- **Règle** : `priority` si et seulement si l'organisation du propriétaire est l'organisation
+  Priority configurée ; sinon `standard`.
+- **`source`** : `organisation` quand la règle a pu être appliquée (organisation Priority
+  configurée et existante, utilisateur connu ; un client sans organisation est alors `standard`
+  / `organisation`) ; `default` quand le niveau est la valeur par défaut faute d'information
+  (pas de client connecté, invité, organisation Priority non configurée ou supprimée, sujet non
+  pris en charge, erreur).
+- **Jamais d'exception** : toute erreur donne `standard` / `default`.
+- **Cache par requête** : l'organisation Priority est lue une fois, puis chaque client une fois
+  (recherches par clé primaire, servies par le cache de l'ORM s'il a déjà l'objet). *Testé* :
+  150 appels de suite (même client, client connecté, ticket) = 0 requête SQL.
+- `label` : le libellé configuré passe par `__()` (catalogue de langue du visiteur) : traduit
+  si le pack de langue contient ce texte, sinon affiché tel quel. **À échapper** à l'affichage
+  (`Format::htmlchars()`), comme tout texte saisi par un administrateur.
+
+### 9.2 Configuration (formulaire du plugin)
+
+Section « Niveau de contrat (thèmes du portail client) » de l'instance du plugin :
+
+| Champ | Rôle |
+| --- | --- |
+| Organisation Priority | Identifiant (`organizations.php?id=…`) ou nom exact. **Validée à l'enregistrement** (organisation inexistante refusée) et enregistrée sous forme d'**identifiant** (un renommage ne la casse pas). Vide = tout le monde `standard` (source `default`). L'aide rappelle « la même organisation que celle utilisée par le plugin Stripe » et affiche l'organisation actuelle, ou un avertissement si elle a été supprimée |
+| Libellé du niveau Priority | Défaut `Priority` |
+| Libellé du niveau Standard | Défaut `Standard` |
+
+**Proposition du plugin Stripe** (sans dépendance : le plugin SLA fonctionne seul) : si
+`contrib/stripe-sync` est installé et a une instance, son organisation est **pré-remplie** pour
+une nouvelle instance du plugin SLA et **proposée dans l'aide** d'une instance existante dont le
+champ est vide (jamais enregistrée sans action de l'administrateur). Lecture seule, dans le même
+ordre que `StripeSyncSettings::getOrgName()` : variable d'environnement
+`STRIPE_SYNC_PRIORITY_ORG`, puis le champ `org_name` de son instance (lu dans la table de
+configuration, sans charger ses classes), puis `Priority`. Le plugin Stripe crée l'organisation
+au premier abonnement : si elle n'existe pas encore, la créer à la main (sans partage de tickets
+ni domaine, comme l'exige le plugin Stripe) avant d'enregistrer.
+
+### 9.3 Chargement côté portail client
+
+Rien à ajouter : chaque page, portail client compris (`index.php`, `tickets.php`, `view.php`,
+`open.php`…), passe par `main.inc.php` → `osTicket::start()` → `PluginManager::bootstrap()`, qui
+appelle `bootstrap()` de chaque instance **active** d'un plugin **actif**
+(`include/class.osticket.php:676-693`, `include/class.plugin.php:193-207`). Le `bootstrap()` du
+plugin charge `contract_level.php` (classe `SlaContractLevel` et fonction gardée par
+`function_exists`, sans autre effet), **avant** et **indépendamment** du contrôle des plans de
+SLA : la fonction existe même si les plans ne sont pas configurés.
+
+*Testé sur une vraie instance* (phase 4c : requêtes HTTP vers le serveur PHP du conteneur,
+sessions normales) : fonction présente et correcte depuis un gabarit de `include/client/` (une
+sonde ajoutée au pied de page de la **copie de test**) sur `index.php` non connecté, puis
+`index.php`, `tickets.php`, `open.php`, `tickets.php?id=…`, `view.php?id=…` en client connecté,
+et pour un invité arrivé par le lien d'accès du ticket.
+
+Limites du chargement : plugin ou instance **désactivés** → la fonction n'existe pas (d'où le
+repli obligatoire ci-dessous) ; pendant une mise à jour d'osTicket en attente
+(`isUpgradePending()`), aucun plugin n'est chargé ; `$thisclient` est défini par
+`client.inc.php` **après** le bootstrap : appeler `coderise_contract_level()` sans argument
+depuis les gabarits ou le code des pages, pas depuis le `bootstrap()` d'un autre plugin.
+
+### 9.4 Exemples de gabarit (avec repli)
+
+Encadré du rail (client connecté) :
+
+```php
+<?php
+$level = function_exists('coderise_contract_level')
+    ? coderise_contract_level()
+    : array('level' => 'standard', 'label' => __('Standard'), 'source' => 'default');
+if ($thisclient && $level['source'] != 'default') { ?>
+    <div class="contract contract--<?php echo $level['level'] == 'priority' ? 'priority' : 'standard'; ?>">
+        <?php echo Format::htmlchars($level['label']); ?>
+    </div>
+<?php } ?>
+```
+
+Pastille dans la liste des tickets et dans le suivi (`include/client/view.inc.php`, variable
+`$ticket`) : le niveau est celui du **propriétaire** du ticket, utile pour les tickets partagés
+d'une organisation.
+
+```php
+<?php
+if (!function_exists('theme_contract_badge')) {
+    function theme_contract_badge($subject) {
+        if (!function_exists('coderise_contract_level'))
+            return '';                  // plugin absent ou désactivé : rien
+        $l = coderise_contract_level($subject);
+        if ($l['level'] != 'priority')
+            return '';                  // par exemple, n'afficher que « Priority »
+        return sprintf('<span class="badge badge--priority">%s</span>',
+            Format::htmlchars($l['label']));
+    }
+}
+echo theme_contract_badge($ticket);
+?>
+```
+
+Dans `include/client/tickets.inc.php`, la boucle parcourt des **tableaux de valeurs** (`$T`),
+pas des objets `Ticket`. Le propriétaire est `$T['user_id']` :
+
+```php
+<?php
+// Dans la boucle foreach ($tickets as $T)
+$owner = ($T['user_id'] == $thisclient->getId())
+    ? null                                  // ses propres tickets : le client connecté
+    : (User::lookup((int) $T['user_id']) ?: false);  // ticket partagé (false = inconnu => standard)
+echo theme_contract_badge($owner);
+?>
+```
+
+Les appels répétés pour un même client sont gratuits (cache) ; une liste d'organisation partagée
+coûte au plus une recherche par propriétaire distinct (`User::lookup()`, puis le cache).
+
+### 9.5 Limites
+
+- C'est le niveau **actuel** du propriétaire, pas celui qu'il avait à la création du ticket : un
+  ticket ouvert pendant l'abonnement s'affiche `standard` après la fin de l'abonnement (et
+  inversement). Pour le niveau « au moment du ticket », utiliser le plan de SLA posé par le
+  filtre à la création (`Priority 4h` ou son plan « réponse faite ») ou les requêtes `sql/`.
+- Un collègue du client qui écrit depuis une autre adresse est un autre utilisateur : il n'est
+  `priority` que s'il est lui-même dans l'organisation Priority (même limite que le comptage,
+  section 5).
+- Un **invité** est `standard` / `default` pour `coderise_contract_level()` sans argument ;
+  `coderise_contract_level($ticket)` donne le niveau du propriétaire du ticket consulté.
+- L'organisation est enregistrée par **identifiant** ; le plugin Stripe la retrouve par **nom**.
+  Si elle est renommée ou supprimée, le plugin Stripe en recrée une « Priority » (nouvel
+  identifiant) que ce plugin ignore : reconfigurer le champ (l'aide signale une organisation
+  supprimée). Garder les deux configurations alignées.
+- Le plugin ne fournit pas de catalogue de traduction propre : `__()` utilise celui d'osTicket.
+  Pour un libellé traduit, choisir un texte présent dans le pack de langue, ou saisir le libellé
+  directement dans la langue du portail.
+
+## 10. Événement « SLA modifié » masqué au client
+
+**Constat.** Jusqu'à la version 0.2, le plugin traçait la bascule par
+`$ticket->logEvent('edited', ['sla_id' => [surveillé, fait]])`. Le gabarit d'origine du portail
+client (`include/client/templates/thread-entries.tmpl.php`) affiche au client les événements
+`created`, `closed`, `reopened`, `edited`, `collab`, `merged`, et `EditEvent::getDescription()`
+rend `sla_id` aussi en mode client : le client lisait « Updated by … — SLA changed from
+Priority 4h … to Priority 4h - 1re reponse faite (… Disabled) ». *Testé* (témoin, phase 4c).
+
+**Options étudiées.**
+
+| Option | Verdict |
+| --- | --- |
+| Changer le plan sans événement (`setSLAId()` n'en écrit pas) | Écartée : l'agent perd la trace dans le fil |
+| Annuler l'événement (`annulled = 1`) | Sans effet : le gabarit client ne filtre pas `annulled` |
+| Purger l'événement après coup | Écartée : supprime aussi la trace de l'agent |
+| Événement `edited` avec d'autres données | Écartée : description vide pour le client **et** pour l'agent |
+| Surcharger le gabarit dans les thèmes | Hors plugin, à refaire dans chaque thème (`deploy/themes/sommet/` le fait déjà) |
+| **Type d'événement propre au plugin** | **Retenue** |
+
+**Solution retenue (version 0.3).** La bascule est journalisée avec un type propre,
+`sla_first_response` (classe `SlaFirstResponseEvent`, `plugin/sla_first_response/event.php`) :
+
+- une ligne `sla_first_response` est ajoutée **une fois** à la table `event` (à la première
+  bascule ; création concurrente gérée par la clé unique sur le nom). Aucun fichier du cœur ni
+  aucune autre table n'est modifié ;
+- l'événement est écrit comme le fait `ThreadEvents::log()` (agent, horodatage, mêmes données
+  `{"sla_id":[surveillé,fait]}` qu'en 0.2) ; le signal `object.created` (`type = edited`) est
+  toujours envoyé, pour un éventuel plugin d'audit ;
+- **client** : le gabarit d'origine ne l'affiche pas (liste blanche de types) ; en plus,
+  `getDescription()` renvoie une chaîne vide en mode client, que les gabarits client (d'origine
+  et des thèmes) n'affichent pas ;
+- **agent** : le panneau agent affiche tous les événements ; `ThreadEvent::getTypedEvent()`
+  retrouve la classe du plugin par son type : « Ada Admin : première réponse adressée au client
+  10/22/26 2:43 PM — plan de SLA Priority 4h (4 hours - Active) remplacé par Priority 4h - 1re
+  reponse faite (4 hours - Disabled) ». *Testé* (phases 2b et 4c).
+
+**Tenue aux mises à jour d'osTicket.** Le portail client filtre les événements par **liste
+blanche** : un type inconnu n'y apparaît pas ; si une version future affichait tous les types,
+la description vide en mode client le masquerait encore. Dépendances : table `event` (nom
+unique), `ThreadEvent::forTicket()`, `ThreadEvent::getTypedEvent()` (recherche des sous-classes
+déclarées : la classe est chargée au bootstrap du plugin, avec `class.thread.php`). Rejouer
+`test/run.ps1` après chaque mise à jour.
+
+**Effets de bord connus.**
+
+- Plugin **désactivé** : la classe n'est plus chargée ; les événements déjà écrits restent
+  invisibles du client et s'affichent pour l'agent avec le texte générique d'osTicket
+  (« sla_first_response by … »).
+- Le graphique d'activité du tableau de bord agent liste tous les types d'événements de la
+  période : une série `sla_first_response` peut y apparaître (non vérifié dans un navigateur).
+- Les événements `edited` écrits par la **version 0.2** restent visibles du client.
+  `sql/masquer-evenements-0.2.sql` (facultatif, une fois, après une première bascule en 0.3) les
+  convertit au nouveau type. *Testé* (phase 4c : le client ne voit plus l'ancien événement,
+  l'agent le voit avec le nouveau texte).
+- Le thème `deploy/themes/sommet/` masque déjà, dans son `thread-event.tmpl.php`, les événements
+  `edited` qui ne portent que `sla_id` : ce filtre n'est plus nécessaire pour le plugin, mais il
+  masque aussi au client les changements de plan faits **à la main** par un agent (choix du
+  thème, sans rapport avec le plugin).
