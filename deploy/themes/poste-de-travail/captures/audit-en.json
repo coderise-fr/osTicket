@@ -1,0 +1,1163 @@
+{
+ "pages": [
+  {
+   "name": "accueil-visiteur",
+   "width": 1280,
+   "url": "/index.php?lang=en_US",
+   "file": "accueil-visiteur-bureau-en.png"
+  },
+  {
+   "name": "ouverture-ticket-visiteur",
+   "width": 1280,
+   "url": "/open.php",
+   "file": "ouverture-ticket-visiteur-bureau-en.png"
+  },
+  {
+   "name": "ouverture-ticket-erreurs",
+   "width": 1280,
+   "url": "/open.php",
+   "file": "ouverture-ticket-erreurs-bureau-en.png"
+  },
+  {
+   "name": "remerciement",
+   "width": 1280,
+   "url": "/open.php",
+   "file": "remerciement-bureau-en.png"
+  },
+  {
+   "name": "connexion",
+   "width": 1280,
+   "url": "/login.php",
+   "file": "connexion-bureau-en.png"
+  },
+  {
+   "name": "connexion-erreur",
+   "width": 1280,
+   "url": "/login.php",
+   "file": "connexion-erreur-bureau-en.png"
+  },
+  {
+   "name": "acces-ticket",
+   "width": 1280,
+   "url": "/view.php",
+   "file": "acces-ticket-bureau-en.png"
+  },
+  {
+   "name": "acces-ticket-erreur",
+   "width": 1280,
+   "url": "/login.php",
+   "file": "acces-ticket-erreur-bureau-en.png"
+  },
+  {
+   "name": "acces-ticket-envoye",
+   "width": 1280,
+   "url": "/login.php",
+   "file": "acces-ticket-envoye-bureau-en.png"
+  },
+  {
+   "name": "inscription",
+   "width": 1280,
+   "url": "/account.php?do=create",
+   "file": "inscription-bureau-en.png"
+  },
+  {
+   "name": "inscription-envoyee",
+   "width": 1280,
+   "url": "/account.php",
+   "file": "inscription-envoyee-bureau-en.png"
+  },
+  {
+   "name": "inscription-confirmee",
+   "width": 1280,
+   "url": "/account.php?confirmed",
+   "file": "inscription-confirmee-bureau-en.png"
+  },
+  {
+   "name": "mot-de-passe-oublie",
+   "width": 1280,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-oublie-bureau-en.png"
+  },
+  {
+   "name": "mot-de-passe-envoye",
+   "width": 1280,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-envoye-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket-invite",
+   "width": 1280,
+   "url": "/tickets.php?id=27",
+   "file": "suivi-ticket-invite-bureau-en.png"
+  },
+  {
+   "name": "base-de-connaissances",
+   "width": 1280,
+   "url": "/kb/index.php",
+   "file": "base-de-connaissances-bureau-en.png"
+  },
+  {
+   "name": "kb-categorie",
+   "width": 1280,
+   "url": "/kb/faq.php?cid=2",
+   "file": "kb-categorie-bureau-en.png"
+  },
+  {
+   "name": "kb-article",
+   "width": 1280,
+   "url": "/kb/faq.php?id=5",
+   "file": "kb-article-bureau-en.png"
+  },
+  {
+   "name": "kb-recherche",
+   "width": 1280,
+   "url": "/kb/faq.php?a=search&q=incident",
+   "file": "kb-recherche-bureau-en.png"
+  },
+  {
+   "name": "accueil",
+   "width": 1280,
+   "url": "/index.php",
+   "file": "accueil-bureau-en.png"
+  },
+  {
+   "name": "mes-tickets",
+   "width": 1280,
+   "url": "/tickets.php",
+   "file": "mes-tickets-bureau-en.png"
+  },
+  {
+   "name": "mes-tickets-fermes",
+   "width": 1280,
+   "url": "/tickets.php?a=search&status=closed",
+   "file": "mes-tickets-fermes-bureau-en.png"
+  },
+  {
+   "name": "mes-tickets-pagination",
+   "width": 1280,
+   "url": "/tickets.php?sort=&order=&p=2",
+   "file": "mes-tickets-pagination-bureau-en.png"
+  },
+  {
+   "name": "mes-tickets-vide",
+   "width": 1280,
+   "url": "/tickets.php?a=search&keywords=zzzzqq",
+   "file": "mes-tickets-vide-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket",
+   "width": 1280,
+   "url": "/tickets.php?id=28",
+   "file": "suivi-ticket-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket-priority",
+   "width": 1280,
+   "url": "/tickets.php?id=27",
+   "file": "suivi-ticket-priority-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket-collaborateur",
+   "width": 1280,
+   "url": "/tickets.php?id=25",
+   "file": "suivi-ticket-collaborateur-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket-ferme",
+   "width": 1280,
+   "url": "/tickets.php?id=24",
+   "file": "suivi-ticket-ferme-bureau-en.png"
+  },
+  {
+   "name": "suivi-ticket-apres-reponse",
+   "width": 1280,
+   "url": "/tickets.php?id=26#reply",
+   "file": "suivi-ticket-apres-reponse-bureau-en.png"
+  },
+  {
+   "name": "modification-ticket",
+   "width": 1280,
+   "url": "/tickets.php?a=edit&id=28",
+   "file": "modification-ticket-bureau-en.png"
+  },
+  {
+   "name": "ouverture-ticket",
+   "width": 1280,
+   "url": "/open.php",
+   "file": "ouverture-ticket-bureau-en.png"
+  },
+  {
+   "name": "profil",
+   "width": 1280,
+   "url": "/profile.php",
+   "file": "profil-bureau-en.png"
+  },
+  {
+   "name": "base-de-connaissances-client",
+   "width": 1280,
+   "url": "/kb/index.php",
+   "file": "base-de-connaissances-client-bureau-en.png"
+  },
+  {
+   "name": "hors-ligne",
+   "width": 1280,
+   "url": "/index.php",
+   "file": "hors-ligne-bureau-en.png"
+  },
+  {
+   "name": "accueil-visiteur",
+   "width": 390,
+   "url": "/index.php?lang=en_US",
+   "file": "accueil-visiteur-mobile-en.png"
+  },
+  {
+   "name": "ouverture-ticket-visiteur",
+   "width": 390,
+   "url": "/open.php",
+   "file": "ouverture-ticket-visiteur-mobile-en.png"
+  },
+  {
+   "name": "ouverture-ticket-erreurs",
+   "width": 390,
+   "url": "/open.php",
+   "file": "ouverture-ticket-erreurs-mobile-en.png"
+  },
+  {
+   "name": "remerciement",
+   "width": 390,
+   "url": "/open.php",
+   "file": "remerciement-mobile-en.png"
+  },
+  {
+   "name": "connexion",
+   "width": 390,
+   "url": "/login.php",
+   "file": "connexion-mobile-en.png"
+  },
+  {
+   "name": "connexion-erreur",
+   "width": 390,
+   "url": "/login.php",
+   "file": "connexion-erreur-mobile-en.png"
+  },
+  {
+   "name": "acces-ticket",
+   "width": 390,
+   "url": "/view.php",
+   "file": "acces-ticket-mobile-en.png"
+  },
+  {
+   "name": "acces-ticket-erreur",
+   "width": 390,
+   "url": "/login.php",
+   "file": "acces-ticket-erreur-mobile-en.png"
+  },
+  {
+   "name": "acces-ticket-envoye",
+   "width": 390,
+   "url": "/login.php",
+   "file": "acces-ticket-envoye-mobile-en.png"
+  },
+  {
+   "name": "inscription",
+   "width": 390,
+   "url": "/account.php?do=create",
+   "file": "inscription-mobile-en.png"
+  },
+  {
+   "name": "inscription-envoyee",
+   "width": 390,
+   "url": "/account.php",
+   "file": "inscription-envoyee-mobile-en.png"
+  },
+  {
+   "name": "inscription-confirmee",
+   "width": 390,
+   "url": "/account.php?confirmed",
+   "file": "inscription-confirmee-mobile-en.png"
+  },
+  {
+   "name": "mot-de-passe-oublie",
+   "width": 390,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-oublie-mobile-en.png"
+  },
+  {
+   "name": "mot-de-passe-envoye",
+   "width": 390,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-envoye-mobile-en.png"
+  },
+  {
+   "name": "suivi-ticket-invite",
+   "width": 390,
+   "url": "/tickets.php?id=27",
+   "file": "suivi-ticket-invite-mobile-en.png"
+  },
+  {
+   "name": "base-de-connaissances",
+   "width": 390,
+   "url": "/kb/index.php",
+   "file": "base-de-connaissances-mobile-en.png"
+  },
+  {
+   "name": "kb-categorie",
+   "width": 390,
+   "url": "/kb/faq.php?cid=2",
+   "file": "kb-categorie-mobile-en.png"
+  },
+  {
+   "name": "kb-article",
+   "width": 390,
+   "url": "/kb/faq.php?id=5",
+   "file": "kb-article-mobile-en.png"
+  },
+  {
+   "name": "kb-recherche",
+   "width": 390,
+   "url": "/kb/faq.php?a=search&q=incident",
+   "file": "kb-recherche-mobile-en.png"
+  },
+  {
+   "name": "accueil",
+   "width": 390,
+   "url": "/index.php",
+   "file": "accueil-mobile-en.png"
+  },
+  {
+   "name": "mes-tickets",
+   "width": 390,
+   "url": "/tickets.php",
+   "file": "mes-tickets-mobile-en.png"
+  },
+  {
+   "name": "mes-tickets-fermes",
+   "width": 390,
+   "url": "/tickets.php?a=search&status=closed",
+   "file": "mes-tickets-fermes-mobile-en.png"
+  },
+  {
+   "name": "mes-tickets-pagination",
+   "width": 390,
+   "url": "/tickets.php?sort=&order=&p=2",
+   "file": "mes-tickets-pagination-mobile-en.png"
+  },
+  {
+   "name": "mes-tickets-vide",
+   "width": 390,
+   "url": "/tickets.php?a=search&keywords=zzzzqq",
+   "file": "mes-tickets-vide-mobile-en.png"
+  },
+  {
+   "name": "suivi-ticket",
+   "width": 390,
+   "url": "/tickets.php?id=28",
+   "file": "suivi-ticket-mobile-en.png"
+  },
+  {
+   "name": "suivi-ticket-priority",
+   "width": 390,
+   "url": "/tickets.php?id=27",
+   "file": "suivi-ticket-priority-mobile-en.png"
+  },
+  {
+   "name": "suivi-ticket-collaborateur",
+   "width": 390,
+   "url": "/tickets.php?id=25",
+   "file": "suivi-ticket-collaborateur-mobile-en.png"
+  },
+  {
+   "name": "suivi-ticket-ferme",
+   "width": 390,
+   "url": "/tickets.php?id=24",
+   "file": "suivi-ticket-ferme-mobile-en.png"
+  },
+  {
+   "name": "modification-ticket",
+   "width": 390,
+   "url": "/tickets.php?a=edit&id=28",
+   "file": "modification-ticket-mobile-en.png"
+  },
+  {
+   "name": "ouverture-ticket",
+   "width": 390,
+   "url": "/open.php",
+   "file": "ouverture-ticket-mobile-en.png"
+  },
+  {
+   "name": "profil",
+   "width": 390,
+   "url": "/profile.php",
+   "file": "profil-mobile-en.png"
+  },
+  {
+   "name": "base-de-connaissances-client",
+   "width": 390,
+   "url": "/kb/index.php",
+   "file": "base-de-connaissances-client-mobile-en.png"
+  },
+  {
+   "name": "hors-ligne",
+   "width": 390,
+   "url": "/index.php",
+   "file": "hors-ligne-mobile-en.png"
+  }
+ ],
+ "console": [],
+ "http": [],
+ "external": [],
+ "overflow": [],
+ "contrast": [
+  {
+   "page": "accueil-visiteur",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-visiteur",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-erreurs",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "remerciement",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion-erreur",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-erreur",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-envoye",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-envoyee",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-confirmee",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-oublie",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-envoye",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-invite",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "base-de-connaissances",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-categorie",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-article",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-recherche",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "accueil",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-fermes",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-pagination",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-vide",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-priority",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-collaborateur",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-ferme",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-apres-reponse",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "modification-ticket",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "profil",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "base-de-connaissances-client",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "hors-ligne",
+   "width": 1280,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "accueil-visiteur",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-visiteur",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-erreurs",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "remerciement",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion-erreur",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-erreur",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-envoye",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-envoyee",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-confirmee",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-oublie",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-envoye",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-invite",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "base-de-connaissances",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-categorie",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-article",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-recherche",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "accueil",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-fermes",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-pagination",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mes-tickets-vide",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-priority",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-collaborateur",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-ferme",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "modification-ticket",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "profil",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "base-de-connaissances-client",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "hors-ligne",
+   "width": 390,
+   "min": 4.91,
+   "failures": []
+  }
+ ],
+ "focus": [
+  {
+   "t": "logo",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Accueil",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Mes tickets\n8",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ouvrir un ticket",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Base de connaissances",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ouverts\n8",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Fermés\n29",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "+33 (0)6 69 93 92 86",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Se déconnecter",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "gsearch-q",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ouvrir un ticket",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "LM\nLéa\n, Profil",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "EN",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "FR",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#676270, Application mobile : ",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ouvrir un ticket",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "8",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "29",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Tout voir",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#440627",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Clé d’API de test expirée",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#676270",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Application mobile : la liste ",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#583480",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Agent de tri des réclamations ",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#851818",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ordre des catégories dans l’ap",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#853646",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "Ajouter un filtre par magasin ",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  },
+  {
+   "t": "#105913",
+   "ow": 3,
+   "os": "solid",
+   "bs": "none"
+  }
+ ],
+ "checks": [
+  {
+   "name": "champs dynamiques AJAX (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "erreurs de validation (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "ticket visiteur créé, page de remerciement (1280)",
+   "ok": true,
+   "detail": "Support ticket request created\nMerci, Claire. Votre ticket est ouvert.\n\nVotre ti"
+  },
+  {
+   "name": "erreur de connexion (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "jeton de confirmation (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "inscription confirmée (1280)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/account.php?confirmed"
+  },
+  {
+   "name": "accès invité par lien (1280)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/tickets.php?id=27"
+  },
+  {
+   "name": "raccourci / vers la recherche",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "connexion réussie (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "lien d’évitement en premier",
+   "ok": true,
+   "detail": "skip"
+  },
+  {
+   "name": "focus visible (30 tabulations, accueil)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "liste des tickets ouverts (1280)",
+   "ok": true,
+   "detail": "8 lignes"
+  },
+  {
+   "name": "isolation : ticket d'un autre client absent (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pagination (1280)",
+   "ok": true,
+   "detail": "1 liens"
+  },
+  {
+   "name": "tri par sujet (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "indicateur Priority affiché sans réponse (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "indicateur Priority absent après la 1re réponse (1280)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "réponse envoyée avec pièce jointe",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "menu mobile ouvert (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "champs dynamiques AJAX (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "erreurs de validation (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "ticket visiteur créé, page de remerciement (390)",
+   "ok": true,
+   "detail": "Support ticket request created\nMerci, Claire. Votre ticket est ouvert.\n\nVotre ti"
+  },
+  {
+   "name": "erreur de connexion (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "jeton de confirmation (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "inscription confirmée (390)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/account.php?confirmed"
+  },
+  {
+   "name": "accès invité par lien (390)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/tickets.php?id=27"
+  },
+  {
+   "name": "connexion réussie (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "liste des tickets ouverts (390)",
+   "ok": true,
+   "detail": "8 lignes"
+  },
+  {
+   "name": "isolation : ticket d'un autre client absent (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "pagination (390)",
+   "ok": true,
+   "detail": "1 liens"
+  },
+  {
+   "name": "tri par sujet (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "indicateur Priority affiché sans réponse (390)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "indicateur Priority absent après la 1re réponse (390)",
+   "ok": true,
+   "detail": ""
+  }
+ ]
+}

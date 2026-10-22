@@ -1,0 +1,274 @@
+{
+ "pages": [
+  {
+   "name": "accueil-visiteur",
+   "width": 820,
+   "url": "/index.php?lang=fr",
+   "file": "accueil-visiteur-bureau.png"
+  },
+  {
+   "name": "ouverture-ticket-visiteur",
+   "width": 820,
+   "url": "/open.php",
+   "file": "ouverture-ticket-visiteur-bureau.png"
+  },
+  {
+   "name": "ouverture-ticket-erreurs",
+   "width": 820,
+   "url": "/open.php",
+   "file": "ouverture-ticket-erreurs-bureau.png"
+  },
+  {
+   "name": "remerciement",
+   "width": 820,
+   "url": "/open.php",
+   "file": "remerciement-bureau.png"
+  },
+  {
+   "name": "connexion",
+   "width": 820,
+   "url": "/login.php",
+   "file": "connexion-bureau.png"
+  },
+  {
+   "name": "connexion-erreur",
+   "width": 820,
+   "url": "/login.php",
+   "file": "connexion-erreur-bureau.png"
+  },
+  {
+   "name": "acces-ticket",
+   "width": 820,
+   "url": "/view.php",
+   "file": "acces-ticket-bureau.png"
+  },
+  {
+   "name": "acces-ticket-erreur",
+   "width": 820,
+   "url": "/login.php",
+   "file": "acces-ticket-erreur-bureau.png"
+  },
+  {
+   "name": "acces-ticket-envoye",
+   "width": 820,
+   "url": "/login.php",
+   "file": "acces-ticket-envoye-bureau.png"
+  },
+  {
+   "name": "inscription",
+   "width": 820,
+   "url": "/account.php?do=create",
+   "file": "inscription-bureau.png"
+  },
+  {
+   "name": "inscription-envoyee",
+   "width": 820,
+   "url": "/account.php",
+   "file": "inscription-envoyee-bureau.png"
+  },
+  {
+   "name": "inscription-confirmee",
+   "width": 820,
+   "url": "/account.php?confirmed",
+   "file": "inscription-confirmee-bureau.png"
+  },
+  {
+   "name": "mot-de-passe-oublie",
+   "width": 820,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-oublie-bureau.png"
+  },
+  {
+   "name": "mot-de-passe-envoye",
+   "width": 820,
+   "url": "/pwreset.php",
+   "file": "mot-de-passe-envoye-bureau.png"
+  },
+  {
+   "name": "suivi-ticket-invite",
+   "width": 820,
+   "url": "/tickets.php?id=27",
+   "file": "suivi-ticket-invite-bureau.png"
+  },
+  {
+   "name": "base-de-connaissances",
+   "width": 820,
+   "url": "/kb/index.php",
+   "file": "base-de-connaissances-bureau.png"
+  },
+  {
+   "name": "kb-categorie",
+   "width": 820,
+   "url": "/kb/faq.php?cid=2",
+   "file": "kb-categorie-bureau.png"
+  },
+  {
+   "name": "kb-article",
+   "width": 820,
+   "url": "/kb/faq.php?id=5",
+   "file": "kb-article-bureau.png"
+  }
+ ],
+ "console": [],
+ "http": [],
+ "external": [],
+ "overflow": [],
+ "contrast": [
+  {
+   "page": "accueil-visiteur",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-visiteur",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "ouverture-ticket-erreurs",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "remerciement",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "connexion-erreur",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-erreur",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "acces-ticket-envoye",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-envoyee",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "inscription-confirmee",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-oublie",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "mot-de-passe-envoye",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "suivi-ticket-invite",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "base-de-connaissances",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-categorie",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  },
+  {
+   "page": "kb-article",
+   "width": 820,
+   "min": 4.91,
+   "failures": []
+  }
+ ],
+ "focus": [],
+ "checks": [
+  {
+   "name": "champs dynamiques AJAX (820)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "erreurs de validation (820)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "ticket visiteur créé, page de remerciement (820)",
+   "ok": true,
+   "detail": "Support ticket request created\nMerci, Claire. Votre ticket est ouvert.\n\nVotre ti"
+  },
+  {
+   "name": "erreur de connexion (820)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "jeton de confirmation (820)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "inscription confirmée (820)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/account.php?confirmed"
+  },
+  {
+   "name": "accès invité par lien (820)",
+   "ok": true,
+   "detail": "http://127.0.0.1:51381/tickets.php?id=27"
+  },
+  {
+   "name": "raccourci / vers la recherche",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "exception 820",
+   "ok": false,
+   "detail": "page.evaluate: Execution context was destroyed, most likely because of a navigation"
+  }
+ ]
+}

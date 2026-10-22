@@ -25,7 +25,7 @@ l'historique git la conserve.
 | `check-drift.sh` | Liste les fichiers du cœur surchargés qui ont changé depuis le commit de base |
 | `captures/` | Captures PNG des pages réelles (instance de test), bureau 1280 px et mobile 390 px, rapport d'audit |
 
-### Fichiers du cœur surchargés (10, inchangés par rapport à la version précédente)
+### Fichiers du cœur surchargés (11 : les 10 de la version précédente + `thread-event.tmpl.php`)
 
 Un fichier de l'overlay **remplace** celui du cœur : chacun est à revoir à chaque mise à jour d'osTicket
 (`check-drift.sh` dit lesquels ont changé).
@@ -38,6 +38,7 @@ Un fichier de l'overlay **remplace** celui du cœur : chacun est à revoir à ch
 | `include/client/tickets.inc.php` | Liste « mes tickets » : filtres segmentés, tri, pagination, cartes sur mobile. Logique PHP copiée telle quelle ; seul ajout : `topic__topic` dans `values()` (sujet d'aide sous le titre). |
 | `include/client/view.inc.php` | Suivi d'un ticket : fil + panneau de propriétés (infos, champs personnalisés, pièces jointes, coordonnées), indicateur Priority facultatif. |
 | `include/client/templates/thread-entry.tmpl.php` | Message du fil : initiales au lieu des avatars (pas de Gravatar), rôle « Vous » / « Équipe Coderise ». |
+| `include/client/templates/thread-event.tmpl.php` | Événements du fil : même balisage, mais les images d'avatar qu'osTicket insère dans la description (Gravatar par défaut, requête externe) sont retirées. |
 | `include/client/open.inc.php` | Ouverture de ticket en panneau avec colonne « Questions fréquentes ». Garde le tableau et `#dynamic-form`. |
 | `include/client/login.inc.php` | Connexion en deux panneaux (compte, suivi d'un ticket sans compte). |
 | `include/client/accesslink.inc.php` | Accès à un ticket par e-mail et numéro. |
@@ -48,7 +49,7 @@ Laissés tels quels, habillés par la feuille de style seulement : `register.inc
 `faq.inc.php`, `knowledgebase.inc.php`, `templates/dynamic-form.tmpl.php` (partagé par l'ouverture,
 l'inscription, le profil, la modification et le rechargement AJAX des champs ; `Form::render()` le prend aussi
 par défaut quand un appel ne précise pas `staff` : ne pas le surcharger), `templates/thread-entries.tmpl.php`,
-`templates/thread-event.tmpl.php`, la page de remerciement (`open.php`) et la page hors ligne (`offline.php`).
+la page de remerciement (`open.php`) et la page hors ligne (`offline.php`).
 
 ### Fichiers ajoutés (aucun équivalent dans le cœur)
 
@@ -140,7 +141,8 @@ jamais servi par Apache) : la liste des fichiers installés avec leur SHA-256. I
   `sommet`, `parcours` (ou tout autre dossier de `deploy/themes/`), ou l'un des fichiers de son `overlay/` est
   présent à l'identique (installation sans manifeste) ;
 - si un fichier qu'il écrirait existe déjà avec un autre contenu et n'appartient pas, inchangé, à une
-  installation précédente de ce thème (personnalisation locale, autre thème) ;
+  installation précédente de ce thème (personnalisation locale, autre thème ; un fichier du thème modifié à la
+  main dans l'overlay est aussi refusé : le fusionner ou le retirer avec `remove.sh -f` d'abord) ;
 - si `MANIFEST` ne correspond pas à `overlay/`.
 
 Relancé sur une installation existante, il met à jour les fichiers du thème et retire ceux qui ont quitté le
@@ -193,4 +195,95 @@ Le portail n'est en français qu'avec le **pack de langue français** d'osTicket
 Les libellés des formulaires (« Adresse e-mail », « Résumé »…), les sujets d'aide et les pages sont du contenu
 de l'administration, à saisir en français.
 
-ECARTS_ET_VERIFICATIONS
+## Écarts avec la maquette Coderise 02
+
+Règle suivie : **aucune donnée inventée**. Ce que la maquette montre et qu'osTicket ne fournit pas est remplacé
+par une donnée réelle, ou omis.
+
+| Maquette | Implémentation |
+|---|---|
+| Statistiques « premier retour moyen, 90 jours », « tickets résolus ce trimestre » | Retirées. Trois compteurs réels : tickets ouverts, « attend votre réponse » (tickets ouverts dont la dernière réponse vient de l'équipe, champ `isanswered`), tickets fermés. |
+| Bandeau « 3 tickets ouverts. 1 attend votre réponse : #260397… » | « L'équipe a répondu, votre réponse est attendue : #n°, sujet » (ticket réel le plus récent) ou « Aucun ticket n'attend votre réponse. » |
+| Panneau « Votre contrat » (niveau, produits couverts) ; pastilles « Priority / Standard » dans les tableaux et le titre du ticket | Omis : le niveau de contrat n'est pas une donnée d'osTicket. Seul l'indicateur Priority du suivi existe, à partir du plan de SLA (voir plus haut). |
+| Colonnes « Produit », « Contrat », « Dernière activité » (« Réponse de Nora, il y a 3 h ») | Liste : N°, Sujet (+ sujet d'aide, pastille « Attend votre réponse »), Statut, Service, Date de création (colonnes triables d'origine). Accueil : « Dernière activité » = date de dernière mise à jour. |
+| Filtres « Produit » et « Contrat », filtre « Tous » | Filtres d'osTicket : Ouverts / Fermés (compteurs réels), recherche par numéro ou mot, sujet d'aide. |
+| Recherche « ticket ou article » de la barre haute | Recherche dans la base de connaissances (le portail n'a pas de recherche commune) ; la liste des tickets garde sa propre recherche. Raccourci `/` conservé. |
+| « Articles recommandés » avec temps de lecture ; « Les plus lus » | Questions mises en avant (FAQ « featured ») avec leur catégorie ; pas de temps de lecture ni de statistique de lecture. |
+| Rail : « Mes tickets » | Lien d'osTicket (« Tickets »), pastille = tickets ouverts ; vues Ouverts / Fermés et pages « Autres ressources » en plus. Sur mobile, menu `<details>` comme la maquette. |
+| Rail : encadré « Support Priority – premier retour sous 4 h, 24 h/24 » | Repris (information commerciale de la charte, la même pour tous les clients). |
+| Barre haute : nom + organisation | Prénom et organisation réels (l'organisation n'apparaît que si le client en a une). Lien vers le profil. |
+| Suivi : « Délai Priority » avec « Apporté en 44 min… Objectif tenu » | Indicateur affiché seulement **avant** la première réponse (échéance réelle, temps écoulé) ; après, il disparaît (pas de mesure « apporté en » : osTicket ne la stocke pas côté client). |
+| Suivi : ligne « Priorité Urgente » et événement « a passé la priorité à Urgente » | Champs et événements tels qu'osTicket les montre au client (la priorité n'est pas visible côté client par défaut). |
+| Fil : avatars à initiales, « Vous » / « Équipe Coderise », filet cyan sur le dernier message | Repris (initiales calculées, rôle d'après l'auteur de l'entrée). Le filet cyan marque la dernière entrée du fil quand c'est un message ; si un événement suit, il n'apparaît pas. |
+| Éditeur à 6 boutons, zone de dépôt « Captures d'écran, journaux… 20 Mo » | Redactor et zone de dépôt d'osTicket restylés (boutons d'osTicket, texte et taille maximale d'osTicket). |
+| Formulaire « libellés à gauche » avec sections | Obtenu en CSS sur les lignes de tableau d'osTicket (sections = en-têtes de formulaire, avec le filet cyan). Le champ « Description » n'a pas de libellé (champ de type bloc, comme dans osTicket). |
+| Récapitulatif des erreurs avec liens vers les champs | Message global d'osTicket + erreur sous chaque champ, champ encadré en rouge. |
+| Pages connexion / inscription sans rail, bandeau bleu nuit | Repris pour un visiteur non connecté (connexion, inscription, mot de passe oublié, accès par numéro), avec pied de page court. |
+| Base de connaissances : icônes propres à chaque thème, temps de lecture, compteurs « 54 articles » | Icône dossier unique, compteurs réels par catégorie ; pas de total ni de temps de lecture. |
+| Article : sommaire, « Cet article vous a aidé ? », tableau, encadré | Gabarit d'origine habillé (titre, fil d'Ariane, date, contenu, barre latérale d'osTicket). |
+| Pied de page « © 2026 Coderise. Portail de support, propulsé par osTicket » | Chaînes d'osTicket : « Copyright © <année> <entreprise> - Tous droits réservés » + lien « propulsé par osTicket ». Le nom vient de l'administration. |
+| Page de remerciement, hors ligne, profil, modification, mot de passe oublié, résultats de recherche (non maquettés) | Gabarits d'origine dans le même habillage (panneaux blancs, formulaires à libellés à gauche). |
+
+Autres limites :
+
+- `:has()` est utilisé (page de remerciement, formulaires d'origine, champs en erreur) : navigateurs de 2023 et
+  plus ; sans `:has()`, ces pages restent lisibles mais sans panneau blanc.
+- Le bouton d'envoi est souligné de rouge quand le formulaire a des modifications non enregistrées : signal
+  d'osTicket (`js/osticket.js`), rendu lisible sur le bouton cyan (il apparaît aussi au chargement des pages avec
+  Redactor, comme dans le thème d'origine).
+- Le message de confirmation après une réponse est affiché une fois, au-dessus du formulaire (le cœur l'affiche
+  deux fois).
+- Les libellés des champs dynamiques ne sont pas associés à leur champ (`for="X"` contre `id="_X"` dans
+  `templates/dynamic-form.tmpl.php` du cœur, non surchargé) : comportement d'osTicket, à signaler en amont.
+- Mode clair uniquement (la charte n'a pas de mode sombre). RTL non testé (`css/rtl.css` reste chargé).
+
+## Vérifications (22/10/2026, commit `06d96c6f`)
+
+Instance de test privée (projet Compose à suffixe unique, port hôte libre, secrets hors dépôt) : image construite
+comme en production à partir du commit (`git archive`, `apply.sh` sur l'overlay exporté, cibles `install` puis
+`runtime` du `Dockerfile`), conteneur durci (racine en lecture seule, `cap_drop ALL`, configuration en lecture
+seule), MariaDB 11.4, installation par l'assistant (requêtes HTTP), puis captures sur l'image `runtime` finale
+**sans aucun montage du thème**. Données réalistes et fictives : une cliente (Léa Marchand, organisation Maison
+Verdier) avec compte, un collègue sans compte (collaborateur), 2 agents, 39 tickets (ouverts, résolus, fermés ;
+29 fermés pour la pagination à 25), pièces jointes, réponses d'agents, un ticket d'un collègue où la cliente est
+collaboratrice, un ticket d'un autre client, un plan de SLA « Priority 4h » (24/7) actif et un plan désactivé
+(comme `contrib/sla-first-response`), formulaire « Contexte technique » à 5 champs sur 2 sujets d'aide,
+9 articles en 4 catégories (dont des articles et catégories mis en avant), pages d'accueil, de remerciement et
+hors ligne. Navigateur : Chromium privé (`playwright-core` installé hors dépôt), pas le navigateur partagé.
+
+Français : aucun pack officiel n'est disponible hors ligne. Un **catalogue de test** d'environ 130 chaînes
+d'osTicket (non livré, monté en lecture seule) active « fr » ; les captures sont en français (les chaînes
+absentes du catalogue de test restent en anglais : statuts « Open », « Showing 1 - 8 of 8 », tailles « bytes »…).
+Les mêmes parcours ont été rejoués en anglais (sans catalogue) : mêmes résultats.
+
+| Contrôle | Résultat |
+|---|---|
+| Parcours réels, à 1280 et 390 px (33 contrôles automatiques) | Tous passés : champs dynamiques rechargés en AJAX au changement de sujet ; erreurs de validation ; ticket d'un visiteur avec éditeur riche, champs dynamiques et pièce jointe, page de remerciement ; erreur de connexion ; accès par e-mail + numéro (erreur, envoi du lien) ; inscription puis confirmation par le vrai jeton ; mot de passe oublié ; accès invité par lien ; recherche de la base depuis la barre (raccourci `/`) ; connexion ; liste (8 ouverts, 29 fermés), isolation du ticket d'un autre client, pagination, tri ; indicateur Priority affiché sur le ticket sans réponse et absent sur le ticket répondu ; réponse avec pièce jointe et message de succès ; modification, profil, ouverture connectée ; impression ; page hors ligne. |
+| Captures | `captures/` : 67 pages (bureau 1280 px, mobile 390 px), menu mobile ouvert, impression du suivi, tablette 820 px (accueil, liste, suivi). |
+| Console du navigateur | Aucune erreur ni avertissement (FR et EN). |
+| Requêtes | Aucune réponse HTTP ≥ 400, **aucune requête vers un autre hôte** (les avatars Gravatar des événements du fil, trouvés pendant la recette, sont retirés par la surcharge de `thread-event.tmpl.php`). |
+| Débordement horizontal | Aucun à 390, 820 et 1280 px. |
+| Contrastes (WCAG, chaque texte visible, fond réel composé) | Minimum 4,91:1, aucun texte sous le seuil (`captures/audit-fr.json`, `audit-en.json`). |
+| Clavier | Lien d'évitement en premier ; 30 tabulations sur l'accueil connecté : contour de 3 px sur chaque élément atteint. |
+| Journaux Apache/PHP | Aucune erreur ni avertissement PHP. Seuls refus : les 403 provoqués exprès. Journal d'osTicket : seulement « Mailer Error » (pas de serveur de messagerie sur l'instance de test). |
+| Accès direct aux fichiers du thème | `include/client/poste-de-travail/theme.php`, `i18n/fr.php`, `installed.manifest`, `header.inc.php`, `templates/thread-event.tmpl.php` : 403. Feuille, polices et favicon : 200. |
+| `apply.sh` / `remove.sh` sur `deploy/docker/overlay/` | Simulation, installation (33 fichiers + manifeste), relance idempotente (0 copié), refus si `include/client/sommet/installed.manifest` existe, refus sur un fichier du thème modifié, `remove.sh` qui conserve le fichier modifié (code 1) puis `-f`, conservation d'un plugin présent dans l'overlay ; `git status` propre ensuite. |
+| `check-drift.sh` | Arbre courant : 11 fichiers OK ; `--rev origin/1.15.x` : 4 fichiers `CHANGED` détectés (code 1). |
+| Syntaxe PHP | `php -l` (PHP 8.3) sur les 13 fichiers PHP du thème : aucune erreur. |
+
+Réglages propres à l'instance de test (sans effet sur le thème) : vérification DNS des adresses e-mail
+désactivée (les adresses `.test` des données fictives sont refusées sinon), CAPTCHA désactivé, inscription
+publique avec confirmation par e-mail.
+
+**Non vérifié** : français avec le pack officiel ; envoi réel des e-mails (pas de SMTP, les liens ont été lus en
+base) ; lecteur d'écran ; Firefox et Safari (Chromium seulement) ; connexion par fournisseur externe ; CAPTCHA ;
+logo téléversé dans l'administration ; organisation affichée sous le nom (l'organisation de test n'a pas été
+rattachée par le script de données) ; modification de mot de passe imposée après le lien de réinitialisation.
+
+## Points à valider
+
+1. Indicateur Priority : libellés, nom du plan (`PTDT_PRIORITY_SLA`), affichage d'un dépassement.
+2. Couleurs d'état (erreur, succès, alerte) : extension de la charte.
+3. Logo : PNG horizontal détouré, faute de SVG horizontal officiel ; favicon composé (symbole sur carré bleu nuit).
+4. Encadré « Support Priority » du rail, montré à tous les clients (pas de niveau de contrat dans osTicket).
+5. Police de code (pile système) et règle « liens bleu nuit soulignés sur fond teinté ».
