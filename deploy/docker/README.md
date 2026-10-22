@@ -604,6 +604,30 @@ le plan par le plugin, messages de suivi, pièces jointes, deux tickets en atten
 pour l'indicateur Priority, un en retard), tickets de Hugo, Nina et Marc, un ticket partagé, un ticket
 de l'invitée. Le plugin `stripe-sync` n'est pas installé.
 
+**Vérifié le 22/10/2026** (Windows 11, Git Bash, Docker 29, Compose 5.1 ; Chromium privé piloté par
+`playwright-core` installé hors du dépôt) : construction depuis le commit, installation par
+l'assistant, peuplement (50 tickets, 37 bascules du plan par le plugin) ; connexion de Léa, Hugo,
+Nina et Marc au portail avec la pastille de contrat attendue (Priority pour Léa, Standard pour les
+autres), encart Priority de l'accueil de Léa, indicateur « premier retour sous 4 h » sur son ticket en
+attente ; connexion de l'agent et de l'administrateur (`/scp/`, `settings.php`, plugin actif) ;
+ouverture d'un ticket depuis le portail et accusé de réception reçu dans Mailpit ; `theme parcours`
+puis `theme sommet` (feuille du thème servie, nombre de tickets, d'entrées, d'utilisateurs et
+d'articles inchangé) ; `down` puis `up` (données et e-mails conservés) ; `docker compose restart` de la
+pile (retour en `healthy`, portail et Mailpit répondent) ; empreintes des 16 binaires du thème dans
+l'image identiques aux fichiers committés ; aucun montage ni label des conteneurs ne pointe hors du
+dossier d'état. **Non vérifié** : `reset` jusqu'au bout (seul le refus sans confirmation l'a été),
+une installation complète sous Linux, le changement vers `atelier`, `poste-de-travail` et les deux
+thèmes `ownalytics-*`, l'accès invité par e-mail et numéro.
+
+Constaté en l'écrivant : Docker ne publie pas le port d'un conteneur relié seulement à des réseaux
+`internal` (d'où le réseau `mail-ui` de Mailpit) ; `Topic::update()` n'associe pas le formulaire du
+ticket à une rubrique créée par script (le peuplement l'ajoute) ; le nom d'un filtre est limité à
+32 caractères ; un plan de SLA créé avec des drapeaux à 0 reçoit la valeur par défaut de la colonne
+(actif) : le plan « réponse faite » est désactivé après coup, comme dans l'administration.
+Au `docker compose restart`, le premier passage de `cron` peut échouer pendant que la base redémarre
+(`Call to undefined function osTicket\Mail\_S()` dans `class.mailer.php`, chemin d'erreur d'osTicket
+quand la base est injoignable) ; les passages suivants réussissent et `cron` reste `healthy`.
+
 **Limites.** HTTP seulement (`OSTICKET_COOKIE_SECURE=0`) ; les échéances de SLA continuent de courir :
 les tickets en attente passent « en retard » quelques heures après le peuplement (`cron` envoie alors
 les alertes, visibles dans Mailpit) ; changer de commit puis relancer `up` reconstruit l'image mais ne

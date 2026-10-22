@@ -457,6 +457,10 @@ function demo_tickets($DEMO) {
     // Crée un ticket comme le portail (le filtre décide du plan de SLA).
     $create = function ($who, $subject, $message, $topic, $created, $extra = array())
             use (&$stats, $topics) {
+        global $thisstaff;
+        // Ticket du client, pas d'un agent : sinon l'événement « créé » et ceux du
+        // filtre sont attribués à l'agent de la réponse précédente.
+        $thisstaff = null;
         $vars = array('name' => $who['name'], 'email' => $who['email'], 'subject' => $subject,
             'message' => $message, 'topicId' => $topics[$topic], 'source' => 'Web',
             'ip' => '127.0.0.1') + $extra;
