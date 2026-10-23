@@ -129,6 +129,6 @@ Règle de la CI : une clé qui fuit permet de charger une image arbitraire sur l
 | Dépôt cloné, `.env`, secrets de la base, minuterie de sauvegarde | fait |
 | CI : build et envoi de l'image par SSH (testé de bout en bout) | fait |
 | Image d'installation sur le Droplet, base et assistant démarrés (`http://127.0.0.1:8080/setup/` en local sur le Droplet) | fait |
-| Assistant d'installation à dérouler (tunnel SSH), mise en production, TLS | à faire |
+| Installation d'osTicket, mise en production, TLS (Let's Encrypt), première sauvegarde | fait (23/10/2026, `https://support.coderise.fr`) |
 | Durcissement SSH (`--harden-ssh`) | à faire |
 | Copie des sauvegardes hors serveur | à faire |
