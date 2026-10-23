@@ -344,6 +344,55 @@ if (!defined('CDR_VERSION')) {
     }
 
     /**
+     * Index of the current item among $items, the sub-menu of tab $name, or
+     * -1. Shared by the rail and the crumbs. Only the active tab can hold
+     * the current item. getActiveMenu() wins when it points at an item;
+     * otherwise (it is 0 or -1 on most pages) the exact script-and-query
+     * match of cdr_item_is_current(), except on settings.php where every
+     * tab is settings.php?t=... and getActiveMenu() is the only source.
+     */
+    function cdr_current_item($nav, $name, $items) {
+        if (!$nav || !is_array($items) || $name === null || $name !== $nav->getActiveTab())
+            return -1;
+        $am = (int) $nav->getActiveMenu();
+        if ($am > 0 && isset($items[$am - 1]) && is_array($items[$am - 1]))
+            return $am - 1;
+        if (basename(isset($_SERVER['SCRIPT_NAME']) ? (string) $_SERVER['SCRIPT_NAME'] : '') === 'settings.php')
+            return -1;
+        foreach ($items as $k => $item)
+            if (is_array($item) && empty($item['droponly']) && cdr_item_is_current($item))
+                return $k;
+        return -1;
+    }
+
+    /**
+     * Read-only view of a StaffNav for core's sub-navigation.tmpl.php, which
+     * prints $item['desc'] and $item['title'] raw: array items get them
+     * through cdr__() and escaped; callables (the queue menus) are untouched.
+     */
+    class CdrNavView {
+        private $nav;
+        function __construct($nav) { $this->nav = $nav; }
+        function getSubMenu($tab=null) {
+            $sub = $this->nav->getSubMenu($tab);
+            if (!is_array($sub))
+                return $sub;
+            foreach ($sub as $k => $item) {
+                if (!is_array($item) || is_callable($item))
+                    continue;
+                foreach (array('desc', 'title') as $f)
+                    if (isset($item[$f]))
+                        $sub[$k][$f] = cdr_h(cdr__($item[$f]));
+            }
+            return $sub;
+        }
+        function getActiveMenu() { return $this->nav->getActiveMenu(); }
+        function getActiveTab() { return $this->nav->getActiveTab(); }
+        function getSubNavInfo() { return $this->nav->getSubNavInfo(); }
+        function getTabs() { return $this->nav->getTabs(); }
+    }
+
+    /**
      * The rail of the staff panel. $nav (StaffNav or AdminNav) may be null
      * (profile.php); $staff is the logged-in agent. Admin mode is the
      * ADMINPAGE constant set by scp/admin.inc.php. One markup for every
@@ -356,7 +405,7 @@ if (!defined('CDR_VERSION')) {
         $tabs = ($nav && is_array($t = $nav->getTabs())) ? $t : array();
         $active = $nav ? $nav->getActiveTab() : null;
 
-        $o = '<aside class="rail on-dark" aria-label="' . cdr_h(cdr__('Main menu')) . '">'
+        $o = '<aside class="rail on-dark" aria-label="' . cdr_h(cdr__('Menu')) . '">'
             . '<div class="rail-top"><a class="brand no-pjax" href="' . ROOT_PATH . 'scp/index.php">'
             . '<img class="logo" src="' . cdr_h(cdr_asset('img/logo-horizontal-sombre.png'))
             . '" width="2041" height="345" alt="Coderise"></a>'
@@ -390,11 +439,13 @@ if (!defined('CDR_VERSION')) {
                         // Core sub-navigation (queues, counts, "add personal
                         // queue"), renamed so jb.overflow.menu.js leaves it be.
                         // A closure keeps the template's variables out of this scope.
+                        // CdrNavView translates and escapes the labels of the
+                        // array items; closures (queues) pass through as is.
                         $render = function ($nav) {
                             include STAFFINC_DIR . 'templates/sub-navigation.tmpl.php';
                         };
                         ob_start();
-                        $render($nav);
+                        $render(new CdrNavView($nav));
                         $sub = trim(ob_get_clean());
                         if ($sub !== '') {
                             $sub = str_replace('id="customQ_nav"', 'id="cdr-queues"', $sub);
@@ -409,20 +460,7 @@ if (!defined('CDR_VERSION')) {
             else {
                 foreach ($tabs as $name => $tab) {
                     $items = $nav->getSubMenu($name) ?: array();
-                    $current = -1;
-                    if ($name === $active) {
-                        // settings.php relies on getActiveMenu() only.
-                        $am = (int) $nav->getActiveMenu();
-                        if ($am > 0 && isset($items[$am - 1]))
-                            $current = $am - 1;
-                        elseif (basename((string) @$_SERVER['SCRIPT_NAME']) !== 'settings.php') {
-                            foreach ($items as $k => $item)
-                                if (is_array($item) && empty($item['droponly']) && cdr_item_is_current($item)) {
-                                    $current = $k;
-                                    break;
-                                }
-                        }
-                    }
+                    $current = cdr_current_item($nav, $name, $items);
                     $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr__($tab['desc'])) . '</p><ul>';
                     foreach ($items as $k => $item) {
                         if (!is_array($item) || !empty($item['droponly']) || !isset($item['href']))
@@ -468,11 +506,10 @@ if (!defined('CDR_VERSION')) {
             if (is_array($tabs) && isset($tabs[$t]))
                 $crumbs[] = array(cdr__($tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
             if ($current === null) {
-                $sub = $nav->getSubMenu();
-                $am = (int) $nav->getActiveMenu();
-                if (is_array($sub) && $am > 0 && isset($sub[$am - 1]) && is_array($sub[$am - 1])
-                        && isset($sub[$am - 1]['desc']))
-                    $current = cdr__($sub[$am - 1]['desc']);
+                $sub = $nav->getSubMenu($t);
+                $k = cdr_current_item($nav, $t, $sub);
+                if ($k >= 0 && isset($sub[$k]['desc']))
+                    $current = cdr__($sub[$k]['desc']);
             }
         }
         if ($current !== null && (string) $current !== ''

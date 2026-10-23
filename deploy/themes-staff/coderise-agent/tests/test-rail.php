@@ -116,8 +116,11 @@ function agent_nav() {
         'tickets' => array($queue,
             item('New Ticket', 'tickets.php?a=open', array('id' => 'new-ticket', 'iconclass' => 'newTicket'))),
         'dashboard' => array(item('Dashboard', 'dashboard.php'), item('Agent Directory', 'directory.php')),
+        'users' => array(item('User Directory', 'users.php'), item('Organizations', 'orgs.php')),
         'tasks' => array(item('Tasks', 'tasks.php', array('droponly' => true))),
-    ), 'tickets', null, array('classes' => ' jb-overflowmenu', 'class' => 'jb-overflowmenu', 'id' => 'customQ_nav'));
+    // Real StaffNav::addSubNavInfo() stores the key "classes" (the core
+    // template reads "class", so it prints an empty class attribute).
+    ), 'tickets', null, array('classes' => ' jb-overflowmenu', 'id' => 'customQ_nav'));
 }
 function admin_tabs() {
     return array(
@@ -244,7 +247,30 @@ check('fr: tab label', link_of($h, 'Tableau de bord') !== null, true);
 check('fr: log out', link_of($h, "D\xC3\xA9connexion") !== null, true);
 check('fr: profile', link_of($h, 'Mon profil') !== null, true);
 check('fr: menu button', strpos($h, '>Menu</button>') !== false || strpos($h, 'Menu</span></button>') !== false, true);
+// Agent sub-menu items are rendered by the core template: labels still go through cdr__.
+$_SERVER['SCRIPT_NAME'] = '/scp/directory.php';
+$h = cdr_rail(new StubNav(agent_tabs(), agent_nav()->submenus, 'dashboard', 2), $admin);
+check('fr: agent sub-menu label translated', strpos($h, '>Annuaire des agents</a>') !== false, true);
+check('fr: agent sub-menu msgid gone', strpos($h, 'Agent Directory'), false);
+check('fr: queue closures untouched', strpos(cdr_rail(agent_nav(), $admin), 'data-queue-id="1"') !== false, true);
+$_SERVER['SCRIPT_NAME'] = '/scp/orgs.php';
+check('fr: crumbs sub-item translated', cdr_crumbs(new StubNav(agent_tabs(), agent_nav()->submenus, 'users', -1)),
+    '<nav class="crumbs" aria-label="Fil d&#039;Ariane"><ol><li><a href="/scp/users.php">Utilisateurs</a></li>'
+    . '<li><span aria-current="page">Organisations</span></li></ol></nav>');
 unset($GLOBALS['CDR_TEST_LANG']);
+$_SERVER['SCRIPT_NAME'] = '/scp/tickets.php';
+
+// Hostile agent sub-menu label (plugin app): escaped once rendered by the core template.
+$sub = agent_nav()->submenus;
+$sub['dashboard'][1]['desc'] = '<img src=x onerror=alert(1)>';
+$h = cdr_rail(new StubNav(agent_tabs(), $sub, 'dashboard', 1), $admin);
+check('hostile: agent sub-menu label escaped', strpos($h, '<img src=x') === false
+    && strpos($h, '&lt;img src=x onerror=alert(1)&gt;') !== false, true);
+
+// Landmarks: the aside and the nav have distinct labels.
+$m = array();
+preg_match_all('#<(?:aside|nav) [^>]*aria-label="([^"]*)"#', cdr_rail(agent_nav(), $admin), $m);
+check('landmarks: distinct labels', count($m[1]) === count(array_unique($m[1])), true);
 
 // ---------- crumbs and #content classes (agent) ----------
 $nav = agent_nav();
@@ -306,6 +332,30 @@ check('admin page, non-admin staff: no mode switch', strpos($h, 'class="mode"'),
 check('crumbs: admin settings', cdr_crumbs(admin_nav('settings', 3), null, true),
     '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/scp/admin.php">Administration</a></li>'
     . '<li><a href="/scp/settings.php">Settings</a></li><li><span aria-current="page">Tickets</span></li></ol></nav>');
+
+// Real AdminNav on teams.php: getActiveMenu() is 0 (or -1); the item is found by
+// script match, and the rail and the crumbs agree (one shared resolver).
+$_SERVER['SCRIPT_NAME'] = '/scp/teams.php';
+$_GET = $_REQUEST = array();
+foreach (array(0, -1, null) as $am) {
+    $nav = admin_nav('staff', $am);
+    check("teams.php (activeMenu " . var_export($am, true) . "): rail", current_labels(cdr_rail($nav, $admin)), array('Teams'));
+    check("teams.php (activeMenu " . var_export($am, true) . "): crumbs", cdr_crumbs($nav, null, true),
+        '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/scp/admin.php">Administration</a></li>'
+        . '<li><a href="/scp/staff.php">Agents</a></li><li><span aria-current="page">Teams</span></li></ol></nav>');
+}
+// settings.php keeps relying on getActiveMenu() only, in the crumbs too.
+$_SERVER['SCRIPT_NAME'] = '/scp/settings.php';
+$_GET = $_REQUEST = array('t' => 'tickets');
+check('crumbs: settings.php without active menu', cdr_crumbs(admin_nav('settings'), null, true),
+    '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/scp/admin.php">Administration</a></li>'
+    . '<li><span aria-current="page">Settings</span></li></ol></nav>');
+// Real StaffNav on orgs.php (users tab, no active menu): "Users / Organizations".
+$_SERVER['SCRIPT_NAME'] = '/scp/orgs.php';
+$_GET = $_REQUEST = array();
+check('crumbs: orgs.php by script match', cdr_crumbs(new StubNav(agent_tabs(), agent_nav()->submenus, 'users', 0)),
+    '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/scp/users.php">Users</a></li>'
+    . '<li><span aria-current="page">Organizations</span></li></ol></nav>');
 
 check('no PHP notice or warning', $php_errors, array());
 

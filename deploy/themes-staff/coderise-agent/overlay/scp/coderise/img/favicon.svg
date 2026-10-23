@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="14.75 -1 64 64" role="img" aria-label="Coderise">
-  <!-- Dérivé de logo_coderise.svg (fichier fourni, qui fait foi) : mêmes coordonnées et mêmes couleurs (cyan #11c9df). Les deux rectangles bleu nuit de l'original découpent à plat les pieds du chevron et le haut de la barre oblique ; ils sont conservés tels quels sur fond bleu nuit et traduits en masque sur fond clair. La police Bebas Neue (SIL OFL, voir OFL-BebasNeue.txt) est embarquée : le texte ne dépend d'aucune police installée. -->
+  <!-- Symbole Coderise sur bleu nuit (favicon du panneau agent), dérivé de logo_coderise.svg (fichier fourni, qui fait foi) : mêmes coordonnées et mêmes couleurs (cyan #11c9df). Les deux rectangles bleu nuit de l'original découpent à plat les pieds du chevron et le haut de la barre oblique. Aucun texte, aucune police. -->
   <defs>
   </defs>
   <rect fill="#000f26" x="14.75" y="-1" width="64" height="64"/>
