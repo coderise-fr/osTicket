@@ -2,3 +2,23 @@
 # Keep in sync with overlay/ (apply.sh refuses otherwise).
 include/staff/coderise/coderise.inc.php
 include/staff/coderise/i18n/fr.php
+include/staff/footer.inc.php
+include/staff/header.inc.php
+scp/coderise/css/coderise.css
+scp/coderise/fonts/OFL-inter.txt
+scp/coderise/fonts/OFL-montserrat.txt
+scp/coderise/fonts/inter-latin-400-normal.woff2
+scp/coderise/fonts/inter-latin-500-normal.woff2
+scp/coderise/fonts/inter-latin-600-normal.woff2
+scp/coderise/fonts/inter-latin-ext-400-normal.woff2
+scp/coderise/fonts/inter-latin-ext-500-normal.woff2
+scp/coderise/fonts/inter-latin-ext-600-normal.woff2
+scp/coderise/fonts/montserrat-latin-600-normal.woff2
+scp/coderise/fonts/montserrat-latin-700-normal.woff2
+scp/coderise/fonts/montserrat-latin-800-normal.woff2
+scp/coderise/fonts/montserrat-latin-ext-600-normal.woff2
+scp/coderise/fonts/montserrat-latin-ext-700-normal.woff2
+scp/coderise/fonts/montserrat-latin-ext-800-normal.woff2
+scp/coderise/img/favicon.svg
+scp/coderise/img/logo-horizontal-sombre.png
+scp/coderise/js/coderise.js

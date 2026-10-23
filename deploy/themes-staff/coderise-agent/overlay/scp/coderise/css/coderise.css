@@ -1,0 +1,217 @@
+/* Coderise staff panel theme (coderise-agent): shell of the agent and admin panel.
+   Charter Coderise v1.0. Loaded after scp/css/scp.css, css/rtl.css and
+   scp/css/translatable.css so that equal specificity wins. Ported from
+   docs/theme-mockups-admin/theme.css (Rail, Barre haute, Boutons, Panneaux,
+   responsive blocks); class names follow the mockup so later stylesheets can
+   target them. Not part of osTicket core: shipped by deploy/themes-staff.
+
+   Contrast rules: cyan is never text on white (cyan-profond is); ardoise is
+   never text on nuit (white at 78 % and more is); a cyan fill carries nuit text. */
+
+/* ───────── Fonts (SIL OFL 1.1, see ../fonts/OFL-*.txt), local only ───────── */
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/montserrat-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/montserrat-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/montserrat-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/montserrat-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/montserrat-latin-800-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/montserrat-latin-ext-800-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/inter-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/inter-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/inter-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/inter-latin-ext-500-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/inter-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/inter-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+/* ───────── Tokens (docs/theme-mockups-coderise/_shared/tokens.css) ───────── */
+:root {
+  --nuit: #000F26;
+  --cyan: #10C9DE;
+  --blanc: #FFFFFF;
+  --cyan-profond: #0A7C8C;
+  --ardoise: #5B6675;
+  --gris: #E8ECF1;
+  --voile: #E3F8FB;
+  --erreur: #B3261E;  --erreur-fond: #FCECEA;
+  --succes: #0F6B4B;  --succes-fond: #E4F5EC;
+  --alerte: #7A4B00;  --alerte-fond: #FFF3D1;
+  --f-titre: "Montserrat", Arial, sans-serif;
+  --f-texte: "Inter", Arial, sans-serif;
+  --focus: var(--cyan-profond);
+  --rail-w: 240px;
+}
+
+/* ───────── Page ───────── */
+html, body { background: var(--gris); }
+body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: normal; font-variant-numeric: tabular-nums; }
+#container { width: auto; max-width: none; margin: 0; padding: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.on-dark { --focus: var(--cyan); }
+.cdr-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 100; background: var(--nuit); color: var(--blanc); padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; }
+.cdr-skip:focus { top: 8px; outline: 3px solid var(--cyan); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ic { flex: none; vertical-align: middle; }
+
+/* The shell: rail | main column. Inline <script>/<title> of a PJAX response
+   are display:none and take no grid cell. */
+#pjax-container { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: 100vh; }
+#pjax-container > .rail { grid-column: 1; }
+#pjax-container > .cdr-main { grid-column: 2; min-width: 0; display: flex; flex-direction: column; }
+
+/* ───────── Rail ───────── */
+.rail { background: var(--nuit); color: var(--blanc); padding: 20px 16px 12px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent; box-sizing: border-box; font-size: .84375rem; }
+.rail *, .rail *::before, .rail *::after { box-sizing: border-box; }
+.rail a { display: flex; text-decoration: none; }
+.rail a:hover { text-decoration: none; }
+.rail-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rail .brand { display: block; line-height: 0; padding: 0 8px; }
+.rail .brand .logo { height: 26px; width: auto; max-width: 100%; }
+.rail .menu-toggle { display: none; }
+.rail-body { display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
+
+/* Mode switch Agent / Administration: the active segment is the only cyan fill of the rail */
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 8px; background: rgba(255,255,255,.1); }
+.rail .mode a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 6px; border-radius: 6px; color: var(--blanc); font: 600 .78125rem var(--f-titre); }
+.rail .mode a:hover { background: rgba(255,255,255,.12); }
+.rail .mode a[aria-current] { background: var(--cyan); color: var(--nuit); }
+
+.rail nav.menu { display: grid; gap: 10px; }
+.rail .group { display: grid; gap: 2px; }
+.rail .group-title { margin: 0 0 4px; padding: 0 10px; font: 600 .75rem var(--f-titre); color: rgba(255,255,255,.78); }
+.rail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.rail li { list-style: none; margin: 0; padding: 0; }
+.rail a.item { align-items: center; gap: 10px; min-height: 34px; padding: 0 10px; border-radius: 7px; color: var(--blanc); font-weight: 500; position: relative; }
+.rail a.item:hover { background: rgba(255,255,255,.1); }
+.rail a.item[aria-current] { background: rgba(255,255,255,.13); font-weight: 600; }
+.rail a.item[aria-current]::before { content: ""; position: absolute; inset-inline-start: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 2px; background: var(--cyan); }
+.rail a.item[aria-current] .ic { color: var(--cyan); }
+.rail .badge { margin-inline-start: auto; min-width: 22px; padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: .75rem; font-weight: 600; text-align: center; }
+.rail .badge-hot { background: var(--cyan); color: var(--nuit); font-weight: 700; }
+
+/* Sub-navigation of the active agent tab (core sub-navigation.tmpl.php) */
+.rail .queues { margin: 2px 0 6px; margin-inline-start: 20px; padding-inline-start: 10px; border-inline-start: 1px solid rgba(255,255,255,.2); }
+.rail .queues nav { display: block; margin: 0; padding: 0; background: none; border: 0; }
+.rail .queues #sub_nav { display: grid; gap: 1px; height: auto; margin: 0; padding: 0; background: none; border: 0; white-space: normal; line-height: 1.4; }
+.rail .queues #sub_nav > li { display: block; position: static; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.rail .queues #sub_nav > li > a { display: flex; align-items: center; gap: 8px; min-height: 30px; margin: 0; padding: 0 10px; border-radius: 6px; color: rgba(255,255,255,.88); font-size: .8125rem; font-weight: 400; background: none; }
+.rail .queues #sub_nav > li > a:hover { background: rgba(255,255,255,.1); color: var(--blanc); }
+.rail .queues #sub_nav > li > a.active,
+.rail .queues #sub_nav > li.active > a,
+.rail .queues #sub_nav > li.child > a { background: rgba(255,255,255,.13); color: var(--blanc); font-weight: 600; }
+.rail .queues #sub_nav i[class^="icon-"], .rail .queues #sub_nav i[class*=" icon-"] { display: none; }
+/* "New Ticket": kept in the DOM (scp.js tags its <li>), the top bar button replaces it */
+.rail .queues #sub_nav #new-ticket { display: none; }
+
+/* Queue counts: core prints "(n)" in #queue-count-bucket; shown as a badge */
+#cdr-queues [id="queue-count-bucket"] { margin-inline-start: auto; font-size: 0; }
+#cdr-queues .queue-count { display: inline-block; float: none; min-width: 20px; margin: 0; margin-inline-start: auto; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: .6875rem; font-weight: 600; line-height: 1.6; text-align: center; }
+#cdr-queues .queue-count:empty, #cdr-queues .queue-count .faded-more:empty { display: none; }
+#cdr-queues .queue-count .faded-more { color: inherit; opacity: 1; }
+
+/* Queue dropdowns flattened (review I-12): only the dropdown of the active
+   top-level queue is expanded, static, without the nested scroll. The
+   !important on position/max-width beat inline offsets set by scp.js on
+   .subQ mouseover and core's own !important. */
+#cdr-queues .customQ-dropdown { display: none; position: static; min-width: 0; margin: 0; padding: 0 0 4px; border: 0; border-radius: 0; box-shadow: none; background: none; font-size: inherit; text-align: start; }
+#cdr-queues li.item.active > .customQ-dropdown,
+#cdr-queues li.item.child > .customQ-dropdown { display: block; }
+#cdr-queues .customQ-dropdown ul.scroll-height { max-height: none; overflow: visible; border: 0; margin: 0; padding: 2px 0; padding-inline-start: 10px; }
+#cdr-queues .customQ-dropdown ul { display: block; }
+#cdr-queues .customQ-dropdown ul li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; position: static; margin: 0; padding: 0; background: none; color: rgba(255,255,255,.88); white-space: normal; cursor: default; }
+#cdr-queues .customQ-dropdown ul li:not(.personalQ):hover { background: none; color: var(--blanc); }
+#cdr-queues .customQ-dropdown ul li > a { order: 1; flex: 1 1 0; min-width: 0; max-width: none !important; margin: 0; padding: 4px 8px; border-radius: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(255,255,255,.88); font-size: .78125rem; }
+#cdr-queues .customQ-dropdown ul li > a:hover { background: rgba(255,255,255,.1); color: var(--blanc); }
+#cdr-queues .customQ-dropdown ul li > a.active { background: rgba(255,255,255,.13); color: var(--blanc); font-weight: 600; }
+#cdr-queues .customQ-dropdown ul li > a::before { content: none; padding: 0; }
+#cdr-queues .customQ-dropdown ul li > span.queue-count { order: 2; }
+#cdr-queues .customQ-dropdown li.subQ > ul.subMenuQ { display: block; order: 3; position: static !important; flex: 0 0 100%; margin: 0; padding: 0; padding-inline-start: 12px; border: 0; box-shadow: none; background: none; }
+#cdr-queues .subMenuQ::before, #cdr-queues .subMenuQ::after { content: none; display: none; }
+#cdr-queues .customQ-dropdown li.personalQ { flex-basis: 100%; height: 0; margin: 4px 0; border: 0; border-top: 1px dashed rgba(255,255,255,.25); background: none; font-size: 0; }
+#cdr-queues .customQ-dropdown li h4, #cdr-queues .customQ-dropdown li.top-level { flex-basis: 100%; margin: 0; padding: 4px 8px 0; background: none; color: rgba(255,255,255,.78); font: 600 .75rem var(--f-titre); }
+#cdr-queues .customQ-dropdown li.top-level { padding: 0; }
+#cdr-queues .add-queue a { display: flex; padding: 4px 8px; padding-inline-start: 18px; border-radius: 6px; color: rgba(255,255,255,.78) !important; font-size: .75rem; cursor: pointer; white-space: nowrap; }
+#cdr-queues .add-queue a:hover { background: rgba(255,255,255,.1); color: var(--blanc) !important; }
+#cdr-queues .add-queue a span { padding: 0; opacity: 1; }
+#cdr-queues .add-queue i[class^="icon-"] { display: inline-block; color: var(--cyan); margin-inline-end: 4px; }
+
+.rail .foot { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.18); display: grid; gap: 4px; }
+.rail .me { display: flex; align-items: center; gap: 10px; padding: 6px 8px; color: var(--blanc); }
+.rail .me b { display: block; font: 600 .8125rem var(--f-titre); line-height: 1.2; overflow-wrap: anywhere; }
+.rail .me small { display: block; color: rgba(255,255,255,.78); font-size: .75rem; }
+.rail .foot a.item { min-height: 32px; font-size: .8125rem; }
+.rail .avatar { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; flex: none; font: 700 .6875rem var(--f-titre); background: var(--cyan); color: var(--nuit); }
+
+/* ───────── Top bar ───────── */
+.topbar { background: var(--blanc); display: flex; align-items: center; gap: 16px; padding: 10px 28px; border-bottom: 1px solid rgba(0,15,38,.12); position: sticky; top: 0; z-index: 5; min-height: 56px; box-sizing: border-box; }
+.crumbs { min-width: 0; }
+.crumbs ol { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; color: var(--ardoise); white-space: nowrap; }
+.crumbs li { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.crumbs li + li::before { content: "/"; margin-inline-end: 6px; }
+.crumbs a { display: inline; color: var(--ardoise); text-decoration: underline; text-underline-offset: 3px; }
+.crumbs [aria-current] { color: var(--nuit); font-weight: 600; }
+.tsearch { flex: 1; max-width: 460px; margin: 0; margin-inline-start: auto; position: relative; }
+.tsearch .ic { position: absolute; inset-inline-start: 11px; top: 9px; color: var(--ardoise); pointer-events: none; }
+.tsearch input[type="search"] { width: 100%; height: 36px; margin: 0; padding: 0 12px; padding-inline-start: 36px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: 400 .84375rem var(--f-texte); box-sizing: border-box; }
+.tsearch input[type="search"]::placeholder { color: var(--ardoise); opacity: 1; }
+.topbar .btn { flex: none; }
+.topbar > .btn { margin-inline-start: auto; }
+.topbar > .tsearch ~ .btn { margin-inline-start: 0; }
+
+/* ───────── Buttons ───────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 6px; border: 1.5px solid transparent; font: 600 .8125rem var(--f-titre); text-decoration: none; cursor: pointer; white-space: nowrap; background: none; box-sizing: border-box; }
+.btn:hover { text-decoration: none; }
+.btn-primary { background: var(--cyan); color: var(--nuit); }
+.btn-primary:hover { background: var(--nuit); color: var(--blanc); }
+.btn-line { border-color: var(--nuit); color: var(--nuit); background: var(--blanc); }
+.btn-line:hover { background: var(--voile); }
+.btn-ghost { color: var(--nuit); }
+.btn-ghost:hover { background: rgba(0,15,38,.07); }
+.btn-danger { border-color: var(--erreur); color: var(--erreur); background: var(--blanc); }
+.btn-danger:hover { background: var(--erreur-fond); }
+.btn-sm { min-height: 30px; padding: 0 10px; font-size: .78125rem; }
+.btn-on-dark { color: var(--blanc); border-color: rgba(255,255,255,.55); }
+.btn-on-dark:hover { background: rgba(255,255,255,.12); }
+.icon-btn { width: 36px; padding: 0; }
+
+/* ───────── Panels ───────── */
+.panel { background: var(--blanc); border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); margin-bottom: 16px; overflow: hidden; }
+.panel-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--gris); flex-wrap: wrap; }
+.panel-h h2 { margin: 0; font: 700 .9375rem var(--f-titre); display: flex; gap: 8px; align-items: center; }
+.panel-h .ic { color: var(--cyan-profond); }
+.pad { padding: 16px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.col-main, .col-side { min-width: 0; }
+
+/* ───────── Main column ───────── */
+/* #content stays the single element core JS reads ($('#content').data(...)).
+   Until the page stylesheets (later tasks) take over, it is one white card. */
+#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; }
+#content.cdr a { color: var(--cyan-profond); }
+#content.cdr h1, #content.cdr h2, #content.cdr h3 { font-family: var(--f-titre); color: var(--nuit); }
+
+/* Core floating bars (scp.js .sticky.bar.fixed: left 0, width 100%) start after the rail */
+@media (min-width: 921px) {
+  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; }
+  html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
+}
+
+/* Footer: small, under the main column */
+#footer { margin: 0; margin-inline-start: var(--rail-w); padding: 8px 28px 16px; color: var(--ardoise); font-size: .75rem; text-align: start; }
+
+/* ───────── Tablet and mobile: the rail becomes a top bar ───────── */
+@media (max-width: 1180px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 920px) {
+  #pjax-container { grid-template-columns: minmax(0, 1fr); }
+  #pjax-container > .rail, #pjax-container > .cdr-main { grid-column: 1; }
+  .rail { position: relative; height: auto; overflow: visible; padding: 14px 20px; gap: 0; }
+  .rail .menu-toggle { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; padding: 8px 14px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.55); background: none; color: var(--blanc); font: 600 .8125rem var(--f-titre); }
+  .rail .menu-toggle:hover { background: rgba(255,255,255,.12); }
+  .rail-body { display: none; padding-top: 16px; }
+  .rail.is-open .rail-body { display: flex; }
+  .topbar { position: static; padding: 10px 20px; }
+  .crumbs, .tsearch { display: none; }
+  .topbar .btn { margin-inline-start: auto; }
+  #content.cdr { margin: 16px 12px 24px; padding: 16px; }
+  #footer { margin-inline-start: 0; padding-inline: 20px; }
+}

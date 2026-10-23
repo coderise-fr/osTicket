@@ -18,6 +18,11 @@
        - cdr_gauge_state()     pure computation of the gauge from timestamps
        - cdr_ticket_gauge()    the gauge of a ticket (reads the thread)
        - cdr_gauge_html()      the .gauge markup
+    4. Shell (header.inc.php)
+       - cdr_rail()            the <aside class="rail"> (mode switch, menu,
+                               queues, profile and log out)
+       - cdr_crumbs()          the breadcrumb of the top bar
+       - cdr_content_class()   the classes of #content
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     vim: expandtab sw=4 ts=4 sts=4:
@@ -281,5 +286,213 @@ if (!defined('CDR_VERSION')) {
             . '<span class="gauge-bar"><i style="width:' . $pct . '%"></i></span>'
             . '<span class="gauge-txt">' . cdr_icon(isset($icon[$kind]) ? $icon[$kind] : 'clock', 13)
             . $label . '</span></div>';
+    }
+
+    /* ------------------------------------------------------------------
+     * 4. Shell
+     * ---------------------------------------------------------------- */
+
+    /** Absolute URL of a navigation href, as navigation.tmpl.php does. */
+    function cdr_nav_href($href) {
+        $href = (string) $href;
+        if ($href === '' || $href[0] != '/')
+            $href = ROOT_PATH . 'scp/' . $href;
+        return $href;
+    }
+
+    /** Icon of an admin sub-menu item, by its href. */
+    function cdr_admin_icon($href) {
+        static $map = array(
+            'logs.php' => 'chart', 'audits.php' => 'search', 'system.php' => 'gauge',
+            'settings.php?t=pages' => 'building', 'settings.php?t=system' => 'sliders',
+            'settings.php?t=tickets' => 'ticket', 'settings.php?t=tasks' => 'tasks',
+            'settings.php?t=agents' => 'user', 'settings.php?t=users' => 'users',
+            'settings.php?t=kb' => 'book', 'helptopics.php' => 'tag', 'filters.php' => 'filter',
+            'slas.php' => 'clock', 'schedules.php' => 'clock', 'apikeys.php' => 'key',
+            'pages.php' => 'book', 'forms.php' => 'layers', 'lists.php' => 'menu',
+            'plugins.php' => 'plug', 'emails.php' => 'mail', 'emailsettings.php' => 'sliders',
+            'banlist.php' => 'ban', 'templates.php' => 'message', 'emailtest.php' => 'bolt',
+            'staff.php' => 'users', 'teams.php' => 'user', 'roles.php' => 'key',
+            'departments.php' => 'building',
+        );
+        $href = (string) $href;
+        return isset($map[$href]) ? $map[$href] : 'layers';
+    }
+
+    /**
+     * True when the admin sub-menu item $item is the current page. The
+     * path must be the script itself (no substring test: emailsettings.php
+     * is not emails.php) and every query parameter of the item must match
+     * the request (settings.php?t=tickets). The item's 'urls' count as well.
+     */
+    function cdr_item_is_current($item) {
+        $script = basename(isset($_SERVER['SCRIPT_NAME']) ? (string) $_SERVER['SCRIPT_NAME'] : '');
+        if ($script === '' || !isset($item['href']))
+            return false;
+        $parts = explode('?', (string) $item['href'], 2);
+        if (strcasecmp(basename($parts[0]), $script) !== 0)
+            return !empty($item['urls']) && is_array($item['urls'])
+                && in_array($script, $item['urls']);
+        if (isset($parts[1])) {
+            $want = array();
+            parse_str($parts[1], $want);
+            foreach ($want as $k => $v)
+                if (!isset($_GET[$k]) || (string) $_GET[$k] !== (string) $v)
+                    return false;
+        }
+        return true;
+    }
+
+    /**
+     * The rail of the staff panel. $nav (StaffNav or AdminNav) may be null
+     * (profile.php); $staff is the logged-in agent. Admin mode is the
+     * ADMINPAGE constant set by scp/admin.inc.php. One markup for every
+     * width: below 920 px the rail collapses behind the "Menu" button.
+     */
+    function cdr_rail($nav, $staff) {
+        global $ost;
+        $admin = defined('ADMINPAGE');
+        $isAdmin = is_object($staff) && $staff->isAdmin();
+        $tabs = ($nav && is_array($t = $nav->getTabs())) ? $t : array();
+        $active = $nav ? $nav->getActiveTab() : null;
+
+        $o = '<aside class="rail on-dark" aria-label="' . cdr_h(cdr__('Main menu')) . '">'
+            . '<div class="rail-top"><a class="brand no-pjax" href="' . ROOT_PATH . 'scp/index.php">'
+            . '<img class="logo" src="' . cdr_h(cdr_asset('img/logo-horizontal-sombre.png'))
+            . '" width="2041" height="345" alt="Coderise"></a>'
+            . '<button type="button" class="menu-toggle" aria-expanded="false" aria-controls="cdr-rail-menu">'
+            . cdr_icon('menu', 18) . cdr_h(cdr__('Menu')) . '</button></div>'
+            . '<div class="rail-body" id="cdr-rail-menu">';
+
+        // Mode switch: only an administrator has two spaces.
+        if ($isAdmin) {
+            $o .= '<div class="mode" role="group" aria-label="' . cdr_h(cdr__('Panel')) . '">'
+                . '<a class="no-pjax" href="' . ROOT_PATH . 'scp/index.php"' . ($admin ? '' : ' aria-current="true"') . '>'
+                . cdr_icon('inbox', 16) . cdr_h(cdr__('Agent')) . '</a>'
+                . '<a class="no-pjax" href="' . ROOT_PATH . 'scp/admin.php"' . ($admin ? ' aria-current="true"' : '') . '>'
+                . cdr_icon('sliders', 16) . cdr_h(cdr__('Administration')) . '</a></div>';
+        }
+
+        if ($tabs) {
+            $o .= '<nav class="menu" aria-label="' . cdr_h(cdr__('Main menu')) . '">';
+            if (!$admin) {
+                static $icons = array('dashboard' => 'chart', 'users' => 'users',
+                    'tasks' => 'tasks', 'tickets' => 'ticket', 'kbase' => 'book');
+                $o .= '<div class="group"><ul>';
+                foreach ($tabs as $name => $tab) {
+                    $cur = !empty($tab['active']) || $name === $active;
+                    $cls = trim('item ' . (isset($tab['class']) ? preg_replace('/[^a-z0-9_ -]/i', '', $tab['class']) : ''));
+                    $o .= '<li><a class="' . $cls . '" href="' . cdr_h(cdr_nav_href($tab['href'])) . '"'
+                        . ($cur ? ' aria-current="page"' : '') . '>'
+                        . cdr_icon(isset($icons[$name]) ? $icons[$name] : 'layers')
+                        . cdr_h(cdr__($tab['desc'])) . '</a>';
+                    if ($cur) {
+                        // Core sub-navigation (queues, counts, "add personal
+                        // queue"), renamed so jb.overflow.menu.js leaves it be.
+                        // A closure keeps the template's variables out of this scope.
+                        $render = function ($nav) {
+                            include STAFFINC_DIR . 'templates/sub-navigation.tmpl.php';
+                        };
+                        ob_start();
+                        $render($nav);
+                        $sub = trim(ob_get_clean());
+                        if ($sub !== '') {
+                            $sub = str_replace('id="customQ_nav"', 'id="cdr-queues"', $sub);
+                            $sub = preg_replace('/\bjb-overflowmenu\b/', '', $sub);
+                            $o .= '<div class="queues">' . $sub . '</div>';
+                        }
+                    }
+                    $o .= '</li>';
+                }
+                $o .= '</ul></div>';
+            }
+            else {
+                foreach ($tabs as $name => $tab) {
+                    $items = $nav->getSubMenu($name) ?: array();
+                    $current = -1;
+                    if ($name === $active) {
+                        // settings.php relies on getActiveMenu() only.
+                        $am = (int) $nav->getActiveMenu();
+                        if ($am > 0 && isset($items[$am - 1]))
+                            $current = $am - 1;
+                        elseif (basename((string) @$_SERVER['SCRIPT_NAME']) !== 'settings.php') {
+                            foreach ($items as $k => $item)
+                                if (is_array($item) && empty($item['droponly']) && cdr_item_is_current($item)) {
+                                    $current = $k;
+                                    break;
+                                }
+                        }
+                    }
+                    $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr__($tab['desc'])) . '</p><ul>';
+                    foreach ($items as $k => $item) {
+                        if (!is_array($item) || !empty($item['droponly']) || !isset($item['href']))
+                            continue;
+                        $o .= '<li><a class="item" href="' . cdr_h(cdr_nav_href($item['href'])) . '"'
+                            . ($k === $current ? ' aria-current="page"' : '') . '>'
+                            . cdr_icon(cdr_admin_icon($item['href']))
+                            . cdr_h(cdr__($item['desc'])) . '</a></li>';
+                    }
+                    $o .= '</ul></div>';
+                }
+            }
+            $o .= '</nav>';
+        }
+
+        // Foot: who is logged in, profile, log out.
+        $name = is_object($staff) ? (string) $staff->getName() : '';
+        $dept = (is_object($staff) && ($d = $staff->getDept())) ? (string) $d->getName() : '';
+        $token = is_object($ost) ? $ost->getLinkToken() : '';
+        $o .= '<div class="foot"><div class="me"><span class="avatar" aria-hidden="true">'
+            . cdr_h(cdr_initials($name)) . '</span><span><b>' . cdr_h($name) . '</b>'
+            . ($dept !== '' ? '<small>' . cdr_h($dept) . '</small>' : '') . '</span></div>'
+            . '<a class="item" href="' . ROOT_PATH . 'scp/profile.php">' . cdr_icon('user')
+            . cdr_h(cdr__('My Profile')) . '</a>'
+            . '<a class="item no-pjax" href="' . ROOT_PATH . 'scp/logout.php?auth=' . cdr_h($token) . '">'
+            . cdr_icon('logout') . cdr_h(cdr__('Log Out')) . '</a></div>';
+
+        return $o . '</div></aside>';
+    }
+
+    /**
+     * Breadcrumb of the top bar: [Administration /] active tab / $current
+     * (queue name, "Ticket #123"), or the active sub-menu item when
+     * $current is null. $current is plain text (escaped here). '' when
+     * there is nothing to show.
+     */
+    function cdr_crumbs($nav, $current=null, $admin=false) {
+        $crumbs = array();
+        if ($admin)
+            $crumbs[] = array(cdr__('Administration'), ROOT_PATH . 'scp/admin.php');
+        if ($nav && ($t = $nav->getActiveTab())) {
+            $tabs = $nav->getTabs();
+            if (is_array($tabs) && isset($tabs[$t]))
+                $crumbs[] = array(cdr__($tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
+            if ($current === null) {
+                $sub = $nav->getSubMenu();
+                $am = (int) $nav->getActiveMenu();
+                if (is_array($sub) && $am > 0 && isset($sub[$am - 1]) && is_array($sub[$am - 1])
+                        && isset($sub[$am - 1]['desc']))
+                    $current = cdr__($sub[$am - 1]['desc']);
+            }
+        }
+        if ($current !== null && (string) $current !== ''
+                && (!$crumbs || (string) $current !== $crumbs[count($crumbs) - 1][0]))
+            $crumbs[] = array((string) $current, null);
+        if (!$nav || !$crumbs)
+            return '';
+        $o = '';
+        $last = count($crumbs) - 1;
+        foreach ($crumbs as $i => $c)
+            $o .= '<li>' . ($i === $last
+                ? '<span aria-current="page">' . cdr_h($c[0]) . '</span>'
+                : '<a href="' . cdr_h($c[1]) . '">' . cdr_h($c[0]) . '</a>') . '</li>';
+        return '<nav class="crumbs" aria-label="' . cdr_h(cdr__('Breadcrumb')) . '"><ol>' . $o . '</ol></nav>';
+    }
+
+    /** Classes of #content: "cdr cdr-<script>" [+ cdr-ticket] [+ cdr-is-admin]. */
+    function cdr_content_class($script, $ticketView=false, $admin=false) {
+        $base = preg_replace('/[^a-z0-9_-]/i', '', basename((string) $script, '.php'));
+        return 'cdr' . ($base !== '' ? ' cdr-' . $base : '')
+            . ($ticketView ? ' cdr-ticket' : '') . ($admin ? ' cdr-is-admin' : '');
     }
 }

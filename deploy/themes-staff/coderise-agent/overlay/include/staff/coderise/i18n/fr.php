@@ -92,6 +92,7 @@ return array(
     'Panel' => 'Panneau',
     'Search tickets' => 'Rechercher un ticket',
     'Skip to content' => 'Aller au contenu',
+    'Breadcrumb' => "Fil d'Ariane",
     'First reply' => 'Première réponse',
     'At risk' => 'À risque',
 
