@@ -1,3 +1,4 @@
 # Files installed by apply.sh (paths relative to the osTicket root). One path per line.
 # Keep in sync with overlay/ (apply.sh refuses otherwise).
-include/staff/coderise/.gitkeep
+include/staff/coderise/coderise.inc.php
+include/staff/coderise/i18n/fr.php
