@@ -212,7 +212,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
   .cols { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 920px) {
-  #pjax-container { grid-template-columns: minmax(0, 1fr); }
+  #pjax-container { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   #pjax-container > .rail, #pjax-container > .cdr-main { grid-column: 1; }
   .rail { position: relative; height: auto; overflow: visible; padding: 14px 20px; gap: 0; }
   .rail .menu-toggle { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; padding: 8px 14px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.55); background: none; color: var(--blanc); font: 600 .8125rem var(--f-titre); }
@@ -288,8 +288,8 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 /* Split layout of the login page */
 .cdr-login .login-wrap { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px); }
 .cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
-/* jQuery UI .effect('shake') wraps the card in a sized .ui-effects-wrapper for the duration */
-.cdr-login .login-wrap .ui-effects-wrapper > #loginBox { height: 100%; }
+/* Descendant (not child) selector: jQuery UI effects may wrap the card; 1.13's
+   shake only pins it absolute at its own size next to a .ui-effects-placeholder */
 .cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
 .cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
 .cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }
