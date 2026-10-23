@@ -67,9 +67,10 @@ if ! command -v caddy >/dev/null 2>&1; then
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' > /etc/apt/sources.list.d/caddy-stable.list
     apt-get update
     apt-get -y install caddy
+    # Not started on a fresh install: while the setup wizard runs it would publish it on
+    # the domain. Never touched on a re-run (the site may be live).
+    systemctl disable --now caddy || true
 fi
-# Not started yet: while the setup wizard runs it would publish it on the domain.
-systemctl disable --now caddy || true
 
 echo "== deploy user"
 id deploy >/dev/null 2>&1 || adduser --disabled-password --gecos "" deploy
@@ -94,6 +95,7 @@ if [ -f "$STACK/droplet/env.example" ]; then
     install -d -m 700 -o deploy -g deploy "$APP/secrets" /var/backups/osticket
     sudo -u deploy "$STACK/scripts/gen-secrets.sh" "$APP/secrets"
     sed "s/SUPPORT_DOMAIN/$DOMAIN/" "$STACK/droplet/Caddyfile" > /etc/caddy/Caddyfile
+    systemctl is-active --quiet caddy && systemctl reload caddy || true
     install -m 644 "$STACK/droplet/osticket-backup.service" "$STACK/droplet/osticket-backup.timer" /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable --now osticket-backup.timer
