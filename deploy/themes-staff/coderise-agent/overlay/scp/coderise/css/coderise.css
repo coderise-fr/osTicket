@@ -796,7 +796,8 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
 #content.cdr-ticket aside.cdr-props > table.ticket_info table tr:nth-child(even),
 #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr:nth-child(even) { background: var(--gris); }
-#content.cdr-ticket aside.cdr-props > table.ticket_info :is(table th, table td, tbody > tr > td) { display: block; width: auto; padding: 0; border: 0; background: none; text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) table :is(th, td),
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td { display: block; width: auto; padding: 0; border: 0; background: none; text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
 #content.cdr-ticket aside.cdr-props > table.ticket_info table th,
 #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td:first-child { color: var(--ardoise); font-weight: 400; }
 #content.cdr-ticket aside.cdr-props > table.ticket_info table td,
