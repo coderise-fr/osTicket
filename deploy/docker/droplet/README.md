@@ -57,7 +57,7 @@ quotidienne. Dépôt privé : le clone échoue avec un avertissement, clonez-le 
 déploiement ou un jeton.
 
 Ouvrez **une deuxième session** `ssh deploy@<ip>`. Si elle fonctionne, relancez
-`sh provision.sh --harden-ssh` (désactive la connexion root et les mots de passe SSH).
+`sh provision.sh --harden-ssh` (désactive la connexion root et les mots de passe SSH). `deploy` a `sudo` sans mot de passe (`/etc/sudoers.d/deploy`) : après le durcissement, relancer le script avec `sudo SUPPORT_DOMAIN=support.coderise.fr sh /opt/osticket/deploy/docker/droplet/provision.sh`.
 
 ## 2. Installer (en `deploy`)
 

@@ -75,6 +75,12 @@ fi
 echo "== deploy user"
 id deploy >/dev/null 2>&1 || adduser --disabled-password --gecos "" deploy
 usermod -aG docker deploy
+# Administration goes through deploy (root SSH is closed by --harden-ssh). The account has
+# no password and only accepts the SSH key, so passwordless sudo is the usual model; being
+# in the docker group is root-equivalent anyway.
+echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy
+chmod 440 /etc/sudoers.d/deploy
+visudo -cf /etc/sudoers.d/deploy >/dev/null || { rm -f /etc/sudoers.d/deploy; echo "invalid sudoers file" >&2; exit 1; }
 install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
 if [ -s /root/.ssh/authorized_keys ] && [ ! -s /home/deploy/.ssh/authorized_keys ]; then
     install -m 600 -o deploy -g deploy /root/.ssh/authorized_keys /home/deploy/.ssh/authorized_keys
@@ -103,6 +109,7 @@ fi
 
 if [ "${1:-}" = "--harden-ssh" ]; then
     [ -s /home/deploy/.ssh/authorized_keys ] || { echo "refusing --harden-ssh: deploy has no SSH key" >&2; exit 1; }
+    [ -f /etc/sudoers.d/deploy ] || { echo "refusing --harden-ssh: deploy has no sudo, root would be unreachable" >&2; exit 1; }
     cat > /etc/ssh/sshd_config.d/10-osticket.conf <<'CONF'
 PermitRootLogin no
 PasswordAuthentication no
