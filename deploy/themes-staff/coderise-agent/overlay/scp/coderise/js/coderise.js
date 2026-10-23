@@ -10,6 +10,7 @@
       on load and after every PJAX navigation.
     - "Menu" button of the rail below 920 px (aria-expanded).
     - The top bar search submits through PJAX, as core's #basic_search does.
+    - Interim: wide core tables of #content get a horizontal scroll wrapper.
 
     Every handler is delegated and bound once; init() only reads the DOM
     of the current page, so running it again (pjax:end) is harmless.
@@ -57,7 +58,20 @@
         $rail.find('.menu-toggle').attr('aria-expanded', open ? 'true' : 'false');
     }
 
+    // Interim until the page stylesheets (Task 5+): core's fixed 940 px tables
+    // scroll horizontally in their own wrapper instead of widening the page.
+    // Only the table is in the wrapper (core dropdowns, tips and typeahead
+    // lists live outside these tables), so nothing else can be clipped.
+    function wrapWideTables() {
+        $('#content').find('table.list, table.ticket_info, table.form_table').each(function () {
+            var $t = $(this);
+            if (!$t.parent().hasClass('cdr-hscroll'))
+                $t.wrap('<div class="cdr-hscroll"></div>');
+        });
+    }
+
     function init() {
+        wrapWideTables();
         loadCounts();
     }
 

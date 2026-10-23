@@ -209,6 +209,27 @@ if (!defined('CDR_VERSION')) {
     }
 
     /**
+     * Is this staff reply addressed to the client? Ruling I-4: the plugin's
+     * own criterion, SlaFirstResponsePlugin::isClientReply($entry) (public
+     * static; it reads only $entry->recipients), when the class is loaded;
+     * otherwise the same rule: the recipients JSON has a non-empty "to".
+     * $entry is any object with a `recipients` property (a ThreadEntry or
+     * the row object built by cdr_ticket_gauge()).
+     */
+    function cdr_is_client_reply($entry) {
+        if (!is_object($entry))
+            return false;
+        if (class_exists('SlaFirstResponsePlugin', false)
+                && is_callable(array('SlaFirstResponsePlugin', 'isClientReply')))
+            return (bool) SlaFirstResponsePlugin::isClientReply($entry);
+        $raw = isset($entry->recipients) ? $entry->recipients : null;
+        if (!is_string($raw) || $raw === '')
+            return false;
+        $list = json_decode($raw, true);
+        return is_array($list) && !empty($list['to']);
+    }
+
+    /**
      * Gauge of a ticket, or null when it does not apply. Rule (contrib/
      * sla-first-response): the owner is on the Priority contract; the ticket
      * is open or already has a qualifying reply. The window starts at the
@@ -248,8 +269,8 @@ if (!defined('CDR_VERSION')) {
                     ->order_by('created')
                     ->values_flat('created', 'recipients');
                 foreach ($rows as $r) {
-                    $to = is_string($r[1]) ? json_decode($r[1], true) : null;
-                    if (is_array($to) && !empty($to['to'])) {
+                    $entry = (object) array('created' => $r[0], 'recipients' => $r[1]);
+                    if (cdr_is_client_reply($entry)) {
                         $first = (int) Misc::db2gmtime($r[0]);
                         break;
                     }

@@ -185,10 +185,12 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 /* ───────── Main column ───────── */
 /* #content stays the single element core JS reads ($('#content').data(...)).
    Until the page stylesheets (later tasks) take over, it is one white card. */
-#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; overflow-x: auto; }
-/* overflow-x above: core pages still carry 940 px tables (width="940",
-   scp.css !important); they scroll inside the card, never the whole page.
-   #content is not positioned, so absolutely placed core dropdowns are not clipped. */
+#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; }
+/* Interim until the page stylesheets (Task 5+): coderise.js wraps core's
+   fixed 940 px tables (table.list, .ticket_info, .form_table: width="940",
+   scp.css !important) in .cdr-hscroll, so only the table scrolls sideways.
+   #content itself never scrolls or clips (dropdowns, tips, outlines). */
+#content.cdr .cdr-hscroll { max-width: 100%; overflow-x: auto; }
 #content.cdr a { color: var(--cyan-profond); }
 #content.cdr h1, #content.cdr h2, #content.cdr h3 { font-family: var(--f-titre); color: var(--nuit); }
 
@@ -287,9 +289,9 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 
 /* Split layout of the login page */
 .cdr-login .login-wrap { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px); }
-.cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
 /* Descendant (not child) selector: jQuery UI effects may wrap the card; 1.13's
    shake only pins it absolute at its own size next to a .ui-effects-placeholder */
+.cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
 .cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
 .cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
 .cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }

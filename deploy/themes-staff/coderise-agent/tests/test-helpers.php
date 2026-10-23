@@ -246,5 +246,43 @@ check('ticket gauge: Priority plan due date used', $g['kind'] . ' ' . $g['label'
 $t = new Ticket(10, db_dt($now - 1980 - 30));
 check('ticket gauge: memoised per ticket', cdr_ticket_gauge($t) === cdr_ticket_gauge($t), true);
 
+// ---------- cdr_is_client_reply (I-4): fallback, then the plugin's verdict ----------
+check('client reply fallback: "to" present', cdr_is_client_reply((object) array('recipients' => '{"to":[["a@b.c"]]}')), true);
+check('client reply fallback: cc only', cdr_is_client_reply((object) array('recipients' => '{"cc":[["a@b.c"]]}')), false);
+check('client reply fallback: null', cdr_is_client_reply((object) array('recipients' => null)), false);
+check('client reply fallback: no property', cdr_is_client_reply(new stdClass()), false);
+check('client reply: not an object', cdr_is_client_reply(null), false);
+check('client reply fallback: plugin class absent', class_exists('SlaFirstResponsePlugin', false), false);
+
+// Stub of contrib/sla-first-response's public static isClientReply($entry):
+// it records what it receives and returns a scripted verdict, so the tests
+// prove its answer wins over the "to" rule.
+// Declared conditionally so PHP does not hoist it above the fallback tests.
+if (!class_exists('SlaFirstResponsePlugin', false)) {
+    class SlaFirstResponsePlugin {
+        static $verdict = false;
+        static $seen = array();
+        static function isClientReply($entry) {
+            self::$seen[] = $entry->recipients;
+            return self::$verdict;
+        }
+    }
+}
+SlaFirstResponsePlugin::$verdict = false;
+check('client reply plugin: verdict false wins over "to"', cdr_is_client_reply((object) array('recipients' => '{"to":[["a@b.c"]]}')), false);
+SlaFirstResponsePlugin::$verdict = true;
+check('client reply plugin: verdict true wins over cc-only', cdr_is_client_reply((object) array('recipients' => '{"cc":[["a@b.c"]]}')), true);
+SlaFirstResponsePlugin::$seen = array();
+ThreadEntry::$rows = array(array(db_dt($now - 20000 + 2640), '{"cc":[["a@b.c"]]}'));
+$t = new Ticket(11, db_dt($now - 20000));
+$g = cdr_ticket_gauge($t);
+check('ticket gauge plugin: its verdict makes a cc-only reply count', $g['kind'] . ' ' . $g['label'], 'done Met in 44 min');
+check('ticket gauge plugin: receives the row recipients', SlaFirstResponsePlugin::$seen, array('{"cc":[["a@b.c"]]}'));
+SlaFirstResponsePlugin::$verdict = false;
+ThreadEntry::$rows = array(array(db_dt($now - 20000 + 2640), '{"to":[["a@b.c"]]}'));
+$t = new Ticket(12, db_dt($now - 20000));
+check('ticket gauge plugin: its "no" makes a "to" reply not count', cdr_ticket_gauge($t)['kind'], 'over');
+ThreadEntry::$rows = array();
+
 echo $fails ? "\n$fails FAILED\n" : "\nall ok\n";
 exit($fails ? 1 : 0);
