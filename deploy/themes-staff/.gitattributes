@@ -1,0 +1,6 @@
+# The themes are copied into a Linux image: keep LF line endings everywhere,
+# including on a Windows checkout (the SHA-256 files and scripts depend on it).
+* text eol=lf
+*.woff2 binary
+*.png binary
+*.svg text eol=lf
