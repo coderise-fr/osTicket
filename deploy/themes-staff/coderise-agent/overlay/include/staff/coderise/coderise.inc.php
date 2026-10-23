@@ -152,7 +152,7 @@ if (!defined('CDR_VERSION')) {
     }
 
     /**
-     * URL of a file in scp/coderise/. The version is the file's mtime so an
+     * URL of a file in scp/coderise/. The version is the file's mtime so a
      * changed stylesheet is never served stale (CDR_VERSION as a fallback).
      */
     function cdr_asset($path) {
