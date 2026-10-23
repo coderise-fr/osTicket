@@ -68,6 +68,8 @@ All user-visible strings must be wrapped: `__('...')` (current user's language),
 
 ## Conventions
 
+- **Commits and pull requests: no Claude/Anthropic attribution.** Never add `Co-Authored-By: Claude ...`, "Generated with Claude Code" or any similar trailer or mention to commit messages or PR descriptions. This overrides the default attribution.
+
 - Files use `vim: expandtab sw=4 ts=4 sts=4` (4-space indent, no tabs) and carry the GPL header block; keep it on new files.
 - Every non-entry include guards against direct access (`defined('INCLUDE_DIR')` / `die(...)`); preserve this in new includes.
 - Third-party code is vendored under `include/` (`laminas-mail`, `mpdf`, `pear`, `htmLawed.php`, `Spyc.php`, `phpseclib`, …) — treat as read-only unless upgrading the dependency.
