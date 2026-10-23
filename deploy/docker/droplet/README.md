@@ -1,7 +1,7 @@
 # Déploiement sur un Droplet DigitalOcean (Compose + Caddy)
 
 Cible : 1 vCPU, 1 Go de RAM, Ubuntu 24.04. Pile `web` + `cron` + MariaDB (Compose), Caddy sur
-l'hôte pour le TLS, image publiée dans GHCR par GitHub Actions. Le détail du durcissement, des
+l'hôte pour le TLS, image publiée dans la registry DigitalOcean par GitHub Actions. Le détail du durcissement, des
 sauvegardes et des mises à jour est dans [../README.md](../README.md).
 
 ```
@@ -15,9 +15,10 @@ Internet ─443→ Caddy (hôte) ─127.0.0.1:8080→ web ─réseau interne→ 
 - Pare-feu DigitalOcean : 22, 80, 443 (UFW est aussi configuré sur le Droplet).
 - Une clé SSH ed25519 installée sur le Droplet (voir « Clé SSH » ci-dessous).
 - Une première exécution réussie du workflow **docker-image** (onglet Actions de GitHub, après un push
-  sur `main`) : elle publie `ghcr.io/coderise-fr/osticket:sha-<7 caractères>` et `…-install`.
-- Un jeton GitHub `read:packages` (PAT classique) pour que le Droplet puisse tirer l'image (les
-  paquets GHCR sont privés par défaut ; sinon rendre le paquet public).
+  sur `main`) : elle publie `registry.digitalocean.com/ownanalytics-registry/osticket:sha-<7 caractères>` et `…-install`.
+- Un jeton DigitalOcean en lecture seule pour la registry, déposé dans
+  `/opt/osticket/secrets/do_registry_token` (droits 600). Secret GitHub `DIGITALOCEAN_ACCESS_TOKEN`
+  (écriture) pour la CI.
 
 ### Clé SSH
 
@@ -62,9 +63,10 @@ Ouvrez **une deuxième session** `ssh deploy@<ip>`. Si elle fonctionne, relancez
 
 ```sh
 cd /opt/osticket/deploy/docker
-echo "<PAT read:packages>" | docker login ghcr.io -u <votre-compte-github> --password-stdin
+t=$(cat /opt/osticket/secrets/do_registry_token)
+printf "%s" "$t" | docker login registry.digitalocean.com -u "$t" --password-stdin
 
-# Tag du build GitHub Actions (onglet Actions > résumé du run, ou Packages)
+# Tag du build GitHub Actions (onglet Actions > résumé du run, ou `doctl registry repository list-tags osticket`)
 sed -i 's|^OST_VERSION=.*|OST_VERSION=sha-abc1234|' .env
 
 docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml pull web
@@ -133,7 +135,7 @@ Pour agrandir le Droplet : augmenter ces valeurs (`OSTICKET_MAX_WORKERS` dans `.
 
 ## Dépannage
 
-- `docker compose pull` : `unauthorized` → refaire `docker login ghcr.io`.
+- `docker compose pull` : `unauthorized` → refaire `docker login registry.digitalocean.com`.
 - Caddy n’obtient pas le certificat → DNS non propagé, ou 80/443 fermés (UFW **et** pare-feu DO).
 - `web` redémarre → `docker compose logs web` (le point d'entrée refuse de démarrer si la config est
   inscriptible ou absente).

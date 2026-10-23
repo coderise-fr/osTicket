@@ -1,16 +1,14 @@
 name: docker-image
 
 # Builds the hardened osTicket images (deploy/docker/Dockerfile) and pushes them to the
-# GitHub Container Registry. Tags are immutable commit tags (sha-<7 chars>); deploy one
+# DigitalOcean Container Registry. Tags are immutable commit tags (sha-<7 chars>); deploy one
 # with deploy/docker/droplet/update.sh <tag>.
-#   ghcr.io/<owner>/osticket:sha-abc1234            runtime image (production)
-#   ghcr.io/<owner>/osticket:sha-abc1234-install    + setup wizard (first install only)
+#   registry.digitalocean.com/ownanalytics-registry/osticket:sha-abc1234            runtime image (production)
+#   registry.digitalocean.com/ownanalytics-registry/osticket:sha-abc1234-install    + setup wizard (first install only)
 
-# DISABLED until the DigitalOcean registry is configured (this file still pushes to
-# GHCR). Manual runs only. To re-enable on every push to main, add under `on:`
-#   push:
-#     branches: [main]
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -19,7 +17,6 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   build:
@@ -31,17 +28,16 @@ jobs:
       - name: Image name and tag
         id: meta
         run: |
-          owner="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
-          echo "image=ghcr.io/${owner}/osticket" >> "$GITHUB_OUTPUT"
+          echo "image=registry.digitalocean.com/ownanalytics-registry/osticket" >> "$GITHUB_OUTPUT"
           echo "tag=sha-$(echo "${{ github.sha }}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: registry.digitalocean.com
+          username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # The Dockerfile fails the build if install-mysql.sql does not match core.sig
       # (corrupted line endings), so a bad checkout can never produce an image.

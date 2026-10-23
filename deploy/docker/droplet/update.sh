@@ -28,7 +28,7 @@ echo "update: pull $(get OST_IMAGE):$new"
 set_tag "$new"
 if ! docker compose pull web cron; then
     set_tag "$prev"
-    echo "update: pull failed (wrong tag, or 'docker login ghcr.io' missing). Nothing changed." >&2
+    echo "update: pull failed (wrong tag, or 'docker login registry.digitalocean.com' missing). Nothing changed." >&2
     exit 1
 fi
 
