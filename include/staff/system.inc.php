@@ -1,8 +1,14 @@
 <?php
 if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access Denied');
 
-$commit = GIT_VERSION != '$git' ? GIT_VERSION : (
-    @shell_exec('git rev-parse HEAD | cut -b 1-8') ?: '?');
+$commit = GIT_VERSION;
+if ($commit == '$git') {
+    // shell_exec() may be disabled (disable_functions), and @ does not
+    // silence the resulting Error on PHP 8.
+    $commit = function_exists('shell_exec')
+        ? @shell_exec('git rev-parse HEAD | cut -b 1-8') : null;
+    $commit = $commit ?: '?';
+}
 
 $extensions = array(
         'gd' => array(
