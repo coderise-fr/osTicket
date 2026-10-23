@@ -95,7 +95,8 @@ return array(
     'Breadcrumb' => "Fil d'Ariane",
     'Ticket #%s' => 'Ticket n° %s',
     'Upgrader' => 'Mise à jour',
-    'First reply' => 'Première réponse',
+    'First reply' => 'Premier retour',
+    'Not applicable' => 'Sans objet',
     'At risk' => 'À risque',
 
     // First-reply gauge (sprintf formats)

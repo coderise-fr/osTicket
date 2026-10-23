@@ -139,7 +139,7 @@ $labels = array(
     // chrome
     'Profile', 'Log Out', 'New Ticket', 'New ticket', 'Not assigned', 'Internal note', 'Menu',
     'Administration', 'Agent', 'Panel', 'Search tickets', 'Skip to content', 'Main menu',
-    'First reply', 'At risk',
+    'First reply', 'At risk', 'Not applicable',
     // gauge
     '%s left', 'Over by %s', 'Met in %s', 'Returned %s late',
 );
