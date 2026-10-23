@@ -235,6 +235,7 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 .cdr-login #loginBox { position: relative; inset: auto; width: min(440px, calc(100% - 32px)); margin: 8vh auto 24px; padding: 36px 32px 28px; border-radius: 10px; background: var(--blanc); color: var(--nuit); box-shadow: none; text-align: start; isolation: isolate; }
 .cdr-login #loginBox:after { display: none; }
 .cdr-login #logo a { height: 72px; }
+.cdr-login #loginBox #logo a { display: block; margin-bottom: 12px; text-decoration: none; }
 .cdr-login #loginBox > h3 { margin: 0 0 18px; color: var(--nuit); font: 600 .9375rem/1.45 var(--f-texte); text-align: start; }
 .cdr-login #loginBox form { width: auto; margin: 0; }
 .cdr-login #loginBox fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
