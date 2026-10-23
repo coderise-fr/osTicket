@@ -142,6 +142,8 @@ $labels = array(
     'First reply', 'At risk', 'Not applicable',
     // gauge
     '%s left', 'Over by %s', 'Met in %s', 'Returned %s late',
+    // ticket view
+    'Priority contract: first reply to the client within %s.', 'Ticket properties',
 );
 $untranslated = array();
 foreach ($labels as $l)
@@ -245,6 +247,16 @@ $g = cdr_ticket_gauge($t);
 check('ticket gauge: Priority plan due date used', $g['kind'] . ' ' . $g['label'], 'ok 59 min left');
 $t = new Ticket(10, db_dt($now - 1980 - 30));
 check('ticket gauge: memoised per ticket', cdr_ticket_gauge($t) === cdr_ticket_gauge($t), true);
+check('ticket gauge: window kept', cdr_ticket_gauge($t)['due'] - cdr_ticket_gauge($t)['start'], CDR_FIRST_RESPONSE_HOURS * 3600);
+
+// ---------- cdr_ticket_sla_panel (ticket view, object.view signal) ----------
+check('sla panel: no gauge = nothing', cdr_ticket_sla_panel(null), '');
+$t2 = new Ticket(101, db_dt($now - 600));
+$t2->level = 'standard';
+check('sla panel: standard owner = nothing', cdr_ticket_sla_panel($t2), '');
+$h = cdr_ticket_sla_panel($t);
+check('sla panel: section + large gauge', strpos($h, '<section class="cdr-sla panel"') === 0 && strpos($h, 'gauge-lg') !== false, true);
+check('sla panel: window line', strpos($h, 'cdr-sla-note') !== false && strpos($h, '4 h 00') !== false, true);
 
 // ---------- cdr_is_client_reply (I-4): fallback, then the plugin's verdict ----------
 check('client reply fallback: "to" present', cdr_is_client_reply((object) array('recipients' => '{"to":[["a@b.c"]]}')), true);

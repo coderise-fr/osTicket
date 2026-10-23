@@ -105,6 +105,10 @@ return array(
     'Met in %s' => 'Tenu en %s',
     'Returned %s late' => 'Rendu avec %s de retard',
 
+    // Ticket view (header.inc.php, coderise.js)
+    'Priority contract: first reply to the client within %s.' => 'Contrat Priority : premier retour au client sous %s.',
+    'Ticket properties' => 'Propriétés du ticket',
+
     // Login page (login.tpl.php)
     'Presentation' => 'Présentation',
     'Every Priority ticket has its own countdown.' => 'Chaque ticket Priority a son compte à rebours.',

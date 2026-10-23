@@ -122,6 +122,27 @@ if ($cdr_queue_list && isset($queue) && is_object($queue))
     $cdr_current = (string) $queue->getName();
 elseif ($cdr_ticket_view && isset($ticket) && is_object($ticket))
     $cdr_current = sprintf(cdr__('Ticket #%s'), $ticket->getNumber());
+
+// Ticket view: the "First reply" panel. ticket-view.inc.php sends
+// object.view with array('type' => 'viewed') right after this header opened
+// #content, so the panel lands at the top of #content; coderise.js moves it
+// into the properties column. The same signal is sent for tasks
+// (task-view.tmpl.php) and on the client portal: only a staff Ticket view
+// prints. Registered once per request (header.inc.php is included once per
+// request, PJAX included; the flag guards a second include).
+if ($cdr_script === 'tickets.php' && empty($GLOBALS['cdr_sla_connected'])) {
+    $GLOBALS['cdr_sla_connected'] = true;
+    Signal::connect('object.view', function ($object, $type) {
+        if ($object instanceof Ticket && is_array($type)
+                && ($type['type'] ?? '') === 'viewed')
+            echo cdr_ticket_sla_panel($object);
+    });
+}
+// Labels the ticket view's CSS and JS need (no translation in CSS/JS)
+$cdr_content_attrs = '';
+if ($cdr_ticket_view)
+    $cdr_content_attrs = ' data-cdr-props="' . cdr_h(cdr__('Ticket properties')) . '"'
+        . ' style="--cdr-note-label: ' . cdr_h('"' . addcslashes(cdr__('Internal note'), "\"\\\n\r") . '"') . '"';
 ?>
     <?php echo cdr_rail(isset($nav) ? $nav : null, $thisstaff); ?>
     <div class="cdr-main">
@@ -146,7 +167,7 @@ elseif ($cdr_ticket_view && isset($ticket) && is_object($ticket))
         <?php } ?>
     </header>
 
-        <div id="content" class="<?php echo cdr_h(cdr_content_class($cdr_script, $cdr_ticket_view, $cdr_admin)); ?>">
+        <div id="content" class="<?php echo cdr_h(cdr_content_class($cdr_script, $cdr_ticket_view, $cdr_admin)); ?>"<?php echo $cdr_content_attrs; ?>>
         <?php if(isset($errors['err'])) { ?>
             <div id="msg_error"><?php echo $errors['err']; ?></div>
         <?php }elseif($msg) { ?>

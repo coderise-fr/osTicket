@@ -199,13 +199,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
    and every other table (and the dropdowns it holds) is never clipped.
    #content itself never scrolls or clips (dropdowns, tips, outlines). */
 #content.cdr .cdr-hscroll { overflow-x: auto; }
-#content.cdr table.ticket_info { width: 100%; }
-#content.cdr select, #content.cdr .select2-container { max-width: 100%; }
-@media (max-width: 920px) {
-  /* Interim (ticket view restyle is Task 6/7): the two info columns stack */
-  #content.cdr table.ticket_info, #content.cdr table.ticket_info > tbody,
-  #content.cdr table.ticket_info > tbody > tr, #content.cdr table.ticket_info > tbody > tr > td { display: block; width: auto; }
-}
+#content.cdr .select2-container { max-width: 100%; } /* inline widths set by select2 (collaborators: 350 px) */
 #content.cdr a { color: var(--cyan-profond); }
 /* Cyan-profond passes 4.5:1 on white only (4.91; on gris 4.14, voile ~4.4,
    the état backgrounds ~4.1-4.4). On tinted areas links are nuit with a
@@ -675,6 +669,163 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 /* Rail: "Add personal queue" as a ghost button */
 #cdr-queues .add-queue { margin: 6px 0 2px; margin-inline-start: 10px; }
 #cdr-queues .add-queue a { justify-content: center; padding-inline-start: 8px; border: 1px dashed rgba(255,255,255,.35); }
+
+/* ═════════ Ticket view (#content.cdr-ticket, core ticket-view.inc.php) ═════════
+   Mockup "Fiche ticket" (theme.css: Panneaux, Propriétés, Fil de discussion,
+   Zone de réponse). Core markup is kept; coderise.js only:
+   - moves ul#ticket_tabs into #ticket_tabs_container (one column-1 item),
+   - wraps the .cdr-sla panel (object.view signal) and the table.ticket_info
+     blocks into <aside class="cdr-props">, placed after the container,
+   - tags the latest thread entry (.cdr-latest), the note mode of the reply
+     area (#response_options.is-note) and a properties column too tall to
+     stick (.cdr-tall).
+   #content is a two-column grid without the card: the conversation, the
+   reply area and every properties block are panels on the gris page.
+   Everything that is not the conversation or the aside (message bars, the
+   action bar, the title) spans both columns. The class cdr-ticket exists on
+   the ticket view only: edit and print keep the stock layout. */
+#content.cdr.cdr-ticket { display: grid; grid-template-columns: minmax(0, 1fr) 330px; column-gap: 16px; align-items: start; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+#content.cdr-ticket > * { grid-column: 1 / -1; min-width: 0; }
+#content.cdr-ticket > #ticket_tabs_container { grid-column: 1; }
+#content.cdr-ticket > aside.cdr-props { grid-column: 2; }
+#content.cdr-ticket > br { display: none; }
+
+/* Action bar and title: the action bar keeps the same height in both states
+   (see Sticky bar); the subject is the page title */
+#content.cdr-ticket .sticky.bar h2 { font-size: 1rem; line-height: 36px; }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2 a { color: var(--ardoise); }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2 a i { color: var(--cyan-profond); }
+#content.cdr-ticket > .tixTitle { margin: 6px 0 16px; padding: 0; border: 0; }
+#content.cdr-ticket > .tixTitle h3 { margin: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
+
+/* Conversation panel: the tab strip (moved into the container) and the tab
+   contents are one white panel; the reply area is its own panel below */
+#content.cdr-ticket #ticket_tabs_container > ul#ticket_tabs { margin: 0; padding: 0 12px; border-radius: 10px 10px 0 0; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #ticket_tabs_container > .tab_content { padding: 0; }
+#content.cdr-ticket #ticket_tabs_container > .tab_content:not(#ticket_thread),
+#content.cdr-ticket #ticket_thread > #ticketThread { border-radius: 0 0 10px 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #ticket_tabs_container > .tab_content:not(#ticket_thread) { padding: 16px; }
+#content.cdr-ticket #thread-items { margin: 0; padding: 0 0 10px; }
+#content.cdr-ticket #ticket_thread > #msg_warning { margin: 16px 0 0; }
+
+/* Thread entries (thread-entry.tmpl.php): .entry of the mockup. Client
+   message = voile; internal note = alerte-fond, 4 px alerte bar and the
+   "Internal note" label (text from header.inc.php, --cdr-note-label); the
+   latest entry = cyan bar. No avatar markup when avatars are off (the
+   demo): a CSS disc with a person icon takes its place; when core prints an
+   avatar (span.avatar) it is shown in the disc's place instead. */
+:root {
+  --cdr-ic-user-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5'/%3E%3C/svg%3E");
+  --cdr-ic-user-n: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000F26' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5'/%3E%3C/svg%3E");
+}
+#content.cdr-ticket #thread-items > [id^="thread-entry-"] { border-bottom: 1px solid var(--gris); }
+#content.cdr-ticket .thread-entry { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 12px; margin: 0; padding: 14px 16px; background: var(--blanc); }
+#content.cdr-ticket .thread-entry::after { content: none; display: none; }
+#content.cdr-ticket .thread-entry::before { content: ""; grid-column: 1; grid-row: 1 / span 2; width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--nuit) var(--cdr-ic-user-w) center / 16px no-repeat; }
+#content.cdr-ticket .thread-entry.message::before { background: var(--voile) var(--cdr-ic-user-n) center / 16px no-repeat; box-shadow: inset 0 0 0 1.5px var(--cyan-profond); }
+#content.cdr-ticket .thread-entry.avatar::before { content: none; display: none; }
+#content.cdr-ticket .thread-entry > .avatar { grid-column: 1; grid-row: 1 / span 2; float: none; width: 30px; height: 30px; max-height: none; margin: 0; border-radius: 50%; overflow: hidden; }
+#content.cdr-ticket .thread-entry > .avatar img { width: 100%; height: 100%; margin: 0; object-fit: cover; }
+#content.cdr-ticket .thread-entry > .header { grid-column: 2; position: static; margin: 0 0 4px; padding: 0; border: 0; border-radius: 0; background: none; color: var(--ardoise); line-height: 1.5; }
+#content.cdr-ticket .thread-entry > .header::before, #content.cdr-ticket .thread-entry > .header::after { content: none; display: none; }
+#content.cdr-ticket .thread-entry > .header > b { color: var(--nuit); font: 600 .875rem var(--f-titre); }
+#content.cdr.cdr-ticket .thread-entry > .header a[href^="#entry-"] { color: var(--ardoise); text-decoration: none; }
+#content.cdr.cdr-ticket .thread-entry > .header a[href^="#entry-"]:hover { color: var(--nuit); text-decoration: underline; }
+#content.cdr-ticket .thread-entry > .header .title { max-width: 100% !important; margin-inline-start: 10px; color: var(--ardoise); } /* inline max-width:400px */
+#content.cdr-ticket .thread-entry > .header .textra .label { color: var(--ardoise); }
+#content.cdr-ticket .thread-entry > .header .muted-button { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -4px 0 0; border-radius: 6px; color: var(--nuit); cursor: pointer; }
+#content.cdr-ticket .thread-entry > .header .muted-button:hover { background: rgba(0,15,38,.07); }
+#content.cdr-ticket .thread-entry > .thread-body { grid-column: 2; padding: 0; border: 0; border-radius: 0; background: none; color: var(--nuit); overflow-wrap: anywhere; }
+#content.cdr.cdr-ticket .thread-entry > .thread-body a:not(.button) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket .thread-entry > .thread-body pre { white-space: pre-wrap; }
+#content.cdr-ticket .thread-entry .attachments { position: static; display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
+#content.cdr-ticket .thread-entry .attachment-info { display: inline-flex; align-items: center; gap: 6px; width: auto; max-width: 100%; margin: 0; padding: 3px 10px; border-radius: 5px; background: var(--blanc); box-shadow: inset 0 0 0 1px var(--ardoise); font-size: .78125rem; }
+#content.cdr-ticket .thread-entry .attachment-info .filename { max-width: 240px; font-weight: 600; }
+#content.cdr-ticket .thread-entry.message { background: var(--voile); }
+#content.cdr-ticket .thread-entry.note { background: var(--alerte-fond); box-shadow: inset 4px 0 0 var(--alerte); }
+#content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset 4px 0 0 var(--cyan); }
+html.rtl #content.cdr-ticket .thread-entry.note { box-shadow: inset -4px 0 0 var(--alerte); }
+html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset -4px 0 0 var(--cyan); }
+#content.cdr-ticket .thread-entry.note > .header, #content.cdr.cdr-ticket .thread-entry.note > .header a[href^="#entry-"] { color: var(--alerte); }
+#content.cdr-ticket .thread-entry.note > .header > b::after { content: var(--cdr-note-label, "Internal note"); display: inline-block; margin-inline-start: 10px; padding: 0 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--alerte); color: var(--alerte); font: 600 .75rem/1.6 var(--f-titre); vertical-align: 1px; }
+#content.cdr-ticket .thread-entry.system { background: var(--gris); }
+
+/* Thread events (thread-event.tmpl.php): one ardoise line, the .event of the mockup */
+#content.cdr-ticket .thread-event { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 7px 16px; padding-inline-start: 58px; border-bottom: 1px solid var(--gris); background: var(--blanc); color: var(--ardoise); line-height: 1.45; }
+#content.cdr-ticket .thread-event .type-icon { flex: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font-size: 13px; line-height: 1.45; }
+#content.cdr-ticket .thread-event .type-icon::after { content: none; display: none; }
+#content.cdr-ticket .thread-event .type-icon i { color: var(--ardoise); opacity: 1; }
+#content.cdr-ticket .thread-event .description { flex: 1 1 0; min-width: 0; width: auto; margin: 0; padding: 0; color: var(--ardoise); overflow-wrap: anywhere; }
+#content.cdr-ticket .thread-event .description :is(b, strong) { color: var(--nuit); font-weight: 600; }
+#content.cdr.cdr-ticket .thread-event a { color: var(--nuit); }
+#content.cdr-ticket .thread-event img.avatar { max-height: 18px; margin: -2px 3px 0; border-radius: 50%; }
+
+/* Reply area (#response_options): its own panel; the "Post Internal Note"
+   tab tints the whole area alerte-fond (coderise.js sets .is-note, no :has()) */
+#content.cdr.cdr-ticket #response_options { margin: 16px 0 0; padding: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #response_options > ul#response-tabs { margin: 0; padding: 0 12px; }
+#content.cdr-ticket #response_options > form { margin: 0; padding: 12px 16px 16px; border: 0; background: transparent; }
+#content.cdr-ticket #response_options > form > table { max-width: 100%; }
+#content.cdr-ticket #response_options > form p:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px 0 0; }
+#content.cdr.cdr-ticket #response_options.is-note { background: var(--alerte-fond); box-shadow: 0 0 0 1px rgba(122,75,0,.25); }
+#content.cdr-ticket #response_options.is-note > ul#response-tabs { border-bottom-color: rgba(122,75,0,.25); }
+#content.cdr-ticket #response_options.is-note > ul#response-tabs li.active a { border-bottom-color: var(--alerte); color: var(--alerte); }
+
+/* Properties column: one sticky aside (top under the top bar, lower while
+   core's action bar floats), each table.ticket_info a panel of .props rows
+   (label left, value right, alternating rows). A column taller than the
+   window is not sticky (.cdr-tall), so its end stays reachable. */
+#content.cdr-ticket > aside.cdr-props { display: grid; gap: 16px; align-content: start; position: sticky; top: calc(var(--topbar-h) + 16px); }
+#content.cdr-ticket:has(.sticky.bar.fixed) > aside.cdr-props { top: calc(var(--topbar-h) + 72px); }
+#content.cdr-ticket > aside.cdr-props.cdr-tall { position: static; }
+#content.cdr-ticket aside.cdr-props > .panel { margin: 0; }
+#content.cdr-ticket aside.cdr-props .cdr-sla .gauge { min-width: 0; }
+#content.cdr-ticket aside.cdr-props .cdr-sla-note { margin: 8px 0 0; color: var(--ardoise); }
+#content.cdr-ticket aside.cdr-props > table.ticket_info { display: block; width: auto; max-width: none; margin: 0; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); overflow: hidden; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody,
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr,
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr > td,
+#content.cdr-ticket aside.cdr-props > table.ticket_info table,
+#content.cdr-ticket aside.cdr-props > table.ticket_info table > tbody,
+#content.cdr-ticket aside.cdr-props > table.custom-data > :is(thead, tbody),
+#content.cdr-ticket aside.cdr-props > table.custom-data > thead > tr { display: block; width: auto; margin: 0; padding: 0; border: 0; background: none; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table tr,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table tr:nth-child(even),
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr:nth-child(even) { background: var(--gris); }
+#content.cdr-ticket aside.cdr-props > table.ticket_info :is(table th, table td, tbody > tr > td) { display: block; width: auto; padding: 0; border: 0; background: none; text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table th,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td:first-child { color: var(--ardoise); font-weight: 400; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table td,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td + td { color: var(--nuit); font-weight: 500; }
+#content.cdr-ticket aside.cdr-props > table.custom-data > thead th { display: block; padding: 11px 16px; border: 0; border-bottom: 1px solid var(--gris); background: none; color: var(--nuit); font: 700 .9375rem var(--f-titre); text-align: start; }
+#content.cdr.cdr-ticket aside.cdr-props a:not(.button) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket aside.cdr-props a.inline-edit, #content.cdr-ticket aside.cdr-props a.tickets-action, #content.cdr-ticket aside.cdr-props a.ticket-action { text-decoration-style: dotted; }
+#content.cdr-ticket aside.cdr-props .faded { color: var(--ardoise); }
+
+@media (max-width: 1180px) {
+  #content.cdr.cdr-ticket { grid-template-columns: minmax(0, 1fr); }
+  #content.cdr-ticket > #ticket_tabs_container, #content.cdr-ticket > aside.cdr-props { grid-column: 1; }
+  #content.cdr-ticket > aside.cdr-props { position: static; margin-top: 16px; }
+}
+@media (max-width: 760px) {
+  #content.cdr-ticket aside.cdr-props > table.ticket_info table tr,
+  #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #content.cdr-ticket .thread-entry { grid-template-columns: minmax(0, 1fr); padding: 12px 14px; }
+  #content.cdr-ticket .thread-entry::before, #content.cdr-ticket .thread-entry > .avatar { display: none; }
+  #content.cdr-ticket .thread-entry > :is(.header, .thread-body) { grid-column: 1; }
+  #content.cdr-ticket .thread-event { padding-inline-start: 14px; }
+  #content.cdr-ticket #response_options > form { padding: 10px 12px 14px; }
+}
+
+/* Table outside the properties column (task view in the Tasks tab): its two
+   info columns stack on narrow screens */
+@media (max-width: 920px) {
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data),
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody,
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody > tr,
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody > tr > td { display: block; width: auto; }
+}
 
 /* ───────── Login and password reset (login.tpl.php, pwreset*.php) ─────────
    All rules are scoped by body.cdr-login (set by login.header.php, which the

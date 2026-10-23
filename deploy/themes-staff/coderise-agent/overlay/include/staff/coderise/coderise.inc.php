@@ -18,6 +18,7 @@
        - cdr_gauge_state()     pure computation of the gauge from timestamps
        - cdr_ticket_gauge()    the gauge of a ticket (reads the thread)
        - cdr_gauge_html()      the .gauge markup
+       - cdr_ticket_sla_panel() the "First reply" panel of the ticket view
     4. Shell (header.inc.php)
        - cdr_rail()            the <aside class="rail"> (mode switch, menu,
                                queues, profile and log out)
@@ -285,7 +286,10 @@ if (!defined('CDR_VERSION')) {
                     && ($d = $t->getSLADueDate()))
                 $due = (int) Misc::db2gmtime($d);
 
-            $memo[$key] = cdr_gauge_state($start, $due, $first, time());
+            $g = cdr_gauge_state($start, $due, $first, time());
+            if (is_array($g))
+                $g += array('start' => $start, 'due' => $due);
+            $memo[$key] = $g;
         }
         catch (Throwable $e) {
             $memo[$key] = null;
@@ -307,6 +311,28 @@ if (!defined('CDR_VERSION')) {
             . '<span class="gauge-bar"><i style="width:' . $pct . '%"></i></span>'
             . '<span class="gauge-txt">' . cdr_icon(isset($icon[$kind]) ? $icon[$kind] : 'clock', 13)
             . $label . '</span></div>';
+    }
+
+    /**
+     * The "First reply" panel of the ticket view (object.view signal, see
+     * header.inc.php): the large gauge plus one line on the Priority
+     * promise. '' when the ticket has no gauge (Standard owner, plugin
+     * absent, closed without a reply).
+     */
+    function cdr_ticket_sla_panel($t) {
+        $g = cdr_ticket_gauge($t);
+        $html = cdr_gauge_html($g, true);
+        if ($html === '')
+            return '';
+        $note = '';
+        if (isset($g['start'], $g['due']) && $g['due'] > $g['start'])
+            $note = '<p class="cdr-sla-note">' . cdr_h(sprintf(
+                cdr__('Priority contract: first reply to the client within %s.'),
+                cdr_duration($g['due'] - $g['start']))) . '</p>';
+        return '<section class="cdr-sla panel" aria-labelledby="cdr-sla-h">'
+            . '<div class="panel-h"><h2 id="cdr-sla-h">' . cdr_icon('gauge', 18)
+            . cdr_h(cdr__('First reply')) . '</h2></div>'
+            . '<div class="pad">' . $html . $note . '</div></section>';
     }
 
     /* ------------------------------------------------------------------
