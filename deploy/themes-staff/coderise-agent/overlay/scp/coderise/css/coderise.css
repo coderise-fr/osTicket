@@ -107,7 +107,14 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 #cdr-queues .queue-count { display: inline-block; float: none; min-width: 20px; margin: 0; margin-inline-start: auto; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: .6875rem; font-weight: 600; line-height: 1.6; text-align: center; }
 #cdr-queues .queue-count:empty, #cdr-queues .queue-count .faded-more:empty { display: none; }
 #cdr-queues .queue-count .faded-more { color: inherit; opacity: 1; }
-
+/* An empty queue shows no "0" badge (coderise.js tags the count) */
+#cdr-queues .queue-count.cdr-zero { display: none; }
+/* scp.css sizes the overflow menu for core's 960 px header (.jb-overflowmenu
+   960 x 35 px, primary list 30 px !important). The rail renames
+   #customQ_nav so the plugin never binds; should a plugin re-add the class,
+   it must still fit the 240 px column. */
+.rail .jb-overflowmenu { position: static; width: auto; height: auto; }
+.rail .jb-overflowmenu .jb-overflowmenu-menu-primary { height: auto !important; margin: 0; }
 /* Queue dropdowns flattened (review I-12): only the dropdown of the active
    top-level queue is expanded, static, without the nested scroll. The
    !important on position/max-width beat inline offsets set by scp.js on
@@ -186,15 +193,12 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 /* #content stays the single element core JS reads ($('#content').data(...)).
    Until the page stylesheets (later tasks) take over, it is one white card. */
 #content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; }
-/* Interim until the page stylesheets (Task 5+): coderise.js wraps core's
-   fixed 940 px tables (table.list, .form_table: width="940", scp.css
-   !important) in .cdr-hscroll, so only the table scrolls sideways.
-   #content itself never scrolls or clips (dropdowns, tips, outlines).
-   .ticket_info holds dropdowns, so it is not wrapped: it fits the card. */
-/* The wrapper may use the card's end padding (22 px) so a 940 px table fits
-   at 1280 px without a scrollbar, as it did before the wrapper existed. */
-#content.cdr .cdr-hscroll { overflow-x: auto; margin-inline-end: -22px; }
-@media (max-width: 920px) { #content.cdr .cdr-hscroll { margin-inline-end: -16px; } }
+/* Wide core tables: the "Fixed widths" rules of the components section make
+   them fit the card. coderise.js wraps a table in .cdr-hscroll only when its
+   content still overflows (fallback), so only that table scrolls sideways
+   and every other table (and the dropdowns it holds) is never clipped.
+   #content itself never scrolls or clips (dropdowns, tips, outlines). */
+#content.cdr .cdr-hscroll { overflow-x: auto; }
 #content.cdr table.ticket_info { width: 100%; }
 #content.cdr select, #content.cdr .select2-container { max-width: 100%; }
 @media (max-width: 920px) {
@@ -205,16 +209,11 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 #content.cdr a { color: var(--cyan-profond); }
 #content.cdr h1, #content.cdr h2, #content.cdr h3 { font-family: var(--f-titre); color: var(--nuit); }
 
-/* Core floating bars (scp.js .sticky.bar.fixed: left 0, width 100%, inline
-   top animated to 0) start after the rail and under the sticky top bar; they
-   slide in from behind it (z-index below the top bar's 5). */
 @media (min-width: 921px) {
   /* The sticky rail stops at the end of #pjax-container; the strip under it
      (beside #footer) stays nuit */
   #container { background: linear-gradient(90deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
   html.rtl #container, [dir="rtl"] #container { background: linear-gradient(270deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
-  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); z-index: 4; }
-  html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
 }
 
 /* Footer: small, under the main column */
@@ -237,6 +236,362 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
   .topbar .btn { margin-inline-start: auto; }
   #content.cdr { margin: 16px 12px 24px; padding: 16px; }
   #footer { margin-inline-start: 0; padding-inline: 20px; }
+}
+
+/* ═════════ Global components ═════════
+   The component vocabulary of every staff screen, on core markup (scp.css,
+   dropdown.css, redactor.css, select2.min.css, tooltip.css). Ported from the
+   Boutons, Panneaux, Tableaux, Formulaires and Onglets blocks of
+   docs/theme-mockups-admin/theme.css. Generic only: page layouts (queue,
+   ticket view, admin save bar, dashboard) build on it in their own sections.
+   Most rules are scoped by :is(#content, .dialog, .tip_content): the id
+   weight beats core's class selectors without !important, and the login
+   page (body.cdr-login, no #content) is left alone. !important is used only
+   against core !important declarations. */
+:root {
+  --cdr-ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18z'/%3E%3Cpath d='M12 10v4.5M12 17.2h.01'/%3E%3C/svg%3E");
+  --cdr-ic-error: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6'/%3E%3C/svg%3E");
+  --cdr-ic-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m8 12.5 2.8 2.7L16 9.5'/%3E%3C/svg%3E");
+  --cdr-ic-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5.5M12 7.8h.01'/%3E%3C/svg%3E");
+  --cdr-ring: 0 0 0 1px rgba(0,15,38,.12), 0 10px 28px rgba(0,15,38,.18);
+}
+
+/* ───────── Titles ───────── */
+:is(#content) h2 { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
+#content.cdr h2 a, #content.cdr h2 a:hover { color: var(--nuit); text-decoration: none; }
+:is(#content) h2 i { color: var(--cyan-profond); }
+:is(#content) h2 small, :is(#content) h3 small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
+:is(#content) h3 { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
+:is(#content) h4 { font-family: var(--f-titre); color: var(--nuit); }
+:is(#content, .dialog, .tip_content) .faded, :is(#content, .dialog) .faded-more { color: var(--ardoise); }
+:is(#content, .dialog, .tip_content) .faded b, :is(#content, .dialog, .tip_content) .faded strong { color: var(--nuit); }
+:is(#content, .dialog) hr { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
+
+/* ───────── Buttons ─────────
+   .button and the input buttons = btn-line; submit = btn-primary (cyan, nuit
+   text); .red / .danger = btn-danger. Core heights (22 px content-box) and
+   inset shadows are reset. */
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=submit], input[type=reset], input[type=button], button[type=submit], button[type=reset], button.button) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  box-sizing: border-box; height: auto; min-height: 36px; margin: 0 4px 0 0; margin-inline: 0 4px; padding: 0 14px;
+  border: 1.5px solid var(--nuit); border-radius: 6px; box-shadow: none;
+  background: var(--blanc); color: var(--nuit); opacity: 1;
+  font: 600 .8125rem/1.2 var(--f-titre); text-decoration: none; white-space: nowrap; vertical-align: middle; cursor: pointer;
+}
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=reset], input[type=button], button[type=reset]):hover {
+  background: var(--voile); color: var(--nuit); box-shadow: none; text-decoration: none;
+}
+:is(#content, .dialog, .tip_content) :is(.button, .action-button) i { margin: 0; color: inherit; }
+/* Primary: submit buttons and .primary.button */
+:is(#content, .dialog, .tip_content) :is(input[type=submit], button[type=submit], .primary.button, .save.pending) {
+  border-color: transparent; background: var(--cyan); color: var(--nuit);
+}
+:is(#content, .dialog, .tip_content) :is(input[type=submit], button[type=submit], .primary.button, .save.pending):is(:hover, :active) {
+  background: var(--nuit); color: var(--blanc); box-shadow: none;
+}
+:is(#content, .dialog) .save.success { border-color: transparent; background: var(--succes); color: var(--blanc); }
+/* Danger: core gives .action-button.danger color and hover with !important */
+:is(#content, .dialog, .tip_content) :is(.red.button, .button.danger, .action-button.danger, input.red, input.danger) {
+  border-color: var(--erreur) !important; background: var(--blanc); color: var(--erreur) !important; opacity: 1; filter: none;
+}
+:is(#content, .dialog, .tip_content) :is(.red.button, .button.danger, .action-button.danger, input.red, input.danger):hover {
+  border-color: var(--erreur) !important; background: var(--erreur-fond); color: var(--erreur) !important; filter: none;
+}
+:is(#content, .dialog) .green.button:hover { background: var(--succes-fond); color: var(--succes); }
+/* Link-looking and small buttons */
+:is(#content, .dialog, .tip_content) .link.button { min-height: 0; padding: 0; border: 0; background: none; color: var(--cyan-profond); font: inherit; text-decoration: underline; }
+:is(#content, .dialog, .tip_content) .link.button:hover { background: none; color: var(--nuit); }
+:is(#content, .dialog, .tip_content) :is(.small.button, input[type=button].small, input[type=submit].small, .button.small) { min-height: 30px; padding: 0 10px; font-size: .78125rem; }
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=submit], input[type=reset], input[type=button], button):disabled { opacity: .5; cursor: not-allowed; }
+/* Muted action buttons (queue settings, thread entry options) */
+:is(#content, .dialog) .action-button.muted { border-color: rgba(0,15,38,.25); }
+/* Caret of the dropdown buttons */
+:is(#content, .dialog) .action-button i.icon-caret-down { order: 9; height: auto; margin: 0; margin-inline-start: 2px; padding: 0; padding-inline-start: 7px; border: 0; border-inline-start: 1px solid rgba(0,15,38,.25); }
+:is(#content, .dialog) .action-button :is(span, a) { float: none; display: inline-flex; align-items: center; gap: 6px; }
+/* Grouped buttons (.action-buttons): one segmented control */
+:is(#content, .dialog) .action-buttons { display: inline-flex; vertical-align: middle; }
+:is(#content, .dialog) .action-buttons .action-button { margin: 0; }
+:is(#content, .dialog) .action-buttons .action-button + .action-button { margin-inline-start: -1.5px; border-start-start-radius: 0; border-end-start-radius: 0; }
+:is(#content, .dialog) .action-buttons .action-button:not(:last-of-type) { border-start-end-radius: 0; border-end-end-radius: 0; }
+/* Input with an attached button (search boxes) */
+:is(#content, .dialog) .input.attached { display: inline-flex; align-items: stretch; height: auto; margin-inline-end: 6px; vertical-align: middle; }
+:is(#content, .dialog) .input.attached input { margin: 0; border-start-end-radius: 0; border-end-end-radius: 0; border-inline-end: 0; }
+:is(#content, .dialog) .input.attached .button.attached { margin: 0; min-height: 36px; height: auto; padding: 0 12px; border: 1px solid var(--ardoise); border-radius: 0 6px 6px 0; background: var(--gris); color: var(--nuit); }
+html.rtl :is(#content, .dialog) .input.attached .button.attached { border-radius: 6px 0 0 6px; }
+:is(#content, .dialog) .input.attached .button.attached:hover { background: var(--voile); }
+:is(#content, .dialog) .input.attached.focus { outline: none; }
+/* Search / filter strip at the top of lists (core #basic_search, grey band) */
+#content #basic_search { margin: 0 0 12px; padding: 8px 10px; border: 0; border-radius: 8px; background: var(--gris); box-shadow: none; }
+
+/* ───────── Form controls ─────────
+   1 px ardoise border, 36 px, 6 px radius; focus = 3 px ring (global
+   :focus-visible, plus :focus for text fields). Widths stay those of the
+   markup (size= / inline styles), capped to the column. */
+:is(#content, .dialog, .tip_content) :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=search], input[type=tel], input[type=url], input[type=date], input[type=datetime-local], input[type=time]):not(.select2-search__field),
+:is(#content, .dialog, .tip_content) select,
+:is(#content, .dialog, .tip_content) textarea {
+  box-sizing: border-box; max-width: 100%; min-height: 36px; margin: 0; padding: 6px 10px;
+  border: 1px solid var(--ardoise); border-radius: 6px; background-color: var(--blanc); color: var(--nuit);
+  font: 400 .84375rem/1.4 var(--f-texte); box-shadow: none;
+}
+:is(#content, .dialog, .tip_content) select { padding-block: 4px; padding-inline-end: 6px; }
+:is(#content, .dialog, .tip_content) select[multiple], :is(#content, .dialog, .tip_content) select[size]:not([size="1"]) { min-height: 0; height: auto; }
+:is(#content, .dialog, .tip_content) textarea { min-height: 72px; resize: vertical; }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):focus:not([type=checkbox]):not([type=radio]):not(.select2-search__field) { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
+:is(#content, .dialog, .tip_content) :is(input, textarea)::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):is([readonly], :disabled):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=reset]) { background-color: var(--gris); color: var(--ardoise); }
+:is(#content, .dialog, .tip_content) :is(input[type=checkbox], input[type=radio]) { width: 16px; height: 16px; margin: 0; margin-inline-end: 4px; vertical-align: -3px; accent-color: var(--nuit); }
+:is(#content, .dialog) label { color: var(--nuit); }
+/* Required markers and field errors: text and asterisk, never colour alone */
+:is(#content, .dialog, .tip_content) :is(.error, font.error, span.error, div.error) { color: var(--erreur); }
+:is(#content, .dialog) .form_table .required, :is(#content, .dialog) .required { font-weight: 600; }
+:is(#content, .dialog) :is(.error, td.error, .has-error) :is(input:not([type=checkbox]):not([type=radio]), select, textarea) { border: 2px solid var(--erreur); }
+
+/* fieldset / legend (settings and dialog forms) */
+:is(#content, .dialog) fieldset { min-width: 0; margin: 0 0 12px; padding: 0; border: 0; }
+:is(#content, .dialog) legend { padding: 0; margin: 0 0 12px; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); }
+:is(#content, .dialog) legend::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
+
+/* ───────── Fixed widths of the legacy markup ─────────
+   width="940" (86 templates), 920, 830 and inline pixel widths would force
+   the 960 px layout: tables take the card width, other boxes are capped. */
+#content :is(table[width="940"], table[width="920"], table[width="830"], table.list, table.form_table, table.settings_table) { width: 100%; max-width: 100%; }
+#content :is(div, table, form, textarea, input, select, ul)[style*="width"] { max-width: 100%; }
+#content img { max-width: 100%; height: auto; }
+#content :is(td, th) { overflow-wrap: break-word; }
+#content :is(td, th) :is(input, select) { max-width: 100%; }
+.dialog { max-width: calc(100vw - 24px) !important; } /* core widths are !important */
+
+/* ───────── Tables: table.list (and .list.queue) ─────────
+   Nuit header, alternating gris rows, voile hover, cells 8 x 12. Core's
+   sort images (black on light) become arrows drawn in text. */
+:is(#content, .dialog) table.list { clear: both; margin: 4px 0 12px; border: 0; border-collapse: collapse; border-spacing: 0; background: var(--blanc); }
+:is(#content, .dialog) table.list caption { padding: 8px 0 10px; background: none; color: var(--nuit); font: 700 .9375rem var(--f-titre); text-align: start; }
+:is(#content, .dialog) table.list caption i.help-tip { color: var(--ardoise); opacity: 1; }
+:is(#content, .dialog) table.list > thead > tr > th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 .75rem/1.35 var(--f-titre); text-align: start; vertical-align: middle; }
+:is(#content, .dialog) table.list > thead > tr > th a { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 0; background: none; color: var(--blanc); text-decoration: none; }
+:is(#content, .dialog) table.list > thead > tr > th a:hover { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: 3px; }
+:is(#content, .dialog) table.list > thead > tr > th a:is(.asc, .desc) { background: none; color: var(--blanc); }
+:is(#content, .dialog) table.list > thead > tr > th a[href]:not(.asc):not(.desc)::after { content: "\2195"; opacity: .7; font-weight: 400; }
+:is(#content, .dialog) table.list > thead > tr > th a.asc::after { content: "\2191"; color: var(--cyan); }
+:is(#content, .dialog) table.list > thead > tr > th a.desc::after { content: "\2193"; color: var(--cyan); }
+:is(#content, .dialog) table.list > thead > tr > th :is(i, .icon-sort) { color: inherit; }
+:is(#content, .dialog) table.list > tbody > tr > td { padding: 8px 12px; border: 0; background: transparent; vertical-align: top; }
+:is(#content, .dialog) table.list > tbody > tr:nth-child(odd) > td { background: var(--blanc); }
+:is(#content, .dialog) table.list > tbody > tr:nth-child(even) > td { background: var(--gris); }
+:is(#content, .dialog) table.list > tbody > tr:hover > td { background: var(--voile); }
+:is(#content, .dialog) table.list > tbody > tr.highlight > td { background: var(--voile); }
+:is(#content, .dialog) table.list > tbody > tr.highlight > td:first-child { box-shadow: inset 4px 0 0 var(--cyan); }
+html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-child { box-shadow: inset -4px 0 0 var(--cyan); }
+:is(#content, .dialog) table.list > tbody > tr > td a { color: var(--nuit); text-decoration-color: var(--cyan-profond); }
+:is(#content, .dialog) table.list > tbody > tr > td a:hover { text-decoration-thickness: 2px; }
+:is(#content, .dialog) table.list > tbody > tr > td input[type=checkbox] { margin-top: 2px; }
+:is(#content, .dialog) table.list > tfoot > tr > td { padding: 9px 12px; border: 0; border-top: 1px solid var(--gris); background: var(--blanc); color: var(--ardoise); }
+:is(#content, .dialog) table.list > tfoot a { color: var(--cyan-profond); }
+:is(#content, .dialog) table.list tr.inactive > td, :is(#content, .dialog) table.list td.faded { color: var(--ardoise); }
+
+/* ───────── Tables: settings and edit forms (.form_table, .settings_table) ─────────
+   Section headers (th) read like the mockup legends; rows separated by gris. */
+:is(#content, .dialog) :is(table.form_table, table.settings_table) { margin: 0 0 16px; border: 0; border-collapse: collapse; }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > td { padding: 8px 12px; border: 0; border-bottom: 1px solid var(--gris); }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > td:empty { padding: 0; }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > th, #content div.section-break {
+  padding: 22px 12px 10px; border: 0; border-bottom: 1px solid var(--gris); background: none; color: var(--nuit); font-weight: 400; text-align: start;
+}
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr:first-child > th { padding-top: 6px; }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4, #content div.section-break h3 { margin: 0; padding: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4::after, #content div.section-break h3::after { content: ""; display: block; width: 28px; height: 3px; margin: 6px 0 4px; background: var(--cyan); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4 a { display: inline; color: var(--nuit); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th em { display: block; margin: 0; color: var(--ardoise); font-style: normal; font-weight: 400; }
+:is(#content, .dialog) :is(.form_table, .settings_table) th em b, :is(#content, .dialog) :is(.form_table, .settings_table) th em strong { color: var(--nuit); font-family: var(--f-titre); font-weight: 700; }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4 i.help-tip { color: var(--ardoise); }
+:is(#content, .dialog) .form_table em { color: var(--ardoise); }
+/* table.table (profile, user and organisation forms): tr.header rows are
+   section titles, like the legends of the mockup */
+:is(#content, .dialog) table.table:not(.list) { border-collapse: collapse; }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th) { padding: 22px 0 6px; border: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); text-align: start; }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th)::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
+:is(#content, .dialog) table.table:not(.list) tr.header { border: 0; }
+:is(#content, .dialog) table.table:not(.list) > tbody > tr > td { padding: 6px 8px; padding-inline-start: 0; background: none; }
+
+/* ───────── Tabs (ul.tabs + .tab_content) ─────────
+   Flat strip, 3 px cyan underline on the active tab; scrolls sideways when
+   narrow instead of wrapping. */
+:is(#content, .dialog) ul.tabs { display: flex; gap: 2px; height: auto; margin: 0 0 4px; padding: 0 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; border: 0; border-bottom: 1px solid var(--gris); background: none; box-shadow: none; text-align: start; list-style: none; }
+:is(#content, .dialog) ul.tabs li { flex: none; display: block; position: relative; bottom: 0; min-width: 0; height: auto; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; color: var(--ardoise); font-size: inherit; line-height: 1.3; text-align: start; }
+:is(#content, .dialog) ul.tabs li a { display: inline-flex; align-items: center; gap: 6px; padding: 11px 12px 9px; border-bottom: 3px solid transparent; color: var(--ardoise); font: 600 .8125rem/1.3 var(--f-titre); text-decoration: none; white-space: nowrap; }
+:is(#content, .dialog) ul.tabs li a:hover { color: var(--nuit); text-decoration: none; }
+:is(#content, .dialog) ul.tabs li.active a { color: var(--nuit); font-weight: 600; border-bottom-color: var(--cyan); }
+:is(#content, .dialog) ul.tabs li.empty { display: none; }
+/* A tab with errors: red underline plus a "!" (never colour alone); core's
+   overlay and !important top border are reset */
+:is(#content, .dialog) ul.tabs li.error { border-top: 0 !important; }
+:is(#content, .dialog) ul.tabs li.error a { color: var(--erreur); border-bottom-color: var(--erreur); }
+:is(#content, .dialog) ul.tabs li.error a::before { content: none; }
+:is(#content, .dialog) ul.tabs li.error a::after { content: "!"; display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--erreur); color: var(--blanc); font-size: .6875rem; font-weight: 700; }
+/* Vertical tabs (dynamic forms, user and organisation dialogs) */
+:is(#content, .dialog) ul.tabs.vertical { flex-direction: column; gap: 1px; padding: 0; overflow: visible; border-bottom: 0; border-inline-end: 1px solid var(--gris); }
+:is(#content, .dialog) ul.tabs.vertical li a { display: flex; padding: 8px 12px; border-bottom: 0; border-inline-start: 3px solid transparent; }
+:is(#content, .dialog) ul.tabs.vertical li.active a { border-inline-start-color: var(--cyan); background: var(--voile); }
+:is(#content, .dialog) .tab_content:not(.left) { padding: 16px 0 4px; }
+
+/* ───────── Dropdown menus (.action-dropdown, .noclick-dropdown) ───────── */
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul { min-width: 180px; margin: 0; padding: 4px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); font: 400 .84375rem/1.35 var(--f-texte); text-align: start; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li { line-height: 1.35; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 6px; color: var(--nuit); text-decoration: none; white-space: nowrap; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a i { flex: none; width: 1.1em; margin: 0; color: var(--cyan-profond); text-align: center; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a:hover,
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.active > a:hover { background: var(--voile); color: var(--nuit) !important; } /* core: #FFF !important */
+:is(#content, body) .action-dropdown ul li.active > a { background: var(--voile); color: var(--nuit); font-weight: 600; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a, :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a i { color: var(--erreur); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a:hover { background: var(--erreur-fond); color: var(--erreur) !important; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.positive > a:hover { background: var(--succes-fond); color: var(--succes) !important; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a.disabled, :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.disabled > a { color: var(--ardoise); opacity: .7; }
+:is(#content, body) .action-dropdown hr { margin: 4px 8px; border: 0; border-bottom: 1px solid var(--gris); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown)::before { border-bottom-color: rgba(0,15,38,.14); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) { max-width: calc(100vw - 24px); }
+
+/* ───────── Dialogs (.dialog, #popup, #alert) ───────── */
+#overlay { background: var(--nuit); opacity: .55; }
+.dialog { padding: 20px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.1), 0 24px 64px rgba(0,15,38,.35); color: var(--nuit); font-size: .84375rem; }
+.dialog h3, .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 3em; color: var(--nuit); font: 700 1.125rem/1.3 var(--f-titre); }
+.dialog a { color: var(--cyan-profond); }
+.dialog a.close { top: 16px; right: 18px; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--nuit); font-size: 16px; text-decoration: none; }
+html.rtl .dialog a.close { right: auto; left: 18px; }
+.dialog a.close:hover { background: var(--gris); }
+.dialog hr { margin: 12px 0; background: var(--gris); }
+.dialog th { padding: 6px 10px; border: 0; background: var(--gris); color: var(--nuit); }
+.dialog .table td:not(:empty) { background-color: transparent !important; } /* core #f8f8f8 !important */
+.dialog #popup-loading { background: rgba(255,255,255,.88); color: var(--nuit); }
+.dialog p.full-width, .dialog .buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.dialog p.full-width > span { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+/* Core "Loading" box (footer #loading; the login page has its own) */
+body:not(.cdr-login) #loading { border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); }
+body:not(.cdr-login) #loading h1 { color: var(--nuit); font: 600 1rem var(--f-titre); }
+
+/* ───────── Messages ─────────
+   État colours, 4 px start border and a leading icon (mask), never colour
+   alone. The icon is absolutely positioned: banners hold inline markup
+   (links, bold), so they are not flex boxes. */
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, #error_bar, #warning_bar, #notice_bar) {
+  position: relative; box-sizing: border-box; height: auto; margin: 0 0 16px; padding: 12px 14px; padding-inline-start: 44px;
+  border: 0; border-inline-start: 4px solid; border-radius: 6px; background-image: none;
+  color: var(--nuit); font-weight: 500; line-height: 1.45; text-align: start;
+}
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, #error_bar, #warning_bar, #notice_bar)::before {
+  content: ""; position: absolute; inset-inline-start: 14px; top: 12px; width: 20px; height: 20px;
+  -webkit-mask: var(--cdr-ic-info) center / contain no-repeat; mask: var(--cdr-ic-info) center / contain no-repeat; background: currentColor;
+}
+:is(#msg_error, .error-banner, #error_bar) { border-color: var(--erreur); background-color: var(--erreur-fond); }
+:is(#msg_error, .error-banner, #error_bar)::before { background: var(--erreur); -webkit-mask-image: var(--cdr-ic-error); mask-image: var(--cdr-ic-error); }
+:is(#msg_warning, .warning-banner, #warning_bar) { border-color: var(--alerte); background-color: var(--alerte-fond); }
+:is(#msg_warning, .warning-banner, #warning_bar)::before { background: var(--alerte); -webkit-mask-image: var(--cdr-ic-alert); mask-image: var(--cdr-ic-alert); }
+:is(#msg_notice, .notice-banner, .success-banner, #notice_bar) { border-color: var(--succes); background-color: var(--succes-fond); }
+:is(#msg_notice, .notice-banner, .success-banner, #notice_bar)::before { background: var(--succes); -webkit-mask-image: var(--cdr-ic-ok); mask-image: var(--cdr-ic-ok); }
+:is(#msg_info, .info-banner) { border-color: var(--cyan-profond); background-color: var(--voile); }
+:is(#msg_info, .info-banner)::before { background: var(--cyan-profond); }
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info):empty { display: none; }
+/* System bars above the shell: full width, square */
+:is(#error_bar, #warning_bar, #notice_bar) { margin: 0; border-radius: 0; }
+:is(#content, .dialog) .banner { margin: 0 0 12px; padding: 10px 14px; border: 0; border-radius: 6px; background: var(--gris); color: var(--nuit); }
+
+/* ───────── Pagination ─────────
+   Core prints "Page: <a><b>1</b></a> <b>[2]</b>"; coderise.js tags the
+   container .cdr-pager and the current page .cdr-page-current (brackets
+   removed, aria-current="page"). */
+#content .cdr-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0; color: var(--ardoise); }
+#content .cdr-pager > a[href]:has(> b, > strong), #content .cdr-pager > .cdr-page-current { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 6px; box-sizing: border-box; color: var(--nuit); font-weight: 600; text-decoration: none; }
+#content .cdr-pager > a[href]:has(> b, > strong) b, #content .cdr-pager > a[href]:has(> b, > strong) strong { font-weight: 600; }
+#content .cdr-pager > a[href]:has(> b, > strong):hover { background: var(--voile); }
+#content .cdr-pager > .cdr-page-current { background: var(--nuit); color: var(--blanc); }
+
+/* ───────── Help tips (.tip_box) and tooltips ───────── */
+:is(#content, .dialog) i.help-tip { color: var(--ardoise); opacity: 1; }
+:is(#content, .dialog) i.help-tip:hover { color: var(--cyan-profond) !important; } /* core: orange !important */
+.tip_box .tip_content { box-sizing: border-box; min-width: min(400px, calc(100vw - 24px)); max-width: calc(100vw - 24px); padding: 14px 16px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .84375rem/1.5 var(--f-texte); }
+.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 1.5em 8px 0; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 1rem/1.3 var(--f-titre); }
+.tip_box .tip_content .links { border-top-color: var(--gris); }
+.tip_box .tip_content a, .tip_box .tip_content .links a { color: var(--cyan-profond); }
+.tip_box .tip_close { color: var(--nuit); }
+body .tooltip { font-family: var(--f-texte); }
+body .tooltip.in { opacity: 1; }
+body .tooltip-inner { padding: 5px 9px; border-radius: 6px; background: var(--nuit); color: var(--blanc); }
+body .tooltip.top .tooltip-arrow { border-top-color: var(--nuit); }
+body .tooltip.bottom .tooltip-arrow { border-bottom-color: var(--nuit); }
+body .tooltip.left .tooltip-arrow { border-left-color: var(--nuit); }
+body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
+
+/* ───────── select2 ───────── */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple { min-height: 36px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
+.select2-container--default .select2-selection--single { height: 36px; }
+.select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 34px; color: var(--nuit); padding-inline: 10px 28px; }
+.select2-container--default .select2-selection--single .select2-selection__placeholder { color: var(--ardoise); }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 34px; }
+.select2-container--default .select2-selection--multiple .select2-selection__rendered { padding: 2px 6px; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice { margin-top: 4px; padding: 1px 8px; border: 0; border-radius: 4px; background: var(--gris); color: var(--nuit); font-weight: 500; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: var(--ardoise); }
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--open .select2-selection { border-color: var(--cyan-profond); }
+.select2-container .select2-selection:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.select2-dropdown { border: 0; border-radius: 6px; box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .84375rem/1.35 var(--f-texte); }
+.select2-container--default .select2-search--dropdown .select2-search__field { min-height: 32px; padding: 4px 8px; border: 1px solid var(--ardoise); border-radius: 6px; }
+.select2-container--default .select2-results__option { padding: 7px 10px; }
+.select2-container--default .select2-results__option[aria-selected=true] { background: var(--gris); color: var(--nuit); font-weight: 600; }
+.select2-container--default .select2-results__option--highlighted[aria-selected] { background: var(--voile); color: var(--nuit); }
+.select2-container--default .select2-results__group { color: var(--ardoise); font: 600 .75rem var(--f-titre); }
+
+/* ───────── Redactor (rich text editor) ───────── */
+:is(#content, .dialog) .redactor-box.redactor-styles-on { border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
+:is(#content, .dialog) .redactor-box.redactor-focus.redactor-styles-on { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
+:is(#content, .dialog) .redactor-toolbar { padding: 4px; border-bottom: 1px solid rgba(0,15,38,.15); border-radius: 6px 6px 0 0; background: var(--gris); box-shadow: none; }
+:is(#content, .dialog) .redactor-toolbar a { min-width: 30px; padding: 7px 9px 6px; border-radius: 5px; background: transparent; color: var(--nuit); font-size: 14px; }
+:is(#content, .dialog) .redactor-toolbar a.re-button-icon { padding: 7px 9px 5px; }
+:is(#content, .dialog) .redactor-toolbar a:hover, :is(#content, .dialog) .redactor-toolbar a.redactor-button-active { background: var(--blanc); color: var(--nuit); }
+:is(#content, .dialog) .redactor-toolbar a.redactor-button-active { box-shadow: inset 0 -2px 0 var(--cyan-profond); }
+:is(#content, .dialog) .redactor-in, :is(#content, .dialog) .redactor-styles { color: var(--nuit); font-family: var(--f-texte); }
+.redactor-dropdown { border: 0; border-radius: 10px; box-shadow: var(--cdr-ring); padding: 4px; }
+.redactor-dropdown a { border-radius: 6px; color: var(--nuit); }
+.redactor-dropdown a:hover { background: var(--voile); color: var(--nuit); }
+.redactor-modal { border-radius: 10px; color: var(--nuit); }
+.redactor-modal-header { font-family: var(--f-titre); }
+
+/* ───────── Sticky bar (core div.sticky.bar, scp.js) ─────────
+   In the page it is part of the card. Once scrolled (.fixed: core
+   position:fixed, left 0, width 100%, z-index 6) it starts after the rail,
+   under the sticky top bar, as a nuit bar; z-index 4 keeps it under the top
+   bar (5) and the dialogs (10). Below 920 px it spans the full width. The
+   scroll-up chevron gets its own space at the end of the bar.
+   Keep the bar's content the same height in both states: scp.js sizes the
+   placeholder with $bar.height() once fixed, so any in-flow margin or
+   padding of the bar, a title margin, or floated buttons taller than the
+   title that the in-flow bar does not contain (a fixed bar does) make the
+   page change height when it
+   sticks, and near the bottom of a page the scroll position then flips the
+   bar between fixed and in-flow without end. For the same reason the inline
+   width scp.js puts on .content (same line breaks in both states) is kept. */
+#content .sticky.placeholder { margin: 0; padding: 0; }
+#content .sticky.bar { display: flow-root; clear: both; margin: 0; padding: 0; } /* contains its floated buttons, as position:fixed does; below earlier floats so it keeps the full width */
+#content .sticky.bar :is(h2, h3) { margin: 0; }
+#content .sticky.bar.fixed { z-index: 4; padding: 10px 24px; padding-inline-end: 72px; background: var(--nuit); color: var(--blanc); box-shadow: 0 6px 18px rgba(0,15,38,.28); --focus: var(--cyan); }
+#content .sticky.bar.fixed .content { max-width: 100%; }
+#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label) { color: var(--blanc); }
+#content .sticky.bar.fixed h2 i { color: var(--cyan); }
+#content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
+#content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
+#content .sticky.bar.fixed .action-button i.icon-caret-down { border-color: rgba(255,255,255,.35); }
+#content .sticky.bar.fixed :is(input[type=submit], button[type=submit], .primary.button):hover { background: var(--blanc); color: var(--nuit); }
+#content .sticky.bar.fixed :is(.red.button, .action-button.danger) { background: transparent; color: var(--blanc) !important; border-color: rgba(255,255,255,.55) !important; }
+#content .sticky.bar .scroll-up { display: none; }
+@media (min-width: 921px) {
+  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); }
+  html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
+  #content .sticky.bar.fixed a.sticky.scroll-up { display: inline-grid; place-items: center; position: absolute; top: 50%; right: 20px; left: auto; width: 36px; height: 36px; margin-top: -18px; padding: 0; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,.55); border-radius: 6px; background: none; box-shadow: none; color: var(--blanc) !important; } /* core color !important */
+  html.rtl #content .sticky.bar.fixed a.sticky.scroll-up, [dir="rtl"] #content .sticky.bar.fixed a.sticky.scroll-up { right: auto; left: 20px; }
+  #content .sticky.bar.fixed a.sticky.scroll-up:hover { background: rgba(255,255,255,.12); }
+}
+@media (max-width: 920px) {
+  #content .sticky.bar.fixed { padding-inline: 16px; }
 }
 
 /* ───────── Login and password reset (login.tpl.php, pwreset*.php) ─────────

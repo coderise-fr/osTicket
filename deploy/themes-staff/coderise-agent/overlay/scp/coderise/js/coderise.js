@@ -10,7 +10,10 @@
       on load and after every PJAX navigation.
     - "Menu" button of the rail below 920 px (aria-expanded).
     - The top bar search submits through PJAX, as core's #basic_search does.
-    - Interim: wide core tables of #content get a horizontal scroll wrapper.
+    - Empty queues: the rail count is tagged .cdr-zero (no "0" badge).
+    - Fallback: a core table that still overflows the card gets its own
+      horizontal scroll wrapper (only while it overflows).
+    - Core pagination links are tagged (.cdr-pager, .cdr-page-current).
 
     Every handler is delegated and bound once; init() only reads the DOM
     of the current page, so running it again (pjax:end) is harmless.
@@ -42,7 +45,7 @@
                     var $e = $(this),
                         n = json['q' + $e.data('queueId')];
                     if (n !== undefined && n !== null)
-                        $e.text(n);
+                        $e.text(n).toggleClass('cdr-zero', +n === 0);
                 });
                 $('#cdr-queues').find('[id="queue-count-bucket"]')
                     .removeClass('hidden').show();
@@ -58,21 +61,56 @@
         $rail.find('.menu-toggle').attr('aria-expanded', open ? 'true' : 'false');
     }
 
-    // Interim until the page stylesheets (Task 5+): core's fixed 940 px tables
-    // scroll horizontally in their own wrapper instead of widening the page.
-    // Only the table is in the wrapper; core tips and typeahead lists go to
-    // <body>. table.ticket_info is NOT wrapped: it holds the user/org stats
-    // dropdowns (#action-dropdown-stats), so coderise.css narrows it instead.
-    function wrapWideTables() {
-        $('#content').find('table.list, table.form_table').each(function () {
-            var $t = $(this);
-            if (!$t.parent().hasClass('cdr-hscroll'))
-                $t.wrap('<div class="cdr-hscroll"></div>');
+    // Fallback for wide core tables. coderise.css makes table.list and
+    // .form_table take the card width (width="940" neutralised); a table whose
+    // content still does not fit (many columns at 390 px) scrolls sideways in
+    // its own .cdr-hscroll wrapper. A scroll box clips vertically too, so a
+    // table is wrapped only while it overflows and unwrapped once it fits:
+    // the dropdowns of fitting tables are never clipped. Hidden tables (inactive
+    // tabs) measure 0 and are left alone until a tab click or resize re-runs.
+    // table.ticket_info is never wrapped: it holds the user/org stats dropdowns.
+    function fitTables() {
+        $('#content').find('table.list, table.form_table, table.settings_table, table.table')
+            .not('.ticket_info').each(function () {
+                var $t = $(this),
+                    $p = $t.parent(),
+                    wrapped = $p.hasClass('cdr-hscroll'),
+                    box = wrapped ? $p[0] : $t[0].parentNode;
+                if (!this.offsetWidth || !box)
+                    return;
+                var over = this.offsetWidth > box.clientWidth + 1;
+                if (over && !wrapped)
+                    $t.wrap('<div class="cdr-hscroll"></div>');
+                else if (!over && wrapped)
+                    $t.unwrap();
+            });
+    }
+
+    // Core pagination ("Page: <a><b>1</b></a> <b>[2]</b>") has no classes:
+    // tag the container and the current page (brackets dropped).
+    function tagPagers() {
+        $('#content').find('b').filter(function () {
+            return /^\[\d+\]$/.test($.trim($(this).text()));
+        }).each(function () {
+            var $b = $(this);
+            $b.text($.trim($b.text()).slice(1, -1))
+                .addClass('cdr-page-current').attr('aria-current', 'page')
+                .parent().addClass('cdr-pager');
         });
     }
 
+    var refreshTimer = null;
+    function refresh() {
+        clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(function () {
+            fitTables();
+            tagPagers();
+        }, 60);
+    }
+
     function init() {
-        wrapWideTables();
+        fitTables();
+        tagPagers();
         loadCounts();
     }
 
@@ -101,6 +139,14 @@
             container: '#pjax-container',
             timeout: 30000
         });
+    });
+
+    // Tables shown later (tabs, AJAX-loaded lists, window size) are re-fitted
+    $(window).on('resize.cdr', refresh);
+    $(document).on('click.cdr', 'ul.tabs a', refresh);
+    $(document).on('ajaxComplete.cdr', function (e, xhr, settings) {
+        if (!settings || !/queue\/counts/.test(settings.url || ''))
+            refresh();
     });
 
     $(init);
