@@ -285,7 +285,7 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 .cdr-login .login-card .card-title { margin: 0 0 4px; color: var(--nuit); font: 700 1.375rem/1.25 var(--f-titre); }
 .cdr-login .login-card .lead { margin: 0 0 20px; color: var(--ardoise); }
 @media (max-width: 860px) {
-  .cdr-login .login-wrap { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .cdr-login .login-wrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .cdr-login .login-art { gap: 20px; padding: 24px 24px 28px; }
   .cdr-login .login-art .hook { font-size: 1.5rem; }
   .cdr-login .login-art .hook ~ p, .cdr-login .login-art .signature { display: none; }
