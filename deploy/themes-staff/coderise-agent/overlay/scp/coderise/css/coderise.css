@@ -38,6 +38,7 @@
   --f-texte: "Inter", Arial, sans-serif;
   --focus: var(--cyan-profond);
   --rail-w: 240px;
+  --topbar-h: 57px;
 }
 
 /* ───────── Page ───────── */
@@ -141,7 +142,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 .rail .avatar { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; flex: none; font: 700 .6875rem var(--f-titre); background: var(--cyan); color: var(--nuit); }
 
 /* ───────── Top bar ───────── */
-.topbar { background: var(--blanc); display: flex; align-items: center; gap: 16px; padding: 10px 28px; border-bottom: 1px solid rgba(0,15,38,.12); position: sticky; top: 0; z-index: 5; min-height: 56px; box-sizing: border-box; }
+.topbar { background: var(--blanc); display: flex; align-items: center; gap: 16px; padding: 10px 28px; border-bottom: 1px solid rgba(0,15,38,.12); position: sticky; top: 0; z-index: 5; min-height: var(--topbar-h); box-sizing: border-box; }
 .crumbs { min-width: 0; }
 .crumbs ol { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; color: var(--ardoise); white-space: nowrap; }
 .crumbs li { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -184,13 +185,18 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 /* ───────── Main column ───────── */
 /* #content stays the single element core JS reads ($('#content').data(...)).
    Until the page stylesheets (later tasks) take over, it is one white card. */
-#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; }
+#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; overflow-x: auto; }
+/* overflow-x above: core pages still carry 940 px tables (width="940",
+   scp.css !important); they scroll inside the card, never the whole page.
+   #content is not positioned, so absolutely placed core dropdowns are not clipped. */
 #content.cdr a { color: var(--cyan-profond); }
 #content.cdr h1, #content.cdr h2, #content.cdr h3 { font-family: var(--f-titre); color: var(--nuit); }
 
-/* Core floating bars (scp.js .sticky.bar.fixed: left 0, width 100%) start after the rail */
+/* Core floating bars (scp.js .sticky.bar.fixed: left 0, width 100%, inline
+   top animated to 0) start after the rail and under the sticky top bar; they
+   slide in from behind it (z-index below the top bar's 5). */
 @media (min-width: 921px) {
-  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; }
+  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); z-index: 4; }
   html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
 }
 
@@ -223,7 +229,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
    docs/theme-mockups-admin/theme.css. Appended after the shell rules; this
    section must stay last. The legacy #brickwall, #blur, #background and the
    #poweredBy logo stay in the DOM and are only hidden visually. */
-html:has(body.cdr-login) { background: var(--nuit); }
+html:has(body.cdr-login) { background: var(--nuit); overflow-y: auto; } /* login.css forces a scrollbar */
 body.cdr-login { background: var(--nuit); color: var(--blanc); font-size: .9375rem; height: auto; min-height: 100vh; text-align: start; line-height: 1.5; }
 .cdr-login #brickwall, .cdr-login #blur, .cdr-login #background { display: none; }
 .cdr-login #poweredBy { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; box-shadow: none; text-shadow: none; background: none; }
@@ -249,6 +255,8 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 .cdr-login #loginBox button[type=submit][disabled] { opacity: .6; cursor: progress; }
 .cdr-login #loginBox a { color: var(--cyan-profond); text-decoration: underline; }
 .cdr-login #loginBox .alt { margin: 16px 0 0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .9375rem; }
+/* Reset link hidden by class (core) and not yet revealed by $('#reset-link').show() (inline style) */
+.cdr-login #loginBox .alt:has(> #reset-link.hidden:not([style])) { display: none; }
 .cdr-login #loginBox hr { margin: 20px 0; border: 0; border-top: 1px solid var(--gris); }
 .cdr-login #loginBox .external-auth { display: block; margin: 0 0 8px; }
 .cdr-login #loginBox .external-auth + br { display: none; }
@@ -275,7 +283,9 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 
 /* Split layout of the login page */
 .cdr-login .login-wrap { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px); }
-.cdr-login .login-wrap > #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+.cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+/* jQuery UI .effect('shake') wraps the card in a sized .ui-effects-wrapper for the duration */
+.cdr-login .login-wrap .ui-effects-wrapper > #loginBox { height: 100%; }
 .cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
 .cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
 .cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }
@@ -291,7 +301,7 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
   .cdr-login .login-art .hook { font-size: 1.5rem; }
   .cdr-login .login-art .hook ~ p, .cdr-login .login-art .signature { display: none; }
   .cdr-login .login-art .sommet { width: 70%; opacity: .12; }
-  .cdr-login .login-wrap > #loginBox { padding: 28px 24px 24px; }
+  .cdr-login .login-wrap #loginBox { padding: 28px 24px 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cdr-login .icon-spin { animation: none; }

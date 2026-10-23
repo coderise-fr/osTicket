@@ -107,6 +107,9 @@ if (osTicket::is_ie())
 // Coderise shell: page kind, from what the controller set before this include
 $cdr_script = basename($_SERVER['SCRIPT_NAME']);
 $cdr_inc = isset($inc) ? (string) $inc : '';
+// scp/index.php only does require('tickets.php'): same page as tickets.php
+if ($cdr_script === 'index.php' && $cdr_inc !== '')
+    $cdr_script = 'tickets.php';
 $cdr_admin = defined('ADMINPAGE');
 // Ticket view: tickets.php with an id and no "a" (edit/print are other pages)
 $cdr_ticket_view = ($cdr_inc !== '')
