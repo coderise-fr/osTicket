@@ -143,6 +143,12 @@ $cdr_content_attrs = '';
 if ($cdr_ticket_view)
     $cdr_content_attrs = ' data-cdr-props="' . cdr_h(cdr__('Ticket properties')) . '"'
         . ' style="--cdr-note-label: ' . cdr_h('"' . addcslashes(cdr__('Internal note'), "\"\\\n\r") . '"') . '"';
+// Admin forms: labels of the changed-field marks and the save bar counter
+// (coderise.js replaces %d with the number of changed settings)
+elseif ($cdr_admin)
+    $cdr_content_attrs = ' data-cdr-changed-flag="' . cdr_h(cdr__('modified')) . '"'
+        . ' data-cdr-changed-one="' . cdr_h(cdr__('%d setting changed')) . '"'
+        . ' data-cdr-changed-many="' . cdr_h(cdr__('%d settings changed')) . '"';
 ?>
     <?php echo cdr_rail(isset($nav) ? $nav : null, $thisstaff); ?>
     <div class="cdr-main">

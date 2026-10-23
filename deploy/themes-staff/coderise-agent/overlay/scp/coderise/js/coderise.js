@@ -16,6 +16,7 @@
     - Core pagination links are tagged (.cdr-pager, .cdr-page-current).
     - Ticket view: the properties column (aside.cdr-props), the latest
       thread entry, the note mode of the reply area.
+    - Admin forms: changed-field marks and the save bar counter.
 
     Every handler is delegated and bound once; init() only reads the DOM
     of the current page, so running it again (pjax:end) is harmless.
@@ -236,6 +237,120 @@
         setTimeout(syncNote, 0);
     });
 
+    // Admin forms (#content.cdr-is-admin form.save): changed-field marks and
+    // the save bar counter. Additive to core's own tracking (scp.js: "save
+    // pending", beforeunload, pjax:beforeSend.changed, the submit handler that
+    // clones the submit inputs): nothing is prevented, no input is moved.
+    // Each field's value is recorded once (data cdrInit) when the page is
+    // ready, or on first focus for fields added later; a field whose value
+    // differs marks its row (tr, else its parent) .is-changed with a text
+    // flag, and the form gets .is-dirty. The labels come from data-
+    // attributes of #content (header.inc.php, cdr__()); text is written with
+    // textContent only.
+    var ADMIN_FORM = '#content.cdr-is-admin form.save',
+        SKIP_TYPES = /^(hidden|submit|reset|button|image)$/;
+
+    function trackable(el) {
+        return !!el.name && !SKIP_TYPES.test(el.type || '')
+            && !$(el).hasClass('nowarn');
+    }
+    function fieldValue(el) {
+        if (el.type === 'checkbox' || el.type === 'radio')
+            return el.checked ? '1' : '';
+        if (el.tagName === 'SELECT') {
+            var v = [];
+            for (var i = 0; i < el.options.length; i++)
+                if (el.options[i].selected)
+                    v.push(i);
+            return v.join(',');
+        }
+        return String(el.value);
+    }
+    function snapshot(el) {
+        if (trackable(el) && $.data(el, 'cdrInit') === undefined)
+            $.data(el, 'cdrInit', fieldValue(el));
+    }
+    function snapshotForms() {
+        $(ADMIN_FORM).find(':input').each(function () {
+            snapshot(this);
+        });
+    }
+    function rowOf(el) {
+        var $r = $(el).closest('tr');
+        return $r.length ? $r[0] : el.parentNode;
+    }
+    function label(name) {
+        return $('#content').attr('data-cdr-changed-' + name) || '';
+    }
+    function saveRow($f) {
+        return $f.children('p').filter(function () {
+            return $(this).children('input[type=submit], button[type=submit]').length > 0;
+        }).last();
+    }
+    function trackForm(form) {
+        var $f = $(form),
+            rows = [];
+        $f.find(':input').each(function () {
+            var init = $.data(this, 'cdrInit'),
+                row;
+            if (init === undefined || !trackable(this) || fieldValue(this) === init)
+                return;
+            row = rowOf(this);
+            if (row && rows.indexOf(row) < 0)
+                rows.push(row);
+        });
+        $f.find('.is-changed').each(function () {
+            if (rows.indexOf(this) < 0)
+                $(this).removeClass('is-changed')
+                    .find('.cdr-changed-flag').first().remove();
+        });
+        $.each(rows, function (i, row) {
+            var $row = $(row), cell, flag;
+            if ($row.hasClass('is-changed'))
+                return;
+            $row.addClass('is-changed');
+            cell = $row.is('tr') ? $row.children('td, th').first()[0] : row;
+            if (!cell)
+                return;
+            flag = document.createElement('span');
+            flag.className = 'cdr-changed-flag';
+            flag.textContent = label('flag');
+            cell.appendChild(flag);
+        });
+        $f.toggleClass('is-dirty', rows.length > 0);
+        var $bar = saveRow($f),
+            $count = $bar.children('.cdr-savebar-count');
+        if (!$bar.length || (!rows.length && !$count.length))
+            return;
+        if (!$count.length) {
+            $count = $(document.createElement('span'))
+                .addClass('cdr-savebar-count').attr('role', 'status');
+            $bar.prepend($count);
+        }
+        $count[0].textContent = rows.length
+            ? label(rows.length === 1 ? 'one' : 'many')
+                .replace('%d', String(rows.length))
+            : '';
+    }
+    var trackTimer = null;
+    function scheduleTrack(form) {
+        clearTimeout(trackTimer);
+        trackTimer = setTimeout(function () {
+            if (form && $.contains(document, form))
+                trackForm(form);
+        }, 0);
+    }
+    $(document).on('focusin.cdr', ADMIN_FORM + ' :input', function () {
+        snapshot(this);
+    });
+    $(document).on('input.cdr change.cdr', ADMIN_FORM + ' :input', function () {
+        scheduleTrack(this.form || $(this).closest('form')[0]);
+    });
+    // Native reset restores the values after the event: re-check afterwards
+    $(document).on('reset.cdr', ADMIN_FORM, function () {
+        scheduleTrack(this);
+    });
+
     var refreshTimer = null;
     function refresh() {
         clearTimeout(refreshTimer);
@@ -251,6 +366,8 @@
         fitTables();
         tagPagers();
         loadCounts();
+        // After the page's own ready/pjax:end handlers (select2, previews)
+        setTimeout(snapshotForms, 0);
     }
 
     // Rail "Menu" button (mobile)

@@ -126,4 +126,9 @@ return array(
     'Forgot My Password' => 'Mot de passe oublié',
     'Copyright' => 'Copyright',
     'Powered by' => 'Propulsé par',
+
+    // Admin forms (changed-field marks, save bar counter)
+    'modified' => 'modifié',
+    '%d setting changed' => '%d réglage modifié',
+    '%d settings changed' => '%d réglages modifiés',
 );
