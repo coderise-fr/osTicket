@@ -60,10 +60,11 @@
 
     // Interim until the page stylesheets (Task 5+): core's fixed 940 px tables
     // scroll horizontally in their own wrapper instead of widening the page.
-    // Only the table is in the wrapper (core dropdowns, tips and typeahead
-    // lists live outside these tables), so nothing else can be clipped.
+    // Only the table is in the wrapper; core tips and typeahead lists go to
+    // <body>. table.ticket_info is NOT wrapped: it holds the user/org stats
+    // dropdowns (#action-dropdown-stats), so coderise.css narrows it instead.
     function wrapWideTables() {
-        $('#content').find('table.list, table.ticket_info, table.form_table').each(function () {
+        $('#content').find('table.list, table.form_table').each(function () {
             var $t = $(this);
             if (!$t.parent().hasClass('cdr-hscroll'))
                 $t.wrap('<div class="cdr-hscroll"></div>');
