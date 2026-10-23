@@ -845,28 +845,30 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 }
 
 /* Left-label fields: label column 220 px, controls capped at 520 px */
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > tbody > tr > td:first-child:not(:only-child) { width: 220px; padding-top: 14px; font-weight: 600; vertical-align: top; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > tbody > tr > td + td { vertical-align: middle; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > tbody > tr > td + td :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], select, textarea):not([type=checkbox]):not([type=radio]) { max-width: min(520px, 100%); }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > tbody > tr > td.required::after { content: " *"; color: var(--erreur); }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) .faded { font-size: .8125rem; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td:first-child:nth-last-child(2) { width: 220px; padding-top: 14px; font-weight: 600; vertical-align: top; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td { vertical-align: middle; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], select, textarea):not([type=checkbox]):not([type=radio]) { max-width: min(520px, 100%); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td.required::after { content: " *"; color: var(--erreur); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .faded { font-size: .8125rem; }
 /* Inline errors (div.error / font.error / span.error): bold red text, the
    empty placeholders core prints for every field take no room */
-#content.cdr-is-admin :is(table.form_table, table.settings_table) :is(div.error, span.error, font.error) { font-weight: 600; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) div.error:empty { display: none; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) div.error:not(:empty) { margin-top: 4px; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) :is(div.error, span.error, font.error) { font-weight: 600; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) div.error:empty { display: none; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) div.error:not(:empty) { margin-top: 4px; }
 
 /* Section rows: the legend look (title, then the 28 x 3 px cyan bar under
    the row; the description stays on the title's line, ardoise) */
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > * > tr > th em :is(b, strong) { font-size: .9375rem; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > * > tr > th:has(> em > :is(b, strong)):not(:has(h4))::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 8px; background: var(--cyan); }
-#content.cdr-is-admin :is(table.form_table, table.settings_table) > * > tr > th em .help-tip { margin-inline-start: 4px; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th em :is(b, strong) { font-size: .9375rem; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th:has(> em > :is(b, strong)):not(:has(h4))::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 8px; background: var(--cyan); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th em .help-tip { margin-inline-start: 4px; }
 
 /* Changed fields: a 4 px cyan bar on the row and a "modified" text flag
    under the label (never colour alone) */
 #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child { box-shadow: inset 4px 0 0 var(--cyan); }
 html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child { box-shadow: inset -4px 0 0 var(--cyan); }
-#content.cdr-is-admin form.save tr.is-changed > td:first-child:not(:only-child) { padding-inline-start: 16px; }
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) { position: relative; padding-inline-start: 16px; padding-bottom: 28px; }
+/* out of the text flow, so the required "*" stays right after the label */
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { position: absolute; inset-inline-start: 16px; bottom: 8px; margin: 0; }
 #content.cdr-is-admin form.save :not(tr).is-changed { box-shadow: inset 4px 0 0 var(--cyan); padding-inline-start: 10px; }
 #content.cdr-is-admin .cdr-changed-flag { display: flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--cyan-profond); font: 600 .75rem/1.4 var(--f-titre); }
 #content.cdr-is-admin .cdr-changed-flag::before { content: ""; flex: none; width: 13px; height: 13px; background: currentColor; -webkit-mask: var(--cdr-ic-pencil) center / contain no-repeat; mask: var(--cdr-ic-pencil) center / contain no-repeat; }
@@ -875,17 +877,17 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
    window as the nuit bar (works without JS; the counter is added by
    coderise.js). Buttons are styled in place: core's submit handler clones
    and moves the submit inputs. */
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) {
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) {
   position: sticky; bottom: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px;
   margin: 20px 0 0; padding: 12px 20px; border-radius: 8px; background: var(--nuit); color: var(--blanc);
   box-shadow: 0 -6px 18px rgba(0,15,38,.14); text-align: start !important; --focus: var(--cyan); /* inline text-align:center */
 }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button) { margin: 0; }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit] { border-color: transparent; background: var(--cyan); color: var(--nuit); }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:hover { background: var(--blanc); color: var(--nuit); }
-#content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:disabled { opacity: .6; }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button) { margin: 0; }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit] { border-color: transparent; background: var(--cyan); color: var(--nuit); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:hover { background: var(--blanc); color: var(--nuit); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:disabled { opacity: .6; }
 #content.cdr-is-admin .cdr-savebar-count { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: auto; font-weight: 600; }
 #content.cdr-is-admin .cdr-savebar-count:not(:empty)::before { content: ""; flex: none; width: 16px; height: 16px; background: var(--cyan); -webkit-mask: var(--cdr-ic-pencil) center / contain no-repeat; mask: var(--cdr-ic-pencil) center / contain no-repeat; }
 
@@ -896,13 +898,13 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
 }
 /* Below 600 px: label above control on two-cell form rows */
 @media (max-width: 600px) {
-  #content.cdr :is(table.form_table, table.settings_table) > tbody > tr:has(> td:nth-child(2):last-child) { display: block; }
-  #content.cdr :is(table.form_table, table.settings_table) > tbody > tr:has(> td:nth-child(2):last-child) > td { display: block; width: auto; box-sizing: border-box; }
-  #content.cdr :is(table.form_table, table.settings_table) > tbody > tr:has(> td:nth-child(2):last-child) > td:first-child { padding-bottom: 0; border-bottom: 0; }
-  #content.cdr :is(table.form_table, table.settings_table) > :is(thead, tbody) > tr > th { display: block; }
-  #content.cdr :is(table.form_table, table.settings_table) :is(input, select, textarea):not([type=checkbox]):not([type=radio]) { max-width: 100%; }
-  #content.cdr :is(table.form_table, table.settings_table) .pull-right { float: none; }
-  #content.cdr-is-admin form.save > p:last-of-type:has(> :is(input, button)[type=submit]) { padding: 10px 12px; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) { display: block; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td { display: block; width: auto; box-sizing: border-box; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td:first-child { padding-bottom: 0; border-bottom: 0; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody) > tr > th { display: block; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) :is(input, select, textarea):not([type=checkbox]):not([type=radio]) { max-width: 100%; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .pull-right { float: none; }
+  #content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) { padding: 10px 12px; }
 }
 
 /* ───────── Login and password reset (login.tpl.php, pwreset*.php) ─────────

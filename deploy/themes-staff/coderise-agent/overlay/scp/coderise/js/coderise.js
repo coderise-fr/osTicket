@@ -282,8 +282,10 @@
     function label(name) {
         return $('#content').attr('data-cdr-changed-' + name) || '';
     }
+    // The button row: the last <p> holding a submit, child of the form or of
+    // a wrapper <div> (settings-agents/users: the *-tabs_container)
     function saveRow($f) {
-        return $f.children('p').filter(function () {
+        return $f.children('p').add($f.children('div').children('p')).filter(function () {
             return $(this).children('input[type=submit], button[type=submit]').length > 0;
         }).last();
     }
