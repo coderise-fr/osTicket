@@ -623,7 +623,10 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content .gauge-none { color: var(--ardoise); font-size: .78125rem; }
 #content .gauge-lg .gauge-bar { height: 12px; border-radius: 3px; }
 #content .gauge-lg .gauge-txt { font-size: .84375rem; }
-#content table.queue > :is(thead, tbody) > tr > .cdr-gauge-col { width: 1%; min-width: 140px; white-space: nowrap; }
+#content table.queue > :is(thead, tbody) > tr > .cdr-gauge-col { position: relative; width: 1%; padding-inline: 10px; white-space: nowrap; } /* relative: containing block of the .sr-only text, which would otherwise escape the .cdr-hscroll wrapper and widen the page */
+#content table.queue .gauge { min-width: 112px; }
+/* Core caps the subject at 300 px (inline): narrower so the gauge column fits the card at 1280 px */
+#content table.queue .truncate { max-width: clamp(140px, 18vw, 300px) !important; }
 
 /* Filter row: the quick search, the quick filter and the sort menu on one
    line, in the card (no grey band) */
@@ -661,13 +664,12 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content form#tickets > table.queue { margin-top: 0; }
 #content table.queue > thead > tr > th { border-top: 1px solid rgba(255,255,255,.14); white-space: nowrap; }
 #content table.queue > tbody > tr > td { line-height: 1.4; }
-#content table.queue > tbody > tr > td a.preview, #content table.queue > tbody > tr > td a[href*="tickets.php?id="] { font-weight: 600; }
 /* Priority (and other coloured columns): core paints the cell and an inner
    div with inline colours; the cell keeps the row stripe, the div becomes a tag */
-#content table.queue > tbody > tr > td[style] { background-color: var(--blanc) !important; }
-#content table.queue > tbody > tr:nth-child(even) > td[style] { background-color: var(--gris) !important; }
-#content table.queue > tbody > tr:is(:hover, .highlight) > td[style] { background-color: var(--voile) !important; }
-#content table.queue > tbody > tr > td[style] > div[style] { display: inline-block; padding: 1px 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,15,38,.18); color: var(--nuit); font: 600 .75rem/1.6 var(--f-titre); white-space: nowrap; }
+#content table.queue > tbody > tr > td[style*="background"] { background-color: var(--blanc) !important; }
+#content table.queue > tbody > tr:nth-child(even) > td[style*="background"] { background-color: var(--gris) !important; }
+#content table.queue > tbody > tr:is(:hover, .highlight) > td[style*="background"] { background-color: var(--voile) !important; }
+#content table.queue > tbody > tr > td[style*="background"] > div[style*="background"] { display: inline-block; padding: 1px 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,15,38,.18); color: var(--nuit); font: 600 .75rem/1.6 var(--f-titre); white-space: nowrap; }
 #content table.queue > tfoot > tr > td i { font-style: normal; }
 
 /* Rail: "Add personal queue" as a ghost button */

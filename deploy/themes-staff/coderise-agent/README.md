@@ -19,11 +19,18 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
 
 - Barre collante (`div.sticky.bar` du cœur) : toujours affichée avec son titre et ses
   actions, comme dans le cœur (la maquette ne montre la barre d'actions groupées qu'une
-  fois une ligne cochée). Elle prend l'aspect de la barre nuit une fois flottante.
+  fois une ligne cochée). Elle prend l'aspect de la barre nuit une fois flottante ; sur
+  la file de tickets, elle est toujours la barre nuit (tâche 6).
+- File de tickets (`include/staff/templates/queue-tickets.tmpl.php`, gabarit du cœur
+  remplacé) : seule une colonne « Premier retour » est ajoutée, en dernière position
+  (la maquette la place après le sujet) ; les colonnes configurées de la file et leurs
+  cellules restent celles du cœur. La jauge n'apparaît que si le plugin
+  sla_first_response est actif, et seulement pour les tickets **ouverts** d'un
+  propriétaire Priority ; ticket fermé ou client Standard : « — » (« Sans objet »).
 
 ## Lacunes connues (Known gaps)
 
-État au composant global (tâche 5), vérifié en anglais sur la démo locale.
+État après la file de tickets (tâche 6), vérifié en anglais sur la démo locale.
 
 1. Sous ~600 px, les tableaux hérités trop larges (formulaires de réglages, profil,
    listes à nombreuses colonnes) défilent latéralement dans leur propre conteneur
@@ -32,8 +39,12 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
 2. Fiche ticket : la mise en page reste celle du cœur (en-tête d'informations, fil,
    zone de réponse) avec les composants restylés ; les liens des messages gardent les
    couleurs du courriel (tâche 7).
-3. File de tickets : la colonne Priorité garde les fonds de couleur en ligne du cœur ;
-   pas encore de jauge ni de filtres façon maquette (tâche 6).
+3. File de tickets : pas de puce de contrat sous le numéro, pas d'avatar d'initiales
+   pour l'assigné, pas de filtres « Contrat / Département / Assigné à / Reçus » ni de
+   compteur de sélection : les cellules sont rendues par les colonnes configurables du
+   cœur (`$C->render()`), inchangées. La priorité devient une étiquette qui garde la
+   couleur du cœur. Sous ~1180 px, le tableau défile latéralement dans `.cdr-hscroll`
+   (pas de cartes empilées comme la maquette sous 760 px, faute d'étiquettes de colonne).
 4. Les erreurs de champ du cœur sont un texte rouge avec astérisque à côté du champ ; le
    champ lui-même n'est pas encadré (le cœur ne marque que le message).
 5. Datepicker jQuery UI, icônes GIF du cœur (calendrier, dossiers de la base de
