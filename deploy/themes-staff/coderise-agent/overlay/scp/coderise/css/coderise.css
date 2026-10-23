@@ -207,7 +207,15 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
   #content.cdr table.ticket_info > tbody > tr, #content.cdr table.ticket_info > tbody > tr > td { display: block; width: auto; }
 }
 #content.cdr a { color: var(--cyan-profond); }
-#content.cdr h1, #content.cdr h2, #content.cdr h3 { font-family: var(--f-titre); color: var(--nuit); }
+/* Cyan-profond passes 4.5:1 on white only (4.91; on gris 4.14, voile ~4.4,
+   the état backgrounds ~4.1-4.4). On tinted areas links are nuit with a
+   cyan-profond underline, as in the mockup's tables. */
+#content.cdr :is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, .banner, #basic_search, #response_options, .thread-entry .header, .filedrop) a:not(.button):not(.action-button):not(:is(ul.tabs, .redactor-box, .action-dropdown, .noclick-dropdown, .cdr-pager) a),
+.dialog :is(.error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, .banner) a:not(.button),
+:is(#error_bar, #warning_bar, #notice_bar) a {
+  color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px;
+}
+#content.cdr :is(h1, h2, h3):not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
 
 @media (min-width: 921px) {
   /* The sticky rail stops at the end of #pjax-container; the strip under it
@@ -257,15 +265,15 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 }
 
 /* ───────── Titles ───────── */
-:is(#content) h2 { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
+#content h2:not(.thread-body *) { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
 #content.cdr h2 a, #content.cdr h2 a:hover { color: var(--nuit); text-decoration: none; }
-:is(#content) h2 i { color: var(--cyan-profond); }
-:is(#content) h2 small, :is(#content) h3 small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
-:is(#content) h3 { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
-:is(#content) h4 { font-family: var(--f-titre); color: var(--nuit); }
+#content h2:not(.thread-body *) i { color: var(--cyan-profond); }
+#content :is(h2, h3):not(.thread-body *) small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
+#content h3:not(.thread-body *) { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
+#content h4:not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
 :is(#content, .dialog, .tip_content) .faded, :is(#content, .dialog) .faded-more { color: var(--ardoise); }
 :is(#content, .dialog, .tip_content) .faded b, :is(#content, .dialog, .tip_content) .faded strong { color: var(--nuit); }
-:is(#content, .dialog) hr { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
+:is(#content, .dialog) hr:not(.thread-body *) { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
 
 /* ───────── Buttons ─────────
    .button and the input buttons = btn-line; submit = btn-primary (cyan, nuit
@@ -357,7 +365,8 @@ html.rtl :is(#content, .dialog) .input.attached .button.attached { border-radius
    the 960 px layout: tables take the card width, other boxes are capped. */
 #content :is(table[width="940"], table[width="920"], table[width="830"], table.list, table.form_table, table.settings_table) { width: 100%; max-width: 100%; }
 #content :is(div, table, form, textarea, input, select, ul)[style*="width"] { max-width: 100%; }
-#content img { max-width: 100%; height: auto; }
+#content img:not(.thread-body *) { max-width: 100%; height: auto; }
+#content .thread-body img { max-width: 100%; }
 #content :is(td, th) { overflow-wrap: break-word; }
 #content :is(td, th) :is(input, select) { max-width: 100%; }
 .dialog { max-width: calc(100vw - 24px) !important; } /* core widths are !important */
@@ -367,7 +376,6 @@ html.rtl :is(#content, .dialog) .input.attached .button.attached { border-radius
    sort images (black on light) become arrows drawn in text. */
 :is(#content, .dialog) table.list { clear: both; margin: 4px 0 12px; border: 0; border-collapse: collapse; border-spacing: 0; background: var(--blanc); }
 :is(#content, .dialog) table.list caption { padding: 8px 0 10px; background: none; color: var(--nuit); font: 700 .9375rem var(--f-titre); text-align: start; }
-:is(#content, .dialog) table.list caption i.help-tip { color: var(--ardoise); opacity: 1; }
 :is(#content, .dialog) table.list > thead > tr > th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 .75rem/1.35 var(--f-titre); text-align: start; vertical-align: middle; }
 :is(#content, .dialog) table.list > thead > tr > th a { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 0; background: none; color: var(--blanc); text-decoration: none; }
 :is(#content, .dialog) table.list > thead > tr > th a:hover { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: 3px; }
@@ -404,7 +412,6 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 :is(#content, .dialog) :is(.form_table, .settings_table) th h4 a { display: inline; color: var(--nuit); }
 :is(#content, .dialog) :is(.form_table, .settings_table) th em { display: block; margin: 0; color: var(--ardoise); font-style: normal; font-weight: 400; }
 :is(#content, .dialog) :is(.form_table, .settings_table) th em b, :is(#content, .dialog) :is(.form_table, .settings_table) th em strong { color: var(--nuit); font-family: var(--f-titre); font-weight: 700; }
-:is(#content, .dialog) :is(.form_table, .settings_table) th h4 i.help-tip { color: var(--ardoise); }
 :is(#content, .dialog) .form_table em { color: var(--ardoise); }
 /* table.table (profile, user and organisation forms): tr.header rows are
    section titles, like the legends of the mockup */
@@ -459,7 +466,6 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 .dialog a.close { top: 16px; right: 18px; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--nuit); font-size: 16px; text-decoration: none; }
 html.rtl .dialog a.close { right: auto; left: 18px; }
 .dialog a.close:hover { background: var(--gris); }
-.dialog hr { margin: 12px 0; background: var(--gris); }
 .dialog th { padding: 6px 10px; border: 0; background: var(--gris); color: var(--nuit); }
 .dialog .table td:not(:empty) { background-color: transparent !important; } /* core #f8f8f8 !important */
 .dialog #popup-loading { background: rgba(255,255,255,.88); color: var(--nuit); }
@@ -509,7 +515,7 @@ body:not(.cdr-login) #loading h1 { color: var(--nuit); font: 600 1rem var(--f-ti
 :is(#content, .dialog) i.help-tip { color: var(--ardoise); opacity: 1; }
 :is(#content, .dialog) i.help-tip:hover { color: var(--cyan-profond) !important; } /* core: orange !important */
 .tip_box .tip_content { box-sizing: border-box; min-width: min(400px, calc(100vw - 24px)); max-width: calc(100vw - 24px); padding: 14px 16px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .84375rem/1.5 var(--f-texte); }
-.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 1.5em 8px 0; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 1rem/1.3 var(--f-titre); }
+.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 0 8px; padding-inline-end: 1.5em; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 1rem/1.3 var(--f-titre); }
 .tip_box .tip_content .links { border-top-color: var(--gris); }
 .tip_box .tip_content a, .tip_box .tip_content .links a { color: var(--cyan-profond); }
 .tip_box .tip_close { color: var(--nuit); }
@@ -575,13 +581,17 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
 #content .sticky.bar :is(h2, h3) { margin: 0; }
 #content .sticky.bar.fixed { z-index: 4; padding: 10px 24px; padding-inline-end: 72px; background: var(--nuit); color: var(--blanc); box-shadow: 0 6px 18px rgba(0,15,38,.28); --focus: var(--cyan); }
 #content .sticky.bar.fixed .content { max-width: 100%; }
-#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label) { color: var(--blanc); }
+/* White text for the bar's own content only: the dropdown menus that live in
+   the bar (Assign, Status, More...) are white panels and keep nuit text */
+#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label):not(:is(.action-dropdown, .noclick-dropdown) *) { color: var(--blanc); }
+#content .sticky.bar.fixed :is(.action-dropdown, .noclick-dropdown) { color: var(--nuit); }
 #content .sticky.bar.fixed h2 i { color: var(--cyan); }
 #content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
 #content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
 #content .sticky.bar.fixed .action-button i.icon-caret-down { border-color: rgba(255,255,255,.35); }
 #content .sticky.bar.fixed :is(input[type=submit], button[type=submit], .primary.button):hover { background: var(--blanc); color: var(--nuit); }
 #content .sticky.bar.fixed :is(.red.button, .action-button.danger) { background: transparent; color: var(--blanc) !important; border-color: rgba(255,255,255,.55) !important; }
+/* Core shows the scroll-up chevron only from 1040 px (scp.css); here it is shown on the floating bar beside the rail (> 920 px) and absent below by design */
 #content .sticky.bar .scroll-up { display: none; }
 @media (min-width: 921px) {
   #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); }

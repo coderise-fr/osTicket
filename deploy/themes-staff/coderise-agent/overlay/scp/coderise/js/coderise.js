@@ -76,7 +76,10 @@
                     $p = $t.parent(),
                     wrapped = $p.hasClass('cdr-hscroll'),
                     box = wrapped ? $p[0] : $t[0].parentNode;
-                if (!this.offsetWidth || !box)
+                // Never re-parent a table while focus is inside it (moving the
+                // node would drop the focus of the field being typed in)
+                if (!this.offsetWidth || !box
+                        || $.contains(this, document.activeElement))
                     return;
                 var over = this.offsetWidth > box.clientWidth + 1;
                 if (over && !wrapped)
@@ -86,11 +89,28 @@
             });
     }
 
-    // Core pagination ("Page: <a><b>1</b></a> <b>[2]</b>") has no classes:
-    // tag the container and the current page (brackets dropped).
+    // Core pagination has no classes. Pagenate::getPageLinks() prints
+    // "Page:" then "<a href="...&p=1"><b>1</b></a>", "<b>[2]</b>" (current)
+    // and "<a ...><strong>&raquo;</strong></a>". Tag the container and the
+    // current page (brackets dropped) only for that exact shape: a bare <b>[n]</b>
+    // next to a page link (href with p=) or right after the "Page:" label,
+    // never inside user content (thread bodies, editors).
+    function isPageLink(el) {
+        return !!el && el.tagName === 'A'
+            && /[?&](amp;)?p=\d+/.test(el.getAttribute('href') || '')
+            && $(el).children('b, strong').length === 1;
+    }
     function tagPagers() {
         $('#content').find('b').filter(function () {
-            return /^\[\d+\]$/.test($.trim($(this).text()));
+            var prev = this.previousSibling;
+            if (this.children.length
+                    || !/^\[\d+\]$/.test($.trim($(this).text()))
+                    || $(this).closest('.thread-body, #ticket_thread, .thread-entry, '
+                        + '.redactor-box, [contenteditable]').length)
+                return false;
+            return isPageLink(this.previousElementSibling)
+                || isPageLink(this.nextElementSibling)
+                || (prev && prev.nodeType === 3 && /:\s*$/.test(prev.nodeValue));
         }).each(function () {
             var $b = $(this);
             $b.text($.trim($b.text()).slice(1, -1))
