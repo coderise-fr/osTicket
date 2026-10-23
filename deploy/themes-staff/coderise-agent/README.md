@@ -30,15 +30,24 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
 
 ## Lacunes connues (Known gaps)
 
-État après la file de tickets (tâche 6), vérifié en anglais sur la démo locale.
+État après la fiche ticket (tâche 7), vérifié en anglais sur la démo locale.
 
 1. Sous ~600 px, les tableaux hérités trop larges (formulaires de réglages, profil,
    listes à nombreuses colonnes) défilent latéralement dans leur propre conteneur
    (`.cdr-hscroll`) : aucune page ne déborde, mais les formulaires d'administration ne
    sont pas encore empilés (tâche 8).
-2. Fiche ticket : la mise en page reste celle du cœur (en-tête d'informations, fil,
-   zone de réponse) avec les composants restylés ; les liens des messages gardent les
-   couleurs du courriel (tâche 7).
+2. Fiche ticket (tâche 7) : le gabarit du cœur est conservé ; `coderise.js` déplace la
+   bande d'onglets dans `#ticket_tabs_container` et regroupe le panneau « Premier retour »
+   et les tableaux `table.ticket_info` dans une colonne `aside.cdr-props`. Écarts avec la
+   maquette : pas de ligne d'identité (état, contrat, urgence) ni de sous-titre client
+   sous le sujet ; les actions restent les boutons-icônes de la barre du cœur (pas de
+   « Modifier / Imprimer / Marquer comme résolu ») ; les propriétés sont des liens
+   d'édition du cœur, pas des listes déroulantes, sans titre de panneau (« Propriétés »,
+   « Client ») ni panneau d'actions ; les avatars sont un disque avec une icône (pas
+   d'initiales, aucune donnée pour le CSS) ; pas de compteur dans les onglets ni d'onglet
+   « Journal » ; la zone de réponse garde les champs du cœur (De, Destinataires, Répondre
+   à, Réponse type, Signature, État). La colonne n'est collante que si elle tient dans
+   la fenêtre sous la barre d'actions flottante, sinon elle défile avec la page.
 3. File de tickets : pas de puce de contrat sous le numéro, pas d'avatar d'initiales
    pour l'assigné, pas de filtres « Contrat / Département / Assigné à / Reçus » ni de
    compteur de sélection : les cellules sont rendues par les colonnes configurables du

@@ -188,24 +188,31 @@
                 || $r.children('form#note').is(':visible')));
     }
 
-    // A properties column taller than the window cannot stick (its end
-    // would never be reachable): it scrolls with the page instead
+    // The aside sticks under the top bar and core's floating action bar
+    // (~130 px). A sticky box is released at the end of its grid area, so
+    // at the bottom of the page its top sits at (viewport - space under
+    // #content - its height): when that would slide under the floating bar,
+    // or when it is simply taller than the window, it scrolls with the page
+    // instead (.cdr-tall).
     function fitProps() {
         var $a = $('#content.cdr-ticket > aside.cdr-props');
         if (!$a.length)
             return;
+        var $c = $a.parent(),
+            tail = $(document).height() - ($c.offset().top + $c.outerHeight());
         $a.removeClass('cdr-tall');
-        if ($a[0].offsetHeight > window.innerHeight - 160)
+        if ($a[0].offsetHeight > window.innerHeight - 140 - Math.max(0, tail))
             $a.addClass('cdr-tall');
     }
 
     // core's dropdown plugin positions a menu against the TRIGGER's offset
     // parent; the sticky aside is one, while some menus of its links live
     // elsewhere (Status: #action-dropdown-statuses is in the action bar).
-    // Re-place such a menu against its own offset parent, after the plugin
-    // (body handler) has shown it.
-    $(document).on('click.cdr', 'aside.cdr-props [data-dropdown]', function () {
-        var $t = $(this),
+    // Re-place such a menu against its own offset parent, once the plugin
+    // has shown it. The plugin's body handler stops propagation, so this one
+    // is bound on body too and waits for it.
+    function placeMenu(t) {
+        var $t = $(t),
             $d = $($t.attr('data-dropdown'));
         if (!$d.length || !$d.is(':visible') || $.contains($t.offsetParent()[0], $d[0]))
             return;
@@ -217,6 +224,12 @@
         if (p[0] !== document.body && p[0] !== document.documentElement)
             o.top -= p.scrollTop();
         $d.css({ left: left - o.left, top: to.top + $t.outerHeight() - o.top });
+    }
+    $(function () {
+        $('body').on('click.cdr', 'aside.cdr-props [data-dropdown]', function () {
+            var t = this;
+            setTimeout(function () { placeMenu(t); }, 0);
+        });
     });
 
     $(document).on('click.cdr', '#content.cdr-ticket #response-tabs a', function () {

@@ -706,6 +706,7 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content.cdr-ticket #ticket_thread > #ticketThread { border-radius: 0 0 10px 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
 #content.cdr-ticket #ticket_tabs_container > .tab_content:not(#ticket_thread) { padding: 16px; }
 #content.cdr-ticket #thread-items { margin: 0; padding: 0 0 10px; }
+#content.cdr-ticket #thread-items::before { content: none; display: none; } /* core: dotted timeline */
 #content.cdr-ticket #ticket_thread > #msg_warning { margin: 16px 0 0; }
 
 /* Thread entries (thread-entry.tmpl.php): .entry of the mockup. Client
@@ -729,14 +730,14 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content.cdr-ticket .thread-entry > .header { grid-column: 2; position: static; margin: 0 0 4px; padding: 0; border: 0; border-radius: 0; background: none; color: var(--ardoise); line-height: 1.5; }
 #content.cdr-ticket .thread-entry > .header::before, #content.cdr-ticket .thread-entry > .header::after { content: none; display: none; }
 #content.cdr-ticket .thread-entry > .header > b { color: var(--nuit); font: 600 .875rem var(--f-titre); }
-#content.cdr.cdr-ticket .thread-entry > .header a[href^="#entry-"] { color: var(--ardoise); text-decoration: none; }
-#content.cdr.cdr-ticket .thread-entry > .header a[href^="#entry-"]:hover { color: var(--nuit); text-decoration: underline; }
+#content.cdr.cdr-ticket #thread-items .thread-entry > .header a[href^="#entry-"] { color: var(--ardoise); text-decoration: none; }
+#content.cdr.cdr-ticket #thread-items .thread-entry > .header a[href^="#entry-"]:hover { color: var(--nuit); text-decoration: underline; }
 #content.cdr-ticket .thread-entry > .header .title { max-width: 100% !important; margin-inline-start: 10px; color: var(--ardoise); } /* inline max-width:400px */
 #content.cdr-ticket .thread-entry > .header .textra .label { color: var(--ardoise); }
 #content.cdr-ticket .thread-entry > .header .muted-button { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -4px 0 0; border-radius: 6px; color: var(--nuit); cursor: pointer; }
 #content.cdr-ticket .thread-entry > .header .muted-button:hover { background: rgba(0,15,38,.07); }
 #content.cdr-ticket .thread-entry > .thread-body { grid-column: 2; padding: 0; border: 0; border-radius: 0; background: none; color: var(--nuit); overflow-wrap: anywhere; }
-#content.cdr.cdr-ticket .thread-entry > .thread-body a:not(.button) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr.cdr-ticket .thread-entry > .thread-body a:not(.button) { color: var(--nuit) !important; /* core thread.css: #428bca !important */ text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
 #content.cdr-ticket .thread-entry > .thread-body pre { white-space: pre-wrap; }
 #content.cdr-ticket .thread-entry .attachments { position: static; display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
 #content.cdr-ticket .thread-entry .attachment-info { display: inline-flex; align-items: center; gap: 6px; width: auto; max-width: 100%; margin: 0; padding: 3px 10px; border-radius: 5px; background: var(--blanc); box-shadow: inset 0 0 0 1px var(--ardoise); font-size: .78125rem; }
@@ -746,7 +747,7 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset 4px 0 0 var(--cyan); }
 html.rtl #content.cdr-ticket .thread-entry.note { box-shadow: inset -4px 0 0 var(--alerte); }
 html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset -4px 0 0 var(--cyan); }
-#content.cdr-ticket .thread-entry.note > .header, #content.cdr.cdr-ticket .thread-entry.note > .header a[href^="#entry-"] { color: var(--alerte); }
+#content.cdr-ticket .thread-entry.note > .header, #content.cdr.cdr-ticket #thread-items .thread-entry.note > .header a[href^="#entry-"] { color: var(--alerte); }
 #content.cdr-ticket .thread-entry.note > .header > b::after { content: var(--cdr-note-label, "Internal note"); display: inline-block; margin-inline-start: 10px; padding: 0 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--alerte); color: var(--alerte); font: 600 .75rem/1.6 var(--f-titre); vertical-align: 1px; }
 #content.cdr-ticket .thread-entry.system { background: var(--gris); }
 
@@ -779,6 +780,8 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 #content.cdr-ticket:has(.sticky.bar.fixed) > aside.cdr-props { top: calc(var(--topbar-h) + 72px); }
 #content.cdr-ticket > aside.cdr-props.cdr-tall { position: static; }
 #content.cdr-ticket aside.cdr-props > .panel { margin: 0; }
+#content.cdr-ticket aside.cdr-props .panel-h h2 { margin: 0; font: 700 .9375rem/1.3 var(--f-titre); }
+#content.cdr-ticket aside.cdr-props .panel-h .ic { color: var(--cyan-profond); }
 #content.cdr-ticket aside.cdr-props .cdr-sla .gauge { min-width: 0; }
 #content.cdr-ticket aside.cdr-props .cdr-sla-note { margin: 8px 0 0; color: var(--ardoise); }
 #content.cdr-ticket aside.cdr-props > table.ticket_info { display: block; width: auto; max-width: none; margin: 0; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); overflow: hidden; }
