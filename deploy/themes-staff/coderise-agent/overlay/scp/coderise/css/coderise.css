@@ -196,6 +196,10 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
    top animated to 0) start after the rail and under the sticky top bar; they
    slide in from behind it (z-index below the top bar's 5). */
 @media (min-width: 921px) {
+  /* The sticky rail stops at the end of #pjax-container; the strip under it
+     (beside #footer) stays nuit */
+  #container { background: linear-gradient(90deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
+  html.rtl #container, [dir="rtl"] #container { background: linear-gradient(270deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
   #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); z-index: 4; }
   html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
 }
