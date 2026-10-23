@@ -1,13 +1,12 @@
 <?php
 if(!defined('OSTCLIENTINC') || !$thisclient || !$ticket || !$ticket->checkUserAccess($thisclient)) die('Access Denied!');
-/* Sommet theme (deploy/themes/sommet): replaces include/client/view.inc.php.
- * Same data, checks, signals, reply form (CSRF token, draft, attachments,
- * reopen warning, merged tickets) and inline images script as the original.
- * New layout: title band (subject, status, number, dates, actions, and the
- * "first reply" indicator of the Priority SLA plan when it applies), then
- * the thread and the reply form, with the ticket information on the side.
- * Support contract badge (band and side column): optional, see
- * sommet_contract() in include/client/sommet/sommet.inc.php. */
+/* Theme "Parcours" (Coderise) - overrides include/client/view.inc.php.
+ * Same access check, signal, thread rendering, reply form (same fields,
+ * names, draft, attachments, CSRF), messages and inline images as the core
+ * template. Added from real ticket data only: progress line (created, first
+ * reply of an agent, closed), "your next step" (state + isanswered), and
+ * the Priority first-reply gauge when the SLA plan allows it
+ * (pcrs_sla_gauge(), see include/client/parcours/parcours.inc.php). */
 
 $info=($_POST && $errors)?Format::htmlchars($_POST):array();
 
@@ -23,82 +22,107 @@ if ($ticket->isClosed() && !$ticket->isReopenable())
 if(!$dept || !$dept->isPublic())
     $dept = $cfg->getDefaultDept();
 
-$S = $ticket->getStatus();
-$sommet_state = $ticket->isClosed() ? 'closed' : 'open';
-$sommet_sla = sommet_priority_sla($ticket);
-// Contract level of the ticket OWNER (never a collaborator), current level;
-// null without the sla_first_response plugin (nothing shown). Once per page.
-$sommet_contract = sommet_contract($ticket);
+if ($blockReply = $ticket->isChild() && $ticket->getMergeType() != 'visual')
+    $warn = sprintf(__('This Ticket is Merged into another Ticket. Please go to the %s%d%s to reply.'),
+        '<a href="tickets.php?id=', $ticket->getPid(), '" style="text-decoration:underline">Parent</a>');
+
+$pcrs_can_reply = ((!$ticket->isClosed() || $ticket->isReopenable()) && !$blockReply);
+$pcrs_state = $ticket->isClosed() ? 'closed' : 'open';
+list($pcrs_k, $pcrs_title, $pcrs_text) = pcrs_next_step($pcrs_state, $ticket->isAnswered(),
+    $ticket->isReopenable() && !$blockReply);
+$pcrs_first = pcrs_first_response($ticket);
+$pcrs_gauge = pcrs_sla_gauge($ticket);
+// Support contract of the ticket OWNER (current level, optional plugin):
+// null without the plugin or when the level is unknown -> nothing shown.
+$pcrs_contract = pcrs_contract($ticket);
+$pcrs_waiting = ($pcrs_state == 'open' && !$pcrs_first);
+$pcrs_subject_field = TicketForm::getInstance()->getField('subject');
+$pcrs_subject = $pcrs_subject_field->display($ticket->getSubject());
+// Progress line: received -> first reply -> closed (dates from the ticket)
+$pcrs_steps = array(
+    array(__('Created'), Format::datetime($ticket->getCreateDate()), 'done'),
+    array(pcrs__('First reply'), $pcrs_first ? Format::datetime($pcrs_first)
+        : ($pcrs_waiting && $pcrs_contract
+            ? ($pcrs_contract['level'] == 'priority' ? pcrs__('Expected within 4 h, 24/7')
+                : pcrs__('Expected on business days'))
+            : pcrs__('Waiting for the team')),
+        $pcrs_first ? 'done' : ($pcrs_state == 'open' ? 'current' : 'todo')),
+    array(__('Closed'), $ticket->isClosed() ? Format::datetime($ticket->getCloseDate()) : pcrs__('When the request is solved'),
+        $ticket->isClosed() ? 'done' : ($pcrs_first ? 'current' : 'todo')),
+);
 ?>
-<!--sommet:bandeau-->
-<h1 id="sommet-title" class="ticket-subject"><?php
-    $subject_field = TicketForm::getInstance()->getField('subject');
-    echo $subject_field->display($ticket->getSubject()); ?></h1>
-<div class="sub">
-    <span class="status status-<?php echo $sommet_state; ?>"><?php
-        echo sommet_icon($sommet_state == 'closed' ? 'lock' : 'inbox', 14);
-        echo $S ? $S->getLocalName() : ''; ?></span>
-<?php if ($sommet_contract) echo '    ', sommet_contract_badge($sommet_contract), "\n"; ?>
-    <span class="num">#<?php echo $ticket->getNumber(); ?></span>
-    <span class="since"><?php echo sommet_icon('clock', 15, __('Create Date'));
-        ?> <time datetime="<?php echo date(DateTime::W3C, Misc::db2gmtime($ticket->getCreateDate()));
-        ?>"><?php echo Format::datetime($ticket->getCreateDate()); ?></time></span>
-    <span class="ticket-actions">
-        <a class="action-button" href="tickets.php?id=<?php echo $ticket->getId(); ?>" title="<?php echo __('Reload'); ?>"><?php
-            echo sommet_icon('refresh', 16); ?><span class="visually-hidden"><?php echo __('Reload'); ?></span></a>
-        <a class="action-button" href="tickets.php?a=print&id=<?php
-            echo $ticket->getId(); ?>"><?php echo sommet_icon('print', 16); ?> <?php echo __('Print'); ?></a>
+<section class="top ticket-head">
+<?php echo pcrs_crumbs(array(array(__('Tickets'), $thisclient->isGuest() ? null : ROOT_PATH . 'tickets.php'),
+    array('#' . $ticket->getNumber(), null))); ?>
+  <h1><?php echo $pcrs_subject; ?></h1>
+  <p class="sub meta">
+    <span class="status <?php echo $pcrs_state == 'open' ? 'status-open' : 'status-closed'; ?>"><?php
+        echo pcrs_icon($pcrs_state == 'open' ? 'inbox' : 'lock', 14);
+        echo ($S = $ticket->getStatus()) ? $S->getLocalName() : ''; ?></span>
+    <?php echo pcrs_contract_pill($pcrs_contract); ?>
+    <span>#<?php echo $ticket->getNumber(); ?> · <?php echo sprintf(pcrs__('opened %s'), Format::datetime($ticket->getCreateDate())); ?></span>
+  </p>
+  <p class="ticket-actions">
+    <a class="btn btn-line" href="tickets.php?id=<?php echo $ticket->getId(); ?>"><?php echo pcrs_icon('refresh', 16); echo __('Reload'); ?></a>
+    <a class="btn btn-line" href="tickets.php?a=print&id=<?php
+        echo $ticket->getId(); ?>"><?php echo pcrs_icon('print', 16); echo __('Print'); ?></a>
 <?php if ($ticket->hasClientEditableFields()
         // Only ticket owners can edit the ticket details (and other forms)
         && $thisclient->getId() == $ticket->getUserId()) { ?>
-        <a class="action-button" href="tickets.php?a=edit&id=<?php
-             echo $ticket->getId(); ?>"><?php echo sommet_icon('edit', 16); ?> <?php echo __('Edit'); ?></a>
+    <a class="btn btn-line" href="tickets.php?a=edit&id=<?php
+         echo $ticket->getId(); ?>"><?php echo pcrs_icon('edit', 16); echo __('Edit'); ?></a>
 <?php } ?>
-    </span>
-</div>
-<?php if ($sommet_sla) {
-    $sommet_left_h = intdiv($sommet_sla['left'], 3600);
-    $sommet_left_m = intdiv($sommet_sla['left'] % 3600, 60); ?>
-<div class="altimeter<?php if ($sommet_sla['overdue']) echo ' is-overdue'; ?>" role="group"
-    aria-label="<?php echo Format::htmlchars(__s('Priority support: time to the first reply')); ?>">
-    <div class="alt-head">
-        <strong><?php echo sprintf(__s('First reply within %d h'), $sommet_sla['hours']); ?></strong>
-        <span><?php
-        if ($sommet_sla['overdue'])
-            echo __s('Target time passed. Your ticket stays at the top of our list.');
-        else
-            echo sprintf(__s('Expected before %s (%d h %02d min left)'),
-                Format::datetime($sommet_sla['due']), $sommet_left_h, $sommet_left_m); ?></span>
-    </div>
-    <div class="alt-bar" role="img" aria-label="<?php echo Format::htmlchars(sprintf(
-        __s('%s %% of the time elapsed'), $sommet_sla['pct'])); ?>"><span class="fill" style="width:<?php
-        echo $sommet_sla['pct']; ?>%"></span><span class="flag" style="left:<?php echo $sommet_sla['pct']; ?>%"></span></div>
-    <ol class="alt-scale">
-        <li class="start"><?php echo __s('Received'); ?><small><?php echo Format::datetime($sommet_sla['start']); ?></small></li>
-        <li class="end"><?php echo __s('Target'); ?><small><?php echo Format::datetime($sommet_sla['due']); ?></small></li>
-    </ol>
-</div>
+  </p>
+  <ol class="route" aria-label="<?php echo Format::htmlchars(pcrs__('Progress of the ticket')); ?>">
+<?php foreach ($pcrs_steps as $i => $st) { ?>
+    <li class="<?php echo $st[2]; ?>"<?php if ($st[2] == 'current') echo ' aria-current="step"'; ?>>
+      <span class="node" aria-hidden="true"><?php echo $st[2] == 'done' ? pcrs_icon('check') : $i + 1; ?></span>
+      <span class="txt"><strong><?php echo $st[0]; ?></strong><small><?php echo $st[1]; ?></small>
+      <span class="sr-only"><?php echo $st[2] == 'done' ? pcrs__('done') : ($st[2] == 'current' ? pcrs__('in progress') : pcrs__('to come')); ?></span></span>
+    </li>
 <?php } ?>
-<!--/sommet:bandeau-->
+  </ol>
+</section>
+
 <?php
 if ($thisclient && $thisclient->isGuest()
     && $cfg->isClientRegistrationEnabled()) { ?>
-
 <div id="msg_info">
-    <?php echo sommet_icon('user', 22); ?>
-    <strong><?php echo __('Looking for your other tickets?'); ?></strong><br />
+    <?php echo pcrs_icon('user', 20); ?>
+    <div><strong><?php echo __('Looking for your other tickets?'); ?></strong><br />
     <a href="<?php echo ROOT_PATH; ?>login.php?e=<?php
         echo urlencode($thisclient->getEmail());
     ?>" style="text-decoration:underline"><?php echo __('Sign In'); ?></a>
     <?php echo sprintf(__('or %s register for an account %s for the best experience on our help desk.'),
         '<a href="account.php?do=create" style="text-decoration:underline">','</a>'); ?>
     </div>
-
+</div>
 <?php } ?>
 
-<div class="ticket-grid" id="ticketInfo">
-<section class="journal" aria-label="<?php echo Format::htmlchars(__s('Conversation')); ?>">
-  <?php
+<div class="ticket-grid">
+  <div class="main-col">
+    <section class="next-step" aria-labelledby="next-title">
+      <span class="ns-ic"><?php echo pcrs_icon($pcrs_k == 'closed' ? 'reopen' : ($pcrs_k == 'you' ? 'reply' : 'flag'), 22); ?></span>
+      <div>
+        <h2 id="next-title"><?php echo pcrs__('Your next step'); ?> · <?php echo $pcrs_title; ?></h2>
+        <p><?php echo $pcrs_text; ?></p>
+<?php if ($pcrs_contract && $pcrs_state == 'open') {
+    // Commitment: the first reply while it is awaited; standard support
+    // replies on business days; no other Priority promise is made.
+    $pcrs_promise = ($pcrs_waiting || $pcrs_contract['level'] != 'priority')
+        ? pcrs_contract_promise($pcrs_contract) : ''; ?>
+        <p class="ns-contract"><span class="ns-label"><?php echo pcrs__('Support contract'); ?></span>
+          <?php echo pcrs_contract_pill($pcrs_contract);
+          if ($pcrs_promise) echo ' <span>' . Format::htmlchars($pcrs_promise) . '</span>'; ?></p>
+<?php } ?>
+      </div>
+<?php if ($pcrs_can_reply && $pcrs_k != 'us') { ?>
+      <a class="btn btn-primary" href="#reply"><?php echo pcrs_icon('reply'); echo __('Post a Reply'); ?></a>
+<?php } ?>
+    </section>
+
+    <h2 class="sr-only"><?php echo pcrs__('Conversation'); ?></h2>
+<?php
     $email = $thisclient->getUserName();
     $clientId = TicketUser::lookupByEmail($email)->getId();
 
@@ -106,86 +130,86 @@ if ($thisclient && $thisclient->isGuest()
                     'mode' => Thread::MODE_CLIENT,
                     'html-id' => 'ticketThread')
                 );
-if ($blockReply = $ticket->isChild() && $ticket->getMergeType() != 'visual')
-    $warn = sprintf(__('This Ticket is Merged into another Ticket. Please go to the %s%d%s to reply.'),
-        '<a href="tickets.php?id=', $ticket->getPid(), '" style="text-decoration:underline">Parent</a>');
-  ?>
+?>
 
-<div class="clear"></div>
-<?php if($errors['err']) { ?>
-    <div id="msg_error" role="alert"><?php echo $errors['err']; ?></div>
-<?php }elseif($msg) { ?>
-    <div id="msg_notice" role="status"><?php echo $msg; ?></div>
-<?php }elseif($warn) { ?>
-    <div id="msg_warning" role="status"><?php echo $warn; ?></div>
+<?php if ($warn) { ?>
+    <div id="msg_warning" class="alert alert-warning" role="alert"><?php echo pcrs_icon('alert', 20); ?><div><?php echo $warn; ?></div></div>
 <?php }
-if ((!$ticket->isClosed() || $ticket->isReopenable()) && !$blockReply) { ?>
-<form id="reply" class="reply" action="tickets.php?id=<?php echo $ticket->getId();
-?>#reply" name="reply" method="post" enctype="multipart/form-data">
-    <?php csrf_token(); ?>
-    <h2><?php echo __('Post a Reply');?></h2>
-    <input type="hidden" name="id" value="<?php echo $ticket->getId(); ?>">
-    <input type="hidden" name="a" value="reply">
-    <div>
-        <p class="hint"><label for="message"><?php
-         echo __('To best assist you, we request that you be specific and detailed'); ?></label>
-        <span class="error" id="message-error">*&nbsp;<?php echo $errors['message']; ?></span>
-        </p>
-        <textarea name="<?php echo $messageField->getFormName(); ?>" id="message" cols="50" rows="9" wrap="soft"
-            aria-describedby="message-error"
-            class="<?php if ($cfg->isRichTextEnabled()) echo 'richtext';
-                ?> draft" <?php
-list($draft, $attrs) = Draft::getDraftAndDataAttrs('ticket.client', $ticket->getId(), $info['message']);
-echo $attrs; ?>><?php echo $draft ?: $info['message'];
-            ?></textarea>
-    <?php
-    if ($messageField->isAttachmentsEnabled()) {
-        print $attachments->render(array('client'=>true));
-    } ?>
-    </div>
-<?php
-  if ($ticket->isClosed() && $ticket->isReopenable()) { ?>
-    <div class="warning-banner">
-        <?php echo __('Ticket will be reopened on message post'); ?>
-    </div>
+if ($pcrs_can_reply) { ?>
+    <form id="reply" class="card reply-card" action="tickets.php?id=<?php echo $ticket->getId();
+        ?>#reply" name="reply" method="post" enctype="multipart/form-data">
+        <?php csrf_token(); ?>
+        <h2><?php echo __('Post a Reply');?></h2>
+        <input type="hidden" name="id" value="<?php echo $ticket->getId(); ?>">
+        <input type="hidden" name="a" value="reply">
+        <div>
+            <label for="message"><?php echo __('Message'); ?> <span class="error" aria-hidden="true">*</span></label>
+            <p class="hint" id="reply-hint"><?php
+             echo __('To best assist you, we request that you be specific and detailed'); ?></p>
+            <textarea name="<?php echo $messageField->getFormName(); ?>" id="message" cols="50" rows="9" wrap="soft"
+                aria-describedby="reply-hint<?php if ($errors['message']) echo ' reply-error'; ?>"<?php
+                if ($errors['message']) echo ' aria-invalid="true"'; ?>
+                class="<?php if ($cfg->isRichTextEnabled()) echo 'richtext';
+                    ?> draft" <?php
+    list($draft, $attrs) = Draft::getDraftAndDataAttrs('ticket.client', $ticket->getId(), $info['message']);
+    echo $attrs; ?>><?php echo $draft ?: $info['message'];
+                ?></textarea>
+<?php if ($errors['message']) { ?>
+            <div class="error" id="reply-error"><?php echo $errors['message']; ?></div>
 <?php } ?>
-    <p class="buttons">
-        <input type="submit" value="<?php echo __('Post Reply');?>">
-        <input type="reset" value="<?php echo __('Reset');?>">
-        <input type="button" value="<?php echo __('Cancel');?>" onClick="history.go(-1)">
-    </p>
-</form>
+        <?php
+        if ($messageField->isAttachmentsEnabled()) {
+            print $attachments->render(array('client'=>true));
+        } ?>
+        </div>
+<?php
+      if ($ticket->isClosed() && $ticket->isReopenable()) { ?>
+        <div class="warning-banner">
+            <?php echo pcrs_icon('reopen', 20); ?><span><?php echo __('Ticket will be reopened on message post'); ?></span>
+        </div>
+<?php } ?>
+        <p class="actions">
+            <input type="submit" value="<?php echo __('Post Reply');?>">
+            <input type="reset" value="<?php echo __('Reset');?>">
+            <input type="button" value="<?php echo __('Cancel');?>" onClick="history.go(-1)">
+        </p>
+    </form>
 <?php
 } ?>
-</section>
+  </div>
 
-<aside class="side" aria-label="<?php echo Format::htmlchars(__('Basic Ticket Information')); ?>">
-    <h2><?php echo __('Basic Ticket Information'); ?></h2>
-    <dl class="props infoTable">
-        <div><dt><?php echo __('Ticket Status');?></dt>
-            <dd><span class="status status-<?php echo $sommet_state; ?>"><?php
-                echo sommet_icon($sommet_state == 'closed' ? 'lock' : 'inbox', 14);
-                echo $S ? $S->getLocalName() : ''; ?></span></dd></div>
-        <div><dt><?php echo __('Department');?></dt>
-            <dd><?php echo Format::htmlchars($dept instanceof Dept ? $dept->getName() : ''); ?></dd></div>
-        <div><dt><?php echo __('Create Date');?></dt>
-            <dd><?php echo Format::datetime($ticket->getCreateDate()); ?></dd></div>
-    </dl>
-    <h2><?php echo __('User Information'); ?></h2>
-    <dl class="props infoTable">
-        <div><dt><?php echo __('Name');?></dt>
-            <dd><?php echo mb_convert_case(Format::htmlchars($ticket->getName()), MB_CASE_TITLE); ?></dd></div>
-        <div><dt><?php echo __('Email');?></dt>
-            <dd><?php echo Format::htmlchars($ticket->getEmail()); ?></dd></div>
-<?php if ($ticket->getPhoneNumber()) { ?>
-        <div><dt><?php echo __('Phone');?></dt>
-            <dd><?php echo $ticket->getPhoneNumber(); ?></dd></div>
+  <aside class="side" aria-label="<?php echo Format::htmlchars(__('Basic Ticket Information')); ?>">
+<?php if ($pcrs_gauge) {
+    $h = $pcrs_gauge['hours'];
+    $pos = round($pcrs_gauge['ratio'] * 100, 1); ?>
+    <section class="card gauge-card" aria-labelledby="gauge-title">
+      <h2 id="gauge-title"><?php echo pcrs_icon('clock'); echo pcrs__('First reply'); ?></h2>
+      <p class="a-sub"><?php echo sprintf(pcrs__('Priority support: first reply within %s h, 24/7.'), $h == (int) $h ? (int) $h : $h); ?></p>
+      <div class="gauge" role="img" aria-label="<?php echo Format::htmlchars(sprintf(pcrs__('%1$s elapsed out of %2$s h'),
+            pcrs_duration($pcrs_gauge['elapsed']), $h == (int) $h ? (int) $h : $h)); ?>">
+        <span class="gf" style="width:<?php echo $pos; ?>%"></span>
+        <span class="gm" style="left:<?php echo $pos; ?>%"><b><?php echo pcrs_duration($pcrs_gauge['elapsed']); ?></b></span>
+        <ol class="ticks" aria-hidden="true">
+<?php   $n = max(1, (int) ceil($h));
+        for ($i = 0; $i <= $n; $i++) { ?>
+          <li style="left:<?php echo round($i / $n * 100, 2); ?>%"><?php echo $i; ?> h</li>
+<?php   } ?>
+        </ol>
+      </div>
+      <p class="a-text<?php if ($pcrs_gauge['late']) echo ' late'; ?>"><?php
+        echo $pcrs_gauge['late']
+            ? sprintf(pcrs__('The first reply was due %s.'), Format::datetime($pcrs_gauge['due']))
+            : sprintf(pcrs__('Due %s at the latest.'), Format::datetime($pcrs_gauge['due'])); ?></p>
+    </section>
 <?php } ?>
-<?php if ($sommet_contract) { ?>
-        <div class="contract"><dt><?php echo __s('Support contract (current)'); ?></dt>
-            <dd><?php echo sommet_contract_badge($sommet_contract, false); ?></dd></div>
-<?php } ?>
-    </dl>
+    <section class="card" aria-labelledby="info-title">
+      <h2 id="info-title"><?php echo __('Basic Ticket Information'); ?></h2>
+      <dl class="props">
+        <div><dt><?php echo __('Ticket Status');?></dt><dd><?php echo ($S = $ticket->getStatus()) ? $S->getLocalName() : ''; ?></dd></div>
+        <div><dt><?php echo __('Department');?></dt><dd><?php echo Format::htmlchars($dept instanceof Dept ? $dept->getName() : ''); ?></dd></div>
+        <div><dt><?php echo __('Create Date');?></dt><dd><?php echo Format::datetime($ticket->getCreateDate()); ?></dd></div>
+      </dl>
+    </section>
 <!-- Custom Data -->
 <?php
 $sections = $forms = array();
@@ -206,26 +230,37 @@ foreach (DynamicFormEntry::forTicket($ticket->getId()) as $i=>$form) {
 }
 foreach ($sections as $i=>$answers) {
     ?>
-    <h2><?php echo $forms[$i]; ?></h2>
-    <dl class="props custom-data">
+    <section class="card custom-data">
+      <h2><?php echo $forms[$i]; ?></h2>
+      <dl class="props">
 <?php foreach ($answers as $A) {
     list($v, $a) = $A; ?>
         <div><dt><?php
 echo $a->getField()->get('label');
-            ?></dt>
-            <dd><?php
+            ?></dt><dd><?php
 echo $v;
             ?></dd></div>
 <?php } ?>
-    </dl>
-    <?php
+      </dl>
+    </section>
+<?php
 } ?>
-    <div class="call">
-        <h2><?php echo __s('A quick word?'); ?></h2>
-        <p><?php echo sprintf(__s('Call us and quote ticket #%s.'), $ticket->getNumber()); ?></p>
-        <a class="btn btn-line" href="tel:+33669939286"><?php echo sommet_icon('phone'); ?><span>+33 (0)6 69 93 92 86</span></a>
-    </div>
-</aside>
+    <section class="card" aria-labelledby="user-title">
+      <h2 id="user-title"><?php echo __('User Information'); ?></h2>
+      <dl class="props">
+        <div><dt><?php echo __('Name');?></dt><dd><?php echo mb_convert_case(Format::htmlchars($ticket->getName()), MB_CASE_TITLE); ?></dd></div>
+        <div><dt><?php echo __('Email');?></dt><dd><?php echo Format::htmlchars($ticket->getEmail()); ?></dd></div>
+<?php if ($ticket->getPhoneNumber()) { ?>
+        <div><dt><?php echo __('Phone');?></dt><dd><?php echo $ticket->getPhoneNumber(); ?></dd></div>
+<?php } ?>
+      </dl>
+    </section>
+    <section class="card soft" aria-labelledby="call-title">
+      <h2 id="call-title"><?php echo pcrs__('A quick word?'); ?></h2>
+      <p><?php echo sprintf(pcrs__('Call us and quote #%s.'), $ticket->getNumber()); ?></p>
+      <a class="btn btn-line" href="tel:+33669939286"><?php echo pcrs_icon('phone', 16); ?>+33 (0)6 69 93 92 86</a>
+    </section>
+  </aside>
 </div>
 <script type="text/javascript">
 <?php

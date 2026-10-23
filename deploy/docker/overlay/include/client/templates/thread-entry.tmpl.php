@@ -1,11 +1,13 @@
 <?php
-/* Sommet theme (deploy/themes/sommet): replaces
+/* Theme "Parcours" (Coderise) - overrides
  * include/client/templates/thread-entry.tmpl.php.
- * Same data and escaping as the original; laid out as a journal entry
- * (author, role, date on the left, message on the right). No avatar image:
- * osTicket takes client avatars from Gravatar by default, and the portal
- * must not load any remote resource. */
+ * Same data, escaping, attachments (download links) and inline-image data
+ * as the core template. Changes: initials instead of avatar images (the
+ * core may load them from Gravatar, an external request), role label
+ * ("You", "Support team"), entry as a card on the progress line. */
 global $cfg, $thisclient;
+if (!function_exists('pcrs__'))
+    require_once INCLUDE_DIR . 'client/parcours/parcours.inc.php';
 $entryTypes = ThreadEntry::getTypes();
 $user = $entry->getUser() ?: $entry->getStaff();
 if ($entry->staff && $cfg->hideStaffName())
@@ -13,39 +15,33 @@ if ($entry->staff && $cfg->hideStaffName())
 else
     $name = $user ? $user->getName() : $entry->poster;
 $type = $entryTypes[$entry->type];
-if ($entry->type == 'R')
-    $role = __s('Coderise team');
-elseif ($thisclient && $entry->user_id
-        && $entry->user_id == $thisclient->getId())
-    $role = __s('You');
+$is_staff = ($entry->type == 'R');
+if ($is_staff)
+    $role = pcrs__('Support team');
+elseif ($thisclient && $entry->user_id && $entry->user_id == $thisclient->getId())
+    $role = pcrs__('You');
 else
     $role = '';
 ?>
 <div class="thread-entry <?php echo $type; ?>">
-    <div class="header meta">
-        <strong class="author"><?php echo Format::htmlchars($name); ?></strong>
+    <span class="dot avatar<?php if ($is_staff) echo ' av-team'; ?>" aria-hidden="true"><?php echo pcrs_initials((string) $name); ?></span>
+    <div class="card">
+    <div class="header">
+        <strong><?php echo Format::htmlchars($name); ?></strong>
 <?php if ($role) { ?>
         <span class="role"><?php echo $role; ?></span>
+<?php } ?>
+<?php if ($entry->flags & ThreadEntry::FLAG_EDITED) { ?>
+        <span class="label label-bare" title="<?php
+        echo sprintf(__('Edited on %s by %s'), Format::datetime($entry->updated), 'You');
+                ?>"><?php echo __('Edited'); ?></span>
 <?php } ?>
         <?php echo sprintf('<time datetime="%s" title="%s">%s</time>',
                     date(DateTime::W3C, Misc::db2gmtime($entry->created)),
                     Format::daydatetime($entry->created),
-                    Format::datetime($entry->created)
-                ); ?>
-        <?php if ($entry->flags & ThreadEntry::FLAG_EDITED) { ?>
-        <span class="textra"><span class="label label-bare" title="<?php
-        echo sprintf(__('Edited on %s by %s'), Format::datetime($entry->updated), 'You');
-                ?>"><?php echo __('Edited'); ?></span></span>
-        <?php } ?>
-<?php
-// Title of the entry (often the e-mail subject): shown when it differs
-// from the ticket subject, which is already the title of the page.
-$sommet_title = trim((string) $entry->title);
-if ($sommet_title !== '' && isset($ticket) && is_object($ticket)
-        && strcasecmp($sommet_title, trim((string) $ticket->getSubject())) === 0)
-    $sommet_title = '';
-if ($sommet_title !== '') { ?>
-        <span class="title"><?php echo Format::htmlchars($entry->title); ?></span>
+                    Format::datetime($entry->created)); ?>
+<?php if ($entry->title) { ?>
+        <span class="e-title"><?php echo Format::htmlchars($entry->title); ?></span>
 <?php } ?>
     </div>
     <div class="thread-body" id="thread-id-<?php echo $entry->getId(); ?>">
@@ -59,11 +55,11 @@ if ($sommet_title !== '') { ?>
                 continue;
             $size = '';
             if ($A->file->size)
-                $size = sprintf('<small class="filesize faded">%s</small>', Format::file_size($A->file->size));
+                $size = sprintf('<small class="filesize">%s</small>', Format::file_size($A->file->size));
 ?>
         <span class="attachment-info">
-        <?php echo sommet_icon('clip', 15); ?>
-        <a  class="no-pjax truncate filename"
+        <?php echo pcrs_icon('clip', 16); ?>
+        <a  class="no-pjax filename"
             href="<?php echo $A->file->getDownloadUrl(['id' => $A->getId()]);
             ?>" download="<?php echo Format::htmlchars($A->getFilename()); ?>"
             target="_blank"><?php echo Format::htmlchars($A->getFilename());
@@ -72,6 +68,7 @@ if ($sommet_title !== '') { ?>
 <?php   }  ?>
     </div>
 <?php } ?>
+    </div>
     </div>
 <?php
     if ($urls = $entry->getAttachmentUrls()) { ?>
