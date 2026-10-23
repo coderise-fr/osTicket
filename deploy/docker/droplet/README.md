@@ -67,6 +67,7 @@ cd /opt/osticket/deploy/docker
 # Tag des images envoyées par la CI (résumé du run) ; sur le Droplet : docker images coderise/osticket
 sed -i 's|^OST_VERSION=.*|OST_VERSION=sha-abc1234|' .env
 
+docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml pull db   # MariaDB (Docker Hub) ; l'image osticket vient de la CI
 docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml up -d --no-build --pull never db web
 ```
 
