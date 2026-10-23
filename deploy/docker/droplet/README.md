@@ -15,7 +15,7 @@ Internet ─443→ Caddy (hôte) ─127.0.0.1:8080→ web ─réseau interne→ 
 - Pare-feu DigitalOcean : 22, 80, 443 (UFW est aussi configuré sur le Droplet).
 - Une clé SSH ed25519 installée sur le Droplet (voir « Clé SSH » ci-dessous).
 - Une première exécution réussie du workflow **docker-image** (onglet Actions de GitHub, après un push
-  sur `main`) : elle publie `registry.digitalocean.com/ownanalytics-registry/osticket:sha-<7 caractères>` et `…-install`.
+  sur `main`) : elle publie `registry.digitalocean.com/coderise-registry/osticket:sha-<7 caractères>` et `…-install`.
 - Un jeton DigitalOcean en lecture seule pour la registry, déposé dans
   `/opt/osticket/secrets/do_registry_token` (droits 600). Secret GitHub `DIGITALOCEAN_ACCESS_TOKEN`
   (écriture) pour la CI.
