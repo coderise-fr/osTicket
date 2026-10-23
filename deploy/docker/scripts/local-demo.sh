@@ -4,9 +4,12 @@
 # le plugin sla_first_response, Mailpit pour capter les e-mails et des données fictives.
 # Jamais pour la production : tout est publié sur 127.0.0.1, en HTTP.
 #
-#   local-demo.sh up [--theme <slug>] [--rebuild]   construit, démarre, installe et peuple
+#   local-demo.sh up [--theme <slug>] [--staff-theme <slug>] [--rebuild]
+#                                                   construit, démarre, installe et peuple
 #                                                   (la première fois), affiche les adresses
 #   local-demo.sh theme <slug>      change de thème en gardant les données (reconstruit l'image)
+#   local-demo.sh staff-theme <slug|none>   change le thème du panneau agent (dossier de
+#                                   deploy/themes-staff/, ou none), données conservées
 #   local-demo.sh status            état des conteneurs, adresses, thème, commit
 #   local-demo.sh logs [args]       journaux (arguments passés à `docker compose logs`)
 #   local-demo.sh down              arrête la pile (les volumes, donc les données, sont gardés)
@@ -14,6 +17,7 @@
 #
 # Thèmes : atelier, poste-de-travail, sommet (défaut), parcours, ownalytics-atelier,
 # ownalytics-ticket-de-caisse.
+# Thèmes du panneau agent : coderise-agent (sans thème agent par défaut : none).
 #
 # Dossier d'état (OST_DEMO_DIR) : par défaut <dépôt principal>/.local-demo (ignoré par Git),
 # même lancé depuis un worktree. Il contient state.env (ports, thème, commit), les fichiers
@@ -30,6 +34,7 @@ IMAGE=ostdemo/osticket
 TAG=demo
 THEMES="atelier poste-de-travail sommet parcours ownalytics-atelier ownalytics-ticket-de-caisse"
 DEFAULT_THEME=sommet
+DEFAULT_STAFF_THEME=none
 # Ports à ne jamais proposer (ddev, Mailpit de ddev, MySQL, port par défaut de la recette).
 RESERVED_PORTS="80 443 3306 8025 8026 8080"
 WEB_PORT_FIRST=8480
@@ -39,7 +44,7 @@ STAFF_DOMAIN=coderise-demo.test
 say() { printf 'local-demo: %s\n' "$*"; }
 die() { printf 'local-demo: %s\n' "$*" >&2; exit 1; }
 
-usage() { sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; }
 
 # Chemin lisible par docker.exe sous Windows (Git Bash), inchangé ailleurs.
 winpath() {
@@ -152,8 +157,17 @@ valid_theme() {
     die "thème inconnu : $1 (choix : $THEMES)"
 }
 
-build_images() { # thème, "install" pour construire aussi la cible d'installation
-    theme="$1"
+cur_staff() { s="$(state_get OST_DEMO_STAFF_THEME)"; echo "${s:-none}"; }
+
+valid_staff_theme() {
+    [ "$1" = none ] && return 0
+    case "$1" in ""|*/*|*..*|.*) die "thème agent invalide : $1" ;; esac
+    [ -f "$repo/deploy/themes-staff/$1/apply.sh" ] && return 0
+    die "thème agent inconnu : $1 (choix : none $(cd "$repo/deploy/themes-staff" && for d in */; do [ -f "$d/apply.sh" ] && printf "%s " "${d%/}"; done))"
+}
+
+build_images() { # thème client, thème agent (ou none), "install" pour construire aussi la cible d'installation
+    theme="$1"; staff="$2"
     need git; need tar
     if [ -n "$(git -C "$repo" status --porcelain -- . ':!CLAUDE.md' ':!.local-demo' 2>/dev/null)" ]; then
         say "attention : les modifications non committées ne sont PAS dans l'image (construite depuis HEAD)."
@@ -173,12 +187,25 @@ build_images() { # thème, "install" pour construire aussi la cible d'installati
     done
     [ -f "$ctx/deploy/themes/$theme/apply.sh" ] || die "deploy/themes/$theme/apply.sh absent du commit $rev"
     sh "$ctx/deploy/themes/$theme/apply.sh" >/dev/null || die "installation du thème $theme impossible"
+    # Thème agent (cohabite avec le thème client) : retrait de tout autre thème agent committé
+    # dans l'overlay (le dossier de include/staff/<slug>/ est le slug), puis le thème voulu.
+    for m in "$ov"/include/staff/*/installed.manifest; do
+        [ -f "$m" ] || continue
+        cur="$(basename "$(dirname "$m")")"
+        [ "$cur" = "$staff" ] && continue
+        [ -f "$ctx/deploy/themes-staff/$cur/remove.sh" ] || die "thème agent installé inconnu dans l'overlay : $cur"
+        sh "$ctx/deploy/themes-staff/$cur/remove.sh" >/dev/null || die "retrait du thème agent $cur impossible"
+    done
+    if [ "$staff" != none ]; then
+        [ -f "$ctx/deploy/themes-staff/$staff/apply.sh" ] || die "deploy/themes-staff/$staff/apply.sh absent du commit $rev"
+        sh "$ctx/deploy/themes-staff/$staff/apply.sh" >/dev/null || die "installation du thème agent $staff impossible"
+    fi
     # Plugin SLA : dans l'overlay de la copie seulement (jamais committé dans deploy/docker/overlay/).
     mkdir -p "$ov/include/plugins"
     cp -R "$ctx/contrib/sla-first-response/plugin/sla_first_response" "$ov/include/plugins/"
     wctx="$(winpath "$ctx")"
-    say "construction de l'image $IMAGE:$TAG (commit ${rev%"${rev#????????}"}, thème $theme)..."
-    for target in runtime ${2:-}; do
+    say "construction de l'image $IMAGE:$TAG (commit ${rev%"${rev#????????}"}, thème $theme, thème agent $staff)..."
+    for target in runtime ${3:-}; do
         suffix=""; [ "$target" = install ] && suffix="-install"
         docker build -q -f "$wctx/deploy/docker/Dockerfile" --target "$target" \
             --build-arg OST_VERSION="$TAG" --build-arg OST_REVISION="$rev" \
@@ -188,6 +215,7 @@ build_images() { # thème, "install" pour construire aussi la cible d'installati
     rm -rf "$ctx"; trap - EXIT INT TERM
     state_set OST_REVISION "$rev"
     state_set OST_DEMO_THEME "$theme"
+    state_set OST_DEMO_STAFF_THEME "$staff"
 }
 
 # --- Identifiants (générés, écrits uniquement dans credentials.txt) ---------------
@@ -386,6 +414,7 @@ show_urls() {
     echo "  Administration       http://127.0.0.1:$web/scp/settings.php"
     echo "  Mailpit (e-mails)    http://127.0.0.1:$mail/"
     echo "  Thème                $(state_get OST_DEMO_THEME)   (commit $(state_get OST_REVISION | cut -c1-8))"
+    echo "  Thème agent          $(cur_staff)"
     echo "  Identifiants         $CREDS"
     echo
 }
@@ -399,11 +428,13 @@ drop_old_image() { # identifiant de l'ancienne image : supprimée si plus aucun 
 # --- Commandes -------------------------------------------------------------------
 
 cmd_up() {
-    theme=""; rebuild=0
+    theme=""; staff=""; rebuild=0
     while [ $# -gt 0 ]; do
         case "$1" in
             --theme) [ $# -ge 2 ] || die "--theme demande un nom"; theme="$2"; shift 2 ;;
             --theme=*) theme="${1#--theme=}"; shift ;;
+            --staff-theme) [ $# -ge 2 ] || die "--staff-theme demande un nom"; staff="$2"; shift 2 ;;
+            --staff-theme=*) staff="${1#--staff-theme=}"; shift ;;
             --rebuild) rebuild=1; shift ;;
             *) die "option inconnue pour up : $1" ;;
         esac
@@ -413,13 +444,17 @@ cmd_up() {
     [ -n "$theme" ] || theme="$(state_get OST_DEMO_THEME)"
     [ -n "$theme" ] || theme="$DEFAULT_THEME"
     valid_theme "$theme"
+    [ -n "$staff" ] || staff="$(state_get OST_DEMO_STAFF_THEME)"
+    [ -n "$staff" ] || staff="$DEFAULT_STAFF_THEME"
+    valid_staff_theme "$staff"
     [ -f "$CREDS" ] || write_credentials
     old="$(image_id)"
     installed="$(state_get OST_DEMO_INSTALLED)"
     if [ "$rebuild" = 1 ] || [ -z "$old" ] || [ "$theme" != "$(state_get OST_DEMO_THEME)" ] \
+            || [ "$staff" != "$(cur_staff)" ] \
             || [ "$(git -C "$repo" rev-parse HEAD)" != "$(state_get OST_REVISION)" ] \
             || { [ -z "$installed" ] && ! docker image inspect "$IMAGE:$TAG-install" >/dev/null 2>&1; }; then
-        if [ -z "$installed" ]; then build_images "$theme" install; else build_images "$theme"; fi
+        if [ -z "$installed" ]; then build_images "$theme" "$staff" install; else build_images "$theme" "$staff"; fi
     fi
     if [ -z "$installed" ]; then
         install_osticket
@@ -441,8 +476,22 @@ cmd_theme() {
     [ -n "$(state_get OST_DEMO_INSTALLED)" ] || die "pas encore installé : lancer d'abord $0 up"
     init_state
     old="$(image_id)"
-    build_images "$1"
+    build_images "$1" "$(cur_staff)"
     say "redémarrage de web et cron avec le thème $1 (données conservées)..."
+    dc up -d --wait --wait-timeout 300 web cron >/dev/null
+    drop_old_image "$old"
+    show_urls
+}
+
+cmd_staff_theme() {
+    [ $# -eq 1 ] || die "usage : $0 staff-theme <slug|none>   (voir deploy/themes-staff/)"
+    valid_staff_theme "$1"
+    require_state
+    [ -n "$(state_get OST_DEMO_INSTALLED)" ] || die "pas encore installé : lancer d'abord $0 up"
+    init_state
+    old="$(image_id)"
+    build_images "$(state_get OST_DEMO_THEME)" "$1"
+    say "redémarrage de web et cron avec le thème agent $1 (données conservées)..."
     dc up -d --wait --wait-timeout 300 web cron >/dev/null
     drop_old_image "$old"
     show_urls
@@ -492,6 +541,7 @@ cmd="$1"; shift
 case "$cmd" in
     up) cmd_up "$@" ;;
     theme) cmd_theme "$@" ;;
+    staff-theme) cmd_staff_theme "$@" ;;
     status) cmd_status "$@" ;;
     logs) cmd_logs "$@" ;;
     down) cmd_down "$@" ;;
