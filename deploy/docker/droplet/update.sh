@@ -1,6 +1,7 @@
 #!/bin/sh
-# Deploy an image tag built by GitHub Actions, with a backup first and an automatic
-# rollback to the previous tag if the stack does not become healthy.
+# Deploy an image tag already loaded on this server (by the CI through ci-receive.sh, or
+# by hand with `docker load`), with a backup first and an automatic rollback to the
+# previous tag if the stack does not become healthy.
 #
 #   droplet/update.sh sha-abc1234
 #
@@ -16,30 +17,32 @@ cd "$here"
 [ -f .env ] || { echo "update: .env missing (see droplet/README.md)" >&2; exit 1; }
 
 get() { sed -n "s/^$1=//p" .env | tail -n 1; }
+image="$(get OST_IMAGE)"
 prev="$(get OST_VERSION)"
 [ "$prev" != "$new" ] || echo "update: $new is already the configured tag, re-checking."
+
+docker image inspect "$image:$new" >/dev/null 2>&1 || {
+    echo "update: image $image:$new is not on this server (the CI loads it first)." >&2
+    exit 1
+}
 
 set_tag() { sed -i "s|^OST_VERSION=.*|OST_VERSION=$1|" .env; }
 
 echo "update: backup"
 ./droplet/backup-local.sh
 
-echo "update: pull $(get OST_IMAGE):$new"
+echo "update: restart on $new"
 set_tag "$new"
-if ! docker compose pull web cron; then
-    set_tag "$prev"
-    echo "update: pull failed (wrong tag, or 'docker login registry.digitalocean.com' missing). Nothing changed." >&2
-    exit 1
-fi
-
-echo "update: restart"
-if docker compose up -d --no-build --wait --remove-orphans; then
+if docker compose up -d --no-build --pull never --wait --remove-orphans; then
     docker compose ps
-    echo "update: $prev -> $new OK. Keep the previous image until you have checked the site."
+    echo "update: $prev -> $new OK."
+    # keep the 4 newest images (current, previous, and two spares for a rollback)
+    docker images "$image" --format '{{.Repository}}:{{.Tag}}' | grep -v -- '-install$' \
+        | tail -n +5 | xargs -r docker rmi 2>/dev/null || true
 else
     echo "update: NOT healthy, rolling back to $prev" >&2
     set_tag "$prev"
-    docker compose up -d --no-build --wait --remove-orphans || true
+    docker compose up -d --no-build --pull never --wait --remove-orphans || true
     docker compose ps
     exit 1
 fi

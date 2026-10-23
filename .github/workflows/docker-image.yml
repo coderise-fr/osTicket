@@ -1,15 +1,29 @@
 name: docker-image
 
-# Builds the hardened osTicket images (deploy/docker/Dockerfile) and pushes them to the
-# DigitalOcean Container Registry. Tags are immutable commit tags (sha-<7 chars>); deploy one
-# with deploy/docker/droplet/update.sh <tag>.
-#   registry.digitalocean.com/coderise-registry/osticket:sha-abc1234            runtime image (production)
-#   registry.digitalocean.com/coderise-registry/osticket:sha-abc1234-install    + setup wizard (first install only)
+# Builds the hardened osTicket image (deploy/docker/Dockerfile) and sends it to the
+# Droplet over SSH (no registry). The CI key can only run deploy/docker/droplet/ci-receive.sh
+# there: `load` (docker load from stdin) and `deploy <tag>` (update.sh).
+#
+#   push to main        build + send the image  coderise/osticket:sha-<7>   (not deployed)
+#   manual run          deploy=true   also run update.sh on the Droplet
+#                       install=true  also send the setup-wizard image  ...:sha-<7>-install
+#   repository variable AUTO_DEPLOY=true  deploy on every push to main
+#
+# Secrets: DROPLET_HOST, DROPLET_SSH_KEY (private key of the CI key), DROPLET_KNOWN_HOSTS.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy the image after sending it"
+        type: boolean
+        default: false
+      install:
+        description: "Also send the setup-wizard image (first install only)"
+        type: boolean
+        default: false
 
 concurrency:
   group: docker-image
@@ -22,22 +36,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      IMAGE: coderise/osticket
     steps:
       - uses: actions/checkout@v4
 
-      - name: Image name and tag
+      - name: Tag
         id: meta
-        run: |
-          echo "image=registry.digitalocean.com/coderise-registry/osticket" >> "$GITHUB_OUTPUT"
-          echo "tag=sha-$(echo "${{ github.sha }}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+        run: echo "tag=sha-$(echo "${{ github.sha }}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/login-action@v3
-        with:
-          registry: registry.digitalocean.com
-          username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # The Dockerfile fails the build if install-mysql.sql does not match core.sig
       # (corrupted line endings), so a bad checkout can never produce an image.
@@ -49,12 +57,13 @@ jobs:
           target: runtime
           build-args: |
             OST_REVISION=${{ github.sha }}
-          tags: ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+          tags: ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
           cache-from: type=gha,scope=runtime
           cache-to: type=gha,scope=runtime,mode=max
-          push: true
+          load: true
 
       - name: Install image (setup wizard)
+        if: ${{ inputs.install }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -62,10 +71,42 @@ jobs:
           target: install
           build-args: |
             OST_REVISION=${{ github.sha }}
-          tags: ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}-install
+          tags: ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}-install
           cache-from: type=gha,scope=runtime
-          push: true
+          load: true
+
+      - name: SSH setup
+        env:
+          SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DROPLET_KNOWN_HOSTS }}
+          HOST: ${{ secrets.DROPLET_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/ci_key
+          chmod 600 ~/.ssh/ci_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          {
+            echo "Host droplet"
+            echo "  HostName $HOST"
+            echo "  User deploy"
+            echo "  IdentityFile ~/.ssh/ci_key"
+            echo "  IdentitiesOnly yes"
+            echo "  BatchMode yes"
+            echo "  StrictHostKeyChecking yes"
+          } > ~/.ssh/config
+
+      - name: Send the image
+        run: docker save "$IMAGE:${{ steps.meta.outputs.tag }}" | gzip -6 | ssh droplet load
+
+      - name: Send the install image
+        if: ${{ inputs.install }}
+        run: docker save "$IMAGE:${{ steps.meta.outputs.tag }}-install" | gzip -6 | ssh droplet load
+
+      - name: Deploy
+        if: ${{ inputs.deploy || vars.AUTO_DEPLOY == 'true' }}
+        run: ssh droplet deploy "${{ steps.meta.outputs.tag }}"
 
       - name: Summary
         run: |
-          echo "Deploy with: ./droplet/update.sh ${{ steps.meta.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image sent: \`$IMAGE:${{ steps.meta.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploy by hand: \`ssh deploy@host /opt/osticket/deploy/docker/droplet/update.sh ${{ steps.meta.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"

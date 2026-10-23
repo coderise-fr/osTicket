@@ -1,7 +1,7 @@
 # Déploiement sur un Droplet DigitalOcean (Compose + Caddy)
 
 Cible : 1 vCPU, 1 Go de RAM, Ubuntu 24.04. Pile `web` + `cron` + MariaDB (Compose), Caddy sur
-l'hôte pour le TLS, image publiée dans la registry DigitalOcean par GitHub Actions. Le détail du durcissement, des
+l'hôte pour le TLS, image construite par GitHub Actions et envoyée par SSH (pas de registry). Le détail du durcissement, des
 sauvegardes et des mises à jour est dans [../README.md](../README.md).
 
 ```
@@ -14,11 +14,11 @@ Internet ─443→ Caddy (hôte) ─127.0.0.1:8080→ web ─réseau interne→ 
 - Enregistrement DNS `support.coderise.fr` (A) vers l'IP du Droplet (Caddy en a besoin pour le certificat).
 - Pare-feu DigitalOcean : 22, 80, 443 (UFW est aussi configuré sur le Droplet).
 - Une clé SSH ed25519 installée sur le Droplet (voir « Clé SSH » ci-dessous).
-- Une première exécution réussie du workflow **docker-image** (onglet Actions de GitHub, après un push
-  sur `main`) : elle publie `registry.digitalocean.com/coderise-registry/osticket:sha-<7 caractères>` et `…-install`.
-- Un jeton DigitalOcean en lecture seule pour la registry, déposé dans
-  `/opt/osticket/secrets/do_registry_token` (droits 600). Secret GitHub `DIGITALOCEAN_ACCESS_TOKEN`
-  (écriture) pour la CI.
+- Les secrets GitHub `DROPLET_HOST`, `DROPLET_SSH_KEY` et `DROPLET_KNOWN_HOSTS` (voir « Déploiement
+  depuis GitHub Actions »).
+- Une première exécution du workflow **docker-image** (onglet Actions, lancée à la main avec
+  `install` coché pour la première installation) : elle envoie `coderise/osticket:sha-<7 caractères>`
+  et `…-install` au Droplet.
 
 ### Clé SSH
 
@@ -63,14 +63,11 @@ Ouvrez **une deuxième session** `ssh deploy@<ip>`. Si elle fonctionne, relancez
 
 ```sh
 cd /opt/osticket/deploy/docker
-t=$(cat /opt/osticket/secrets/do_registry_token)
-printf "%s" "$t" | docker login registry.digitalocean.com -u "$t" --password-stdin
 
-# Tag du build GitHub Actions (onglet Actions > résumé du run, ou `doctl registry repository list-tags osticket`)
+# Tag des images envoyées par la CI (résumé du run) ; sur le Droplet : docker images coderise/osticket
 sed -i 's|^OST_VERSION=.*|OST_VERSION=sha-abc1234|' .env
 
-docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml pull web
-docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml up -d db web
+docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml up -d --no-build --pull never db web
 ```
 
 L'assistant n'écoute que sur le Droplet : depuis votre poste, ouvrez un tunnel puis
@@ -90,7 +87,7 @@ Base : hôte `db`, nom `osticket`, utilisateur `osticket`, mot de passe = conten
 ```sh
 docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml stop web
 docker compose -f compose.yaml -f compose.droplet.yaml -f compose.install.yaml rm -f web
-docker compose up -d --no-build --wait          # web + cron + db, config en lecture seule
+docker compose up -d --no-build --pull never --wait          # web + cron + db, config en lecture seule
 sudo systemctl enable --now caddy               # TLS : https://support.coderise.fr
 docker compose ps                               # trois conteneurs « healthy »
 ```
@@ -101,16 +98,30 @@ SLA, rubriques. Faites une **première sauvegarde** à la main :
 
 ## 4. Mettre à jour (à chaque nouvelle image)
 
-Un push sur `main` construit `sha-xxxxxxx` dans GitHub Actions, puis sur le Droplet :
+Un push sur `main` lance le workflow **docker-image**, qui construit `coderise/osticket:sha-xxxxxxx`
+et l'envoie au Droplet (sans le déployer). Pour déployer :
 
-```sh
-cd /opt/osticket/deploy/docker && git pull --ff-only
-./droplet/update.sh sha-xxxxxxx
-```
+- depuis GitHub : Actions > docker-image > *Run workflow* avec `deploy` coché (ou la variable de
+  dépôt `AUTO_DEPLOY=true` pour déployer à chaque push sur `main`) ;
+- ou à la main sur le Droplet : `./droplet/update.sh sha-xxxxxxx` (après `git pull --ff-only`).
 
-`update.sh` sauvegarde, tire l'image, redémarre et **revient automatiquement au tag précédent** si
-les conteneurs ne deviennent pas sains. Si le schéma de la base a changé, connectez-vous ensuite à
-`/scp/` (bandeau « System upgrade is pending » > `/scp/upgrade.php`).
+`update.sh` sauvegarde, redémarre sur l'image déjà chargée et **revient automatiquement au tag
+précédent** si les conteneurs ne deviennent pas sains. Il garde les 4 images les plus récentes. Si le
+schéma de la base a changé, connectez-vous ensuite à `/scp/` (bandeau « System upgrade is pending »
+> `/scp/upgrade.php`).
+
+### Déploiement depuis GitHub Actions
+
+La CI utilise une clé SSH dédiée, **limitée à une seule commande** : dans
+`/home/deploy/.ssh/authorized_keys`, la ligne
+`restrict,command="/opt/osticket/deploy/docker/droplet/ci-receive.sh" ssh-ed25519 AAAA… ci-deploy`
+n'autorise que `load` (charger une image) et `deploy sha-xxxxxxx` (lancer `update.sh`), sans shell,
+terminal ni redirection de port. Secrets GitHub : `DROPLET_HOST` (IP), `DROPLET_SSH_KEY` (clé privée
+de la CI) et `DROPLET_KNOWN_HOSTS` (empreinte du serveur, pour refuser tout autre serveur).
+
+Pour changer la clé : générer une paire (`ssh-keygen -t ed25519 -N "" -C ci-deploy`), remplacer la ligne
+`ci-deploy` dans `authorized_keys` et le secret `DROPLET_SSH_KEY`. Une clé qui fuit permet de charger
+une image arbitraire sur le Droplet : à révoquer aussitôt.
 
 ## 5. Sauvegardes
 
@@ -135,7 +146,7 @@ Pour agrandir le Droplet : augmenter ces valeurs (`OSTICKET_MAX_WORKERS` dans `.
 
 ## Dépannage
 
-- `docker compose pull` : `unauthorized` → refaire `docker login registry.digitalocean.com`.
+- `update.sh` : « image … is not on this server » → la CI n’a pas envoyé cette image (voir l’onglet Actions).
 - Caddy n’obtient pas le certificat → DNS non propagé, ou 80/443 fermés (UFW **et** pare-feu DO).
 - `web` redémarre → `docker compose logs web` (le point d'entrée refuse de démarrer si la config est
   inscriptible ou absente).

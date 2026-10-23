@@ -516,7 +516,7 @@ page de statut, et le délai de réaction contractuel que les seuils ci-dessus d
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `OST_PROJECT` | `osticket` | Nom du projet Compose (préfixe des conteneurs et volumes) |
-| `OST_IMAGE`, `OST_VERSION` | `coderise/osticket`, `1.18.4` | Dépôt et tag de l'image (Droplet : `registry.digitalocean.com/…`, `sha-xxxxxxx`) |
+| `OST_IMAGE`, `OST_VERSION` | `coderise/osticket`, `1.18.4` | Dépôt et tag de l'image (Droplet : `coderise/osticket`, `sha-xxxxxxx`) |
 | `OSTICKET_MAX_WORKERS` | `40` | Processus Apache (8 sur le Droplet 1 Go) |
 | `OST_BIND`, `OST_PORT` | `127.0.0.1`, `8080` | Adresse et port publiés |
 | `OSTICKET_COOKIE_SECURE` | `1` | `0` uniquement pour un test en HTTP local |
@@ -636,5 +636,5 @@ environ 1 Go (supprimées par `reset`).
 
 ## Droplet DigitalOcean
 
-Déploiement sur un Droplet (Caddy sur l'hôte, image de la registry DigitalOcean construite par GitHub Actions,
+Déploiement sur un Droplet (Caddy sur l'hôte, image construite par GitHub Actions et envoyée par SSH,
 sauvegardes locales, UFW, réglages 1 Go de RAM) : voir [droplet/README.md](droplet/README.md).

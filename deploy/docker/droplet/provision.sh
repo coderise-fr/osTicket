@@ -111,4 +111,4 @@ CONF
 fi
 
 echo
-echo "Provisioning done. Next: $STACK/droplet/README.md (log in as deploy, docker login registry.digitalocean.com, first install)."
+echo "Provisioning done. Next: $STACK/droplet/README.md (log in as deploy, first install)."
