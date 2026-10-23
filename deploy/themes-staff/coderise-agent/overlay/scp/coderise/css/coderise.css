@@ -215,3 +215,83 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
   #content.cdr { margin: 16px 12px 24px; padding: 16px; }
   #footer { margin-inline-start: 0; padding-inline: 20px; }
 }
+
+/* ───────── Login and password reset (login.tpl.php, pwreset*.php) ─────────
+   All rules are scoped by body.cdr-login (set by login.header.php, which the
+   three password-reset templates also include, so they get the card look with
+   no markup change). Ported from the "Connexion" block of
+   docs/theme-mockups-admin/theme.css. Appended after the shell rules; this
+   section must stay last. The legacy #brickwall, #blur, #background and the
+   #poweredBy logo stay in the DOM and are only hidden visually. */
+html:has(body.cdr-login) { background: var(--nuit); }
+body.cdr-login { background: var(--nuit); color: var(--blanc); font-size: .9375rem; height: auto; min-height: 100vh; text-align: start; line-height: 1.5; }
+.cdr-login #brickwall, .cdr-login #blur, .cdr-login #background { display: none; }
+.cdr-login #poweredBy { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; box-shadow: none; text-shadow: none; background: none; }
+.cdr-login #poweredBy:focus-within { position: fixed; inset: auto 12px 12px auto; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; padding: 8px 12px; border-radius: 6px; background: var(--nuit); color: var(--blanc); font-size: .75rem; z-index: 10; }
+html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
+.cdr-login #poweredBy .osticket-logo { filter: none; }
+
+/* The card: alone and centred on the password-reset pages, right column on the login page */
+.cdr-login #loginBox { position: relative; width: min(440px, calc(100% - 32px)); margin: 8vh auto 24px; padding: 36px 32px 28px; border-radius: 10px; background: var(--blanc); color: var(--nuit); box-shadow: none; text-align: start; isolation: isolate; }
+.cdr-login #loginBox:after { display: none; }
+.cdr-login #logo a { height: 72px; }
+.cdr-login #loginBox > h3 { margin: 0 0 18px; color: var(--nuit); font: 600 .9375rem/1.45 var(--f-texte); text-align: start; }
+.cdr-login #loginBox form { width: auto; margin: 0; }
+.cdr-login #loginBox fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.cdr-login #loginBox label { display: block; margin: 0 0 4px; font-weight: 600; color: var(--nuit); }
+.cdr-login #loginBox input:not([type=hidden]):not([type=submit]):not([type=checkbox]):not([type=radio]) { display: block; width: 100%; min-height: 42px; margin: 0 0 16px; padding: 6px 10px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: inherit; box-shadow: none; box-sizing: border-box; }
+.cdr-login #loginBox input::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
+.cdr-login #loginBox input:focus { border-color: var(--cyan-profond); box-shadow: none; outline: none; }
+.cdr-login #loginBox input:focus-visible, .cdr-login #loginBox button:focus-visible, .cdr-login #loginBox a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cdr-login #loginBox button[type=submit], .cdr-login #loginBox input[type=submit] { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: auto; min-height: 42px; margin: 4px 0 0; padding: 0 14px; float: none; border: 1.5px solid transparent; border-radius: 6px; background: var(--cyan); color: var(--nuit); font: 600 .9375rem/1.2 var(--f-titre); box-shadow: none; cursor: pointer; }
+.cdr-login #loginBox button[type=submit]:hover, .cdr-login #loginBox input[type=submit]:hover, .cdr-login #loginBox input[type=submit]:active { background: var(--nuit); color: var(--blanc); box-shadow: none; }
+.cdr-login #loginBox button[type=submit][disabled] { opacity: .6; cursor: progress; }
+.cdr-login #loginBox a { color: var(--cyan-profond); text-decoration: underline; }
+.cdr-login #loginBox .alt { margin: 16px 0 0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .9375rem; }
+.cdr-login #loginBox hr { margin: 20px 0; border: 0; border-top: 1px solid var(--gris); }
+.cdr-login #loginBox .external-auth { display: block; margin: 0 0 8px; }
+.cdr-login #loginBox .external-auth + br { display: none; }
+.cdr-login #company { position: static; width: auto; margin: 28px 0 0; bottom: auto; font-size: .75rem; color: var(--ardoise); text-align: start; }
+.cdr-login #company .content { display: inline; padding: 0; border-radius: 0; background: none; box-shadow: none; text-shadow: none; color: inherit; }
+
+/* The error banner IS #login-message (role="alert"): attemptLoginAjax() rewrites it with .text().
+   Empty: collapsed but kept in the accessibility tree so the live region still announces. */
+.cdr-login { --cdr-ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18z'/%3E%3Cpath d='M12 10v4.5M12 17.2h.01'/%3E%3C/svg%3E"); }
+.cdr-login #login-message { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 18px; padding: 12px 14px; border-radius: 6px; border-inline-start: 4px solid var(--erreur); background: var(--erreur-fond); color: var(--nuit); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-align: start; }
+.cdr-login #login-message::before { content: ""; flex: none; width: 20px; height: 20px; margin-top: 1px; background: var(--erreur); -webkit-mask: var(--cdr-ic-alert) center / contain no-repeat; mask: var(--cdr-ic-alert) center / contain no-repeat; }
+.cdr-login #login-message:empty { height: 0; margin: 0; padding: 0; border: 0; overflow: hidden; }
+.cdr-login #login-message:empty::before { display: none; }
+/* Optional login notice configured by the admin (core div.banner) */
+.cdr-login div.banner { margin: 0; color: var(--ardoise); line-height: 1.45; }
+.cdr-login div.banner small { font-size: .875rem; }
+.cdr-login div.banner small:empty { display: none; }
+.cdr-login div.banner small:not(:empty) { display: block; margin-bottom: 18px; }
+
+/* "Verifying" overlay shown by attemptLoginAjax() (inline display:none until .show()) */
+.cdr-login #loading { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; border-radius: inherit; background: rgba(255,255,255,.9); }
+.cdr-login #loading h1 { margin: 0; color: var(--nuit); font: 600 1rem var(--f-titre); }
+.cdr-login #loading .icon-spin { color: var(--cyan-profond); margin-inline-end: 6px; }
+
+/* Split layout of the login page */
+.cdr-login .login-wrap { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px); }
+.cdr-login .login-wrap > #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+.cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
+.cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
+.cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }
+.cdr-login .login-art .hook { margin: 0; max-width: 13em; color: var(--blanc); font: 800 2.25rem/1.12 var(--f-titre); }
+.cdr-login .login-art .signature { margin: 0; color: var(--blanc); font-weight: 600; font-size: .875rem; }
+.cdr-login .login-art .signature .up { color: var(--cyan); }
+.cdr-login .login-art .sommet { position: absolute; inset-inline-end: -4%; bottom: -8%; width: 54%; aspect-ratio: 1 / .9; background: var(--cyan); opacity: .16; clip-path: polygon(50% 0, 100% 100%, 78% 100%, 50% 40%, 22% 100%, 0 100%); }
+.cdr-login .login-card .card-title { margin: 0 0 4px; color: var(--nuit); font: 700 1.375rem/1.25 var(--f-titre); }
+.cdr-login .login-card .lead { margin: 0 0 20px; color: var(--ardoise); }
+@media (max-width: 860px) {
+  .cdr-login .login-wrap { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .cdr-login .login-art { gap: 20px; padding: 24px 24px 28px; }
+  .cdr-login .login-art .hook { font-size: 1.5rem; }
+  .cdr-login .login-art .hook ~ p, .cdr-login .login-art .signature { display: none; }
+  .cdr-login .login-art .sommet { width: 70%; opacity: .12; }
+  .cdr-login .login-wrap > #loginBox { padding: 28px 24px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cdr-login .icon-spin { animation: none; }
+}

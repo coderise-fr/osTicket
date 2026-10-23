@@ -103,4 +103,22 @@ return array(
     'Over by %s' => 'Dépassé de %s',
     'Met in %s' => 'Tenu en %s',
     'Returned %s late' => 'Rendu avec %s de retard',
+
+    // Login page (login.tpl.php)
+    'Presentation' => 'Présentation',
+    'Every Priority ticket has its own countdown.' => 'Chaque ticket Priority a son compte à rebours.',
+    'Panel reserved for the Coderise team. Customers open and follow their requests on the support portal.' => "Panneau réservé à l'équipe Coderise. Les clients ouvrent et suivent leurs demandes sur le portail de support.",
+    'The code that makes your projects %s' => 'Le code qui fait %s vos projets',
+    'take off' => 'décoller',
+    'Staff Control Panel' => 'Panneau de contrôle des agents',
+    'Team sign-in' => "Connexion à l'équipe",
+    'Use your Coderise username.' => 'Utilisez votre identifiant Coderise.',
+    'Verifying' => 'Vérification',
+    'Verify' => 'Vérifier',
+    'Email or Username' => 'Identifiant ou adresse e-mail',
+    'Password' => 'Mot de passe',
+    'Log In' => 'Se connecter',
+    'Forgot My Password' => 'Mot de passe oublié',
+    'Copyright' => 'Copyright',
+    'Powered by' => 'Propulsé par',
 );

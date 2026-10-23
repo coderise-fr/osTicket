@@ -4,6 +4,8 @@ include/staff/coderise/coderise.inc.php
 include/staff/coderise/i18n/fr.php
 include/staff/footer.inc.php
 include/staff/header.inc.php
+include/staff/login.header.php
+include/staff/login.tpl.php
 scp/coderise/css/coderise.css
 scp/coderise/fonts/OFL-inter.txt
 scp/coderise/fonts/OFL-montserrat.txt
