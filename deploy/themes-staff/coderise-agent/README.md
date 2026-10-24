@@ -60,7 +60,9 @@ première entrée de type réponse d'un agent (`staff_id > 0`), ni masquée ni s
 au client** (`SlaFirstResponsePlugin::isClientReply()` quand le plugin est chargé, sinon un
 destinataire « to »). La fenêtre part de la création du ticket (pas de nouvelle fenêtre à la
 réouverture). Échéance : celle du plan SLA `Priority 4h` (`CDR_SLA_PRIORITY`) quand le ticket
-est sur ce plan actif, sinon création + `CDR_FIRST_RESPONSE_HOURS` (4 h ; les deux constantes
+est sur ce plan actif et n'a jamais été rouvert ; sinon création + `CDR_FIRST_RESPONSE_HOURS`
+(osTicket recalcule l'échéance du plan à partir de la date de réouverture, ce qui ouvrirait une
+nouvelle fenêtre : elle est donc ignorée pour un ticket rouvert) (4 h ; les deux constantes
 se redéfinissent dans `ost-config.php`). Elle n'apparaît que si le plugin `sla_first_response`
 est actif (fonction `coderise_contract_level()`), pour les tickets ouverts d'un propriétaire
 Priority ; sinon « — ». L'état se lit dans le texte (« Reste 38 min », « Dépassé de 47 min »,

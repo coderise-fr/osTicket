@@ -239,7 +239,8 @@ if (!defined('CDR_VERSION')) {
      * earliest visible, non-system staff reply (type R, staff_id > 0) that
      * is addressed to the client (a "to" recipient, as the plugin's
      * isClientReply()). The deadline is the Priority SLA plan's due date
-     * when the ticket is on that plan, else created + CDR_FIRST_RESPONSE_HOURS.
+     * when the ticket is on that plan and has never been reopened (core moves
+     * that due date to the reopen date), else created + CDR_FIRST_RESPONSE_HOURS.
      * Memoised per ticket for the request.
      */
     function cdr_ticket_gauge($t) {
@@ -281,8 +282,13 @@ if (!defined('CDR_VERSION')) {
             if (!$t->isOpen() && $first === null)
                 return null;
 
+            // A reopened ticket keeps the window of its creation: core
+            // recomputes est_duedate from the reopen date (Ticket::setStatus()
+            // -> updateEstDueDate() -> getSLADueDate(), which starts from
+            // getReopenDate()), so the plan's due date is ignored then.
             $due = $start + CDR_FIRST_RESPONSE_HOURS * 3600;
-            if (CDR_SLA_PRIORITY !== '' && ($sla = $t->getSLA()) && $sla->isActive()
+            if (!$t->getReopenDate()
+                    && CDR_SLA_PRIORITY !== '' && ($sla = $t->getSLA()) && $sla->isActive()
                     && strcasecmp(trim((string) $sla->getName()), CDR_SLA_PRIORITY) === 0
                     && ($d = $t->getSLADueDate()))
                 $due = (int) Misc::db2gmtime($d);

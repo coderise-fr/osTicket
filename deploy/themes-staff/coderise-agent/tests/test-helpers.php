@@ -57,13 +57,13 @@ class StubSla {
     function getName() { return 'Priority 4h'; }
 }
 class Ticket {
-    public $id, $open = true, $created, $due = null, $sla = null, $level = 'priority';
+    public $id, $open = true, $created, $due = null, $sla = null, $level = 'priority', $reopened = null;
     function __construct($id, $created) { $this->id = $id; $this->created = $created; }
     function getId() { return $this->id; }
     function getThreadId() { return 100 + $this->id; }
     function isOpen() { return $this->open; }
     function getCreateDate() { return $this->created; }
-    function getReopenDate() { return null; }
+    function getReopenDate() { return $this->reopened; }
     function getSLA() { return $this->sla; }
     function getSLADueDate() { return $this->due; }
 }
@@ -252,6 +252,19 @@ $t->sla = new StubSla();
 $t->due = db_dt($now - 3630 + 7200);
 $g = cdr_ticket_gauge($t);
 check('ticket gauge: Priority plan due date used', $g['kind'] . ' ' . $g['label'], 'ok 59 min left');
+// Reopened: core moved est_duedate to reopen + grace; the window stays created + 4 h.
+$t = new Ticket(13, db_dt($now - 5 * 3600));
+$t->sla = new StubSla();
+$t->reopened = db_dt($now - 600);
+$t->due = db_dt($now - 600 + 4 * 3600);
+$g = cdr_ticket_gauge($t);
+check('ticket gauge: reopened ignores the plan due date', $g['due'] - $g['start'], CDR_FIRST_RESPONSE_HOURS * 3600);
+check('ticket gauge: reopened past created + 4 h is over', $g['kind'] . ' ' . $g['label'], 'over Over by 1 h 00');
+$t = new Ticket(14, db_dt($now - 5 * 3600));
+$t->sla = new StubSla();
+$t->due = db_dt($now + 3600);
+$g = cdr_ticket_gauge($t);
+check('ticket gauge: not reopened keeps the plan due date', $g['kind'] . ' ' . $g['label'], 'warn 1 h 00 left');
 $t = new Ticket(10, db_dt($now - 1980 - 30));
 check('ticket gauge: memoised per ticket', cdr_ticket_gauge($t) === cdr_ticket_gauge($t), true);
 check('ticket gauge: window kept', cdr_ticket_gauge($t)['due'] - cdr_ticket_gauge($t)['start'], CDR_FIRST_RESPONSE_HOURS * 3600);

@@ -96,7 +96,9 @@ ticket n'apparaissent que si le plugin `sla_first_response` est installé et act
 seulement pour les tickets ouverts d'un client Priority. L'échéance est celle du plan SLA
 « Priority 4h » quand le ticket est sur ce plan, sinon 4 h après la création ; le premier retour est
 la première réponse d'un agent adressée au client (règle de `contrib/sla-first-response/README.md`).
-La fenêtre ne repart pas à la réouverture d'un ticket.
+La fenêtre ne repart pas à la réouverture d'un ticket : pour un ticket rouvert, l'échéance est
+toujours 4 h après la création (osTicket déplace l'échéance du plan à la date de réouverture, la
+jauge ne la suit pas).
 
 **File « À risque ».** Le thème ne crée pas de file : un administrateur l'ajoute comme file
 enregistrée (Admin > Paramètres > Tickets, onglet « Queues », « Add New Queue »), visible ensuite
