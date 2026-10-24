@@ -74,8 +74,18 @@ Priority ; sinon « — ». L'état se lit dans le texte (« Reste 38 min », «
 
 Toutes les chaînes du thème sont des msgid anglais passés par `cdr__()` : le pack de langue
 d'osTicket d'abord (`__()`), puis `include/staff/coderise/i18n/fr.php` pour un agent dont la
-langue est le français. La démo étant en anglais sans pack français, le panneau y est en
-anglais ; le français n'apparaît que pour un agent réglé en français.
+langue est le français. Depuis le 24/10/2026 l'image contient le pack officiel `fr.phar`
+(`deploy/docker/overlay/include/i18n/`) et la démo locale est en français (langue principale
+`fr`, tous les agents en `fr`).
+
+Avec le pack, **le pack l'emporte** pour les msgid qu'il traduit : 30 entrées de `fr.php` ne
+servent alors plus (libellés de menu surtout : « Tableau de Bord », « Services » pour
+Departments, « Rubriques d'aide », « Filtre », « Rôle », « Gabarits », « e-mails bannis »,
+« Courriel ou nom d'utilisateur », « Connexion »…). Elles restent pour un panneau sans pack.
+Le pack traduit « Ticket #%s » par lui-même : la barre du cœur affiche « Ticket #… » et le fil
+d'Ariane du thème « Ticket n° … » (`fr.php`). Vérification en français (libellés, jauge,
+compteur de la barre d'enregistrement, menu mobile, débordements, éditeur) : voir
+« Vérifications en français ».
 
 ## Écart assumé
 
@@ -152,9 +162,10 @@ anglais ; le français n'apparaît que pour un agent réglé en français.
    `logo.php?login` du cœur reste seulement dans le titre masqué de la connexion).
 10. Les libellés de sous-menu calculés par le cœur avec un compteur (« My Tasks (3) »,
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
-    traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit.
-11. `captures/` pèse environ 15 Mo (174 PNG, dont 72 `interaction-*` pour 4,4 Mo) dans le
-    dépôt.
+    traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit (c'est le cas
+    depuis l'ajout de `fr.phar` à l'image).
+11. `captures/` pèse environ 17 Mo (193 PNG, dont 72 `interaction-*` pour 4,4 Mo et 19
+    `fr-*` pour 1,6 Mo) dans le dépôt.
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -181,8 +192,10 @@ Autres éléments non réalisés :
 - Écrans d'administration autres que Paramètres > Tickets et Agents (maquettés) : habillés
   par la feuille de style seulement (listes `table.list`, formulaires, barre
   d'enregistrement), sans gabarit dédié.
-- Libellés : les textes du cœur restent ceux d'osTicket (anglais sur la démo) ; seules les
-  chaînes du thème passent par `cdr__()` et son catalogue français.
+- Libellés : les textes du cœur sont ceux d'osTicket et de son pack français ; seules les
+  chaînes du thème passent par `cdr__()` et son catalogue. Les contenus en base créés en
+  anglais à l'installation (noms et colonnes des files, statuts, priorités…) restent en
+  anglais : liste dans `docs/guide-utilisateur.md`, « Interface en français ».
 - RTL non vérifié (voir lacune 6).
 
 ## Vérifications (tâche 10)
@@ -236,20 +249,35 @@ liste que `RICH` dans `coderise.js`, qui ne déplace ni n'étiquette rien dedans
 
 Mesuré avec `tests/editor-check.js` après saisie réelle (deux paragraphes avec Entrée, gras
 et italique par la barre d'outils, liste à puces, titre 2 par le menu « Format », collage
-HTML, perte puis reprise du focus, vue source) à **1280, 1720, 2200 et 390 px**, compte
-administrateur, en anglais : premier et dernier paragraphe à 18 px du bord (le padding),
-`text-align: start`, `display: block`, zone éditable = largeur intérieure du cadre, titre
-sans la police du thème, italique de la couleur du texte, vue source à chasse fixe et
-pleine largeur. Contextes, tous conformes : réponse, note interne, nouveau ticket (réponse
+HTML, perte puis reprise du focus, vue source), compte administrateur, en anglais : premier
+et dernier paragraphe à 18 px du bord (le padding), `text-align: start`, `display: block`,
+zone éditable = largeur intérieure du cadre, titre sans la police du thème, italique de la
+couleur du texte, vue source à chasse fixe et pleine largeur. **Ce qui a été mesuré sur la
+version finale** : à 1280 px, 16 contextes (réponse, note interne, nouveau ticket (réponse
 et note), modification d'un ticket (note), boîte « Edit » d'une entrée du fil, boîte
 « Create Task », réponse à une tâche, réponse type, page du portail, FAQ (largeur fixe de
 670 px voulue par le cœur, `data-width`), modèle d'e-mail, note d'utilisateur et
 d'organisation, signature du profil et du département (éditeurs sans barre d'outils), plein
-écran. Aussi vérifiés à 1280 px : menus « Format » et couleur, brouillon enregistré, zone
-de dépôt (fichier joint), réponse type et collaborateurs (select2), texte indicatif, calendrier,
-`spellcheck`/`lang` de la zone éditable. Écart entre le cadre focalisé (anneau 3 px + 1 px) et
-la zone de dépôt qui le suit : 10 px (réponse, note, nouveau ticket, boîtes de dialogue,
-tâche).
+écran) ; à 390 et 2200 px, 8 de ces contextes ; 1720 px n'a été mesuré que sur une version
+antérieure (par une surcharge locale de la route), pas sur la version finale. Aussi vérifiés
+à 1280 px : menus « Format » et couleur, brouillon enregistré, zone de dépôt (fichier joint),
+réponse type et collaborateurs (select2), texte indicatif, calendrier, `spellcheck`/`lang` de
+la zone éditable. Écart entre le cadre focalisé (anneau 3 px + 1 px) et la zone de dépôt qui
+le suit : 10 px (réponse, note, nouveau ticket, boîtes de dialogue, tâche) ; cet écart
+suppose un `.redactor-box` juste avant la zone de dépôt : avec un simple `textarea` (texte
+riche désactivé dans l'administration), la zone de dépôt reste collée au champ. En français
+(24/10/2026) : réponse de la fiche ticket à 1280 et 390 px et réponse du nouveau ticket à
+1280 px, avec un tableau collé (voir « Vérifications en français »).
+
+**Non testé** : RTL, compte agent non administrateur, glisser-déposer réel d'un fichier
+(seul le choix par la boîte de dialogue l'a été), boîtes « lien » et « image » de Redactor.
+
+Règles du cœur qui atteignent encore un tableau collé dans un éditeur placé dans un
+`.form_table` (nouveau ticket, réponse type) : `.form_table th` (fond `#eee`),
+`.form_table th h4` (blanc sur `#929292`), `.form_table th em` (`display: block`) de
+`scp/css/scp.css`, comme sans le thème ; les règles du thème pour ces en-têtes (`th h4`,
+`th h4::after`, `th h4 a`, `th em`, `th em b/strong`) portent depuis le 24/10/2026
+l'exclusion `RICH` et ne l'atteignent plus.
 
 Corrigés pendant ce passage : titres h1-h4, `hr`, `em` des tableaux de formulaire, `th` de
 `table.table` et des boîtes de dialogue, `h3` des boîtes de dialogue, titres de la barre
@@ -262,10 +290,39 @@ ticket) ; champ de recherche désactivé d'un select2 multiple peint en gris. R�
 restantes qui atteignent le contenu, voulues : couleur des liens, `img { max-width: 100% }`,
 coupure des mots dans les cellules.
 
+### Vérifications en français (2026-10-24)
+
+Démo locale reconstruite depuis le commit, pack `fr.phar` présent, langue principale `fr`,
+agents en `fr` ; comptes `dev.agent` (non administrateur) et `dev.admin`.
+
+- `<html lang="fr">` sur le portail, la connexion agent, le panneau et l'administration ;
+  dates `22/10/2026 20:09` ; calendrier jQuery UI en français (`janvier`, lundi premier
+  jour) ; Redactor en français (`$R.lang.fr` ; boutons « Gras », « Listes », « Lien »…) ;
+  textes JavaScript du cœur traduits (`$.oststrings`).
+- Chaînes du thème : rail (« Tableau de Bord », « Tâches », « Base de connaissances », « Mon
+  profil », « Déconnexion », groupes de l'administration), bascule Agent / Administration,
+  jauge (« Tenu en 3 h 09 », « Dépassé de 15 h 39 », « Sans objet » ; « Reste » non visible
+  sur les données de la démo, couvert par `tests/test-helpers.php`), compteur « 2 réglages
+  modifiés » et marque « modifié », bouton « Menu » à 390 px, page de connexion. Contrôle
+  statique : chaque `cdr__('…')` littéral du thème est traduit par le pack ou par `fr.php`
+  (aucun manque).
+- Débordement (`tests/overflow.js`, 28 chemins agent et administration à 390, 820 et 1280 px,
+  connecté `dev.admin`) : aucun. Texte tronqué par le thème : aucun (seuls les sujets de
+  tickets, coupés par le cœur, et le texte indicatif du select2 de réponse type à 390 px,
+  « Sélectionner la répons… »).
+- `tests/editor-check.js` sur la réponse de la fiche ticket après saisie (paragraphes, gras,
+  italique, titre, liste, `hr`, tableau collé) : conforme à 1280 et 390 px ; nouveau ticket
+  (éditeur dans un `.form_table`) avec un tableau collé : ni police de titre, ni trait cyan,
+  ni gris ardoise du thème dans le tableau.
+- Captures `captures/fr-*.png`.
+
 ## Captures
 
 `captures/` : coquille (`shell-*`), connexion (`connexion-*`, `pwreset-*`), composants
 (`components-*`, `dropdown-*`, `typeahead-*`), file (`queue-*`), fiche ticket (`ticket-*`),
 administration (`admin-*`), tableau de bord (`dashboard-*`), à 1280, 820 et 390 px ;
 éditeurs après saisie (`interaction-<contexte>-<largeur>`, 1280, 1720, 2200 et 390 px, plus
-menus, plein écran, calendrier, select2 et zone de dépôt à 1280 px).
+menus, plein écran, calendrier, select2 et zone de dépôt à 1280 px) ; interface en français
+(`fr-*`, 1280 et 390 px : connexion, file, rail mobile, fiche ticket et propriétés, éditeur
+de réponse, barre d'enregistrement, nouveau ticket avec tableau collé, et portail client
+Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès).
