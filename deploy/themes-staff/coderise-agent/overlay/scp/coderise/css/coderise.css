@@ -826,9 +826,14 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
   #content.cdr-ticket #response_options > form { padding: 10px 12px 14px; }
 }
 
-/* Table outside the properties column (task view in the Tasks tab): its two
-   info columns stack on narrow screens */
+/* Table outside the properties column (task view in the Tasks tab, user and
+   organisation pages where it is a child of #content): its two info columns
+   stack on narrow screens */
 @media (max-width: 920px) {
+  #content.cdr > table.ticket_info:not(.custom-data),
+  #content.cdr > table.ticket_info:not(.custom-data) > tbody,
+  #content.cdr > table.ticket_info:not(.custom-data) > tbody > tr,
+  #content.cdr > table.ticket_info:not(.custom-data) > tbody > tr > td,
   #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data),
   #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody,
   #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody > tr,
