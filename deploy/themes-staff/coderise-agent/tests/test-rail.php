@@ -51,6 +51,7 @@ function __($msgid) { return $msgid; }
 // ---------- stubs ----------
 class StubNav {
     public $tabs, $submenus, $activeTab, $activeMenu, $info;
+    static $seen = array();
     function __construct($tabs, $submenus, $activeTab, $activeMenu=null, $info=null) {
         $this->tabs = $tabs;
         $this->submenus = $submenus;
@@ -106,7 +107,10 @@ function agent_tabs() {
     );
 }
 function agent_nav() {
-    $queue = function ($nav) {
+    // Type-hinted like a plugin closure may be: it must receive the real nav
+    // object, not the theme's CdrNavView wrapper (TypeError otherwise).
+    $queue = function (StubNav $nav) {
+        StubNav::$seen[] = get_class($nav);
         echo '<li class="top-queue item active"><a href="tickets.php?queue=1" class="Ticket">Open'
             . '<span id="queue-count-bucket" class="hidden">(<span class="queue-count" data-queue-id="1"></span>)</span></a>'
             . '<div class="customQ-dropdown"><ul class="scroll-height"></ul></div></li>';
@@ -181,6 +185,7 @@ $_GET = $_REQUEST = array();
 // ---------- agent mode ----------
 $h = cdr_rail(agent_nav(), $admin);
 check('agent: aside.rail', strpos($h, '<aside class="rail') === 0, true);
+check('agent: nav closure receives the real nav (type-hinted)', StubNav::$seen, array('StubNav'));
 preg_match_all('#<a class="item[^"]*" href="([^"]+)"[^>]*>(<svg class="ic ic-([a-z]+))?#', $h, $m);
 check('agent: items, order and hrefs', $m[1], array('/scp/dashboard.php', '/scp/users.php', '/scp/tasks.php',
     '/scp/tickets.php', '/scp/kb.php', '/scp/apps.php', '/scp/profile.php', '/scp/logout.php?auth=TOKEN123'));

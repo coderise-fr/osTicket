@@ -432,7 +432,14 @@ if (!defined('CDR_VERSION')) {
             if (!is_array($sub))
                 return $sub;
             foreach ($sub as $k => $item) {
-                if (!is_array($item) || is_callable($item))
+                // A callable item (queue list, plugin entry) is called by the
+                // core template with this wrapper: hand it the real nav
+                // instead, a closure may type-hint StaffNav.
+                if (is_callable($item)) {
+                    $sub[$k] = function () use ($item) { return $item($this->nav); };
+                    continue;
+                }
+                if (!is_array($item))
                     continue;
                 foreach (array('desc', 'title') as $f)
                     if (isset($item[$f]))
