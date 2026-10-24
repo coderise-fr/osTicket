@@ -10,6 +10,9 @@ Vagrantfile
 *.code-workspace
 stage
 **/*.phar
+# Exception: the official French language pack of the overlay (see overlay/README.md).
+# Patterns are relative to the build context, i.e. the repository root.
+!deploy/docker/overlay/include/i18n/fr.phar
 deploy/docker/secrets
 deploy/docker/.env
 deploy/docker/plugins.env

@@ -320,8 +320,21 @@ git add deploy/docker/overlay && git commit -m "overlay: plugins stripe-sync et 
 
 L'image est construite depuis le commit : un fichier non committé n'y est pas. Les `.phar` et les
 `.htaccess` sont ignorés par le `.gitignore` du dépôt (les plugins sous forme de dossier ne le sont pas).
-Un plugin au format `.phar` demande en plus de retirer `**/*.phar` de `Dockerfile.dockerignore` et
-`git add -f` (voir `overlay/README.md`).
+Un plugin ou un pack de langue au format `.phar` demande une exception étroite pour **ce seul chemin**
+dans `.gitignore` et dans `Dockerfile.dockerignore` (sans retirer les lignes `*.phar` / `**/*.phar`),
+comme pour le pack français (voir `overlay/README.md`).
+
+### Pack de langue français
+
+Le pack officiel `fr.phar` (osTicket 1.18.x, build v1.18.2 du 04/02/2025, SHA-256 et provenance dans
+`overlay/README.md`) est committé dans `overlay/include/i18n/fr.phar` et donc présent dans l'image.
+Code de langue osTicket : **`fr`**. Activation (en base, une fois par installation) : Admin >
+Paramètres > Système > « Langue principale » = Français ; garder l'anglais en langue secondaire
+si l'on veut le proposer aux clients ; la langue d'un agent se règle dans son profil. Les contenus
+déjà en base (rubriques, départements, statuts, réponses types, pages, modèles d'e-mails) restent dans
+la langue de l'installation : voir `docs/guide-utilisateur.md`, « Interface en français ».
+**À chaque mise à jour mineure d'osTicket**, télécharger le pack de la nouvelle version, remplacer le
+fichier, mettre à jour son SHA-256 dans `overlay/README.md`, committer et reconstruire.
 
 ### Permissions et exécution (constatées)
 
@@ -445,10 +458,11 @@ Rien de ceci n'a été exécuté. À faire sur une instance de test, pas sur la 
    (limite de taille alignée sur 10 Mo).
 6. [ ] Domaine : enregistrement DNS A/AAAA, URL du helpdesk (Admin > Paramètres > Système) réglée sur
    `https://support.coderise.fr/`, e-mail du système.
-7. [ ] Pack de langue français : le placer dans `overlay/include/i18n/fr.phar` (retirer `**/*.phar` de
-   `Dockerfile.dockerignore`, `git add -f`), reconstruire, puis l'activer (Admin > Paramètres >
-   Système > langue) ; vérifier le portail, les e-mails et les modèles (les modèles déjà en base
-   ne sont pas traduits automatiquement).
+7. [ ] Pack de langue français : il est dans l'image (`overlay/include/i18n/fr.phar`, voir « Pack de
+   langue français ») ; l'activer en production (Admin > Paramètres > Système > Langue principale =
+   Français) ; vérifier le portail, les e-mails et les modèles (les modèles déjà en base ne sont pas
+   traduits automatiquement). Vérifié sur la démo locale seulement (portail, panneau agent,
+   administration).
 8. [ ] Après chaque mise à jour : rejouer 2 et 5.
 
 ## Veille de sécurité et supervision (proposition à valider)
