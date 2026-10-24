@@ -74,12 +74,14 @@ if [ "$rc" = 1 ] && grep -q edited "$d/$f1"; then
     if ! grep -q edited "$d/$f1"; then ok "f: refuse un fichier modifié, --force l'écrase"; else bad "f: --force n'a pas écrasé"; fi
 else bad "f: refus attendu (code $rc)"; fi
 
-# (g) MANIFEST and overlay/ differ: refuse
+# (g) MANIFEST and overlay/ differ: refuse (on a temporary copy of the package,
+# never in the real overlay/)
 d="$(fresh)"
-extra="$pkg/overlay/zz-test-extra.txt"
-echo x > "$extra"
-rc=0; sh "$pkg/apply.sh" "$d" >/dev/null 2>&1 || rc=$?
-rm -f "$extra"
+pcopy="$root/pkg/deploy/themes-staff/$THEME"
+mkdir -p "$pcopy"
+cp -R "$pkg/." "$pcopy/"
+echo x > "$pcopy/overlay/zz-test-extra.txt"
+rc=0; sh "$pcopy/apply.sh" "$d" >/dev/null 2>&1 || rc=$?
 if [ "$rc" = 1 ] && [ -z "$(find "$d" -mindepth 1 | head -n 1)" ]; then ok "g: refuse si MANIFEST et overlay/ diffèrent"; else bad "g: refus attendu (code $rc)"; fi
 
 echo
