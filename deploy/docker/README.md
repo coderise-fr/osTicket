@@ -549,6 +549,7 @@ Jamais pour la production : HTTP, cookies non `Secure`, identifiants de démonst
 ```sh
 deploy/docker/scripts/local-demo.sh up [--theme <slug>] [--rebuild]
 deploy/docker/scripts/local-demo.sh theme <slug>    # change de thème, données conservées
+deploy/docker/scripts/local-demo.sh language <code> # langue de l'interface (fr, en_US), données conservées
 deploy/docker/scripts/local-demo.sh status          # conteneurs, adresses, thème, commit
 deploy/docker/scripts/local-demo.sh logs [-f] [web] # journaux
 deploy/docker/scripts/local-demo.sh down            # arrête, garde les volumes
@@ -572,7 +573,9 @@ l'image si le commit `HEAD` ou le thème a changé) :
 3. installe osTicket par l'**assistant web** (requêtes HTTP, image `install`), puis repasse sur l'image
    de production (configuration en lecture seule) ;
 4. démarre `web`, `cron`, la base et **Mailpit**, puis peuple la base (`local-demo/seed.php`, exécuté
-   dans un conteneur ponctuel de l'image) ;
+   dans un conteneur ponctuel de l'image) et passe l'interface en français (`local-demo/language.php` :
+   langue principale `fr`, aucune langue secondaire, langue de chaque agent ; `OST_DEMO_LANG=en_US`
+   garde l'anglais) ;
 5. affiche les adresses et le **chemin** du fichier d'identifiants (jamais un mot de passe).
 
 **Isolation.** Projet Compose fixe `ostdemo` (conteneurs `ostdemo-*`, volumes `ostdemo_ost-db`,
@@ -605,7 +608,8 @@ et de Mailpit, puis, pour chaque compte, rôle, identifiant et mot de passe **g�
 | `gina.roux@lumen-studio.test` | Invitée sans compte (organisation Priority) : « Check Ticket Status » avec l'e-mail et le numéro noté dans le fichier |
 
 **Données** (toutes fictives) : vérification MX des adresses désactivée, fuseau Europe/Paris,
-anglais (aucun pack de langue n'est téléchargé), inscription des clients ouverte, accusés de
+installation en anglais (`en_US` : contenus de départ en anglais) puis interface en **français** (pack
+`overlay/include/i18n/fr.phar`, commande `language`), inscription des clients ouverte, accusés de
 réception activés ; SMTP de toutes les adresses système vers Mailpit (aucun e-mail ne sort de la
 machine) ; plans de SLA « Priority 4h » (actif, calendrier 24/7) et « Priority 4h - 1re reponse faite »
 (désactivé, non transitoire) ; filtre « Organisation / Nom = Priority » qui pose le plan ; plugin

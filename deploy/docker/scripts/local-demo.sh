@@ -10,6 +10,8 @@
 #   local-demo.sh theme <slug>      change de thème en gardant les données (reconstruit l'image)
 #   local-demo.sh staff-theme <slug|none>   change le thème du panneau agent (dossier de
 #                                   deploy/themes-staff/, ou none), données conservées
+#   local-demo.sh language <code>   langue de l'interface (fr, en_US) : langue principale,
+#                                   sans langue secondaire, et langue de tous les agents
 #   local-demo.sh status            état des conteneurs, adresses, thème, commit
 #   local-demo.sh logs [args]       journaux (arguments passés à `docker compose logs`)
 #   local-demo.sh down              arrête la pile (les volumes, donc les données, sont gardés)
@@ -18,6 +20,9 @@
 # Thèmes : atelier, poste-de-travail, sommet (défaut), parcours, ownalytics-atelier,
 # ownalytics-ticket-de-caisse.
 # Thèmes du panneau agent : coderise-agent (sans thème agent par défaut : none).
+# Langue : l'assistant installe en anglais (en_US : contenus de départ et peuplement), puis
+# `up` passe l'interface en OST_DEMO_LANG (défaut fr, pack overlay/include/i18n/fr.phar) après
+# le premier peuplement ; OST_DEMO_LANG=en_US garde l'anglais.
 #
 # Dossier d'état (OST_DEMO_DIR) : par défaut <dépôt principal>/.local-demo (ignoré par Git),
 # même lancé depuis un worktree. Il contient state.env (ports, thème, commit), les fichiers
@@ -35,6 +40,8 @@ TAG=demo
 THEMES="atelier poste-de-travail sommet parcours ownalytics-atelier ownalytics-ticket-de-caisse"
 DEFAULT_THEME=sommet
 DEFAULT_STAFF_THEME=none
+# Langue de l'interface réglée après le premier peuplement (code osTicket : fr, en_US).
+DEFAULT_LANG="${OST_DEMO_LANG:-fr}"
 # Ports à ne jamais proposer (ddev, Mailpit de ddev, MySQL, port par défaut de la recette).
 RESERVED_PORTS="80 443 3306 8025 8026 8080"
 WEB_PORT_FIRST=8480
@@ -44,7 +51,7 @@ STAFF_DOMAIN=coderise-demo.test
 say() { printf 'local-demo: %s\n' "$*"; }
 die() { printf 'local-demo: %s\n' "$*" >&2; exit 1; }
 
-usage() { sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,31p' "$0" | sed 's/^# \{0,1\}//'; }
 
 # Chemin lisible par docker.exe sous Windows (Git Bash), inchangé ailleurs.
 winpath() {
@@ -404,6 +411,26 @@ seed_demo() {
     write_credentials
 }
 
+# Langue de l'interface (deploy/docker/local-demo/language.php, conteneur ponctuel de l'image).
+set_language() { # code osTicket (fr, en_US)
+    case "$1" in ""|*[!A-Za-z_]*) die "code de langue invalide : $1 (exemples : fr, en_US)" ;; esac
+    web="$(state_get OST_PORT)"
+    out="$STATE/language.log"
+    say "langue de l'interface : $1..."
+    {
+        printf '<?php\n$DEMO = array(\n'
+        printf "    'lang' => '%s',\n" "$1"
+        printf "    'base_url' => 'http://127.0.0.1:%s/',\n" "$web"
+        printf ');\n?>\n'
+        cat "$demo_src/language.php"
+    } | dc run --rm --no-deps -T --entrypoint php web > "$out" 2>&1 || {
+        sed -e 's/^/  /' "$out" >&2
+        die "réglage de la langue $1 en échec : voir $out"
+    }
+    sed -e 's/^/  /' "$out"
+    state_set OST_DEMO_LANG "$1"
+}
+
 # --- Affichage -------------------------------------------------------------------
 
 show_urls() {
@@ -415,6 +442,7 @@ show_urls() {
     echo "  Mailpit (e-mails)    http://127.0.0.1:$mail/"
     echo "  Thème                $(state_get OST_DEMO_THEME)   (commit $(state_get OST_REVISION | cut -c1-8))"
     echo "  Thème agent          $(cur_staff)"
+    echo "  Langue               $(state_get OST_DEMO_LANG || true)"
     echo "  Identifiants         $CREDS"
     echo
 }
@@ -464,6 +492,7 @@ cmd_up() {
     drop_old_image "$old"
     if [ -z "$(state_get OST_DEMO_SEEDED)" ]; then
         seed_demo
+        set_language "$DEFAULT_LANG"
     fi
     say "environnement prêt."
     show_urls
@@ -495,6 +524,13 @@ cmd_staff_theme() {
     dc up -d --wait --wait-timeout 300 web cron >/dev/null
     drop_old_image "$old"
     show_urls
+}
+
+cmd_language() {
+    [ $# -eq 1 ] || die "usage : $0 language <code>   (fr, en_US : packs de include/i18n/ de l'image)"
+    require_state
+    [ -n "$(state_get OST_DEMO_SEEDED)" ] || die "pas encore installé et peuplé : lancer d'abord $0 up"
+    set_language "$1"
 }
 
 cmd_status() {
@@ -542,6 +578,7 @@ case "$cmd" in
     up) cmd_up "$@" ;;
     theme) cmd_theme "$@" ;;
     staff-theme) cmd_staff_theme "$@" ;;
+    language) cmd_language "$@" ;;
     status) cmd_status "$@" ;;
     logs) cmd_logs "$@" ;;
     down) cmd_down "$@" ;;
