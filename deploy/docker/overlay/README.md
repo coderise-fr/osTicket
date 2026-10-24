@@ -8,6 +8,7 @@ normally install from its admin panel has to be added here and the image rebuilt
 |---|---|
 | Client portal stylesheet and images | `assets/default/css/theme.css`, `assets/default/images/` |
 | Client portal templates | `include/client/*.inc.php` |
+| Staff panel theme (`deploy/themes-staff/<slug>/apply.sh`) | `include/staff/*.php`, `include/staff/templates/`, `include/staff/coderise/`, `scp/coderise/` |
 | Language packs (`fr.phar`, ...) | `include/i18n/<lang>.phar` |
 | Plugins (dossier) | `include/plugins/<name>/plugin.php` et fichiers du plugin (testé : `contrib/stripe-sync`, `contrib/sla-first-response`) |
 | Plugins (archive) | `include/plugins/<name>.phar` |

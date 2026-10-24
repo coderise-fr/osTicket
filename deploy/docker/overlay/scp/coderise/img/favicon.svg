@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="14.75 -1 64 64" role="img" aria-label="Coderise">
+  <!-- Symbole Coderise sur bleu nuit (favicon du panneau agent), dérivé de logo_coderise.svg (fichier fourni, qui fait foi) : mêmes coordonnées et mêmes couleurs (cyan #11c9df). Les deux rectangles bleu nuit de l'original découpent à plat les pieds du chevron et le haut de la barre oblique. Aucun texte, aucune police. -->
+  <defs>
+  </defs>
+  <rect fill="#000f26" x="14.75" y="-1" width="64" height="64"/>
+  <g transform="translate(0,-5)">
+    <path d="m 40.255924,49.480112 15,-25 15,25" fill="none" stroke="#11c9df" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="miter"/>
+    <path d="M 29.998327,50.720629 43.547143,29.231447" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="butt"/>
+    <circle cx="23.840757" cy="45.900478" r="2.839432" fill="#ffffff"/>
+    <rect x="13.646532" y="48.845947" width="61.277992" height="3.4866524" transform="matrix(1,0,0.05325764,0.9985808,0,0)" fill="#000f26"/>
+    <rect x="34.322262" y="27.702435" width="12.820247" height="3.4819207" transform="matrix(1,0,0.01115742,0.99993775,0,0)" fill="#000f26"/>
+  </g>
+</svg>

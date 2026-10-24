@@ -1,0 +1,1055 @@
+/* Coderise staff panel theme (coderise-agent): shell of the agent and admin panel.
+   Charter Coderise v1.0. Loaded after scp/css/scp.css, css/rtl.css and
+   scp/css/translatable.css so that equal specificity wins. Ported from
+   docs/theme-mockups-admin/theme.css (Rail, Barre haute, Boutons, Panneaux,
+   responsive blocks); class names follow the mockup so later stylesheets can
+   target them. Not part of osTicket core: shipped by deploy/themes-staff.
+
+   Contrast rules: cyan is never text on white (cyan-profond is); ardoise is
+   never text on nuit (white at 78 % and more is); a cyan fill carries nuit text. */
+
+/* ───────── Fonts (SIL OFL 1.1, see ../fonts/OFL-*.txt), local only ───────── */
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/montserrat-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/montserrat-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/montserrat-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/montserrat-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/montserrat-latin-800-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/montserrat-latin-ext-800-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/inter-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/inter-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/inter-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/inter-latin-ext-500-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/inter-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/inter-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+/* ───────── Tokens (docs/theme-mockups-coderise/_shared/tokens.css) ───────── */
+:root {
+  --nuit: #000F26;
+  --cyan: #10C9DE;
+  --blanc: #FFFFFF;
+  --cyan-profond: #0A7C8C;
+  --ardoise: #5B6675;
+  --gris: #E8ECF1;
+  --voile: #E3F8FB;
+  --erreur: #B3261E;  --erreur-fond: #FCECEA;
+  --succes: #0F6B4B;  --succes-fond: #E4F5EC;
+  --alerte: #7A4B00;  --alerte-fond: #FFF3D1;
+  --f-titre: "Montserrat", Arial, sans-serif;
+  --f-texte: "Inter", Arial, sans-serif;
+  --focus: var(--cyan-profond);
+  --rail-w: 240px;
+  --topbar-h: 57px;
+}
+
+/* ───────── Page ───────── */
+html, body { background: var(--gris); }
+body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: normal; font-variant-numeric: tabular-nums; }
+#container { width: auto; max-width: none; margin: 0; padding: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* Core rules that remove the outline with a stronger selector (keyboard audit) */
+ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; } /* scp.css: ul.tabs li a { outline: none } */
+.redactor-box:has(.redactor-styles:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; } /* the editable area itself has no outline */
+.on-dark { --focus: var(--cyan); }
+.cdr-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 100; background: var(--nuit); color: var(--blanc); padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; }
+.cdr-skip:focus { top: 8px; outline: 3px solid var(--cyan); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ic { flex: none; vertical-align: middle; }
+
+/* The shell: rail | main column. Inline <script>/<title> of a PJAX response
+   are display:none and take no grid cell. */
+#pjax-container { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: 100vh; }
+#pjax-container > .rail { grid-column: 1; }
+#pjax-container > .cdr-main { grid-column: 2; min-width: 0; display: flex; flex-direction: column; }
+
+/* ───────── Rail ───────── */
+.rail { background: var(--nuit); color: var(--blanc); padding: 20px 16px 12px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent; box-sizing: border-box; font-size: .84375rem; }
+.rail *, .rail *::before, .rail *::after { box-sizing: border-box; }
+.rail a { display: flex; text-decoration: none; }
+.rail a:hover { text-decoration: none; }
+.rail-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rail .brand { display: block; line-height: 0; padding: 0 8px; }
+.rail .brand .logo { height: 26px; width: auto; max-width: 100%; }
+.rail .menu-toggle { display: none; }
+.rail-body { display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
+
+/* Mode switch Agent / Administration: the active segment is the only cyan fill of the rail */
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 8px; background: rgba(255,255,255,.1); }
+.rail .mode a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 6px; border-radius: 6px; color: var(--blanc); font: 600 .78125rem var(--f-titre); }
+.rail .mode a:hover { background: rgba(255,255,255,.12); }
+.rail .mode a[aria-current] { background: var(--cyan); color: var(--nuit); }
+
+.rail nav.menu { display: grid; gap: 10px; }
+.rail .group { display: grid; gap: 2px; }
+.rail .group-title { margin: 0 0 4px; padding: 0 10px; font: 600 .75rem var(--f-titre); color: rgba(255,255,255,.78); }
+.rail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.rail li { list-style: none; margin: 0; padding: 0; }
+.rail a.item { align-items: center; gap: 10px; min-height: 34px; padding: 0 10px; border-radius: 7px; color: var(--blanc); font-weight: 500; position: relative; }
+.rail a.item:hover { background: rgba(255,255,255,.1); }
+.rail a.item[aria-current] { background: rgba(255,255,255,.13); font-weight: 600; }
+.rail a.item[aria-current]::before { content: ""; position: absolute; inset-inline-start: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 2px; background: var(--cyan); }
+.rail a.item[aria-current] .ic { color: var(--cyan); }
+.rail .badge { margin-inline-start: auto; min-width: 22px; padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: .75rem; font-weight: 600; text-align: center; }
+.rail .badge-hot { background: var(--cyan); color: var(--nuit); font-weight: 700; }
+
+/* Sub-navigation of the active agent tab (core sub-navigation.tmpl.php) */
+.rail .queues { margin: 2px 0 6px; margin-inline-start: 20px; padding-inline-start: 10px; border-inline-start: 1px solid rgba(255,255,255,.2); }
+.rail .queues nav { display: block; margin: 0; padding: 0; background: none; border: 0; }
+.rail .queues #sub_nav { display: grid; gap: 1px; height: auto; margin: 0; padding: 0; background: none; border: 0; white-space: normal; line-height: 1.4; }
+.rail .queues #sub_nav > li { display: block; position: static; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.rail .queues #sub_nav > li > a { display: flex; align-items: center; gap: 8px; min-height: 30px; margin: 0; padding: 0 10px; border-radius: 6px; color: rgba(255,255,255,.88); font-size: .8125rem; font-weight: 400; background: none; }
+.rail .queues #sub_nav > li > a:hover { background: rgba(255,255,255,.1); color: var(--blanc); }
+.rail .queues #sub_nav > li > a.active,
+.rail .queues #sub_nav > li.active > a,
+.rail .queues #sub_nav > li.child > a { background: rgba(255,255,255,.13); color: var(--blanc); font-weight: 600; }
+.rail .queues #sub_nav i[class^="icon-"], .rail .queues #sub_nav i[class*=" icon-"] { display: none; }
+/* "New Ticket": kept in the DOM (scp.js tags its <li>), the top bar button replaces it */
+.rail .queues #sub_nav #new-ticket { display: none; }
+
+/* Queue counts: core prints "(n)" in #queue-count-bucket; shown as a badge */
+#cdr-queues [id="queue-count-bucket"] { margin-inline-start: auto; font-size: 0; }
+#cdr-queues .queue-count { display: inline-block; float: none; min-width: 20px; margin: 0; margin-inline-start: auto; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: .6875rem; font-weight: 600; line-height: 1.6; text-align: center; }
+#cdr-queues .queue-count:empty, #cdr-queues .queue-count .faded-more:empty { display: none; }
+#cdr-queues .queue-count .faded-more { color: inherit; opacity: 1; }
+/* An empty queue shows no "0" badge (coderise.js tags the count) */
+#cdr-queues .queue-count.cdr-zero { display: none; }
+/* scp.css sizes the overflow menu for core's 960 px header (.jb-overflowmenu
+   960 x 35 px, primary list 30 px !important). The rail renames
+   #customQ_nav so the plugin never binds; should a plugin re-add the class,
+   it must still fit the 240 px column. */
+.rail .jb-overflowmenu { position: static; width: auto; height: auto; }
+.rail .jb-overflowmenu .jb-overflowmenu-menu-primary { height: auto !important; margin: 0; }
+/* Queue dropdowns flattened (review I-12): only the dropdown of the active
+   top-level queue is expanded, static, without the nested scroll. The
+   !important on position/max-width beat inline offsets set by scp.js on
+   .subQ mouseover and core's own !important. */
+#cdr-queues .customQ-dropdown { display: none; position: static; min-width: 0; margin: 0; padding: 0 0 4px; border: 0; border-radius: 0; box-shadow: none; background: none; font-size: inherit; text-align: start; }
+#cdr-queues li.item.active > .customQ-dropdown,
+#cdr-queues li.item.child > .customQ-dropdown { display: block; }
+#cdr-queues .customQ-dropdown ul.scroll-height { max-height: none; overflow: visible; border: 0; margin: 0; padding: 2px 0; padding-inline-start: 10px; }
+#cdr-queues .customQ-dropdown ul { display: block; }
+#cdr-queues .customQ-dropdown ul li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; position: static; margin: 0; padding: 0; background: none; color: rgba(255,255,255,.88); white-space: normal; cursor: default; }
+#cdr-queues .customQ-dropdown ul li:not(.personalQ):hover { background: none; color: var(--blanc); }
+#cdr-queues .customQ-dropdown ul li > a { order: 1; flex: 1 1 0; min-width: 0; max-width: none !important; margin: 0; padding: 4px 8px; border-radius: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(255,255,255,.88); font-size: .78125rem; }
+#cdr-queues .customQ-dropdown ul li > a:hover { background: rgba(255,255,255,.1); color: var(--blanc); }
+#cdr-queues .customQ-dropdown ul li > a.active { background: rgba(255,255,255,.13); color: var(--blanc); font-weight: 600; }
+#cdr-queues .customQ-dropdown ul li > a::before { content: none; padding: 0; }
+#cdr-queues .customQ-dropdown ul li > span.queue-count { order: 2; }
+#cdr-queues .customQ-dropdown li.subQ > ul.subMenuQ { display: block; order: 3; position: static !important; flex: 0 0 100%; margin: 0; padding: 0; padding-inline-start: 12px; border: 0; box-shadow: none; background: none; }
+#cdr-queues .subMenuQ::before, #cdr-queues .subMenuQ::after { content: none; display: none; }
+#cdr-queues .customQ-dropdown li.personalQ { flex-basis: 100%; height: 0; margin: 4px 0; border: 0; border-top: 1px dashed rgba(255,255,255,.25); background: none; font-size: 0; }
+#cdr-queues .customQ-dropdown li h4, #cdr-queues .customQ-dropdown li.top-level { flex-basis: 100%; margin: 0; padding: 4px 8px 0; background: none; color: rgba(255,255,255,.78); font: 600 .75rem var(--f-titre); }
+#cdr-queues .customQ-dropdown li.top-level { padding: 0; }
+#cdr-queues .add-queue a { display: flex; padding: 4px 8px; padding-inline-start: 18px; border-radius: 6px; color: rgba(255,255,255,.78) !important; font-size: .75rem; cursor: pointer; white-space: nowrap; }
+#cdr-queues .add-queue a:hover { background: rgba(255,255,255,.1); color: var(--blanc) !important; }
+#cdr-queues .add-queue a span { padding: 0; opacity: 1; }
+#cdr-queues .add-queue i[class^="icon-"] { display: inline-block; color: var(--cyan); margin-inline-end: 4px; }
+
+.rail .foot { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.18); display: grid; gap: 4px; }
+.rail .me { display: flex; align-items: center; gap: 10px; padding: 6px 8px; color: var(--blanc); }
+.rail .me b { display: block; font: 600 .8125rem var(--f-titre); line-height: 1.2; overflow-wrap: anywhere; }
+.rail .me small { display: block; color: rgba(255,255,255,.78); font-size: .75rem; }
+.rail .foot a.item { min-height: 32px; font-size: .8125rem; }
+.rail .avatar { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; flex: none; font: 700 .6875rem var(--f-titre); background: var(--cyan); color: var(--nuit); }
+
+/* ───────── Top bar ───────── */
+.topbar { background: var(--blanc); display: flex; align-items: center; gap: 16px; padding: 10px 28px; border-bottom: 1px solid rgba(0,15,38,.12); position: sticky; top: 0; z-index: 5; min-height: var(--topbar-h); box-sizing: border-box; }
+.crumbs { min-width: 0; }
+.crumbs ol { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; color: var(--ardoise); white-space: nowrap; }
+.crumbs li { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.crumbs li + li::before { content: "/"; margin-inline-end: 6px; }
+.crumbs a { display: inline; color: var(--ardoise); text-decoration: underline; text-underline-offset: 3px; }
+.crumbs [aria-current] { color: var(--nuit); font-weight: 600; }
+.tsearch { flex: 1; max-width: 460px; margin: 0; margin-inline-start: auto; position: relative; }
+.tsearch .ic { position: absolute; inset-inline-start: 11px; top: 9px; color: var(--ardoise); pointer-events: none; }
+.tsearch input[type="search"] { width: 100%; height: 36px; margin: 0; padding: 0 12px; padding-inline-start: 36px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: 400 .84375rem var(--f-texte); box-sizing: border-box; }
+.tsearch input[type="search"]::placeholder { color: var(--ardoise); opacity: 1; }
+.topbar .btn { flex: none; }
+.topbar > .btn { margin-inline-start: auto; }
+.topbar > .tsearch ~ .btn { margin-inline-start: 0; }
+
+/* ───────── Buttons ───────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 6px; border: 1.5px solid transparent; font: 600 .8125rem var(--f-titre); text-decoration: none; cursor: pointer; white-space: nowrap; background: none; box-sizing: border-box; }
+.btn:hover { text-decoration: none; }
+.btn-primary { background: var(--cyan); color: var(--nuit); }
+.btn-primary:hover { background: var(--nuit); color: var(--blanc); }
+.btn-line { border-color: var(--nuit); color: var(--nuit); background: var(--blanc); }
+.btn-line:hover { background: var(--voile); }
+.btn-ghost { color: var(--nuit); }
+.btn-ghost:hover { background: rgba(0,15,38,.07); }
+.btn-danger { border-color: var(--erreur); color: var(--erreur); background: var(--blanc); }
+.btn-danger:hover { background: var(--erreur-fond); }
+.btn-sm { min-height: 30px; padding: 0 10px; font-size: .78125rem; }
+.btn-on-dark { color: var(--blanc); border-color: rgba(255,255,255,.55); }
+.btn-on-dark:hover { background: rgba(255,255,255,.12); }
+.icon-btn { width: 36px; padding: 0; }
+
+/* ───────── Panels ───────── */
+.panel { background: var(--blanc); border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); margin-bottom: 16px; overflow: hidden; }
+.panel-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--gris); flex-wrap: wrap; }
+.panel-h h2 { margin: 0; font: 700 .9375rem var(--f-titre); display: flex; gap: 8px; align-items: center; }
+.panel-h .ic { color: var(--cyan-profond); }
+.pad { padding: 16px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.col-main, .col-side { min-width: 0; }
+
+/* ───────── Main column ───────── */
+/* #content stays the single element core JS reads ($('#content').data(...)).
+   Until the page stylesheets (later tasks) take over, it is one white card. */
+#content.cdr { clear: none; margin: 22px 28px 36px; padding: 20px 22px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); min-width: 0; }
+/* Wide core tables: the "Fixed widths" rules of the components section make
+   them fit the card. coderise.js wraps a table in .cdr-hscroll only when its
+   content still overflows (fallback), so only that table scrolls sideways
+   and every other table (and the dropdowns it holds) is never clipped.
+   #content itself never scrolls or clips (dropdowns, tips, outlines). */
+#content.cdr .cdr-hscroll { overflow-x: auto; }
+#content.cdr .select2-container { max-width: 100%; } /* inline widths set by select2 (collaborators: 350 px) */
+#content.cdr a { color: var(--cyan-profond); }
+/* Cyan-profond passes 4.5:1 on white only (4.91; on gris 4.14, voile ~4.4,
+   the état backgrounds ~4.1-4.4). On tinted areas links are nuit with a
+   cyan-profond underline, as in the mockup's tables. */
+#content.cdr :is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, .banner, #basic_search, #response_options, .thread-entry .header, .filedrop) a:not(.button):not(.action-button):not(:is(ul.tabs, .redactor-box, .action-dropdown, .noclick-dropdown, .cdr-pager) a),
+.dialog :is(.error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, .banner) a:not(.button),
+:is(#error_bar, #warning_bar, #notice_bar) a {
+  color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px;
+}
+#content.cdr .filedrop .dropzone { color: var(--ardoise); } /* filedrop.css: #999 on #f2f2f2 (2.6:1) */
+#content.cdr :is(h1, h2, h3):not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
+
+@media (min-width: 921px) {
+  /* The sticky rail stops at the end of #pjax-container; the strip under it
+     (beside #footer) stays nuit */
+  #container { background: linear-gradient(90deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
+  html.rtl #container, [dir="rtl"] #container { background: linear-gradient(270deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
+}
+
+/* Footer: small, under the main column */
+#footer { margin: 0; margin-inline-start: var(--rail-w); padding: 8px 28px 16px; color: var(--ardoise); font-size: .75rem; text-align: start; }
+
+/* ───────── Tablet and mobile: the rail becomes a top bar ───────── */
+@media (max-width: 1180px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 920px) {
+  #pjax-container { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  #pjax-container > .rail, #pjax-container > .cdr-main { grid-column: 1; }
+  .rail { position: relative; height: auto; overflow: visible; padding: 14px 20px; gap: 0; }
+  .rail .menu-toggle { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; padding: 8px 14px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.55); background: none; color: var(--blanc); font: 600 .8125rem var(--f-titre); }
+  .rail .menu-toggle:hover { background: rgba(255,255,255,.12); }
+  .rail-body { display: none; padding-top: 16px; }
+  .rail.is-open .rail-body { display: flex; }
+  .topbar { position: static; padding: 10px 20px; }
+  .crumbs, .tsearch { display: none; }
+  .topbar .btn { margin-inline-start: auto; }
+  #content.cdr { margin: 16px 12px 24px; padding: 16px; }
+  #footer { margin-inline-start: 0; padding-inline: 20px; }
+}
+
+/* ═════════ Global components ═════════
+   The component vocabulary of every staff screen, on core markup (scp.css,
+   dropdown.css, redactor.css, select2.min.css, tooltip.css). Ported from the
+   Boutons, Panneaux, Tableaux, Formulaires and Onglets blocks of
+   docs/theme-mockups-admin/theme.css. Generic only: page layouts (queue,
+   ticket view, admin save bar, dashboard) build on it in their own sections.
+   Most rules are scoped by :is(#content, .dialog, .tip_content): the id
+   weight beats core's class selectors without !important, and the login
+   page (body.cdr-login, no #content) is left alone. !important is used only
+   against core !important declarations. */
+:root {
+  --cdr-ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18z'/%3E%3Cpath d='M12 10v4.5M12 17.2h.01'/%3E%3C/svg%3E");
+  --cdr-ic-error: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6'/%3E%3C/svg%3E");
+  --cdr-ic-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m8 12.5 2.8 2.7L16 9.5'/%3E%3C/svg%3E");
+  --cdr-ic-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5.5M12 7.8h.01'/%3E%3C/svg%3E");
+  --cdr-ring: 0 0 0 1px rgba(0,15,38,.12), 0 10px 28px rgba(0,15,38,.18);
+}
+
+/* ───────── Titles ───────── */
+#content h2:not(.thread-body *) { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
+#content.cdr h2 a, #content.cdr h2 a:hover { color: var(--nuit); text-decoration: none; }
+#content h2:not(.thread-body *) i { color: var(--cyan-profond); }
+#content :is(h2, h3):not(.thread-body *) small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
+#content h3:not(.thread-body *) { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
+#content h4:not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
+:is(#content, .dialog, .tip_content) .faded, :is(#content, .dialog) .faded-more { color: var(--ardoise); }
+:is(#content, .dialog, .tip_content) .faded b, :is(#content, .dialog, .tip_content) .faded strong { color: var(--nuit); }
+:is(#content, .dialog) hr:not(.thread-body *) { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
+
+/* ───────── Buttons ─────────
+   .button and the input buttons = btn-line; submit = btn-primary (cyan, nuit
+   text); .red / .danger = btn-danger. Core heights (22 px content-box) and
+   inset shadows are reset. */
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=submit], input[type=reset], input[type=button], button[type=submit], button[type=reset], button.button) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  box-sizing: border-box; height: auto; min-height: 36px; margin: 0 4px 0 0; margin-inline: 0 4px; padding: 0 14px;
+  border: 1.5px solid var(--nuit); border-radius: 6px; box-shadow: none;
+  background: var(--blanc); color: var(--nuit); opacity: 1;
+  font: 600 .8125rem/1.2 var(--f-titre); text-decoration: none; white-space: nowrap; vertical-align: middle; cursor: pointer;
+}
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=reset], input[type=button], button[type=reset]):hover {
+  background: var(--voile); color: var(--nuit); box-shadow: none; text-decoration: none;
+}
+:is(#content, .dialog, .tip_content) :is(.button, .action-button) i { margin: 0; color: inherit; }
+/* Primary: submit buttons and .primary.button */
+:is(#content, .dialog, .tip_content) :is(input[type=submit], button[type=submit], .primary.button, .save.pending) {
+  border-color: transparent; background: var(--cyan); color: var(--nuit);
+}
+:is(#content, .dialog, .tip_content) :is(input[type=submit], button[type=submit], .primary.button, .save.pending):is(:hover, :active) {
+  background: var(--nuit); color: var(--blanc); box-shadow: none;
+}
+:is(#content, .dialog) .save.success { border-color: transparent; background: var(--succes); color: var(--blanc); }
+/* Danger: core gives .action-button.danger color and hover with !important */
+:is(#content, .dialog, .tip_content) :is(.red.button, .button.danger, .action-button.danger, input.red, input.danger) {
+  border-color: var(--erreur) !important; background: var(--blanc); color: var(--erreur) !important; opacity: 1; filter: none;
+}
+:is(#content, .dialog, .tip_content) :is(.red.button, .button.danger, .action-button.danger, input.red, input.danger):hover {
+  border-color: var(--erreur) !important; background: var(--erreur-fond); color: var(--erreur) !important; filter: none;
+}
+:is(#content, .dialog) .green.button:hover { background: var(--succes-fond); color: var(--succes); }
+/* Link-looking and small buttons */
+:is(#content, .dialog, .tip_content) .link.button { min-height: 0; padding: 0; border: 0; background: none; color: var(--cyan-profond); font: inherit; text-decoration: underline; }
+:is(#content, .dialog, .tip_content) .link.button:hover { background: none; color: var(--nuit); }
+:is(#content, .dialog, .tip_content) :is(.small.button, input[type=button].small, input[type=submit].small, .button.small) { min-height: 30px; padding: 0 10px; font-size: .78125rem; }
+:is(#content, .dialog, .tip_content) :is(.button, .action-button, input[type=submit], input[type=reset], input[type=button], button):disabled { opacity: .5; cursor: not-allowed; }
+/* Muted action buttons (queue settings, thread entry options) */
+:is(#content, .dialog) .action-button.muted { border-color: rgba(0,15,38,.25); }
+/* Caret of the dropdown buttons */
+:is(#content, .dialog) .action-button i.icon-caret-down { order: 9; height: auto; margin: 0; margin-inline-start: 2px; padding: 0; padding-inline-start: 7px; border: 0; border-inline-start: 1px solid rgba(0,15,38,.25); }
+:is(#content, .dialog) .action-button :is(span, a) { float: none; display: inline-flex; align-items: center; gap: 6px; }
+/* Grouped buttons (.action-buttons): one segmented control */
+:is(#content, .dialog) .action-buttons { display: inline-flex; vertical-align: middle; }
+:is(#content, .dialog) .action-buttons .action-button { margin: 0; }
+:is(#content, .dialog) .action-buttons .action-button + .action-button { margin-inline-start: -1.5px; border-start-start-radius: 0; border-end-start-radius: 0; }
+:is(#content, .dialog) .action-buttons .action-button:not(:last-of-type) { border-start-end-radius: 0; border-end-end-radius: 0; }
+/* Input with an attached button (search boxes) */
+:is(#content, .dialog) .input.attached { display: inline-flex; align-items: stretch; height: auto; margin-inline-end: 6px; vertical-align: middle; }
+:is(#content, .dialog) .input.attached input { margin: 0; border-start-end-radius: 0; border-end-end-radius: 0; border-inline-end: 0; }
+:is(#content, .dialog) .input.attached .button.attached { margin: 0; min-height: 36px; height: auto; padding: 0 12px; border: 1px solid var(--ardoise); border-radius: 0 6px 6px 0; background: var(--gris); color: var(--nuit); }
+html.rtl :is(#content, .dialog) .input.attached .button.attached { border-radius: 6px 0 0 6px; }
+:is(#content, .dialog) .input.attached .button.attached:hover { background: var(--voile); }
+:is(#content, .dialog) .input.attached.focus { outline: none; }
+/* Search / filter strip at the top of lists (core #basic_search, grey band) */
+#content #basic_search { margin: 0 0 12px; padding: 8px 10px; border: 0; border-radius: 8px; background: var(--gris); box-shadow: none; }
+
+/* ───────── Form controls ─────────
+   1 px ardoise border, 36 px, 6 px radius; focus = 3 px ring (global
+   :focus-visible, plus :focus for text fields). Widths stay those of the
+   markup (size= / inline styles), capped to the column. */
+:is(#content, .dialog, .tip_content) :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=search], input[type=tel], input[type=url], input[type=date], input[type=datetime-local], input[type=time]):not(.select2-search__field),
+:is(#content, .dialog, .tip_content) select,
+:is(#content, .dialog, .tip_content) textarea {
+  box-sizing: border-box; max-width: 100%; min-height: 36px; margin: 0; padding: 6px 10px;
+  border: 1px solid var(--ardoise); border-radius: 6px; background-color: var(--blanc); color: var(--nuit);
+  font: 400 .84375rem/1.4 var(--f-texte); box-shadow: none;
+}
+:is(#content, .dialog, .tip_content) select { padding-block: 4px; padding-inline-end: 6px; }
+:is(#content, .dialog, .tip_content) select[multiple], :is(#content, .dialog, .tip_content) select[size]:not([size="1"]) { min-height: 0; height: auto; }
+:is(#content, .dialog, .tip_content) textarea { min-height: 72px; resize: vertical; }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):focus:not([type=checkbox]):not([type=radio]):not(.select2-search__field) { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
+:is(#content, .dialog, .tip_content) :is(input, textarea)::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):is([readonly], :disabled):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=reset]) { background-color: var(--gris); color: var(--ardoise); }
+:is(#content, .dialog, .tip_content) :is(input[type=checkbox], input[type=radio]) { width: 16px; height: 16px; margin: 0; margin-inline-end: 4px; vertical-align: -3px; accent-color: var(--nuit); }
+:is(#content, .dialog) label { color: var(--nuit); }
+/* Required markers and field errors: text and asterisk, never colour alone */
+:is(#content, .dialog, .tip_content) :is(.error, font.error, span.error, div.error) { color: var(--erreur); }
+:is(#content, .dialog) .form_table .required, :is(#content, .dialog) .required { font-weight: 600; }
+:is(#content, .dialog) :is(.error, td.error, .has-error) :is(input:not([type=checkbox]):not([type=radio]), select, textarea) { border: 2px solid var(--erreur); }
+
+/* fieldset / legend (settings and dialog forms) */
+:is(#content, .dialog) fieldset { min-width: 0; margin: 0 0 12px; padding: 0; border: 0; }
+:is(#content, .dialog) legend { padding: 0; margin: 0 0 12px; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); }
+:is(#content, .dialog) legend::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
+
+/* ───────── Fixed widths of the legacy markup ─────────
+   width="940" (86 templates), 920, 830 and inline pixel widths would force
+   the 960 px layout: tables take the card width, other boxes are capped. */
+#content :is(table[width="940"], table[width="920"], table[width="830"], table.list, table.form_table, table.settings_table) { width: 100%; max-width: 100%; }
+#content :is(div, table, form, textarea, input, select, ul)[style*="width"] { max-width: 100%; }
+#content img:not(.thread-body *) { max-width: 100%; height: auto; }
+#content .thread-body img { max-width: 100%; }
+#content :is(td, th) { overflow-wrap: break-word; }
+#content :is(td, th) :is(input, select) { max-width: 100%; }
+.dialog { max-width: calc(100vw - 24px) !important; } /* core widths are !important */
+
+/* ───────── Tables: table.list (and .list.queue) ─────────
+   Nuit header, alternating gris rows, voile hover, cells 8 x 12. Core's
+   sort images (black on light) become arrows drawn in text. */
+:is(#content, .dialog) table.list { clear: both; margin: 4px 0 12px; border: 0; border-collapse: collapse; border-spacing: 0; background: var(--blanc); }
+:is(#content, .dialog) table.list caption { padding: 8px 0 10px; background: none; color: var(--nuit); font: 700 .9375rem var(--f-titre); text-align: start; }
+:is(#content, .dialog) table.list > thead > tr > th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 .75rem/1.35 var(--f-titre); text-align: start; vertical-align: middle; }
+:is(#content, .dialog) table.list > thead > tr > th a { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 0; background: none; color: var(--blanc); text-decoration: none; }
+:is(#content, .dialog) table.list > thead > tr > th a:hover { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: 3px; }
+:is(#content, .dialog) table.list > thead > tr > th a:is(.asc, .desc) { background: none; color: var(--blanc); }
+:is(#content, .dialog) table.list > thead > tr > th a[href]:not(.asc):not(.desc)::after { content: "\2195"; opacity: .7; font-weight: 400; }
+:is(#content, .dialog) table.list > thead > tr > th a.asc::after { content: "\2191"; color: var(--cyan); }
+:is(#content, .dialog) table.list > thead > tr > th a.desc::after { content: "\2193"; color: var(--cyan); }
+:is(#content, .dialog) table.list > thead > tr > th :is(i, .icon-sort) { color: inherit; }
+:is(#content, .dialog) table.list > tbody > tr > td { padding: 8px 12px; border: 0; background: transparent; vertical-align: top; }
+:is(#content, .dialog) table.list > tbody > tr:nth-child(odd) > td { background: var(--blanc); }
+:is(#content, .dialog) table.list > tbody > tr:nth-child(even) > td { background: var(--gris); }
+:is(#content, .dialog) table.list > tbody > tr:hover > td { background: var(--voile); }
+:is(#content, .dialog) table.list > tbody > tr.highlight > td { background: var(--voile); }
+:is(#content, .dialog) table.list > tbody > tr.highlight > td:first-child { box-shadow: inset 4px 0 0 var(--cyan); }
+html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-child { box-shadow: inset -4px 0 0 var(--cyan); }
+:is(#content, .dialog) table.list > tbody > tr > td a { color: var(--nuit); text-decoration-color: var(--cyan-profond); }
+:is(#content, .dialog) table.list > tbody > tr > td a:hover { text-decoration-thickness: 2px; }
+:is(#content, .dialog) table.list > tbody > tr > td input[type=checkbox] { margin-top: 2px; }
+:is(#content, .dialog) table.list > tfoot > tr > td { padding: 9px 12px; border: 0; border-top: 1px solid var(--gris); background: var(--blanc); color: var(--ardoise); }
+:is(#content, .dialog) table.list > tfoot a { color: var(--cyan-profond); }
+:is(#content, .dialog) table.list tr.inactive > td, :is(#content, .dialog) table.list td.faded { color: var(--ardoise); }
+
+/* ───────── Tables: settings and edit forms (.form_table, .settings_table) ─────────
+   Section headers (th) read like the mockup legends; rows separated by gris. */
+:is(#content, .dialog) :is(table.form_table, table.settings_table) { margin: 0 0 16px; border: 0; border-collapse: collapse; }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > td { padding: 8px 12px; border: 0; border-bottom: 1px solid var(--gris); }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > td:empty { padding: 0; }
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr > th, #content div.section-break {
+  padding: 22px 12px 10px; border: 0; border-bottom: 1px solid var(--gris); background: none; color: var(--nuit); font-weight: 400; text-align: start;
+}
+:is(#content, .dialog) :is(.form_table, .settings_table) > * > tr:first-child > th { padding-top: 6px; }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4, #content div.section-break h3 { margin: 0; padding: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4::after, #content div.section-break h3::after { content: ""; display: block; width: 28px; height: 3px; margin: 6px 0 4px; background: var(--cyan); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th h4 a { display: inline; color: var(--nuit); }
+:is(#content, .dialog) :is(.form_table, .settings_table) th em { display: block; margin: 0; color: var(--ardoise); font-style: normal; font-weight: 400; }
+:is(#content, .dialog) :is(.form_table, .settings_table) th em b, :is(#content, .dialog) :is(.form_table, .settings_table) th em strong { color: var(--nuit); font-family: var(--f-titre); font-weight: 700; }
+:is(#content, .dialog) .form_table em { color: var(--ardoise); }
+/* table.table (profile, user and organisation forms): tr.header rows are
+   section titles, like the legends of the mockup */
+:is(#content, .dialog) table.table:not(.list) { border-collapse: collapse; }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th) { padding: 22px 0 6px; border: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); text-align: start; }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th)::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
+:is(#content, .dialog) table.table:not(.list) tr.header { border: 0; }
+:is(#content, .dialog) table.table:not(.list) > tbody > tr > td { padding: 6px 8px; padding-inline-start: 0; background: none; }
+
+/* ───────── Tabs (ul.tabs + .tab_content) ─────────
+   Flat strip, 3 px cyan underline on the active tab; scrolls sideways when
+   narrow instead of wrapping. */
+:is(#content, .dialog) ul.tabs { display: flex; gap: 2px; height: auto; margin: 0 0 4px; padding: 0 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; border: 0; border-bottom: 1px solid var(--gris); background: none; box-shadow: none; text-align: start; list-style: none; }
+:is(#content, .dialog) ul.tabs li { flex: none; display: block; position: relative; bottom: 0; min-width: 0; height: auto; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; color: var(--ardoise); font-size: inherit; line-height: 1.3; text-align: start; }
+:is(#content, .dialog) ul.tabs li a { display: inline-flex; align-items: center; gap: 6px; padding: 11px 12px 9px; border-bottom: 3px solid transparent; color: var(--ardoise); font: 600 .8125rem/1.3 var(--f-titre); text-decoration: none; white-space: nowrap; }
+:is(#content, .dialog) ul.tabs li a:hover { color: var(--nuit); text-decoration: none; }
+:is(#content, .dialog) ul.tabs li.active a { color: var(--nuit); font-weight: 600; border-bottom-color: var(--cyan); }
+:is(#content, .dialog) ul.tabs li.empty { display: none; }
+/* A tab with errors: red underline plus a "!" (never colour alone); core's
+   overlay and !important top border are reset */
+:is(#content, .dialog) ul.tabs li.error { border-top: 0 !important; }
+:is(#content, .dialog) ul.tabs li.error a { color: var(--erreur); border-bottom-color: var(--erreur); }
+:is(#content, .dialog) ul.tabs li.error a::before { content: none; }
+:is(#content, .dialog) ul.tabs li.error a::after { content: "!"; display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--erreur); color: var(--blanc); font-size: .6875rem; font-weight: 700; }
+/* Vertical tabs (dynamic forms, user and organisation dialogs) */
+:is(#content, .dialog) ul.tabs.vertical { flex-direction: column; gap: 1px; padding: 0; overflow: visible; border-bottom: 0; border-inline-end: 1px solid var(--gris); }
+:is(#content, .dialog) ul.tabs.vertical li a { display: flex; padding: 8px 12px; border-bottom: 0; border-inline-start: 3px solid transparent; }
+:is(#content, .dialog) ul.tabs.vertical li.active a { border-inline-start-color: var(--cyan); background: var(--voile); }
+:is(#content, .dialog) .tab_content:not(.left) { padding: 16px 0 4px; }
+
+/* ───────── Dropdown menus (.action-dropdown, .noclick-dropdown) ───────── */
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul { min-width: 180px; margin: 0; padding: 4px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); font: 400 .84375rem/1.35 var(--f-texte); text-align: start; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li { line-height: 1.35; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 6px; color: var(--nuit); text-decoration: none; white-space: nowrap; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a i { flex: none; width: 1.1em; margin: 0; color: var(--cyan-profond); text-align: center; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a:hover,
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.active > a:hover { background: var(--voile); color: var(--nuit) !important; } /* core: #FFF !important */
+:is(#content, body) .action-dropdown ul li.active > a { background: var(--voile); color: var(--nuit); font-weight: 600; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a, :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a i { color: var(--erreur); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.danger > a:hover { background: var(--erreur-fond); color: var(--erreur) !important; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.positive > a:hover { background: var(--succes-fond); color: var(--succes) !important; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a.disabled, :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.disabled > a { color: var(--ardoise); opacity: .7; }
+:is(#content, body) .action-dropdown hr { margin: 4px 8px; border: 0; border-bottom: 1px solid var(--gris); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown)::before { border-bottom-color: rgba(0,15,38,.14); }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) { max-width: calc(100vw - 24px); }
+
+/* ───────── Dialogs (.dialog, #popup, #alert) ───────── */
+#overlay { background: var(--nuit); opacity: .55; }
+.dialog { padding: 20px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.1), 0 24px 64px rgba(0,15,38,.35); color: var(--nuit); font-size: .84375rem; }
+.dialog h3, .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 3em; color: var(--nuit); font: 700 1.125rem/1.3 var(--f-titre); }
+.dialog a { color: var(--cyan-profond); }
+.dialog a.close { top: 16px; right: 18px; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--nuit); font-size: 16px; text-decoration: none; }
+html.rtl .dialog a.close { right: auto; left: 18px; }
+.dialog a.close:hover { background: var(--gris); }
+.dialog th { padding: 6px 10px; border: 0; background: var(--gris); color: var(--nuit); }
+.dialog .table td:not(:empty) { background-color: transparent !important; } /* core #f8f8f8 !important */
+.dialog #popup-loading { background: rgba(255,255,255,.88); color: var(--nuit); }
+.dialog p.full-width, .dialog .buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.dialog p.full-width > span { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+/* Core "Loading" box (footer #loading; the login page has its own) */
+body:not(.cdr-login) #loading { border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); }
+body:not(.cdr-login) #loading h1 { color: var(--nuit); font: 600 1rem var(--f-titre); }
+
+/* ───────── Messages ─────────
+   État colours, 4 px start border and a leading icon (mask), never colour
+   alone. The icon is absolutely positioned: banners hold inline markup
+   (links, bold), so they are not flex boxes. */
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, #error_bar, #warning_bar, #notice_bar) {
+  position: relative; box-sizing: border-box; height: auto; margin: 0 0 16px; padding: 12px 14px; padding-inline-start: 44px;
+  border: 0; border-inline-start: 4px solid; border-radius: 6px; background-image: none;
+  color: var(--nuit); font-weight: 500; line-height: 1.45; text-align: start;
+}
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info, .error-banner, .warning-banner, .notice-banner, .success-banner, .info-banner, #error_bar, #warning_bar, #notice_bar)::before {
+  content: ""; position: absolute; inset-inline-start: 14px; top: 12px; width: 20px; height: 20px;
+  -webkit-mask: var(--cdr-ic-info) center / contain no-repeat; mask: var(--cdr-ic-info) center / contain no-repeat; background: currentColor;
+}
+:is(#msg_error, .error-banner, #error_bar) { border-color: var(--erreur); background-color: var(--erreur-fond); }
+:is(#msg_error, .error-banner, #error_bar)::before { background: var(--erreur); -webkit-mask-image: var(--cdr-ic-error); mask-image: var(--cdr-ic-error); }
+:is(#msg_warning, .warning-banner, #warning_bar) { border-color: var(--alerte); background-color: var(--alerte-fond); }
+:is(#msg_warning, .warning-banner, #warning_bar)::before { background: var(--alerte); -webkit-mask-image: var(--cdr-ic-alert); mask-image: var(--cdr-ic-alert); }
+:is(#msg_notice, .notice-banner, .success-banner, #notice_bar) { border-color: var(--succes); background-color: var(--succes-fond); }
+:is(#msg_notice, .notice-banner, .success-banner, #notice_bar)::before { background: var(--succes); -webkit-mask-image: var(--cdr-ic-ok); mask-image: var(--cdr-ic-ok); }
+:is(#msg_info, .info-banner) { border-color: var(--cyan-profond); background-color: var(--voile); }
+:is(#msg_info, .info-banner)::before { background: var(--cyan-profond); }
+:is(#msg_error, #msg_warning, #msg_notice, #msg_info):empty { display: none; }
+/* System bars above the shell: full width, square */
+:is(#error_bar, #warning_bar, #notice_bar) { margin: 0; border-radius: 0; }
+:is(#content, .dialog) .banner { margin: 0 0 12px; padding: 10px 14px; border: 0; border-radius: 6px; background: var(--gris); color: var(--nuit); }
+
+/* ───────── Pagination ─────────
+   Core prints "Page: <a><b>1</b></a> <b>[2]</b>"; coderise.js tags the
+   container .cdr-pager and the current page .cdr-page-current (brackets
+   removed, aria-current="page"). */
+#content .cdr-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0; color: var(--ardoise); }
+#content .cdr-pager > a[href]:has(> b, > strong), #content .cdr-pager > .cdr-page-current { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 6px; box-sizing: border-box; color: var(--nuit); font-weight: 600; text-decoration: none; }
+#content .cdr-pager > a[href]:has(> b, > strong) b, #content .cdr-pager > a[href]:has(> b, > strong) strong { font-weight: 600; }
+#content .cdr-pager > a[href]:has(> b, > strong):hover { background: var(--voile); }
+#content .cdr-pager > .cdr-page-current { background: var(--nuit); color: var(--blanc); }
+
+/* ───────── Help tips (.tip_box) and tooltips ───────── */
+:is(#content, .dialog) i.help-tip { color: var(--ardoise); opacity: 1; }
+:is(#content, .dialog) i.help-tip:hover { color: var(--cyan-profond) !important; } /* core: orange !important */
+.tip_box .tip_content { box-sizing: border-box; min-width: min(400px, calc(100vw - 24px)); max-width: calc(100vw - 24px); padding: 14px 16px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .84375rem/1.5 var(--f-texte); }
+.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 0 8px; padding-inline-end: 1.5em; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 1rem/1.3 var(--f-titre); }
+.tip_box .tip_content .links { border-top-color: var(--gris); }
+.tip_box .tip_content a, .tip_box .tip_content .links a { color: var(--cyan-profond); }
+.tip_box .tip_close { color: var(--nuit); }
+body .tooltip { font-family: var(--f-texte); }
+body .tooltip.in { opacity: 1; }
+body .tooltip-inner { padding: 5px 9px; border-radius: 6px; background: var(--nuit); color: var(--blanc); }
+body .tooltip.top .tooltip-arrow { border-top-color: var(--nuit); }
+body .tooltip.bottom .tooltip-arrow { border-bottom-color: var(--nuit); }
+body .tooltip.left .tooltip-arrow { border-left-color: var(--nuit); }
+body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
+
+/* ───────── select2 ───────── */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple { min-height: 36px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
+.select2-container--default .select2-selection--single { height: 36px; }
+.select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 34px; color: var(--nuit); padding-inline: 10px 28px; box-sizing: border-box; } /* scp.css forces width: 100% */
+.select2-container--default .select2-selection--single .select2-selection__placeholder { color: var(--ardoise); }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 34px; }
+.select2-container--default .select2-selection--multiple .select2-selection__rendered { padding: 2px 6px; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice { margin-top: 4px; padding: 1px 8px; border: 0; border-radius: 4px; background: var(--gris); color: var(--nuit); font-weight: 500; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: var(--ardoise); }
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--open .select2-selection { border-color: var(--cyan-profond); }
+.select2-container .select2-selection:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.select2-dropdown { border: 0; border-radius: 6px; box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .84375rem/1.35 var(--f-texte); }
+.select2-container--default .select2-search--dropdown .select2-search__field { min-height: 32px; padding: 4px 8px; border: 1px solid var(--ardoise); border-radius: 6px; }
+.select2-container--default .select2-results__option { padding: 7px 10px; }
+.select2-container--default .select2-results__option[aria-selected=true] { background: var(--gris); color: var(--nuit); font-weight: 600; }
+.select2-container--default .select2-results__option--highlighted[aria-selected] { background: var(--voile); color: var(--nuit); }
+.select2-container--default .select2-results__group { color: var(--ardoise); font: 600 .75rem var(--f-titre); }
+
+/* ───────── Redactor (rich text editor) ───────── */
+:is(#content, .dialog) .redactor-box.redactor-styles-on { border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
+:is(#content, .dialog) .redactor-box.redactor-focus.redactor-styles-on { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
+:is(#content, .dialog) .redactor-toolbar { padding: 4px; border-bottom: 1px solid rgba(0,15,38,.15); border-radius: 6px 6px 0 0; background: var(--gris); box-shadow: none; }
+:is(#content, .dialog) .redactor-toolbar a { min-width: 30px; padding: 7px 9px 6px; border-radius: 5px; background: transparent; color: var(--nuit); font-size: 14px; }
+:is(#content, .dialog) .redactor-toolbar a.re-button-icon { padding: 7px 9px 5px; }
+:is(#content, .dialog) .redactor-toolbar a:hover, :is(#content, .dialog) .redactor-toolbar a.redactor-button-active { background: var(--blanc); color: var(--nuit); }
+:is(#content, .dialog) .redactor-toolbar a.redactor-button-active { box-shadow: inset 0 -2px 0 var(--cyan-profond); }
+:is(#content, .dialog) .redactor-in, :is(#content, .dialog) .redactor-styles { color: var(--nuit); font-family: var(--f-texte); }
+.redactor-dropdown { border: 0; border-radius: 10px; box-shadow: var(--cdr-ring); padding: 4px; }
+.redactor-dropdown a { border-radius: 6px; color: var(--nuit); }
+.redactor-dropdown a:hover { background: var(--voile); color: var(--nuit); }
+.redactor-modal { border-radius: 10px; color: var(--nuit); }
+.redactor-modal-header { font-family: var(--f-titre); }
+
+/* ───────── Sticky bar (core div.sticky.bar, scp.js) ─────────
+   In the page it is part of the card. Once scrolled (.fixed: core
+   position:fixed, left 0, width 100%, z-index 6) it starts after the rail,
+   under the sticky top bar, as a nuit bar; z-index 4 keeps it under the top
+   bar (5) and the dialogs (10). Below 920 px it spans the full width. The
+   scroll-up chevron gets its own space at the end of the bar.
+   Keep the bar's content the same height in both states: scp.js sizes the
+   placeholder with $bar.height() once fixed, so any in-flow margin or
+   padding of the bar, a title margin, or floated buttons taller than the
+   title that the in-flow bar does not contain (a fixed bar does) make the
+   page change height when it
+   sticks, and near the bottom of a page the scroll position then flips the
+   bar between fixed and in-flow without end. For the same reason the inline
+   width scp.js puts on .content (same line breaks in both states) is kept. */
+#content .sticky.placeholder { margin: 0; padding: 0; }
+#content .sticky.bar { display: flow-root; clear: both; margin: 0; padding: 0; } /* contains its floated buttons, as position:fixed does; below earlier floats so it keeps the full width */
+#content .sticky.bar :is(h2, h3) { margin: 0; }
+#content .sticky.bar.fixed { z-index: 4; padding: 10px 24px; padding-inline-end: 72px; background: var(--nuit); color: var(--blanc); box-shadow: 0 6px 18px rgba(0,15,38,.28); --focus: var(--cyan); }
+#content .sticky.bar.fixed .content { max-width: 100%; }
+/* White text for the bar's own content only: the dropdown menus that live in
+   the bar (Assign, Status, More...) are white panels and keep nuit text */
+#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label):not(:is(.action-dropdown, .noclick-dropdown) *) { color: var(--blanc); }
+#content .sticky.bar.fixed :is(.action-dropdown, .noclick-dropdown) { color: var(--nuit); }
+#content .sticky.bar.fixed h2 i { color: var(--cyan); }
+#content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
+#content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
+#content .sticky.bar.fixed .action-button i.icon-caret-down { border-color: rgba(255,255,255,.35); }
+#content .sticky.bar.fixed :is(input[type=submit], button[type=submit], .primary.button):hover { background: var(--blanc); color: var(--nuit); }
+#content .sticky.bar.fixed :is(.red.button, .action-button.danger) { background: transparent; color: var(--blanc) !important; border-color: rgba(255,255,255,.55) !important; }
+/* Core shows the scroll-up chevron only from 1040 px (scp.css); here it is shown on the floating bar beside the rail (> 920 px) and absent below by design */
+#content .sticky.bar .scroll-up { display: none; }
+@media (min-width: 921px) {
+  #content .sticky.bar.fixed { left: var(--rail-w); right: 0; width: auto; margin-top: var(--topbar-h); }
+  html.rtl #content .sticky.bar.fixed, [dir="rtl"] #content .sticky.bar.fixed { left: 0; right: var(--rail-w); }
+  #content .sticky.bar.fixed a.sticky.scroll-up { display: inline-grid; place-items: center; position: absolute; top: 50%; right: 20px; left: auto; width: 36px; height: 36px; margin-top: -18px; padding: 0; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,.55); border-radius: 6px; background: none; box-shadow: none; color: var(--blanc) !important; } /* core color !important */
+  html.rtl #content .sticky.bar.fixed a.sticky.scroll-up, [dir="rtl"] #content .sticky.bar.fixed a.sticky.scroll-up { right: auto; left: 20px; }
+  #content .sticky.bar.fixed a.sticky.scroll-up:hover { background: rgba(255,255,255,.12); }
+}
+@media (max-width: 920px) {
+  #content .sticky.bar.fixed { padding-inline: 16px; }
+}
+
+/* ───────── Ticket queue (queue-tickets.tmpl.php) ─────────
+   Mockup "File de tickets": filter row, nuit selection bar, nuit table
+   header, first-reply gauge column. Core markup and cells are unchanged. */
+
+/* First-reply gauge (theme.css "Jauge de premier retour"): the state reads
+   from the text and the icon, never from the colour alone; marks at 25, 50
+   and 75 % of the window. */
+#content .gauge { display: grid; gap: 3px; min-width: 128px; }
+#content .gauge-bar { position: relative; display: block; height: 8px; border-radius: 2px; background: var(--gris); box-shadow: inset 0 0 0 1px rgba(0,15,38,.18); overflow: hidden; }
+#content .gauge-bar i { position: absolute; inset: 0 auto 0 0; background: var(--cyan-profond); }
+html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
+#content .gauge-bar::after { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), rgba(255,255,255,.9) calc(25% - 1px) 25%); }
+#content .gauge-txt { display: inline-flex; align-items: center; gap: 5px; color: var(--nuit); font: 600 .75rem var(--f-titre); white-space: nowrap; }
+#content .gauge-warn .gauge-bar i { background: var(--alerte); } #content .gauge-warn .gauge-txt { color: var(--alerte); }
+#content .gauge-over .gauge-bar i { background: var(--erreur); } #content .gauge-over .gauge-txt { color: var(--erreur); }
+#content .gauge-done .gauge-bar i { background: var(--succes); } #content .gauge-done .gauge-txt { color: var(--succes); }
+#content .gauge-none { color: var(--ardoise); font-size: .78125rem; }
+#content .gauge-lg .gauge-bar { height: 12px; border-radius: 3px; }
+#content .gauge-lg .gauge-txt { font-size: .84375rem; }
+#content table.queue > :is(thead, tbody) > tr > .cdr-gauge-col { position: relative; width: 1%; padding-inline: 10px; white-space: nowrap; } /* relative: containing block of the .sr-only text, which would otherwise escape the .cdr-hscroll wrapper and widen the page */
+#content table.queue .gauge { min-width: 112px; }
+/* Core caps the subject at 300 px (inline): narrower so the gauge column fits the card at 1280 px */
+#content table.queue .truncate { max-width: clamp(140px, 18vw, 300px) !important; }
+
+/* Filter row: the quick search, the quick filter and the sort menu on one
+   line, in the card (no grey band) */
+#content.cdr-tickets #basic_search { display: flex; flex-wrap: wrap-reverse; align-items: center; justify-content: space-between; gap: 10px 14px; margin: -4px 0 14px; padding: 0 0 14px; border-bottom: 1px solid var(--gris); border-radius: 0; background: none; }
+#content.cdr-tickets #basic_search > .pull-right { float: none; display: flex; align-items: center; gap: 8px; height: auto !important; margin: 0; margin-inline-start: auto; order: 2; } /* inline height:25px */
+#content.cdr-tickets #basic_search > .pull-right .valign-helper { display: none; }
+#content.cdr-tickets #basic_search > form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; max-width: 100%; order: 1; }
+#content.cdr-tickets #basic_search .attached.input { min-width: 0; max-width: 100%; margin: 0; }
+#content.cdr-tickets #basic_search input.basic-search { width: 300px; min-width: 0; }
+#content.cdr-tickets #basic_search form > a { font-weight: 600; }
+
+/* The queue's bar (the only sticky bar holding .configureQ): always the
+   mockup's nuit ".bulk" bar (ruling: core's always-visible bar is kept,
+   styled as the nuit bar). Its padding sits on .content (border-box), the
+   same in both states, so the placeholder scp.js sizes with $bar.height()
+   keeps the page height when the bar sticks. */
+#content div:has(> .sticky.bar .configureQ) { margin: 0 !important; padding: 0 !important; } /* core inline margin-bottom:20px / padding-top:5px */
+#content .sticky.bar:has(.configureQ) { border-radius: 8px 8px 0 0; background: var(--nuit); color: var(--blanc); --focus: var(--cyan); }
+#content .sticky.bar:has(.configureQ) > .content { display: flow-root; box-sizing: border-box; max-width: 100%; padding: 8px 16px; }
+#content .sticky.bar.fixed:has(.configureQ) { padding-block: 0; padding-inline-start: 0; border-radius: 0; }
+#content .sticky.bar:has(.configureQ) h2 { display: flex; align-items: center; gap: 8px; min-height: 36px; font-size: 1rem; line-height: 1.3; }
+#content .sticky.bar:has(.configureQ) h2 a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+#content .sticky.bar:has(.configureQ) h2 a:hover { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: 3px; }
+#content .sticky.bar:has(.configureQ) :is(h2, h2 a, h3, a, .faded, .faded b, label, .configureQ > i):not(:is(.action-dropdown, .noclick-dropdown) *) { color: var(--blanc); }
+#content .sticky.bar:has(.configureQ) h2 i, #content .sticky.bar:has(.configureQ) .configureQ > i { color: var(--cyan); }
+#content .sticky.bar:has(.configureQ) :is(.action-dropdown, .noclick-dropdown) { color: var(--nuit); }
+#content .sticky.bar:has(.configureQ) .configureQ { display: inline-grid; place-items: center; min-height: 36px; margin-inline-start: 6px; }
+#content .sticky.bar:has(.configureQ) :is(.button, .action-button, input[type=button], input[type=reset]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
+#content .sticky.bar:has(.configureQ) :is(.button, .action-button, input[type=button], input[type=reset]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
+#content .sticky.bar:has(.configureQ) .action-button i.icon-caret-down { border-color: rgba(255,255,255,.35); }
+#content .sticky.bar:has(.configureQ) :is(.red.button, .action-button.danger) { background: transparent; color: var(--blanc) !important; border-color: rgba(255,255,255,.55) !important; }
+#content .sticky.bar:has(.configureQ) .pull-right.flush-right { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+
+/* Table: glued under the bar, a thin separator between the two nuit bands */
+#content form#tickets > table.queue { margin-top: 0; }
+#content table.queue > thead > tr > th { border-top: 1px solid rgba(255,255,255,.14); white-space: nowrap; }
+#content table.queue > tbody > tr > td { line-height: 1.4; }
+/* Priority (and other coloured columns): core paints the cell and an inner
+   div with inline colours; the cell keeps the row stripe, the div becomes a tag */
+#content table.queue > tbody > tr > td[style*="background"] { background-color: var(--blanc) !important; }
+#content table.queue > tbody > tr:nth-child(even) > td[style*="background"] { background-color: var(--gris) !important; }
+#content table.queue > tbody > tr:is(:hover, .highlight) > td[style*="background"] { background-color: var(--voile) !important; }
+#content table.queue > tbody > tr > td[style*="background"] > div[style*="background"] { display: inline-block; padding: 1px 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,15,38,.18); color: var(--nuit); font: 600 .75rem/1.6 var(--f-titre); white-space: nowrap; }
+#content table.queue > tfoot > tr > td i { font-style: normal; }
+
+/* Rail: "Add personal queue" as a ghost button */
+#cdr-queues .add-queue { margin: 6px 0 2px; margin-inline-start: 10px; }
+#cdr-queues .add-queue a { justify-content: center; padding-inline-start: 8px; border: 1px dashed rgba(255,255,255,.35); }
+
+/* ═════════ Ticket view (#content.cdr-ticket, core ticket-view.inc.php) ═════════
+   Mockup "Fiche ticket" (theme.css: Panneaux, Propriétés, Fil de discussion,
+   Zone de réponse). Core markup is kept; coderise.js only:
+   - moves ul#ticket_tabs into #ticket_tabs_container (one column-1 item),
+   - wraps the .cdr-sla panel (object.view signal) and the table.ticket_info
+     blocks into <aside class="cdr-props">, placed after the container,
+   - tags the latest thread entry (.cdr-latest), the note mode of the reply
+     area (#response_options.is-note) and a properties column too tall to
+     stick (.cdr-tall).
+   #content is a two-column grid without the card: the conversation, the
+   reply area and every properties block are panels on the gris page.
+   Everything that is not the conversation or the aside (message bars, the
+   action bar, the title) spans both columns. The class cdr-ticket exists on
+   the ticket view only: edit and print keep the stock layout. */
+#content.cdr.cdr-ticket { display: grid; grid-template-columns: minmax(0, 1fr) 330px; column-gap: 16px; align-items: start; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+#content.cdr-ticket > * { grid-column: 1 / -1; min-width: 0; }
+#content.cdr-ticket > #ticket_tabs_container { grid-column: 1; }
+#content.cdr-ticket > aside.cdr-props { grid-column: 2; }
+#content.cdr-ticket > br { display: none; }
+
+/* Action bar and title: the action bar keeps the same height in both states
+   (see Sticky bar); the subject is the page title */
+#content.cdr-ticket .sticky.bar h2 { font-size: 1rem; line-height: 36px; }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2 a { color: var(--ardoise); }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2 a i { color: var(--cyan-profond); }
+#content.cdr-ticket > .tixTitle { margin: 6px 0 16px; padding: 0; border: 0; }
+#content.cdr-ticket > .tixTitle h3 { margin: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
+
+/* Conversation panel: the tab strip (moved into the container) and the tab
+   contents are one white panel; the reply area is its own panel below */
+#content.cdr-ticket #ticket_tabs_container > ul#ticket_tabs { margin: 0; padding: 0 12px; border-radius: 10px 10px 0 0; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #ticket_tabs_container > .tab_content { padding: 0; }
+#content.cdr-ticket #ticket_tabs_container > .tab_content:not(#ticket_thread),
+#content.cdr-ticket #ticket_thread > #ticketThread { border-radius: 0 0 10px 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #ticket_tabs_container > .tab_content:not(#ticket_thread) { padding: 16px; }
+#content.cdr-ticket #thread-items { margin: 0; padding: 0 0 10px; }
+#content.cdr-ticket #thread-items::before { content: none; display: none; } /* core: dotted timeline */
+#content.cdr-ticket #ticket_thread > #msg_warning { margin: 16px 0 0; }
+
+/* Thread entries (thread-entry.tmpl.php): .entry of the mockup. Client
+   message = voile; internal note = alerte-fond, 4 px alerte bar and the
+   "Internal note" label (text from header.inc.php, --cdr-note-label); the
+   latest entry = cyan bar. No avatar markup when avatars are off (the
+   demo): a CSS disc with a person icon takes its place; when core prints an
+   avatar (span.avatar) it is shown in the disc's place instead. */
+:root {
+  --cdr-ic-user-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5'/%3E%3C/svg%3E");
+  --cdr-ic-user-n: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000F26' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5'/%3E%3C/svg%3E");
+}
+#content.cdr-ticket #thread-items > [id^="thread-entry-"] { border-bottom: 1px solid var(--gris); }
+#content.cdr-ticket .thread-entry { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 12px; margin: 0; padding: 14px 16px; background: var(--blanc); }
+#content.cdr-ticket .thread-entry::after { content: none; display: none; }
+#content.cdr-ticket .thread-entry::before { content: ""; grid-column: 1; grid-row: 1 / span 2; width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--nuit) var(--cdr-ic-user-w) center / 16px no-repeat; }
+#content.cdr-ticket .thread-entry.message::before { background: var(--voile) var(--cdr-ic-user-n) center / 16px no-repeat; box-shadow: inset 0 0 0 1.5px var(--cyan-profond); }
+#content.cdr-ticket .thread-entry.avatar::before { content: none; display: none; }
+#content.cdr-ticket .thread-entry > .avatar { grid-column: 1; grid-row: 1 / span 2; float: none; width: 30px; height: 30px; max-height: none; margin: 0; border-radius: 50%; overflow: hidden; }
+#content.cdr-ticket .thread-entry > .avatar img { width: 100%; height: 100%; margin: 0; object-fit: cover; }
+#content.cdr-ticket .thread-entry > .header { grid-column: 2; position: static; margin: 0 0 4px; padding: 0; border: 0; border-radius: 0; background: none; color: var(--ardoise); line-height: 1.5; }
+#content.cdr-ticket .thread-entry > .header::before, #content.cdr-ticket .thread-entry > .header::after { content: none; display: none; }
+#content.cdr-ticket .thread-entry > .header > b { color: var(--nuit); font: 600 .875rem var(--f-titre); }
+#content.cdr.cdr-ticket #thread-items .thread-entry > .header a[href^="#entry-"] { color: var(--ardoise); text-decoration: none; }
+#content.cdr.cdr-ticket #thread-items .thread-entry > .header a[href^="#entry-"]:hover { color: var(--nuit); text-decoration: underline; }
+#content.cdr-ticket .thread-entry > .header .title { max-width: 100% !important; margin-inline-start: 10px; color: var(--ardoise); } /* inline max-width:400px */
+#content.cdr-ticket .thread-entry > .header .textra .label { color: var(--ardoise); }
+#content.cdr-ticket .thread-entry > .header .muted-button { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -4px 0 0; border-radius: 6px; color: var(--nuit); cursor: pointer; }
+#content.cdr-ticket .thread-entry > .header .muted-button:hover { background: rgba(0,15,38,.07); }
+#content.cdr-ticket .thread-entry > .thread-body { grid-column: 2; padding: 0; border: 0; border-radius: 0; background: none; color: var(--nuit); overflow-wrap: anywhere; }
+#content.cdr.cdr-ticket .thread-entry > .thread-body a:not(.button) { color: var(--nuit) !important; /* core thread.css: #428bca !important */ text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket .thread-entry > .thread-body pre { white-space: pre-wrap; }
+#content.cdr-ticket .thread-entry .attachments { position: static; display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 0; background: none; }
+#content.cdr-ticket .thread-entry .attachment-info { display: inline-flex; align-items: center; gap: 6px; width: auto; max-width: 100%; margin: 0; padding: 3px 10px; border-radius: 5px; background: var(--blanc); box-shadow: inset 0 0 0 1px var(--ardoise); font-size: .78125rem; }
+#content.cdr-ticket .thread-entry .attachment-info .filename { max-width: 240px; font-weight: 600; }
+#content.cdr-ticket .thread-entry.message { background: var(--voile); }
+#content.cdr-ticket .thread-entry.note { background: var(--alerte-fond); box-shadow: inset 4px 0 0 var(--alerte); }
+#content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset 4px 0 0 var(--cyan); }
+html.rtl #content.cdr-ticket .thread-entry.note { box-shadow: inset -4px 0 0 var(--alerte); }
+html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: inset -4px 0 0 var(--cyan); }
+#content.cdr-ticket .thread-entry.note > .header, #content.cdr.cdr-ticket #thread-items .thread-entry.note > .header a[href^="#entry-"] { color: var(--alerte); }
+#content.cdr-ticket .thread-entry.note > .header > b::after { content: var(--cdr-note-label, "Internal note"); display: inline-block; margin-inline-start: 10px; padding: 0 8px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--alerte); color: var(--alerte); font: 600 .75rem/1.6 var(--f-titre); vertical-align: 1px; }
+#content.cdr-ticket .thread-entry.system { background: var(--gris); }
+
+/* Thread events (thread-event.tmpl.php): one ardoise line, the .event of the mockup */
+#content.cdr-ticket .thread-event { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 7px 16px; padding-inline-start: 58px; border-bottom: 1px solid var(--gris); background: var(--blanc); color: var(--ardoise); line-height: 1.45; }
+#content.cdr-ticket .thread-event .type-icon { flex: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font-size: 13px; line-height: 1.45; }
+#content.cdr-ticket .thread-event .type-icon::after { content: none; display: none; }
+#content.cdr-ticket .thread-event .type-icon i { color: var(--ardoise); opacity: 1; }
+#content.cdr-ticket .thread-event .description { flex: 1 1 0; min-width: 0; width: auto; margin: 0; padding: 0; color: var(--ardoise); overflow-wrap: anywhere; }
+#content.cdr-ticket .thread-event .description :is(b, strong) { color: var(--nuit); font-weight: 600; }
+#content.cdr.cdr-ticket .thread-event a { color: var(--nuit); }
+#content.cdr-ticket .thread-event img.avatar { max-height: 18px; margin: -2px 3px 0; border-radius: 50%; }
+
+/* Reply area (#response_options): its own panel; the "Post Internal Note"
+   tab tints the whole area alerte-fond (coderise.js sets .is-note, no :has()) */
+#content.cdr.cdr-ticket #response_options { margin: 16px 0 0; padding: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-ticket #response_options > ul#response-tabs { margin: 0; padding: 0 12px; }
+#content.cdr-ticket #response_options > form { margin: 0; padding: 12px 16px 16px; border: 0; background: transparent; }
+#content.cdr-ticket #response_options > form > table { max-width: 100%; }
+#content.cdr-ticket #response_options > form p:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px 0 0; }
+#content.cdr.cdr-ticket #response_options.is-note { background: var(--alerte-fond); box-shadow: 0 0 0 1px rgba(122,75,0,.25); }
+#content.cdr-ticket #response_options.is-note > ul#response-tabs { border-bottom-color: rgba(122,75,0,.25); }
+#content.cdr-ticket #response_options.is-note > ul#response-tabs li.active a { border-bottom-color: var(--alerte); color: var(--alerte); }
+
+/* Properties column: one sticky aside (top under the top bar, lower while
+   core's action bar floats), each table.ticket_info a panel of .props rows
+   (label left, value right, alternating rows). A column taller than the
+   window is not sticky (.cdr-tall), so its end stays reachable. */
+#content.cdr-ticket > aside.cdr-props { display: grid; gap: 16px; align-content: start; position: sticky; top: calc(var(--topbar-h) + 16px); }
+#content.cdr-ticket:has(.sticky.bar.fixed) > aside.cdr-props { top: calc(var(--topbar-h) + 72px); }
+#content.cdr-ticket > aside.cdr-props.cdr-tall { position: static; }
+#content.cdr-ticket aside.cdr-props > .panel { margin: 0; }
+#content.cdr-ticket aside.cdr-props .panel-h h2 { margin: 0; font: 700 .9375rem/1.3 var(--f-titre); }
+#content.cdr-ticket aside.cdr-props .panel-h .ic { color: var(--cyan-profond); }
+#content.cdr-ticket aside.cdr-props .cdr-sla .gauge { min-width: 0; }
+#content.cdr-ticket aside.cdr-props .cdr-sla-note { margin: 8px 0 0; color: var(--ardoise); }
+#content.cdr-ticket aside.cdr-props > table.ticket_info { display: block; width: auto; max-width: none; margin: 0; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); overflow: hidden; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody,
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr,
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr > td,
+#content.cdr-ticket aside.cdr-props > table.ticket_info table,
+#content.cdr-ticket aside.cdr-props > table.ticket_info table > tbody,
+#content.cdr-ticket aside.cdr-props > table.custom-data > :is(thead, tbody),
+#content.cdr-ticket aside.cdr-props > table.custom-data > thead > tr { display: block; width: auto; margin: 0; padding: 0; border: 0; background: none; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table tr,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table tr:nth-child(even),
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr:nth-child(even) { background: var(--gris); }
+#content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) table :is(th, td),
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td { display: block; width: auto; padding: 0; border: 0; background: none; text-align: start; vertical-align: middle; overflow-wrap: anywhere; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table th,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td:first-child { color: var(--ardoise); font-weight: 400; }
+#content.cdr-ticket aside.cdr-props > table.ticket_info table td,
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr > td + td { color: var(--nuit); font-weight: 500; }
+#content.cdr-ticket aside.cdr-props > table.custom-data > thead th { display: block; padding: 11px 16px; border: 0; border-bottom: 1px solid var(--gris); background: none; color: var(--nuit); font: 700 .9375rem var(--f-titre); text-align: start; }
+#content.cdr.cdr-ticket aside.cdr-props a:not(.button) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket aside.cdr-props a.inline-edit, #content.cdr-ticket aside.cdr-props a.tickets-action, #content.cdr-ticket aside.cdr-props a.ticket-action { text-decoration-style: dotted; }
+#content.cdr-ticket aside.cdr-props .faded { color: var(--ardoise); }
+
+@media (max-width: 1180px) {
+  #content.cdr.cdr-ticket { grid-template-columns: minmax(0, 1fr); }
+  #content.cdr-ticket > #ticket_tabs_container, #content.cdr-ticket > aside.cdr-props { grid-column: 1; }
+  #content.cdr-ticket > aside.cdr-props { position: static; margin-top: 16px; }
+}
+@media (max-width: 760px) {
+  #content.cdr-ticket aside.cdr-props > table.ticket_info table tr,
+  #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #content.cdr-ticket .thread-entry { grid-template-columns: minmax(0, 1fr); padding: 12px 14px; }
+  #content.cdr-ticket .thread-entry::before, #content.cdr-ticket .thread-entry > .avatar { display: none; }
+  #content.cdr-ticket .thread-entry > :is(.header, .thread-body) { grid-column: 1; }
+  #content.cdr-ticket .thread-event { padding-inline-start: 14px; }
+  #content.cdr-ticket #response_options > form { padding: 10px 12px 14px; }
+}
+
+/* Table outside the properties column (task view in the Tasks tab): its two
+   info columns stack on narrow screens */
+@media (max-width: 920px) {
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data),
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody,
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody > tr,
+  #content.cdr :not(aside.cdr-props) > table.ticket_info:not(.custom-data) > tbody > tr > td { display: block; width: auto; }
+}
+
+/* ═════════ Administration (#content.cdr-is-admin) ═════════
+   Mockup "Paramètres" and "Agents" (theme.css: Formulaires, Barre
+   d'enregistrement). Core templates are unchanged: settings and edit forms
+   are form.save > table.form_table rows (label cell + control cell), section
+   rows are <th colspan="2"><em><b>Title</b>: description</em></th>, the
+   button row is the last direct <p> of the form holding a submit input.
+   coderise.js adds is-changed on the row of a changed field (with a
+   .cdr-changed-flag text), is-dirty on the form and the counter
+   (.cdr-savebar-count) in the button row; everything else is CSS. */
+:root {
+  --cdr-ic-pencil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9l-4-4L4 16z'/%3E%3Cpath d='m13.5 6.5 4 4'/%3E%3C/svg%3E");
+}
+
+/* Left-label fields: label column 220 px, controls capped at 520 px */
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td:first-child:nth-last-child(2) { width: 220px; padding-top: 14px; font-weight: 600; vertical-align: top; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td { vertical-align: middle; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], select, textarea):not([type=checkbox]):not([type=radio]) { max-width: min(520px, 100%); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td.required:not(:has(span.error))::after { content: " *"; color: var(--erreur); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .faded { font-size: .8125rem; }
+/* Inline errors (div.error / font.error / span.error): bold red text, the
+   empty placeholders core prints for every field take no room */
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) :is(div.error, span.error, font.error) { font-weight: 600; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) div.error:empty { display: none; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) div.error:not(:empty) { margin-top: 4px; }
+
+/* Section rows: the legend look (title, then the 28 x 3 px cyan bar under
+   the row; the description stays on the title's line, ardoise) */
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th em :is(b, strong) { font-size: .9375rem; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th:has(> em > :is(b, strong)):not(:has(h4))::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 8px; background: var(--cyan); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th em .help-tip { margin-inline-start: 4px; }
+
+/* Changed fields: a 4 px cyan bar on the row and a "modified" text flag
+   under the label (never colour alone) */
+#content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child { box-shadow: inset 4px 0 0 var(--cyan); }
+html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child { box-shadow: inset -4px 0 0 var(--cyan); }
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) { position: relative; padding-inline-start: 16px; padding-bottom: 28px; }
+/* out of the text flow, so the required "*" stays right after the label */
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { position: absolute; inset-inline-start: 16px; bottom: 8px; margin: 0; }
+#content.cdr-is-admin form.save :not(tr).is-changed { box-shadow: inset 4px 0 0 var(--cyan); padding-inline-start: 10px; }
+#content.cdr-is-admin .cdr-changed-flag { display: flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--cyan-profond); font: 600 .75rem/1.4 var(--f-titre); }
+#content.cdr-is-admin .cdr-changed-flag::before { content: ""; flex: none; width: 13px; height: 13px; background: currentColor; -webkit-mask: var(--cdr-ic-pencil) center / contain no-repeat; mask: var(--cdr-ic-pencil) center / contain no-repeat; }
+
+/* Save bar: the button row of an admin form sticks to the bottom of the
+   window as the nuit bar (works without JS; the counter is added by
+   coderise.js). Buttons are styled in place: core's submit handler clones
+   and moves the submit inputs. */
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) {
+  position: sticky; bottom: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px;
+  margin: 20px 0 0; padding: 12px 20px; border-radius: 8px; background: var(--nuit); color: var(--blanc);
+  box-shadow: 0 -6px 18px rgba(0,15,38,.14); text-align: start !important; --focus: var(--cyan); /* inline text-align:center */
+}
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button) { margin: 0; }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(.button, input[type=reset], input[type=button], button[type=reset], button[type=button]):not([type=submit]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit] { border-color: transparent; background: var(--cyan); color: var(--nuit); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:hover { background: var(--blanc); color: var(--nuit); }
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button)[type=submit]:disabled { opacity: .6; }
+#content.cdr-is-admin .cdr-savebar-count { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: auto; font-weight: 600; }
+#content.cdr-is-admin .cdr-savebar-count:not(:empty)::before { content: ""; flex: none; width: 16px; height: 16px; background: var(--cyan); -webkit-mask: var(--cdr-ic-pencil) center / contain no-repeat; mask: var(--cdr-ic-pencil) center / contain no-repeat; }
+
+/* Narrow screens: the top bar of the admin panel holds nothing below 920 px
+   (crumbs and search hidden, no "New ticket"): no empty white band */
+@media (max-width: 920px) {
+  .topbar:not(:has(> .btn)) { display: none; }
+}
+/* Agent edit (staff.inc.php): the nested field table has an inline 760 px
+   width beside the 100 px avatar; it takes what is left of the card */
+#content.cdr-is-admin form.save table.table[style*="width"] { width: auto !important; }
+/* Below 600 px: label above control on two-cell form rows. The tables are
+   blocks: a long <select> no longer gives them a min-content width wider
+   than the card (rows with another cell count get an anonymous table). */
+@media (max-width: 600px) {
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody) > tr:has(> th:only-child) { display: block; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) { display: block; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td { display: block; width: auto; height: auto; box-sizing: border-box; } /* core: td height 20px */
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td:first-child { padding-bottom: 0; border-bottom: 0; }
+  #content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) { padding-bottom: 0; padding-inline-end: 96px; }
+  #content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { inset-inline: auto 12px; top: 14px; bottom: auto; } /* beside the label, the required "*" stays after it */
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody) > tr > th { display: block; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) :is(input, select, textarea):not([type=checkbox]):not([type=radio]) { max-width: 100%; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .pull-right { float: none; }
+  /* profile.php: a full-width row (td colspan=2) holds a nested table with an inline width: 760px, beside a floated avatar */
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list))[style*="width"] { width: auto !important; max-width: 100%; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child) > td { display: block; width: auto; box-sizing: border-box; }
+  #content.cdr form.save .avatar.pull-left { float: none; }
+  #content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) { padding: 10px 12px; }
+}
+
+/* ───────── Login and password reset (login.tpl.php, pwreset*.php) ─────────
+   All rules are scoped by body.cdr-login (set by login.header.php, which the
+   three password-reset templates also include, so they get the card look with
+   no markup change). Ported from the "Connexion" block of
+   docs/theme-mockups-admin/theme.css. Appended after the shell rules; this
+   section must stay last. The legacy #brickwall, #blur, #background and the
+   #poweredBy logo stay in the DOM and are only hidden visually. */
+html:has(body.cdr-login) { background: var(--nuit); overflow-y: auto; } /* login.css forces a scrollbar */
+body.cdr-login { background: var(--nuit); color: var(--blanc); font-size: .9375rem; height: auto; min-height: 100vh; text-align: start; line-height: 1.5; }
+.cdr-login #brickwall, .cdr-login #blur, .cdr-login #background { display: none; }
+.cdr-login #poweredBy { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; box-shadow: none; text-shadow: none; background: none; }
+.cdr-login #poweredBy:focus-within { position: fixed; inset: auto 12px 12px auto; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; padding: 8px 12px; border-radius: 6px; background: var(--nuit); color: var(--blanc); font-size: .75rem; z-index: 10; }
+html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
+.cdr-login #poweredBy .osticket-logo { filter: none; }
+
+/* The card: alone and centred on the password-reset pages, right column on the login page */
+.cdr-login #loginBox { position: relative; inset: auto; width: min(440px, calc(100% - 32px)); margin: 8vh auto 24px; padding: 36px 32px 28px; border-radius: 10px; background: var(--blanc); color: var(--nuit); box-shadow: none; text-align: start; isolation: isolate; }
+.cdr-login #loginBox:after { display: none; }
+.cdr-login #logo a { height: 72px; }
+.cdr-login #loginBox #logo a { display: block; margin-bottom: 12px; text-decoration: none; }
+.cdr-login #loginBox > h3 { margin: 0 0 18px; color: var(--nuit); font: 600 .9375rem/1.45 var(--f-texte); text-align: start; }
+.cdr-login #loginBox form { width: auto; margin: 0; }
+.cdr-login #loginBox fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.cdr-login #loginBox label { display: block; margin: 0 0 4px; font-weight: 600; color: var(--nuit); }
+.cdr-login #loginBox input:not([type=hidden]):not([type=submit]):not([type=checkbox]):not([type=radio]) { display: block; width: 100%; min-height: 42px; margin: 0 0 16px; padding: 6px 10px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: inherit; box-shadow: none; box-sizing: border-box; }
+.cdr-login #loginBox input::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
+.cdr-login #loginBox input:focus { border-color: var(--cyan-profond); box-shadow: none; outline: none; }
+.cdr-login #loginBox input:focus-visible, .cdr-login #loginBox button:focus-visible, .cdr-login #loginBox a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cdr-login #loginBox button[type=submit], .cdr-login #loginBox input[type=submit] { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: auto; min-height: 42px; margin: 4px 0 0; padding: 0 14px; float: none; border: 1.5px solid transparent; border-radius: 6px; background: var(--cyan); color: var(--nuit); font: 600 .9375rem/1.2 var(--f-titre); box-shadow: none; cursor: pointer; }
+.cdr-login #loginBox button[type=submit]:hover, .cdr-login #loginBox input[type=submit]:hover, .cdr-login #loginBox input[type=submit]:active { background: var(--nuit); color: var(--blanc); box-shadow: none; }
+.cdr-login #loginBox button[type=submit][disabled] { opacity: .6; cursor: progress; }
+.cdr-login #loginBox a { color: var(--cyan-profond); text-decoration: underline; }
+.cdr-login #loginBox .alt { margin: 16px 0 0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .9375rem; }
+/* Reset link hidden by class (core) and not yet revealed by $('#reset-link').show() (inline style) */
+.cdr-login #loginBox .alt:has(> #reset-link.hidden:not([style])) { display: none; }
+.cdr-login #loginBox hr { margin: 20px 0; border: 0; border-top: 1px solid var(--gris); }
+.cdr-login #loginBox .external-auth { display: block; margin: 0 0 8px; }
+.cdr-login #loginBox .external-auth + br { display: none; }
+.cdr-login #company { position: static; width: auto; margin: 28px 0 0; bottom: auto; font-size: .75rem; color: var(--ardoise); text-align: start; }
+.cdr-login #company .content { display: inline; padding: 0; border-radius: 0; background: none; box-shadow: none; text-shadow: none; color: inherit; }
+
+/* The error banner IS #login-message (role="alert"): attemptLoginAjax() rewrites it with .text().
+   Empty: collapsed but kept in the accessibility tree so the live region still announces. */
+.cdr-login { --cdr-ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18z'/%3E%3Cpath d='M12 10v4.5M12 17.2h.01'/%3E%3C/svg%3E"); }
+.cdr-login #login-message { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 18px; padding: 12px 14px; border-radius: 6px; border-inline-start: 4px solid var(--erreur); background: var(--erreur-fond); color: var(--nuit); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-align: start; }
+.cdr-login #login-message::before { content: ""; flex: none; width: 20px; height: 20px; margin-top: 1px; background: var(--erreur); -webkit-mask: var(--cdr-ic-alert) center / contain no-repeat; mask: var(--cdr-ic-alert) center / contain no-repeat; }
+.cdr-login #login-message:empty { height: 0; margin: 0; padding: 0; border: 0; overflow: hidden; }
+.cdr-login #login-message:empty::before { display: none; }
+/* Optional login notice configured by the admin (core div.banner) */
+.cdr-login div.banner { margin: 0; color: var(--ardoise); line-height: 1.45; }
+.cdr-login div.banner small { font-size: .875rem; }
+.cdr-login div.banner small:empty { display: none; }
+.cdr-login div.banner small:not(:empty) { display: block; margin-bottom: 18px; }
+
+/* "Verifying" overlay shown by attemptLoginAjax() (inline display:none until .show()) */
+.cdr-login #loading { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; border-radius: inherit; background: rgba(255,255,255,.9); }
+.cdr-login #loading h1 { margin: 0; color: var(--nuit); font: 600 1rem var(--f-titre); }
+.cdr-login #loading .icon-spin { color: var(--cyan-profond); margin-inline-end: 6px; }
+
+/* Split layout of the login page */
+.cdr-login .login-wrap { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, 480px); }
+/* Descendant (not child) selector: jQuery UI effects may wrap the card; 1.13's
+   shake only pins it absolute at its own size next to a .ui-effects-placeholder */
+.cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+.cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
+.cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
+.cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }
+.cdr-login .login-art .hook { margin: 0; max-width: 13em; color: var(--blanc); font: 800 2.25rem/1.12 var(--f-titre); }
+.cdr-login .login-art .signature { margin: 0; color: var(--blanc); font-weight: 600; font-size: .875rem; }
+.cdr-login .login-art .signature .up { color: var(--cyan); }
+.cdr-login .login-art .sommet { position: absolute; inset-inline-end: -4%; bottom: -8%; width: 54%; aspect-ratio: 1 / .9; background: var(--cyan); opacity: .16; clip-path: polygon(50% 0, 100% 100%, 78% 100%, 50% 40%, 22% 100%, 0 100%); }
+.cdr-login .login-card .card-title { margin: 0 0 4px; color: var(--nuit); font: 700 1.375rem/1.25 var(--f-titre); }
+.cdr-login .login-card .lead { margin: 0 0 20px; color: var(--ardoise); }
+@media (max-width: 860px) {
+  .cdr-login .login-wrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .cdr-login .login-art { gap: 20px; padding: 24px 24px 28px; }
+  .cdr-login .login-art .hook { font-size: 1.5rem; }
+  .cdr-login .login-art .hook ~ p, .cdr-login .login-art .signature { display: none; }
+  .cdr-login .login-art .sommet { width: 70%; opacity: .12; }
+  .cdr-login .login-wrap #loginBox { padding: 28px 24px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cdr-login .icon-spin { animation: none; }
+}
+
+/* ───────── Dashboard (scp/dashboard.php; scp/logs.php is already table.list) ─────────
+   The activity chart is drawn by core's Raphael (js/dashboard.inc.js) into
+   #line-chart-here, its legend into #line-chart-legend: ids and DOM untouched, series
+   colours stay the library's (set inline by the script). Core's gradient/border and
+   the absolute legend (inline style) are replaced here, hence the !important. */
+#content form[action="dashboard.php"] #basic_search > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 0; }
+#content form[action="dashboard.php"] #basic_search label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 600; }
+#content form[action="dashboard.php"] #basic_search input.dp { width: 9.5em; }
+#content form[action="dashboard.php"] #basic_search button[type=submit] { margin: 0; }
+#content div:has(> #line-chart-here) { margin-bottom: 20px !important; padding: 12px 14px 10px; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.12); }
+#content #line-chart-here { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; filter: none; overflow-x: auto; overflow-y: hidden; }
+#content #line-chart-here tspan { font-family: var(--f-texte); font-size: 11px; fill: var(--nuit); }
+#content #line-chart-here svg { display: block; max-width: none; }
+#content #line-chart-legend { position: static !important; display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 10px 0 0; line-height: 1.4; }
+#content #line-chart-legend br { display: none; }
+/* Swatch (the inline series colour) + white text pill in nuit: legible on any series colour */
+#content #line-chart-legend span.label { display: inline-flex; align-items: center; margin: 0 !important; padding: 2px 9px 2px 20px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,15,38,.25); background-image: linear-gradient(var(--blanc), var(--blanc)); background-repeat: no-repeat; background-position: right; background-size: calc(100% - 12px) 100%; color: var(--nuit); font: 600 .75rem/1.4 var(--f-titre); text-shadow: none; }
+#content #line-chart-legend span.label.disabled { opacity: 1; background-color: var(--ardoise) !important; color: var(--ardoise); text-decoration: line-through; }
+#content form[action="dashboard.php"] hr { height: 0; margin: 20px 0 16px; border: 0; border-top: 1px solid var(--gris); }
+#content table.dashboard-stats { width: 100%; margin: 8px 0 4px; border-collapse: collapse; background: var(--blanc); }
+#content table.dashboard-stats > tbody:first-child > tr > th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 .75rem/1.35 var(--f-titre); text-align: end; vertical-align: middle; white-space: nowrap; }
+#content table.dashboard-stats > tbody:first-child > tr > th.flush-left { text-align: start; }
+#content table.dashboard-stats > tbody:first-child i.help-tip { margin-inline-start: 4px; color: rgba(255,255,255,.78); }
+#content table.dashboard-stats > tbody + tbody > tr > :is(th, td) { padding: 8px 12px; border: 0; vertical-align: middle; text-align: end; background: var(--blanc); color: var(--nuit); font: 400 13.5px/1.4 var(--f-texte); }
+#content table.dashboard-stats > tbody + tbody > tr > th.flush-left { text-align: start; font-weight: 600; }
+#content .tab_content:has(> table.dashboard-stats) { overflow-x: auto; }
+@media (max-width: 600px) {
+  #content form[action="dashboard.php"] #basic_search > div > label { flex: 1 1 100%; justify-content: space-between; }
+  #content form[action="dashboard.php"] #basic_search input.dp, #content form[action="dashboard.php"] #basic_search select { flex: 1 1 auto; max-width: 60%; }
+}
+#content table.dashboard-stats tbody:nth-child(2) tr, #content table.dashboard-stats tbody:nth-child(2) tr:hover { background: none; }
+#content table.dashboard-stats tbody:nth-child(2) tr:hover :is(th, td) { color: var(--nuit); }
+#content table.dashboard-stats { border-bottom: 1px solid var(--gris); }
+/* beats the generic table.table:not(.list) cell rule */
+#content table.dashboard-stats.table:not(.list) > tbody + tbody > tr > :is(th, td) { padding: 8px 12px; background: var(--blanc); }
+#content table.dashboard-stats.table:not(.list) > tbody + tbody > tr:nth-child(even) > :is(th, td) { background: var(--gris); }
+#content table.dashboard-stats.table:not(.list) > tbody + tbody > tr:hover > :is(th, td) { background: var(--voile); }
+@media (max-width: 600px) { #content #line-chart-here tspan { font-size: 9px; } }
+
+/* System logs filter (syslogs.inc.php): core fixes the strip at 25px, so it overflowed when wrapping */
+#content #basic_search:has(> div > #filter > form[action="logs.php"]) > div { height: auto !important; }
+#content #filter > form[action="logs.php"] > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }

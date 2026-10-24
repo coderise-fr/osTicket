@@ -22,29 +22,69 @@ here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/../../.." && pwd)"
 overlay="$here/overlay"
 
-# Core files the theme relies on without replacing them (provisional list, finalised with --write-base).
+# Core files the theme relies on without replacing them: the pages and templates whose
+# markup coderise.css / coderise.js style or move (ids, classes, form actions), the
+# classes and AJAX routes the PHP helpers and coderise.js call, the core style sheets
+# the theme overrides, and the sla_first_response plugin used by the gauge. The
+# replaced files themselves are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
 scp/tickets.php
 scp/login.php
+scp/pwreset.php
 scp/dashboard.php
+scp/profile.php
+scp/logs.php
 scp/staff.inc.php
 scp/admin.inc.php
+scp/ajax.php
 scp/js/scp.js
 scp/js/jb.overflow.menu.js
 scp/js/ticket.js
+scp/js/dashboard.inc.js
 scp/css/scp.css
 scp/css/dropdown.css
 css/thread.css
+css/filedrop.css
+css/redactor.css
+css/select2.min.css
+css/rtl.css
 include/class.nav.php
 include/class.queue.php
 include/class.pagenate.php
+include/class.ticket.php
+include/class.thread.php
+include/class.misc.php
 include/ajax.tickets.php
-include/staff/header.inc.php
-include/staff/footer.inc.php
-include/staff/login.header.php
-include/staff/templates/queue-tickets.tmpl.php
+include/ajax.search.php
+include/ajax.config.php
+include/staff/ticket-view.inc.php
+include/staff/dashboard.inc.php
+include/staff/syslogs.inc.php
+include/staff/profile.inc.php
+include/staff/settings-agents.inc.php
+include/staff/settings-alerts.inc.php
+include/staff/settings-autoresp.inc.php
+include/staff/settings-emails.inc.php
+include/staff/settings-kb.inc.php
+include/staff/settings-pages.inc.php
+include/staff/settings-system.inc.php
+include/staff/settings-tasks.inc.php
+include/staff/settings-tickets.inc.php
+include/staff/settings-users.inc.php
+include/staff/pwreset.php
+include/staff/pwreset.login.php
+include/staff/pwreset.sent.php
+include/staff/templates/navigation.tmpl.php
+include/staff/templates/sub-navigation.tmpl.php
 include/staff/templates/queue-navigation.tmpl.php
+include/staff/templates/queue-subnavigation.tmpl.php
+include/staff/templates/queue-savedsearches-nav.tmpl.php
+include/staff/templates/queue-quickfilter.tmpl.php
+include/staff/templates/queue-sort.tmpl.php
+include/staff/templates/dynamic-form-simple.tmpl.php
+include/staff/templates/task-view.tmpl.php
+contrib/sla-first-response/plugin/sla_first_response/sla_first_response.php
 "
 
 sha() {
