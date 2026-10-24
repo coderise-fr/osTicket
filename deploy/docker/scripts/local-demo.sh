@@ -338,7 +338,7 @@ install_osticket() {
     pw="$(cred_get admin mot_de_passe)"
     {
         echo 'data-urlencode = "s=install"'
-        echo 'data-urlencode = "name=Support Coderise (démonstration)"'
+        echo 'data-urlencode = "name=Support Coderise"'
         echo "data-urlencode = \"email=support@$STAFF_DOMAIN\""
         echo 'data-urlencode = "lang_id=en_US"'
         echo 'data-urlencode = "fname=Camille"'

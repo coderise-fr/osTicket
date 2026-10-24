@@ -65,7 +65,7 @@ $D_CLIENTS = array(
 );
 // Invitée : pas de compte, accès au portail par e-mail + numéro de ticket.
 $D_GUEST = array('name' => 'Gina Roux', 'email' => 'gina.roux@lumen-studio.test', 'org' => 'Priority');
-$D_NOTE = 'Compte fictif de l\'environnement local de démonstration.';
+$D_NOTE = 'Compte fictif de l\'environnement local.';
 
 $nfail = 0;
 function demo_say($msg) { echo "  $msg\n"; }
@@ -111,7 +111,7 @@ function demo_config($DEMO) {
         'ticket_autoresponder' => 1,
         'message_autoresponder' => 1,
         'enable_avatars' => 0,
-        'helpdesk_title' => 'Support Coderise (démonstration, données fictives)',
+        'helpdesk_title' => 'Support Coderise',
         'helpdesk_url' => $DEMO['base_url'],
     );
     foreach ($settings as $k => $v)
@@ -151,7 +151,7 @@ function demo_config($DEMO) {
         $errors = array();
         $ok = $sla->update(array('name' => $name, 'grace_period' => 4, 'schedule_id' => $schedId,
             'isactive' => $active, 'notes' => $active
-                ? 'Support Priority : premier retour sous 4 h, 24 h/24 et 7 j/7 (démonstration).'
+                ? 'Support Priority : premier retour sous 4 h, 24 h/24 et 7 j/7.'
                 : 'Posé par le plugin sla_first_response après la première réponse. Doit rester désactivé et non transitoire.'),
             $errors);
         if (!$ok)
@@ -218,7 +218,7 @@ function demo_config($DEMO) {
     if (!$fid) {
         db_query('INSERT INTO ' . FILTER_TABLE . ' (execorder, isactive, flags, status, match_all_rules,'
             . ' stop_onmatch, target, email_id, name, notes, created, updated) VALUES (1, 1, 0, 0, 1, 0,'
-            . " 'Any', 0, " . db_input($D_FILTER) . ', ' . db_input('Démonstration : les clients de'
+            . " 'Any', 0, " . db_input($D_FILTER) . ', ' . db_input('Les clients de'
             . ' l\'organisation Priority reçoivent le plan Priority 4h à la création du ticket.')
             . ', NOW(), NOW())');
         $fid = db_insert_id();
@@ -275,7 +275,7 @@ function demo_config($DEMO) {
         $form = DynamicForm::create(array(
             'type' => 'G', 'title' => 'Contexte technique',
             'instructions' => 'Ces informations nous aident à reproduire le problème plus vite.',
-            'notes' => 'Formulaire de démonstration (champs dynamiques).',
+            'notes' => 'Formulaire (champs dynamiques).',
             'fields' => array(
                 array('type' => 'choices', 'name' => 'environnement', 'label' => 'Environnement concerné',
                     'sort' => 1, 'flags' => $flags | DynamicFormField::FLAG_CLIENT_REQUIRED,
@@ -307,7 +307,7 @@ function demo_config($DEMO) {
         $errors = array();
         if (!$topic->update(array('topic' => $name, 'status' => 'active', 'ispublic' => 1,
                 'dept_id' => $support, 'priority_id' => $prio, 'forms' => $forms,
-                'notes' => 'Rubrique de démonstration.'), $errors))
+                'notes' => 'Rubrique.'), $errors))
             demo_fail("rubrique $name : " . json_encode($errors));
     }
     // Les rubriques d'origine restent actives mais ne sont plus proposées aux clients.
@@ -356,7 +356,7 @@ function demo_config($DEMO) {
             $c = Category::create();
             $errors = array();
             if (!$c->update(array('name' => $cname, 'description' => $cdesc, 'ispublic' => $cvis,
-                    'notes' => 'Catégorie de démonstration.'), $errors)) {
+                    'notes' => 'Catégorie.'), $errors)) {
                 demo_fail("catégorie $cname : " . json_encode($errors));
                 continue;
             }
@@ -382,7 +382,7 @@ function demo_config($DEMO) {
     $pages = array(
         'landing' => '<h1>Faisons monter votre projet d’un niveau.</h1>'
             . '<p>Un incident, une question, une évolution : écrivez-nous. Une personne de l’équipe vous répond, avec une vraie réponse.</p>'
-            . '<p><em>Environnement de démonstration : toutes les données (clients, tickets, adresses) sont fictives.</em></p>',
+            . '',
         'thank-you' => '<h1>Merci, %{ticket.name.first}.</h1>'
             . '<p>Votre ticket <strong>#%{ticket.number}</strong> est enregistré. Nous vous répondons ici et par e-mail.</p>',
         'offline' => '<h1>Le support est en maintenance.</h1><p>Nous revenons très vite.</p>',
@@ -398,8 +398,8 @@ function demo_config($DEMO) {
     }
     if (!Page::lookup(array('name' => 'Politique de support'))) {
         $p = Page::create(array('type' => 'other', 'name' => 'Politique de support', 'isactive' => 1,
-            'notes' => 'Page de démonstration.', 'updated' => SqlFunction::NOW(),
-            'body' => '<h1>Politique de support</h1><p>Standard : réponse les jours ouvrés. Priority : premier retour sous 4 heures, 24 h/24, 7 j/7. (Texte de démonstration.)</p>'));
+            'notes' => 'Page.', 'updated' => SqlFunction::NOW(),
+            'body' => '<h1>Politique de support</h1><p>Standard : réponse les jours ouvrés. Priority : premier retour sous 4 heures, 24 h/24, 7 j/7.</p>'));
         $p->save();
     }
     demo_say('accueil, remerciement, hors ligne, « Politique de support »');
@@ -582,7 +582,7 @@ function demo_tickets($DEMO) {
                 'https://boutique.lumen-studio.test/');
         if ($i % 5 == 1)
             $extra['attachments'] = array($files[$i % 3]);
-        $body = "Bonjour,\n\n$subject. Pouvez-vous regarder ?\n\nMerci,\nLéa\n\n(Demande fictive de démonstration.)";
+        $body = "Bonjour,\n\n$subject. Pouvez-vous regarder ?\n\nMerci,\nLéa";
         if ($i < 37) {
             // Du plus ancien (environ 160 jours) au plus récent (environ 2 jours).
             $created = $now - (160 - $i * 4) * 86400 - mt_rand(0, 8) * 3600 - mt_rand(0, 59) * 60;
@@ -633,7 +633,7 @@ function demo_tickets($DEMO) {
         list($subject, $topic, $days, $isClosed) = $h;
         $created = $now - $days * 86400 - mt_rand(1, 6) * 3600;
         $extra = ($topic == 'incident') ? $ctx('production', 'majeur', 'https://shop.acme.test/') : array();
-        $t = $create($D_CLIENTS['hugo'], $subject, "Bonjour,\n\n$subject : merci de votre aide.\n\nHugo\n\n(Demande fictive de démonstration.)", $topic, $created, $extra);
+        $t = $create($D_CLIENTS['hugo'], $subject, "Bonjour,\n\n$subject : merci de votre aide.\n\nHugo", $topic, $created, $extra);
         if (!$t)
             continue;
         if ($t->getSLAId() == $watch)
@@ -645,7 +645,7 @@ function demo_tickets($DEMO) {
     }
     // Ticket partagé : Hugo est demandeur, Marc (Acme) et Léa (Priority) collaborateurs.
     $shared = $create($D_CLIENTS['hugo'], 'Accès partagé au tableau de bord des ventes',
-        "Bonjour,\n\nPouvez-vous donner accès au tableau de bord à Marc et à Léa (agence) ?\n\nHugo\n\n(Demande fictive de démonstration.)",
+        "Bonjour,\n\nPouvez-vous donner accès au tableau de bord à Marc et à Léa (agence) ?\n\nHugo",
         'question', $now - 6 * 86400, array('attachments' => array($files[2])));
     if ($shared) {
         foreach (array('marc', 'lea') as $k) {
@@ -658,7 +658,7 @@ function demo_tickets($DEMO) {
         demo_out('shared_ticket', $shared->getNumber());
     }
     $t = $create($D_CLIENTS['marc'], 'Export des ventes par magasin',
-        "Bonjour,\n\nL'export ne contient pas le magasin de Lyon.\n\nMarc\n\n(Demande fictive de démonstration.)",
+        "Bonjour,\n\nL'export ne contient pas le magasin de Lyon.\n\nMarc",
         'incident', $now - 2 * 86400, $ctx('production', 'mineur', 'https://shop.acme.test/admin/export'));
     $nina = array(
         array('Impossible de me connecter à mon espace', 'incident', 30, true),
@@ -669,7 +669,7 @@ function demo_tickets($DEMO) {
         list($subject, $topic, $days, $isClosed) = $n;
         $created = $now - $days * 86400 - mt_rand(1, 6) * 3600;
         $extra = ($topic == 'incident') ? $ctx('production', 'bloquant', 'https://nina-petit.test/') : array();
-        $t = $create($D_CLIENTS['nina'], $subject, "Bonjour,\n\n$subject\n\nNina\n\n(Demande fictive de démonstration.)", $topic, $created, $extra);
+        $t = $create($D_CLIENTS['nina'], $subject, "Bonjour,\n\n$subject\n\nNina", $topic, $created, $extra);
         if (!$t)
             continue;
         if ($days > 2)
@@ -680,7 +680,7 @@ function demo_tickets($DEMO) {
 
     echo "== Ticket de l'invitée (Priority, sans compte)\n";
     $g = $create($D_GUEST, 'Le formulaire de devis ne s\'envoie plus',
-        "Bonjour,\n\nDepuis ce matin le formulaire de devis tourne sans fin.\n\nGina\n\n(Demande fictive de démonstration.)",
+        "Bonjour,\n\nDepuis ce matin le formulaire de devis tourne sans fin.\n\nGina",
         'incident', $now - 50 * 60, $ctx('production', 'majeur', 'https://lumen-studio.test/devis'));
     if ($g) {
         demo_out('guest_ticket', $g->getNumber());
