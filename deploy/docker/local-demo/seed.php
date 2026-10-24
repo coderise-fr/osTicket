@@ -381,8 +381,7 @@ function demo_config($DEMO) {
     echo "== Pages (textes proposés par le README du thème Sommet)\n";
     $pages = array(
         'landing' => '<h1>Faisons monter votre projet d’un niveau.</h1>'
-            . '<p>Un incident, une question, une évolution : écrivez-nous. Une personne de l’équipe vous répond, avec une vraie réponse.</p>'
-            . '',
+            . '<p>Un incident, une question, une évolution : écrivez-nous. Une personne de l’équipe vous répond, avec une vraie réponse.</p>',
         'thank-you' => '<h1>Merci, %{ticket.name.first}.</h1>'
             . '<p>Votre ticket <strong>#%{ticket.number}</strong> est enregistré. Nous vous répondons ici et par e-mail.</p>',
         'offline' => '<h1>Le support est en maintenance.</h1><p>Nous revenons très vite.</p>',

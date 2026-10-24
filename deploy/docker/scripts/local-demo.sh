@@ -416,6 +416,7 @@ set_language() { # code osTicket (fr, en_US)
     case "$1" in ""|*[!A-Za-z_]*) die "code de langue invalide : $1 (exemples : fr, en_US)" ;; esac
     web="$(state_get OST_PORT)"
     out="$STATE/language.log"
+    rc=0
     say "langue de l'interface : $1..."
     {
         printf '<?php\n$DEMO = array(\n'
@@ -423,12 +424,15 @@ set_language() { # code osTicket (fr, en_US)
         printf "    'base_url' => 'http://127.0.0.1:%s/',\n" "$web"
         printf ');\n?>\n'
         cat "$demo_src/language.php"
-    } | dc run --rm --no-deps -T --entrypoint php web > "$out" 2>&1 || {
+    } | dc run --rm --no-deps -T --entrypoint php web > "$out" 2>&1 || rc=$?
+    # php sort avec 0 même quand la base est injoignable : seule la ligne de résultat fait foi.
+    if [ "$rc" -ne 0 ] || ! grep -q '^langue principale :' "$out"; then
         sed -e 's/^/  /' "$out" >&2
         die "réglage de la langue $1 en échec : voir $out"
-    }
+    fi
     sed -e 's/^/  /' "$out"
     state_set OST_DEMO_LANG "$1"
+    state_set OST_DEMO_LANG_PENDING ""
 }
 
 # --- Affichage -------------------------------------------------------------------
@@ -491,9 +495,12 @@ cmd_up() {
     dc up -d --wait --wait-timeout 300 --remove-orphans >/dev/null
     drop_old_image "$old"
     if [ -z "$(state_get OST_DEMO_SEEDED)" ]; then
+        state_set OST_DEMO_LANG_PENDING "$DEFAULT_LANG"
         seed_demo
-        set_language "$DEFAULT_LANG"
     fi
+    # Langue réglée après le premier peuplement ; reprise au up suivant en cas d'échec.
+    lang="$(state_get OST_DEMO_LANG_PENDING)"
+    [ -z "$lang" ] || set_language "$lang"
     say "environnement prêt."
     show_urls
 }
@@ -530,6 +537,8 @@ cmd_language() {
     [ $# -eq 1 ] || die "usage : $0 language <code>   (fr, en_US : packs de include/i18n/ de l'image)"
     require_state
     [ -n "$(state_get OST_DEMO_SEEDED)" ] || die "pas encore installé et peuplé : lancer d'abord $0 up"
+    [ -n "$(dc ps -q --status running db)" ] && [ -n "$(dc ps -q --status running web)" ] \
+        || die "pile arrêtée (base ou web) : lancer d'abord $0 up"
     set_language "$1"
 }
 
