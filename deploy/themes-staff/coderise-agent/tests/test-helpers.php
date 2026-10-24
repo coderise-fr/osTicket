@@ -121,6 +121,12 @@ check('cdr__: fr_FR falls back to fr', (function () {
     return cdr__('Log Out');
 })(), "D\xC3\xA9connexion");
 $GLOBALS['CDR_TEST_LANG'] = 'fr';
+// Admin save bar and changed-field labels (header.inc.php data- attributes)
+check('cdr__: fr changed flag', cdr__('modified'), "modifi\xC3\xA9");
+check('cdr__: fr counter (one)', str_replace('%d', '1', cdr__('%d setting changed')),
+    "1 r\xC3\xA9glage modifi\xC3\xA9");
+check('cdr__: fr counter (many)', str_replace('%d', '2', cdr__('%d settings changed')),
+    "2 r\xC3\xA9glages modifi\xC3\xA9s");
 
 // Inventory of I-10: every rail label has a French string.
 $labels = array(
