@@ -21,11 +21,15 @@ if (($cdr_lang = Internationalization::getCurrentLanguage())) {
     if (($cdr_info = Internationalization::getLanguageInfo($cdr_lang))
             && (@$cdr_info['direction'] == 'rtl'))
         $cdr_html .= ' dir="rtl" class="rtl"';
-    $cdr_html .= ' lang="' . Format::htmlchars(Internationalization::rfc1766($cdr_lang)) . '"';
+    $cdr_tag = Format::htmlchars(Internationalization::rfc1766($cdr_lang));
+    $cdr_html .= ' xml:lang="' . $cdr_tag . '" lang="' . $cdr_tag . '"';
 }
+// Core's hard-coded language only when none is known (no duplicate lang attribute).
+if (strpos($cdr_html, ' lang="') === false)
+    $cdr_html .= ' xml:lang="en" lang="en"';
 ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"<?php echo $cdr_html; ?>>
+<html xmlns="http://www.w3.org/1999/xhtml"<?php echo $cdr_html; ?>>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="refresh" content="7200" />
