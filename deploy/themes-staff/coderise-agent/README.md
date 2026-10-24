@@ -76,3 +76,21 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
    gras), sans cadre rouge. Marques « modifié » : barre cyan et texte sous le libellé de
    la ligne (pas sur le champ lui-même comme la maquette) ; un éditeur riche (Redactor)
    n'est suivi que s'il déclenche `input`/`change` sur son `textarea`.
+8. Tableau de bord (tâche 9, `dashboard.php` ; `logs.php` reprend `table.list`) : le
+   graphique reste celui du cœur (Raphael) ; les couleurs des séries sont posées par le
+   script et ne sont pas modifiables en CSS (le panneau, la police et la légende le sont :
+   pastille de la série + texte nuit, barré quand la série est masquée). Sous ~500 px les
+   dates de l'axe horizontal se chevauchent (le script du cœur ne redessine pas au
+   redimensionnement). La légende reste cliquable à la souris seulement (éléments `span`).
+
+## Non réalisé (Not done)
+
+Éléments de la maquette « Tableau de bord » qui demandent de nouvelles requêtes, donc hors
+d'un thème en CSS seul (écarts à revoir après la première recette locale) :
+
+- bandeau d'alerte « N tickets Priority risquent de dépasser leur premier retour » ;
+- bandeau de quatre indicateurs (tickets reçus, ouverts, premier retour moyen, premiers
+  retours dans l'objectif) et leurs variations ;
+- panneaux « Premier retour à risque », « Par sujet d'aide » et « Charge par agent » ;
+- sélecteur de période et bouton « Exporter » de l'en-tête : le cœur garde son formulaire
+  (date de début, période, Actualiser) et ses boutons « Export » par onglet.
