@@ -93,7 +93,6 @@ return array(
     'Search tickets' => 'Rechercher un ticket',
     'Skip to content' => 'Aller au contenu',
     'Breadcrumb' => "Fil d'Ariane",
-    'Ticket #%s' => 'Ticket n° %s',
     'Upgrader' => 'Mise à jour',
     'First reply' => 'Premier retour',
     'Not applicable' => 'Sans objet',

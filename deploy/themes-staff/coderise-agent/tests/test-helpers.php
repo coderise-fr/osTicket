@@ -262,7 +262,8 @@ check('ticket gauge: reopened ignores the plan due date', $g['due'] - $g['start'
 check('ticket gauge: reopened past created + 4 h is over', $g['kind'] . ' ' . $g['label'], 'over Over by 1 h 00');
 $t = new Ticket(14, db_dt($now - 5 * 3600));
 $t->sla = new StubSla();
-$t->due = db_dt($now + 3600);
+// 30 s of margin: the gauge reads the clock again, 3630 s or 3629 s left both floor to 60 min
+$t->due = db_dt($now + 3630);
 $g = cdr_ticket_gauge($t);
 check('ticket gauge: not reopened keeps the plan due date', $g['kind'] . ' ' . $g['label'], 'warn 1 h 00 left');
 $t = new Ticket(10, db_dt($now - 1980 - 30));

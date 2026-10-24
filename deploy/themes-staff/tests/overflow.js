@@ -12,22 +12,42 @@
 //
 // La page de connexion (/scp/login.php) redirige quand on est connecté : la mesurer
 // dans un contexte Playwright neuf (non authentifié), pas ici.
+// Identifiants de la démo locale (local-demo/seed.php) : ticket 37 = ticket Priority avec
+// jauge, utilisateur 2 = lea.moreau, organisation 2 = Priority. Ticket 1 = ticket
+// d'installation. Ajuster sur une autre base.
 const paths = [
     '/scp/index.php',
     '/scp/tickets.php',
     '/scp/tickets.php?id=1',
+    '/scp/tickets.php?id=37',
+    '/scp/tickets.php?a=open',
     '/scp/dashboard.php',
     '/scp/users.php',
+    '/scp/users.php?id=2',
     '/scp/orgs.php',
+    '/scp/orgs.php?id=2',
+    '/scp/directory.php',
     '/scp/tasks.php',
     '/scp/kb.php',
+    '/scp/canned.php',
     '/scp/profile.php',
     '/scp/admin.php',
+    '/scp/settings.php?t=system',
     '/scp/settings.php?t=tickets',
+    '/scp/settings.php?t=agents',
+    '/scp/settings.php?t=pages',
     '/scp/staff.php',
+    '/scp/staff.php?id=1',
     '/scp/helptopics.php',
+    '/scp/helptopics.php?id=1',
+    '/scp/departments.php',
+    '/scp/queues.php',
+    '/scp/slas.php',
     '/scp/plugins.php',
     '/scp/logs.php',
+    '/scp/templates.php',
+    '/scp/forms.php',
+    '/scp/roles.php',
 ];
 const widths = [390, 820, 1280];
 const result = {};

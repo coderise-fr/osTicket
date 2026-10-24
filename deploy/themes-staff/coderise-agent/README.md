@@ -63,9 +63,9 @@ au client** (`SlaFirstResponsePlugin::isClientReply()` quand le plugin est charg
 destinataire « to »). La fenêtre part de la création du ticket (pas de nouvelle fenêtre à la
 réouverture). Échéance : celle du plan SLA `Priority 4h` (`CDR_SLA_PRIORITY`) quand le ticket
 est sur ce plan actif et n'a jamais été rouvert ; sinon création + `CDR_FIRST_RESPONSE_HOURS`
-(osTicket recalcule l'échéance du plan à partir de la date de réouverture, ce qui ouvrirait une
-nouvelle fenêtre : elle est donc ignorée pour un ticket rouvert) (4 h ; les deux constantes
-se redéfinissent dans `ost-config.php`). Elle n'apparaît que si le plugin `sla_first_response`
+(4 h). Les deux constantes se redéfinissent dans `ost-config.php`. Pour un ticket rouvert,
+l'échéance du plan est ignorée : osTicket la recalcule à partir de la date de réouverture, ce
+qui ouvrirait une nouvelle fenêtre. La jauge n'apparaît que si le plugin `sla_first_response`
 est actif (fonction `coderise_contract_level()`), pour les tickets ouverts d'un propriétaire
 Priority ; sinon « — ». L'état se lit dans le texte (« Reste 38 min », « Dépassé de 47 min »,
 « Tenu en 44 min »), jamais par la couleur seule.
@@ -82,9 +82,9 @@ Avec le pack, **le pack l'emporte** pour les msgid qu'il traduit : 30 entrées d
 servent alors plus (libellés de menu surtout : « Tableau de Bord », « Services » pour
 Departments, « Rubriques d'aide », « Filtre », « Rôle », « Gabarits », « e-mails bannis »,
 « Courriel ou nom d'utilisateur », « Connexion »…). Elles restent pour un panneau sans pack.
-Le pack traduit « Ticket #%s » par lui-même : la barre du cœur affiche « Ticket #… » et le fil
-d'Ariane du thème « Ticket n° … » (`fr.php`). Vérification en français (libellés, jauge,
-compteur de la barre d'enregistrement, menu mobile, débordements, éditeur) : voir
+Le pack traduit « Ticket #%s » par lui-même ; `fr.php` ne le surcharge plus (24/10/2026), le fil
+d'Ariane du thème et la barre du cœur affichent donc tous deux « Ticket #… ».
+Vérification en français (libellés, jauge, compteur de la barre d'enregistrement, menu mobile, débordements, éditeur) : voir
 « Vérifications en français ».
 
 ## Écart assumé
@@ -200,8 +200,14 @@ Autres éléments non réalisés :
 
 ## Vérifications (tâche 10)
 
+Comptes utilisés : `dev.admin` (administrateur) et `dev.agent` (agent non administrateur) sont
+des comptes jetables créés à la main dans la base de la démo locale pour ces vérifications ;
+`local-demo/seed.php` ne les crée pas (sur une autre démo : `camille.durand` et `theo.martin`).
+
 - Débordement horizontal (`tests/overflow.js`, largeur utile sans la barre de défilement),
-  à 390, 820 et 1280 px : aucun.
+  à 390, 820 et 1280 px : aucun. La liste ci-dessous est celle de la tâche 10 ; la liste
+  committée dans `tests/overflow.js` (32 chemins depuis le 24/10/2026) reprend ces pages et
+  celles du passage en français.
   - Administrateur (`dev.admin`) : accueil, file, fiche ticket, tableau de bord, tâches, base
     de connaissances, profil, administration, Paramètres > Tickets, agents, sujets d'aide,
     plugins, journaux ; et, après lui avoir donné la permission d'agent « User Directory »
@@ -293,7 +299,7 @@ coupure des mots dans les cellules.
 ### Vérifications en français (2026-10-24)
 
 Démo locale reconstruite depuis le commit, pack `fr.phar` présent, langue principale `fr`,
-agents en `fr` ; comptes `dev.agent` (non administrateur) et `dev.admin`.
+agents en `fr` ; comptes jetables `dev.agent` (non administrateur) et `dev.admin` (voir « Vérifications (tâche 10) »).
 
 - `<html lang="fr">` sur le portail, la connexion agent, le panneau et l'administration ;
   dates `22/10/2026 20:09` ; calendrier jQuery UI en français (`janvier`, lundi premier
@@ -305,9 +311,9 @@ agents en `fr` ; comptes `dev.agent` (non administrateur) et `dev.admin`.
   sur les données de la démo, couvert par `tests/test-helpers.php`), compteur « 2 réglages
   modifiés » et marque « modifié », bouton « Menu » à 390 px, page de connexion. Contrôle
   statique : chaque `cdr__('…')` littéral du thème est traduit par le pack ou par `fr.php`
-  (aucun manque).
-- Débordement (`tests/overflow.js`, 28 chemins agent et administration à 390, 820 et 1280 px,
-  connecté `dev.admin`) : aucun. Texte tronqué par le thème : aucun (seuls les sujets de
+  (aucun manque ; « Ticket #%s » reste tel quel, comme dans le pack).
+- Débordement (`tests/overflow.js` tel que committé, 32 chemins agent et administration, à 390,
+  820 et 1280 px, connecté `dev.admin`) : aucun. Texte tronqué par le thème : aucun (seuls les sujets de
   tickets, coupés par le cœur, et le texte indicatif du select2 de réponse type à 390 px,
   « Sélectionner la répons… »).
 - `tests/editor-check.js` sur la réponse de la fiche ticket après saisie (paragraphes, gras,
