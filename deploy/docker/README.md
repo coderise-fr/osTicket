@@ -112,7 +112,9 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 - La réception et l'envoi d'e-mails de bout en bout avec **votre** serveur de messagerie
   (check-list dans « À tester par vous »), TLS vers le serveur de messagerie.
 - Le comportement derrière votre reverse proxy réel (en-têtes, HSTS, cookies `Secure`).
-- Les pièces jointes volumineuses (au-delà de 300 Ko testés), les packs de langue.
+- Les pièces jointes volumineuses (au-delà de 300 Ko testés). Le pack de langue français n'est
+  vérifié que sur la démo locale (portail, panneau agent, administration ; pas les e-mails
+  envoyés en français) ; aucun autre pack.
 - Le fonctionnement réel des plugins (événements Stripe réels, SLA sur de vrais échanges).
 - La mise à jour sur App Platform.
 
@@ -144,6 +146,13 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 - **Page « Information » de l'administration** (Tableau de bord > Information, `scp/system.php`) :
   erreur fatale `Call to undefined function shell_exec()`, car `shell_exec` est désactivée.
   Constaté sur PHP 8.2 et 8.3 ; sans conséquence pour le reste de l'administration.
+- **Requêtes `DELETE` refusées (403 d'Apache).** La configuration n'accepte que GET, POST et HEAD,
+  mais quelques appels AJAX d'osTicket utilisent `DELETE` (`scp/ajax.php` : `url_delete`). Constaté
+  le 24/10/2026 sur la démo locale : le bouton « Supprimer le brouillon » de l'éditeur ne supprime
+  rien (`DELETE /scp/ajax.php/draft/<id>` → 403). Concernés aussi d'après le code (non testés) :
+  notes rapides des utilisateurs et organisations, recherches enregistrées, réponses de
+  formulaire. Rien n'est modifié ici (décision à prendre : autoriser `DELETE` sur `ajax.php`
+  seulement, ou accepter la limite).
 - **Pas de `sendmail`** dans l'image : osTicket n'envoie des e-mails que par le SMTP configuré
   dans l'administration (Emails > adresse > SMTP). Sans SMTP, le journal système affiche
   « Unable to email via Sendmail ».
@@ -605,7 +614,7 @@ et de Mailpit, puis, pour chaque compte, rôle, identifiant et mot de passe **g�
 | `hugo.bernard@acme.test` | Client de l'organisation **Acme** (Standard), demandeur du ticket partagé |
 | `nina.petit@mail-perso.test` | Cliente sans organisation (Standard) |
 | `marc.lefevre@acme.test` | Client Acme, collaborateur du ticket partagé |
-| `gina.roux@lumen-studio.test` | Invitée sans compte (organisation Priority) : « Check Ticket Status » avec l'e-mail et le numéro noté dans le fichier |
+| `gina.roux@lumen-studio.test` | Invitée sans compte (organisation Priority) : « Vérifier le statut d'un ticket » (« Check Ticket Status » en anglais) avec l'e-mail et le numéro noté dans le fichier |
 
 **Données** (toutes fictives) : vérification MX des adresses désactivée, fuseau Europe/Paris,
 installation en anglais (`en_US` : contenus de départ en anglais) puis interface en **français** (pack

@@ -139,10 +139,52 @@ Le niveau de contrat (Priority / Standard) affiché par les thèmes vient du plu
 il faut qu'il soit installé dans l'overlay, activé et configuré sur l'organisation Priority, sinon les thèmes
 n'affichent aucun niveau. Détails : `contrib/sla-first-response/README.md`.
 
-## 3. Limites à connaître
+## 3. Interface en français
 
-- Le portail est en anglais tant que le pack de langue français officiel n'est pas ajouté à l'overlay
-  (voir « À tester par vous » dans le README Docker).
+**Le pack.** Le pack de langue officiel d'osTicket (`fr.phar`, osTicket 1.18.x, build v1.18.2 du
+04/02/2025) est dans `deploy/docker/overlay/include/i18n/fr.phar`, donc dans chaque image construite.
+Provenance et empreinte SHA-256 : `deploy/docker/overlay/README.md`. Code de langue osTicket : `fr`.
+
+**Le mettre à jour.** À chaque mise à jour **mineure** d'osTicket (1.18 vers 1.19…), télécharger le pack
+de la nouvelle version (osticket.com/download, sélecteur des packs de langue), remplacer le fichier,
+reporter version, taille et SHA-256 dans `deploy/docker/overlay/README.md`, committer, reconstruire.
+Un pack plus ancien que le code laisse seulement les nouveaux textes en anglais.
+
+**Choisir la langue par défaut** (réglage en base, sans reconstruire) : Admin > Paramètres > Système >
+« Langue principale » = Français. Sans langue secondaire, tout le monde voit le français. Avec
+l'anglais en langue secondaire, le portail suit la langue du navigateur du visiteur (en-tête
+`Accept-Language`) et propose un sélecteur ; chaque agent choisit sa langue dans son profil.
+Sur la démo locale : `deploy/docker/scripts/local-demo.sh language fr` (ou `en_US`) règle la langue
+principale, retire les langues secondaires et règle la langue de tous les agents ; `up` le fait tout seul
+en français après la première installation (`OST_DEMO_LANG=en_US` pour garder l'anglais).
+
+**Ce qui reste en anglais.** Les contenus créés **en base** à l'installation restent dans la langue de
+l'installation (la démo est installée en anglais, puis passée en français) : noms des files (Open,
+Answered, Overdue, My Tickets, Closed et leurs sous-files), en-têtes de colonnes et tris des files,
+statuts (Open, Resolved…), priorités (Low, Normal, High, Emergency), « Default SLA », calendriers,
+formulaires (Contact Information : Email Address, Full Name, Phone Number ; Company ; Ticket Details),
+rôles (All Access, View only), réponses types d'exemple, pages (« Authentication Required » sur la
+connexion agent, « Sign in to… » sur la connexion client, accueil, remerciement), modèles d'e-mails
+(« Ticket [#…] Access Link »), ticket de bienvenue « osTicket Installed! ». Pour les traduire :
+renommer dans l'administration, ou utiliser la traduction par champ d'osTicket (icône de drapeau,
+visible quand une langue secondaire est configurée) ; pour les e-mails, Admin > E-mails > Modèles >
+ajouter un jeu de modèles en Français (les textes viennent du pack) et le choisir par défaut et sur les
+services. osTicket n'a pas d'outil pour réimporter les contenus de départ traduits dans une
+installation existante (le chargement initial n'a lieu qu'à l'installation : le relancer créerait des
+doublons). Une **nouvelle** installation faite en français (langue choisie dans l'assistant) crée ces
+contenus directement en français.
+
+Restent aussi en anglais quelques textes du cœur absents du pack ou écrits en dur : boutons
+« Text Color », « Font », « Video », « Table », « Fullscreen » de l'éditeur, « View Email Recipients »,
+l'événement « … Filter set SLA to … », « No, Cancel » / « Yes, Do it! » sur quatre pages
+d'administration, l'état « Active » des rubriques, « Enabled » des plugins. Le pack garde « Email » et
+« Organization » tels quels et traduit « Open » par « Ouverts » partout (bouton de création de ticket
+compris). Les thèmes n'ont pas de texte anglais : leur catalogue français ne sert que si le pack ne
+traduit pas déjà le texte (le pack l'emporte : « Services » pour les départements, « Début » au lieu de
+« Commencer » sur les cartes du thème Parcours).
+
+## 4. Limites à connaître
+
 - Le niveau de contrat affiché est celui **actuel** du propriétaire du ticket, pas celui du jour où il a été créé.
 - Un sélecteur de thème dans l'administration demanderait un plugin dédié ou une modification du cœur
   d'osTicket, ce qui compliquerait les mises à jour : non prévu.
