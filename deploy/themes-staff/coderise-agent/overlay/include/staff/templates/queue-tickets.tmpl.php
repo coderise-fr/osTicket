@@ -274,6 +274,9 @@ if ($cdrGauge) {
             }
         }
         catch (Throwable $e) {
+            // Every row falls back to the dash; leave a trace for the admin.
+            error_log('coderise-agent: first-reply gauges skipped on the queue: '
+                . get_class($e) . ': ' . $e->getMessage());
             $cdrGauges = array();
         }
     }
