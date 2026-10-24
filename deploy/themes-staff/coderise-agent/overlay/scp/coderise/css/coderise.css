@@ -1040,3 +1040,7 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 #content table.dashboard-stats.table:not(.list) > tbody + tbody > tr:nth-child(even) > :is(th, td) { background: var(--gris); }
 #content table.dashboard-stats.table:not(.list) > tbody + tbody > tr:hover > :is(th, td) { background: var(--voile); }
 @media (max-width: 600px) { #content #line-chart-here tspan { font-size: 9px; } }
+
+/* System logs filter (syslogs.inc.php): core fixes the strip at 25px, so it overflowed when wrapping */
+#content #basic_search:has(> div > #filter > form[action="logs.php"]) > div { height: auto !important; }
+#content #filter > form[action="logs.php"] > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
