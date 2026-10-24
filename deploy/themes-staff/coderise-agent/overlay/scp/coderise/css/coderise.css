@@ -1007,10 +1007,10 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
    #line-chart-here, its legend into #line-chart-legend: ids and DOM untouched, series
    colours stay the library's (set inline by the script). Core's gradient/border and
    the absolute legend (inline style) are replaced here, hence the !important. */
-#content #basic_search > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 0; }
-#content #basic_search label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 600; }
-#content #basic_search input.dp { width: 9.5em; }
-#content #basic_search button[type=submit] { margin: 0; }
+#content form[action="dashboard.php"] #basic_search > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 0; }
+#content form[action="dashboard.php"] #basic_search label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 600; }
+#content form[action="dashboard.php"] #basic_search input.dp { width: 9.5em; }
+#content form[action="dashboard.php"] #basic_search button[type=submit] { margin: 0; }
 #content div:has(> #line-chart-here) { margin-bottom: 20px !important; padding: 12px 14px 10px; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.12); }
 #content #line-chart-here { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; filter: none; overflow-x: auto; overflow-y: hidden; }
 #content #line-chart-here tspan { font-family: var(--f-texte); font-size: 11px; fill: var(--nuit); }
@@ -1020,19 +1020,17 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 /* Swatch (the inline series colour) + white text pill in nuit: legible on any series colour */
 #content #line-chart-legend span.label { display: inline-flex; align-items: center; margin: 0 !important; padding: 2px 9px 2px 20px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,15,38,.25); background-image: linear-gradient(var(--blanc), var(--blanc)); background-repeat: no-repeat; background-position: right; background-size: calc(100% - 12px) 100%; color: var(--nuit); font: 600 .75rem/1.4 var(--f-titre); text-shadow: none; }
 #content #line-chart-legend span.label.disabled { opacity: 1; background-color: var(--ardoise) !important; color: var(--ardoise); text-decoration: line-through; }
-#content hr { height: 0; margin: 20px 0 16px; border: 0; border-top: 1px solid var(--gris); }
+#content form[action="dashboard.php"] hr { height: 0; margin: 20px 0 16px; border: 0; border-top: 1px solid var(--gris); }
 #content table.dashboard-stats { width: 100%; margin: 8px 0 4px; border-collapse: collapse; background: var(--blanc); }
 #content table.dashboard-stats > tbody:first-child > tr > th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 .75rem/1.35 var(--f-titre); text-align: end; vertical-align: middle; white-space: nowrap; }
 #content table.dashboard-stats > tbody:first-child > tr > th.flush-left { text-align: start; }
 #content table.dashboard-stats > tbody:first-child i.help-tip { margin-inline-start: 4px; color: rgba(255,255,255,.78); }
 #content table.dashboard-stats > tbody + tbody > tr > :is(th, td) { padding: 8px 12px; border: 0; vertical-align: middle; text-align: end; background: var(--blanc); color: var(--nuit); font: 400 13.5px/1.4 var(--f-texte); }
 #content table.dashboard-stats > tbody + tbody > tr > th.flush-left { text-align: start; font-weight: 600; }
-#content table.dashboard-stats > tbody + tbody > tr:nth-child(even) > :is(th, td) { background: var(--gris); }
-#content table.dashboard-stats > tbody + tbody > tr:hover > :is(th, td) { background: var(--voile); }
 #content .tab_content:has(> table.dashboard-stats) { overflow-x: auto; }
 @media (max-width: 600px) {
-  #content #basic_search > div > label { flex: 1 1 100%; justify-content: space-between; }
-  #content #basic_search input.dp, #content #basic_search select { flex: 1 1 auto; max-width: 60%; }
+  #content form[action="dashboard.php"] #basic_search > div > label { flex: 1 1 100%; justify-content: space-between; }
+  #content form[action="dashboard.php"] #basic_search input.dp, #content form[action="dashboard.php"] #basic_search select { flex: 1 1 auto; max-width: 60%; }
 }
 #content table.dashboard-stats tbody:nth-child(2) tr, #content table.dashboard-stats tbody:nth-child(2) tr:hover { background: none; }
 #content table.dashboard-stats tbody:nth-child(2) tr:hover :is(th, td) { color: var(--nuit); }
