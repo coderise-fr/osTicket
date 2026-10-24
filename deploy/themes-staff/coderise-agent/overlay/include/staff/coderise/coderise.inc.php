@@ -61,10 +61,11 @@ if (!defined('CDR_VERSION')) {
      * and skips __() (tests only).
      */
     function cdr__($msgid) {
+        global $CDR_TEST_LANG; // not $GLOBALS: setup/test UnitializedVars flags it
         static $catalogs = array();
         $lang = '';
-        if (isset($GLOBALS['CDR_TEST_LANG'])) {
-            $lang = (string) $GLOBALS['CDR_TEST_LANG'];
+        if (isset($CDR_TEST_LANG)) {
+            $lang = (string) $CDR_TEST_LANG;
         }
         else {
             $text = __($msgid);

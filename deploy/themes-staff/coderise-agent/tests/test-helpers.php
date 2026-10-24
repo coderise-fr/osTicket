@@ -117,7 +117,8 @@ $GLOBALS['CDR_TEST_LANG'] = 'fr';
 check('cdr__: fr known', cdr__('Log Out'), "D\xC3\xA9connexion");
 check('cdr__: fr unknown msgid', cdr__('No such msgid zz'), 'No such msgid zz');
 check('cdr__: fr_FR falls back to fr', (function () {
-    $GLOBALS['CDR_TEST_LANG'] = 'fr_FR';
+    global $CDR_TEST_LANG;
+    $CDR_TEST_LANG = 'fr_FR';
     return cdr__('Log Out');
 })(), "D\xC3\xA9connexion");
 $GLOBALS['CDR_TEST_LANG'] = 'fr';
