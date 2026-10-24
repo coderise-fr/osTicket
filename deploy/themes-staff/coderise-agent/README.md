@@ -32,8 +32,8 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php` et `tests/test-rail.php` (assistants PHP, en CLI dans l'image de
-  démo avec `-d open_basedir=`), `deploy/themes-staff/tests/overflow.js` (débordement,
-  Playwright).
+  démo avec `-d open_basedir=`), `node --check overlay/scp/coderise/js/coderise.js`,
+  `deploy/themes-staff/tests/overflow.js` (débordement, Playwright).
 
 ## Fichiers
 
@@ -99,7 +99,7 @@ anglais ; le français n'apparaît que pour un agent réglé en français.
 
 ## Lacunes connues (Known gaps)
 
-État après l'administration (tâche 8), vérifié en anglais sur la démo locale.
+État après le tableau de bord (tâche 9), vérifié en anglais sur la démo locale.
 
 1. Sous 600 px, les formulaires (`table.form_table`, `table.table` des formulaires
    `form.save`) empilent le libellé au-dessus du champ. Les listes à nombreuses colonnes
@@ -142,6 +142,15 @@ anglais ; le français n'apparaît que pour un agent réglé en français.
    pastille de la série + texte nuit, barré quand la série est masquée). Sous ~500 px les
    dates de l'axe horizontal se chevauchent (le script du cœur ne redessine pas au
    redimensionnement). La légende reste cliquable à la souris seulement (éléments `span`).
+9. Logo : le rail et la page de connexion affichent le logo Coderise du thème ; le réglage
+   « logo du panneau agent » de l'administration n'a plus d'effet visible (le logo
+   `logo.php?login` du cœur reste seulement dans le titre masqué de la connexion).
+10. Les libellés de sous-menu calculés par le cœur avec un compteur (« My Tasks (3) »,
+    composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
+    traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit.
+11. `captures/` pèse environ 11 Mo (102 PNG) dans le dépôt.
+12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
+    `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
 ## Non réalisé (Not done)
 
@@ -160,7 +169,9 @@ Autres éléments non réalisés :
 - **File « À risque »** du rail : le thème n'ajoute ni table ni réglage ; un administrateur
   la crée comme file enregistrée (Admin > Paramètres > Tickets, onglet « Queues »), voir « Thème du panneau agent » dans `docs/guide-utilisateur.md`. Le
   rail l'affiche avec les autres files, sous le nom saisi (non traduit). Elle approche la jauge (champ
-  « Answered » et échéance SLA du cœur) sans reprendre exactement la règle I-4.
+  « Answered » et échéance SLA du cœur) sans reprendre exactement la règle I-4 : « Answered »
+  repasse à « non » à chaque message du client (`Ticket::onMessage()`), donc un ticket servi à
+  temps puis relancé peut y réapparaître alors que la jauge affiche « Tenu en … ».
 - Écrans d'administration autres que Paramètres > Tickets et Agents (maquettés) : habillés
   par la feuille de style seulement (listes `table.list`, formulaires, barre
   d'enregistrement), sans gabarit dédié.
@@ -170,21 +181,35 @@ Autres éléments non réalisés :
 
 ## Vérifications (tâche 10)
 
-- Débordement horizontal (`tests/overflow.js`, largeur utile sans la barre de défilement) :
-  aucun, à 390, 820 et 1280 px, en administrateur et en agent non administrateur, sur
-  l'accueil, la file, une fiche ticket, le tableau de bord, utilisateurs, tâches, base de
-  connaissances, profil, administration, Paramètres > Tickets, agents, sujets d'aide,
-  plugins, journaux ; connexion et mot de passe oublié dans un contexte neuf sans session.
-  Corrigés pendant l'audit : profil à 390 px (tableau imbriqué à `width: 760px` en ligne) et
-  sélecteur de réponse type de la fiche ticket (select2 à `width: 100%` plus marge interne).
+- Débordement horizontal (`tests/overflow.js`, largeur utile sans la barre de défilement),
+  à 390, 820 et 1280 px : aucun.
+  - Administrateur (`dev.admin`) : accueil, file, fiche ticket, tableau de bord, tâches, base
+    de connaissances, profil, administration, Paramètres > Tickets, agents, sujets d'aide,
+    plugins, journaux ; et, après lui avoir donné la permission d'agent « User Directory »
+    sur la démo locale, liste des utilisateurs, fiche utilisateur, organisations, fiche
+    organisation, annuaire des agents.
+  - Agent non administrateur (`dev.agent`) : accueil, file, fiche ticket, tableau de bord,
+    tâches, base de connaissances, profil ; ses autres chemins (utilisateurs, pages
+    d'administration) le renvoient à l'accueil, mesuré à la place.
+  - Connexion et mot de passe oublié dans un contexte neuf sans session.
+  - Corrigés pendant l'audit : profil à 390 px (tableau imbriqué à `width: 760px` en ligne),
+    sélecteur de réponse type de la fiche ticket (select2 à `width: 100%` plus marge
+    interne), fiche utilisateur à 390 px (tableau d'informations enfant direct de
+    `#content`, désormais empilé sous 920 px).
 - Contraste (ratio WCAG de chaque nœud de texte visible, couleur composée sur les fonds des
-  ancêtres, seuil 4,5:1 et 3:1 pour le grand texte) à 1280 px sur le rail, la barre haute,
-  la file, une fiche ticket, Paramètres > Tickets, agents, le tableau de bord et la
-  connexion : minimum 9,52 (rail), 5,83 (barre haute), 4,91 (contenu), 5,83 (connexion).
-  Corrigé : texte de la zone de dépôt de fichiers (`#999` sur `#f2f2f2`, 2,6:1, du cœur).
+  ancêtres, seuil 4,5:1 et 3:1 pour le grand texte) : minimum 9,52 (rail), 5,83 (barre
+  haute), 4,91 (contenu), 5,83 (connexion). **Périmètre** : 1280 px seulement, compte
+  administrateur, en anglais, pages file, fiche ticket, Paramètres > Tickets, agents,
+  tableau de bord et connexion ; **non mesurés** : 390 px et menu ouvert, boîtes de
+  dialogue, menus déroulants ouverts, RTL, français. Corrigé : texte de la zone de dépôt
+  de fichiers de la fiche ticket (`#999` sur `#f2f2f2`, 2,6:1, du cœur), règle limitée à
+  `#content.cdr` (les zones de dépôt des boîtes de dialogue gardent la couleur du cœur).
   Exception d'outil : les étiquettes de la légende du graphique sont signalées à tort (le
   texte est sur un calque blanc en dégradé, la couleur de série n'occupe que la pastille de
   12 px). Hors périmètre : contenu des messages (`.thread-body`) et tracé du graphique.
+- JavaScript : la suite du dépôt (`setup/test/run-tests.php`) ne vérifie rien en JS dans
+  l'image de démo (`jsl` absent) ; `coderise.js` est vérifié avec
+  `node --check deploy/themes-staff/coderise-agent/overlay/scp/coderise/js/coderise.js`.
 - Clavier : parcours à la touche Tab de la file (114 éléments), d'une fiche ticket et de
   Paramètres > Tickets : chaque élément focalisé a un contour d'au moins 2 px (3 px du thème,
   ou le contour automatique du navigateur sur 5 boutons de l'éditeur). Corrigés : onglets

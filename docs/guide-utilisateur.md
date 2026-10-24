@@ -113,9 +113,16 @@ dans le rail de chaque agent. Critères disponibles dans l'éditeur de files (v�
 
 Les critères s'additionnent (ET) : les tickets déjà en dépassement n'y figurent pas, ils sont dans
 la file « Open / Overdue » du cœur. Variante sans le dernier critère : tous les tickets Priority sans
-réponse, à trier par « SLA Due Date ». Le champ « Answered » d'osTicket passe à « oui » dès la
-première réponse d'un agent, même non adressée au client : la file approche la jauge sans la
-reproduire exactement. Nom conseillé : « À risque » (le nom d'une file est
+réponse, à trier par « SLA Due Date ».
+
+Cette recette **approche** la règle de la jauge sans la reproduire : le champ « Answered »
+d'osTicket passe à « oui » à chaque réponse d'un agent, même non adressée au client
+(`Ticket::onResponse()`), et repasse à « non » à **chaque** nouveau message du client
+(`Ticket::onMessage()`) ou à la main (« Mark as unanswered »). Un ticket qui a reçu son premier retour
+à temps puis une relance du client réapparaît donc dans la file tant que son échéance SLA tombe
+dans la fenêtre choisie (et toujours dans la variante sans échéance), alors que la jauge affiche
+« Tenu en … ». Pour un ticket rouvert, l'échéance SLA d'osTicket part de la réouverture, celle de
+la jauge de la création. Nom conseillé : « À risque » (le nom d'une file est
 affiché tel quel, il n'est pas traduit).
 
 ## 2. Ce qui se change dans l'administration, sans reconstruire
