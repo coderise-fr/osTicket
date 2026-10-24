@@ -27,15 +27,24 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
   cellules restent celles du cœur. La jauge n'apparaît que si le plugin
   sla_first_response est actif, et seulement pour les tickets **ouverts** d'un
   propriétaire Priority ; ticket fermé ou client Standard : « — » (« Sans objet »).
+- Administration (tâche 8) : la sous-navigation reste dans les groupes du rail
+  (Paramètres, Gérer, E-mails, Agents, comme les onglets d'administration du cœur), pas
+  dans la bande d'onglets horizontale de la maquette.
+- Barre d'enregistrement : c'est la ligne de boutons du cœur (dernier `<p>` du formulaire
+  `form.save` contenant un bouton d'envoi), collée en bas de la fenêtre **dans la carte**
+  (la maquette la montre sur toute la largeur de la colonne) et toujours visible ;
+  `coderise.js` n'y ajoute que le compteur « N réglage(s) modifié(s) », et seulement une
+  fois un champ modifié. Sans JavaScript, la barre colle sans compteur. Le suivi
+  (`is-changed`, `is-dirty`) ne concerne que les formulaires de l'administration.
 
 ## Lacunes connues (Known gaps)
 
-État après la fiche ticket (tâche 7), vérifié en anglais sur la démo locale.
+État après l'administration (tâche 8), vérifié en anglais sur la démo locale.
 
-1. Sous ~600 px, les tableaux hérités trop larges (formulaires de réglages, profil,
-   listes à nombreuses colonnes) défilent latéralement dans leur propre conteneur
-   (`.cdr-hscroll`) : aucune page ne déborde, mais les formulaires d'administration ne
-   sont pas encore empilés (tâche 8).
+1. Sous 600 px, les formulaires (`table.form_table`, `table.table` des formulaires
+   `form.save`) empilent le libellé au-dessus du champ. Les listes à nombreuses colonnes
+   (`table.list`) et les tableaux à plus de deux cellules par ligne défilent encore
+   latéralement dans leur propre conteneur (`.cdr-hscroll`) ; aucune page ne déborde.
 2. Fiche ticket (tâche 7) : le gabarit du cœur est conservé ; `coderise.js` déplace la
    bande d'onglets dans `#ticket_tabs_container` et regroupe le panneau « Premier retour »
    et les tableaux `table.ticket_info` dans une colonne `aside.cdr-props`. Écarts avec la
@@ -59,3 +68,11 @@ fichiers dans `deploy/docker/overlay/` : l'arbre d'osTicket n'est jamais modifi�
 5. Datepicker jQuery UI, icônes GIF du cœur (calendrier, dossiers de la base de
    connaissances) : aspect d'origine.
 6. Composants non vérifiés en RTL.
+7. Administration : les listes (agents, équipes, départements, sujets d'aide, SLA,
+   plugins, formulaires…) prennent le style `table.list` ; les étiquettes d'état et de
+   rôle de la maquette ne sont **pas faisables en CSS** (« Active / Disabled » sont du
+   texte brut sans classe), pas plus que l'avatar d'initiales, les filtres « Statut » et
+   le pied « N agents ». Les champs en erreur gardent le message du cœur (texte rouge en
+   gras), sans cadre rouge. Marques « modifié » : barre cyan et texte sous le libellé de
+   la ligne (pas sur le champ lui-même comme la maquette) ; un éditeur riche (Redactor)
+   n'est suivi que s'il déclenche `input`/`change` sur son `textarea`.

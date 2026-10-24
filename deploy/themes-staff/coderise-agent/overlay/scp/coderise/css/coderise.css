@@ -896,8 +896,16 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
 @media (max-width: 920px) {
   .topbar:not(:has(> .btn)) { display: none; }
 }
-/* Below 600 px: label above control on two-cell form rows */
+/* Agent edit (staff.inc.php): the nested field table has an inline 760 px
+   width beside the 100 px avatar; it takes what is left of the card */
+#content.cdr-is-admin form.save table.table[style*="width"] { width: auto !important; }
+/* Below 600 px: label above control on two-cell form rows. The tables are
+   blocks: a long <select> no longer gives them a min-content width wider
+   than the card (rows with another cell count get an anonymous table). */
 @media (max-width: 600px) {
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody) > tr:has(> th:only-child) { display: block; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) { display: block; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td { display: block; width: auto; box-sizing: border-box; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:nth-child(2):last-child) > td:first-child { padding-bottom: 0; border-bottom: 0; }
