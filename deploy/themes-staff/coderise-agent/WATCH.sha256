@@ -1,4 +1,4 @@
-# Thème coderise-agent : fichiers du cœur dont le thème dépend sans les remplacer, empreintes au commit 39de708831b09824c46c54d306cc1cb9e40366e0
+# Thème coderise-agent : fichiers du cœur dont le thème dépend sans les remplacer, empreintes au commit 552bee929b7317c66c8c87f1a556158101f8f501
 8054b9eb1b2e7f0ffa574e54f7fb5bcd98b3cf1ac5403dc516bcb297f6ef0543  scp/index.php
 3cd907f807453ad7e19219ff85b4180b4a98662d9b4b41bc547ff1d07908fb0e  scp/tickets.php
 e2bdfa5ded4a4a7222484da96b84c96903e4ff8da3b2e1f8308ba82af7e5a1b1  scp/login.php
@@ -55,4 +55,7 @@ e60314d31c38eeb8f1059bb4fd6015ee94decd97eba2079eb141b1bf677daff9  include/staff/
 b785645b2db29894c25e7d6cf7c370faabe886d85f278634df6f5e15c5c28289  include/staff/templates/queue-sort.tmpl.php
 35de5c6c1ae3834ef24e6c3793ce980469e4d1d0019cb10c830b5beca37e144a  include/staff/templates/dynamic-form-simple.tmpl.php
 8db42bcd7f59b1a09a0ee610ce754763fa5c1190e4e9a75e282a5a29c4e304de  include/staff/templates/task-view.tmpl.php
+155c23931d73ccbcef967b521318e889fee164c72caed1ad75496be0a9f26519  include/staff/templates/thread-entry.tmpl.php
+8d8c27d72be7e2c9341f3c0c3ae86ba8ca56b3b1454bd4d8ec945ad497b1691d  include/staff/templates/thread-event.tmpl.php
 2d71d6d8aabef2b3609dfbf3b143f0cf8e426156f74de7f5839cb696d8ab97ce  contrib/sla-first-response/plugin/sla_first_response/sla_first_response.php
+cf2b59c92a0be9b287009642366b71fe5b605ea0d566832ab1eeea1102ec900a  contrib/sla-first-response/plugin/sla_first_response/contract_level.php

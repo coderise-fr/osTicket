@@ -1,4 +1,4 @@
-# Thème coderise-agent : fichiers du cœur remplacés par overlay/, empreintes au commit 39de708831b09824c46c54d306cc1cb9e40366e0
+# Thème coderise-agent : fichiers du cœur remplacés par overlay/, empreintes au commit 552bee929b7317c66c8c87f1a556158101f8f501
 205b8640e20fbaf9a668027e64f7323147bcffb3b979939e8aec547ab84c72a1  include/staff/footer.inc.php
 0bb2c6b15e3c6c298c99a5714bccaae3e5e5b534c5beec7d5b74581607a40d43  include/staff/header.inc.php
 9a42008270c730d13f4b313af0e73e081fdf73c9b75d394d37fd0203be453e8b  include/staff/login.header.php

@@ -8,7 +8,8 @@
 #                                     (archive de version extraite, copie d'une image…)
 #   ./check-drift.sh --write-base [REV]
 #                                     réécrit BASE.sha256 et WATCH.sha256 depuis REV
-#                                     (HEAD par défaut), après avoir rebasé les gabarits
+#                                     (HEAD par défaut ; utiliser la base develop, ex. 552bee92),
+#                                     après avoir rebasé les gabarits
 #
 # BASE.sha256  : fichiers du cœur REMPLACÉS par le thème (à rebaser s'ils changent).
 # WATCH.sha256 : fichiers du cœur NON remplacés dont le thème dépend (balisage habillé
@@ -16,6 +17,11 @@
 #                gabarits et l'assistant) : à revoir s'ils changent.
 # Les fins de ligne CR sont ignorées (copie Windows). Code de sortie : 0 aucune
 # dérive, 1 dérive détectée, 2 erreur d'utilisation.
+# En mode ARBRE (dossier, copie d'une image), les fichiers sous contrib/ absents de
+# l'arbre sont ignorés (une image ou une archive de version n'a pas contrib/) ; un
+# fichier du cœur absent reste signalé SUPPRIMÉ.
+# La référence (ligne 1 des .sha256) est le commit de base de develop sur lequel le
+# thème a été écrit, pas un commit de la branche, pour survivre à une fusion écrasée.
 set -eu
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -84,7 +90,10 @@ include/staff/templates/queue-quickfilter.tmpl.php
 include/staff/templates/queue-sort.tmpl.php
 include/staff/templates/dynamic-form-simple.tmpl.php
 include/staff/templates/task-view.tmpl.php
+include/staff/templates/thread-entry.tmpl.php
+include/staff/templates/thread-event.tmpl.php
 contrib/sla-first-response/plugin/sla_first_response/sla_first_response.php
+contrib/sla-first-response/plugin/sla_first_response/contract_level.php
 "
 
 sha() {
@@ -97,7 +106,7 @@ rev=HEAD
 dir=
 write=0
 case "${1:-}" in
-    -h|--help) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     --rev) [ $# -ge 2 ] || { echo "check-drift: --rev demande un commit" >&2; exit 2; }; rev="$2" ;;
     --write-base) write=1; rev="${2:-HEAD}" ;;
     "") ;;
@@ -150,6 +159,9 @@ check() { # $1 = file of hashes, $2 = label, $3 = advice
     while read -r h f; do
         case "$h" in ''|'#'*) continue ;; esac
         now="$(hash_of "$f")"
+        if [ "$now" = absent ] && [ "$mode" = dir ]; then
+            case "$f" in contrib/*) continue ;; esac
+        fi
         if [ "$now" = absent ]; then
             changed="$changed
   SUPPRIMÉ  $f"
