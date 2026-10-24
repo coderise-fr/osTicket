@@ -16,8 +16,11 @@ normally install from its admin panel has to be added here and the image rebuilt
 Plugins : procédure exacte, activation, secrets (fichier sous `/etc/osticket/` ou `plugins.env`) et
 obstacles constatés dans la section « Plugins et personnalisation » du `README.md` parent.
 Un fichier de l'overlay **remplace** le fichier du même chemin (copier l'original puis le modifier).
-Tout doit être **committé** avant `scripts/build.sh` (l'image est construite depuis `HEAD`) ; Git ignore
-`*.phar` et `.htaccess` (ajouter avec `git add -f` si nécessaire).
+Tout doit être **committé** avant `scripts/build.sh` (l'image est construite depuis `HEAD`). Git ignore
+`*.phar` et `.htaccess`. Un `.htaccess` s'ajoute avec `git add -f`. Un `.phar` demande en plus une
+exception étroite dans `.gitignore` **et** dans `Dockerfile.dockerignore` (voir ci-dessous) : avec
+`git add -f` seul, il serait committé mais resterait hors de l'image (`**/*.phar` exclu du contexte de
+construction).
 
 Keep this folder small: every file that replaces a core file has to be reviewed
 again at each osTicket upgrade.

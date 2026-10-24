@@ -183,6 +183,18 @@ compris). Les thèmes n'ont pas de texte anglais : leur catalogue français ne s
 traduit pas déjà le texte (le pack l'emporte : « Services » pour les départements, « Début » au lieu de
 « Commencer » sur les cartes du thème Parcours).
 
+**Passage en production.** L'overlay committé contient le thème du panneau agent
+(`coderise-agent`) et le pack `fr.phar` : ils arrivent avec l'image. Le pack reste **inactif** tant
+qu'un administrateur n'a pas choisi Français comme langue principale (Admin > Paramètres > Système)
+et, pour chaque agent, sa langue dans son profil (la commande `language` n'existe que pour la démo
+locale). À savoir avant de mettre en service : le durcissement d'Apache de l'image refuse les
+requêtes `DELETE`, ce qui casse dans l'interface la suppression des brouillons (bouton « Supprimer le
+brouillon » de l'éditeur, panneau agent et portail client), des organisations, des notes rapides
+d'utilisateur ou d'organisation, des réponses de formulaire et des recherches enregistrées. Seule la
+suppression de brouillon a été constatée, les autres se déduisent du code. Le correctif (autoriser
+`DELETE` sur les seuls routeurs `ajax.php`) n'est **pas appliqué** : il reste à décider et à tester,
+voir « Limites connues » dans `deploy/docker/README.md`.
+
 ## 4. Limites à connaître
 
 - Le niveau de contrat affiché est celui **actuel** du propriétaire du ticket, pas celui du jour où il a été créé.

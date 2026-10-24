@@ -146,13 +146,25 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 - **Page « Information » de l'administration** (Tableau de bord > Information, `scp/system.php`) :
   erreur fatale `Call to undefined function shell_exec()`, car `shell_exec` est désactivée.
   Constaté sur PHP 8.2 et 8.3 ; sans conséquence pour le reste de l'administration.
-- **Requêtes `DELETE` refusées (403 d'Apache).** La configuration n'accepte que GET, POST et HEAD,
-  mais quelques appels AJAX d'osTicket utilisent `DELETE` (`scp/ajax.php` : `url_delete`). Constaté
-  le 24/10/2026 sur la démo locale : le bouton « Supprimer le brouillon » de l'éditeur ne supprime
-  rien (`DELETE /scp/ajax.php/draft/<id>` → 403). Concernés aussi d'après le code (non testés) :
-  notes rapides des utilisateurs et organisations, recherches enregistrées, réponses de
-  formulaire. Rien n'est modifié ici (décision à prendre : autoriser `DELETE` sur `ajax.php`
-  seulement, ou accepter la limite).
+- **Requêtes `DELETE` refusées (403 d'Apache).** `conf/apache2.conf` (bloc `<Directory "/var/www/html">`,
+  `Require method GET POST HEAD`, en place depuis le commit `6e7f290d`) refuse toute requête `DELETE`,
+  or osTicket en envoie par AJAX. Fonctions cassées dans cette image :
+  - suppression d'un **brouillon** depuis l'éditeur (« Supprimer le brouillon », `js/redactor-osticket.js`
+    vers `scp/ajax.php` `draft/<id>` et, côté portail client, `ajax.php` `draft/<id>`) : **constaté** le
+    24/10/2026 sur la démo locale (`DELETE /scp/ajax.php/draft/<id>` → 403, le brouillon reste) ;
+  - suppression d'une **organisation** (Agents > Organisations > Supprimer :
+    `include/staff/templates/org-delete.tmpl.php`, formulaire `method="delete"` envoyé par
+    `scp/js/scp.js` vers `scp/ajax.php` `orgs/<id>/delete`) ;
+  - suppression d'une **note rapide** d'utilisateur ou d'organisation (`scp/js/scp.js` vers
+    `scp/ajax.php` `note/<id>`) ;
+  - suppression d'une **réponse de formulaire** (`scp/ajax.php` `form/answer/<entry>/<field>`) ;
+  - suppression d'une **recherche enregistrée** (`scp/ajax.php` `tickets/search/<id>`).
+  Seule la suppression de brouillon a été constatée ; les autres se déduisent du code (routes
+  `url_delete` des deux routeurs AJAX). Correctif possible, **non appliqué ici** et à décider puis
+  tester à part : autoriser `DELETE` uniquement sur les routeurs AJAX, par exemple
+  `<LocationMatch "^/(scp/)?ajax\.php/">` avec `Require method GET POST HEAD DELETE` (osTicket vérifie
+  déjà le jeton CSRF des `DELETE` : `scp/staff.inc.php` et `client.inc.php`). Contournement en
+  attendant : supprimer une organisation ou un brouillon reste impossible depuis l'interface.
 - **Pas de `sendmail`** dans l'image : osTicket n'envoie des e-mails que par le SMTP configuré
   dans l'administration (Emails > adresse > SMTP). Sans SMTP, le journal système affiche
   « Unable to email via Sendmail ».
@@ -344,6 +356,13 @@ déjà en base (rubriques, départements, statuts, réponses types, pages, modè
 la langue de l'installation : voir `docs/guide-utilisateur.md`, « Interface en français ».
 **À chaque mise à jour mineure d'osTicket**, télécharger le pack de la nouvelle version, remplacer le
 fichier, mettre à jour son SHA-256 dans `overlay/README.md`, committer et reconstruire.
+
+**Passage en production.** L'overlay committé livre le thème du panneau agent `coderise-agent` et
+`fr.phar`. Le pack reste inactif tant qu'un administrateur n'a pas réglé la langue principale (et la
+langue des agents dans leur profil). Avant la mise en service, lire « Requêtes `DELETE` refusées »
+dans « Limites connues » : la suppression des brouillons, des organisations, des notes rapides, des
+réponses de formulaire et des recherches enregistrées ne fonctionne pas avec la configuration Apache
+actuelle (correctif non appliqué, à décider et tester à part).
 
 ### Permissions et exécution (constatées)
 
