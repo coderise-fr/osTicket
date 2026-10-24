@@ -13,6 +13,7 @@ dans `deploy/docker/overlay/` ; un seul thème agent à la fois.
 | `tests/test-scripts.sh` | Teste `apply.sh` / `remove.sh` sur des copies temporaires de l'overlay, dont la cohabitation avec le thème client installé |
 | `tests/lint-php.sh` | `php -l` de chaque fichier PHP du thème, dans l'image de démo |
 | `tests/overflow.js` | Mesure du débordement horizontal (Playwright, session authentifiée) |
+| `tests/editor-check.js` | Contrôle du texte saisi dans les éditeurs Redactor de la page courante : décalage, alignement, largeur, vue source (Playwright, `browser_evaluate`) |
 
 Chaque thème suit les conventions des thèmes client : `apply.sh`, `remove.sh`,
 `check-drift.sh`, `MANIFEST`, `overlay/`, manifeste des fichiers installés

@@ -48,7 +48,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 /* Core rules that remove the outline with a stronger selector (keyboard audit) */
 ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; } /* scp.css: ul.tabs li a { outline: none } */
-.redactor-box:has(.redactor-styles:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; } /* the editable area itself has no outline */
+.redactor-box:has(.redactor-styles:focus-visible, .redactor-source:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; } /* the editable area and the source view (redactor.css: outline none) have no outline of their own */
 .on-dark { --focus: var(--cyan); }
 .cdr-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 100; background: var(--nuit); color: var(--blanc); padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; }
 .cdr-skip:focus { top: 8px; outline: 3px solid var(--cyan); }
@@ -213,7 +213,7 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
   color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px;
 }
 #content.cdr .filedrop .dropzone { color: var(--ardoise); } /* filedrop.css: #999 on #f2f2f2 (2.6:1) */
-#content.cdr :is(h1, h2, h3):not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
+#content.cdr :is(h1, h2, h3):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font-family: var(--f-titre); color: var(--nuit); }
 
 @media (min-width: 921px) {
   /* The sticky rail stops at the end of #pjax-container; the strip under it
@@ -253,7 +253,15 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
    Most rules are scoped by :is(#content, .dialog, .tip_content): the id
    weight beats core's class selectors without !important, and the login
    page (body.cdr-login, no #content) is left alone. !important is used only
-   against core !important declarations. */
+   against core !important declarations.
+   User and rich content (what agents type or paste, what clients send) is
+   never restyled: a rule whose descendant selector could reach an element
+   type users produce (h1-h4, p, em, hr, th, table...) either uses child
+   combinators from a known core element, or ends with
+   :not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *)
+   (the same list as RICH in coderise.js). Redactor's source view
+   (textarea.redactor-source) keeps its own look. Check typed content with
+   deploy/themes-staff/tests/editor-check.js. */
 :root {
   --cdr-ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4 3 19.5h18z'/%3E%3Cpath d='M12 10v4.5M12 17.2h.01'/%3E%3C/svg%3E");
   --cdr-ic-error: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6'/%3E%3C/svg%3E");
@@ -263,15 +271,15 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
 }
 
 /* ───────── Titles ───────── */
-#content h2:not(.thread-body *) { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
-#content.cdr h2 a, #content.cdr h2 a:hover { color: var(--nuit); text-decoration: none; }
-#content h2:not(.thread-body *) i { color: var(--cyan-profond); }
-#content :is(h2, h3):not(.thread-body *) small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
-#content h3:not(.thread-body *) { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
-#content h4:not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
+#content h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { margin: 0 0 16px; padding: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); }
+#content.cdr h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a, #content.cdr h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a:hover { color: var(--nuit); text-decoration: none; }
+#content h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) i { color: var(--cyan-profond); }
+#content :is(h2, h3):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) small { color: var(--ardoise); font-family: var(--f-texte); font-weight: 400; }
+#content h3:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { margin: 18px 0 8px; padding: 0; font: 700 1.0625rem/1.35 var(--f-titre); color: var(--nuit); }
+#content h4:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font-family: var(--f-titre); color: var(--nuit); }
 :is(#content, .dialog, .tip_content) .faded, :is(#content, .dialog) .faded-more { color: var(--ardoise); }
 :is(#content, .dialog, .tip_content) .faded b, :is(#content, .dialog, .tip_content) .faded strong { color: var(--nuit); }
-:is(#content, .dialog) hr:not(.thread-body *) { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
+:is(#content, .dialog) hr:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { height: 1px; margin: 16px 0; border: 0; background: var(--gris); }
 
 /* ───────── Buttons ─────────
    .button and the input buttons = btn-line; submit = btn-primary (cyan, nuit
@@ -335,17 +343,17 @@ html.rtl :is(#content, .dialog) .input.attached .button.attached { border-radius
    markup (size= / inline styles), capped to the column. */
 :is(#content, .dialog, .tip_content) :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=search], input[type=tel], input[type=url], input[type=date], input[type=datetime-local], input[type=time]):not(.select2-search__field),
 :is(#content, .dialog, .tip_content) select,
-:is(#content, .dialog, .tip_content) textarea {
+:is(#content, .dialog, .tip_content) textarea:not(.redactor-source) {
   box-sizing: border-box; max-width: 100%; min-height: 36px; margin: 0; padding: 6px 10px;
   border: 1px solid var(--ardoise); border-radius: 6px; background-color: var(--blanc); color: var(--nuit);
   font: 400 .84375rem/1.4 var(--f-texte); box-shadow: none;
 }
 :is(#content, .dialog, .tip_content) select { padding-block: 4px; padding-inline-end: 6px; }
 :is(#content, .dialog, .tip_content) select[multiple], :is(#content, .dialog, .tip_content) select[size]:not([size="1"]) { min-height: 0; height: auto; }
-:is(#content, .dialog, .tip_content) textarea { min-height: 72px; resize: vertical; }
-:is(#content, .dialog, .tip_content) :is(input, select, textarea):focus:not([type=checkbox]):not([type=radio]):not(.select2-search__field) { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
+:is(#content, .dialog, .tip_content) textarea:not(.redactor-source) { min-height: 72px; resize: vertical; }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):focus:not([type=checkbox]):not([type=radio]):not(.select2-search__field):not(.redactor-source) { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
 :is(#content, .dialog, .tip_content) :is(input, textarea)::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
-:is(#content, .dialog, .tip_content) :is(input, select, textarea):is([readonly], :disabled):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=reset]) { background-color: var(--gris); color: var(--ardoise); }
+:is(#content, .dialog, .tip_content) :is(input, select, textarea):is([readonly], :disabled):not(.select2-search__field):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=reset]) { background-color: var(--gris); color: var(--ardoise); }
 :is(#content, .dialog, .tip_content) :is(input[type=checkbox], input[type=radio]) { width: 16px; height: 16px; margin: 0; margin-inline-end: 4px; vertical-align: -3px; accent-color: var(--nuit); }
 :is(#content, .dialog) label { color: var(--nuit); }
 /* Required markers and field errors: text and asterisk, never colour alone */
@@ -410,12 +418,12 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 :is(#content, .dialog) :is(.form_table, .settings_table) th h4 a { display: inline; color: var(--nuit); }
 :is(#content, .dialog) :is(.form_table, .settings_table) th em { display: block; margin: 0; color: var(--ardoise); font-style: normal; font-weight: 400; }
 :is(#content, .dialog) :is(.form_table, .settings_table) th em b, :is(#content, .dialog) :is(.form_table, .settings_table) th em strong { color: var(--nuit); font-family: var(--f-titre); font-weight: 700; }
-:is(#content, .dialog) .form_table em { color: var(--ardoise); }
+:is(#content, .dialog) .form_table em:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { color: var(--ardoise); }
 /* table.table (profile, user and organisation forms): tr.header rows are
    section titles, like the legends of the mockup */
 :is(#content, .dialog) table.table:not(.list) { border-collapse: collapse; }
-:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th) { padding: 22px 0 6px; border: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); text-align: start; }
-:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th)::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { padding: 22px 0 6px; border: 0; background: none; color: var(--nuit); font: 700 .9375rem/1.3 var(--f-titre); text-align: start; }
+:is(#content, .dialog) table.table:not(.list) :is(tr.header > th, tr.header > td, thead th):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *)::after { content: ""; display: block; width: 28px; height: 3px; margin-top: 6px; background: var(--cyan); }
 :is(#content, .dialog) table.table:not(.list) tr.header { border: 0; }
 :is(#content, .dialog) table.table:not(.list) > tbody > tr > td { padding: 6px 8px; padding-inline-start: 0; background: none; }
 
@@ -459,12 +467,12 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 /* ───────── Dialogs (.dialog, #popup, #alert) ───────── */
 #overlay { background: var(--nuit); opacity: .55; }
 .dialog { padding: 20px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.1), 0 24px 64px rgba(0,15,38,.35); color: var(--nuit); font-size: .84375rem; }
-.dialog h3, .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 3em; color: var(--nuit); font: 700 1.125rem/1.3 var(--f-titre); }
+.dialog h3:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *), .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 3em; color: var(--nuit); font: 700 1.125rem/1.3 var(--f-titre); }
 .dialog a { color: var(--cyan-profond); }
 .dialog a.close { top: 16px; right: 18px; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--nuit); font-size: 16px; text-decoration: none; }
 html.rtl .dialog a.close { right: auto; left: 18px; }
 .dialog a.close:hover { background: var(--gris); }
-.dialog th { padding: 6px 10px; border: 0; background: var(--gris); color: var(--nuit); }
+.dialog th:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { padding: 6px 10px; border: 0; background: var(--gris); color: var(--nuit); }
 .dialog .table td:not(:empty) { background-color: transparent !important; } /* core #f8f8f8 !important */
 .dialog #popup-loading { background: rgba(255,255,255,.88); color: var(--nuit); }
 .dialog p.full-width, .dialog .buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
@@ -545,6 +553,28 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
 .select2-container--default .select2-results__option--highlighted[aria-selected] { background: var(--voile); color: var(--nuit); }
 .select2-container--default .select2-results__group { color: var(--ardoise); font: 600 .75rem var(--f-titre); }
 
+/* ───────── Date picker (jQuery UI #ui-datepicker-div, appended to body) ─────────
+   Core ships the orange "ui-lightness" theme; the id weight beats its
+   .ui-state-* classes. Today = voile with a cyan-profond ring, the chosen day
+   = nuit; past days stay disabled by core (opacity). */
+#ui-datepicker-div { padding: 6px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 .8125rem/1.35 var(--f-texte); }
+#ui-datepicker-div .ui-datepicker-header { border: 0; border-radius: 6px; background: var(--nuit); color: var(--blanc); }
+#ui-datepicker-div .ui-datepicker-title { color: var(--blanc); font: 700 .8125rem/1.8em var(--f-titre); }
+#ui-datepicker-div :is(.ui-datepicker-prev, .ui-datepicker-next) { border: 0; background: none; cursor: pointer; }
+#ui-datepicker-div :is(.ui-datepicker-prev, .ui-datepicker-next):hover { border: 0; border-radius: 4px; background: rgba(255,255,255,.16); }
+#ui-datepicker-div th { color: var(--ardoise); font: 600 .75rem var(--f-titre); }
+#ui-datepicker-div td :is(a, span).ui-state-default { border: 1px solid var(--gris); border-radius: 4px; background: var(--blanc); color: var(--nuit); text-align: center; font-weight: 500; }
+#ui-datepicker-div td a.ui-state-default:hover, #ui-datepicker-div td a.ui-state-hover { border-color: var(--cyan-profond); background: var(--voile); color: var(--nuit); }
+#ui-datepicker-div td a.ui-state-highlight { border-color: var(--cyan-profond); background: var(--voile); color: var(--nuit); font-weight: 700; }
+#ui-datepicker-div td a.ui-state-active { border-color: var(--nuit); background: var(--nuit); color: var(--blanc); }
+#ui-datepicker-div .ui-datepicker-buttonpane { margin: 6px 0 0; padding-top: 6px; border-top: 1px solid var(--gris); background: none; }
+#ui-datepicker-div .ui-datepicker-buttonpane button { min-height: 30px; margin: 0; padding: 0 12px; border: 1.5px solid var(--nuit); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: 600 .78125rem var(--f-titre); opacity: 1; }
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-priority-primary { border-color: transparent; background: var(--cyan); color: var(--nuit); }
+#ui-datepicker-div .ui-datepicker-buttonpane button:hover { background: var(--voile); color: var(--nuit); }
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-priority-primary:hover { background: var(--nuit); color: var(--blanc); }
+#ui-datepicker-div .ui-timepicker-div dl dt { color: var(--ardoise); }
+#ui-datepicker-div .ui-timepicker-div select { min-height: 28px; padding: 0 4px; border: 1px solid var(--ardoise); border-radius: 4px; background: var(--blanc); color: var(--nuit); font: inherit; }
+
 /* ───────── Redactor (rich text editor) ───────── */
 :is(#content, .dialog) .redactor-box.redactor-styles-on { border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
 :is(#content, .dialog) .redactor-box.redactor-focus.redactor-styles-on { border-color: var(--cyan-profond); outline: 3px solid var(--focus); outline-offset: 1px; }
@@ -553,7 +583,20 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
 :is(#content, .dialog) .redactor-toolbar a.re-button-icon { padding: 7px 9px 5px; }
 :is(#content, .dialog) .redactor-toolbar a:hover, :is(#content, .dialog) .redactor-toolbar a.redactor-button-active { background: var(--blanc); color: var(--nuit); }
 :is(#content, .dialog) .redactor-toolbar a.redactor-button-active { box-shadow: inset 0 -2px 0 var(--cyan-profond); }
-:is(#content, .dialog) .redactor-in, :is(#content, .dialog) .redactor-styles { color: var(--nuit); font-family: var(--f-texte); }
+:is(#content, .dialog) .redactor-in, :is(#content, .dialog) .redactor-styles, .redactor-box-fullscreen .redactor-styles { color: var(--nuit); font-family: var(--f-texte); } /* fullscreen: Redactor moves the box to <body>; its centred 950 px column is kept there (reading width) */
+/* Redactor (osTicket redactor-osticket.js) writes style="max-width: 950px; margin: auto" on the editable area: on a wide card it floated centred with dead margins. The box already bounds the width. */
+:is(#content, .dialog) .redactor-in[style*="max-width"] { max-width: none !important; margin: 0 !important; }
+/* Core leak neutralised: scp.css ".form_table em" (#666, weight 400) reached
+   italics typed in every editor of a form table (new ticket, canned
+   responses...) and un-bolded bold italics */
+:is(#content, .dialog) .redactor-box em { color: inherit; font-weight: inherit; }
+/* Source view: the original textarea keeps the inline width of the markup
+   (width: 80% / 60%), narrower than the editor it replaces */
+:is(#content, .dialog) .redactor-box textarea.redactor-source { width: 100% !important; max-width: 100%; }
+/* Space between an editor and the attachment drop zone that follows it
+   (div.attachments > .filedrop, or a .filedrop sibling in dynamic forms):
+   the focus ring (3 px + 1 px offset) no longer touches the dashed zone */
+:is(#content, .dialog) :is(.redactor-box ~ .attachments > .filedrop, .redactor-box ~ .filedrop) { margin-top: 10px; }
 .redactor-dropdown { border: 0; border-radius: 10px; box-shadow: var(--cdr-ring); padding: 4px; }
 .redactor-dropdown a { border-radius: 6px; color: var(--nuit); }
 .redactor-dropdown a:hover { background: var(--voile); color: var(--nuit); }
@@ -576,14 +619,14 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
    width scp.js puts on .content (same line breaks in both states) is kept. */
 #content .sticky.placeholder { margin: 0; padding: 0; }
 #content .sticky.bar { display: flow-root; clear: both; margin: 0; padding: 0; } /* contains its floated buttons, as position:fixed does; below earlier floats so it keeps the full width */
-#content .sticky.bar :is(h2, h3) { margin: 0; }
+#content .sticky.bar :is(h2, h3):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { margin: 0; }
 #content .sticky.bar.fixed { z-index: 4; padding: 10px 24px; padding-inline-end: 72px; background: var(--nuit); color: var(--blanc); box-shadow: 0 6px 18px rgba(0,15,38,.28); --focus: var(--cyan); }
 #content .sticky.bar.fixed .content { max-width: 100%; }
 /* White text for the bar's own content only: the dropdown menus that live in
    the bar (Assign, Status, More...) are white panels and keep nuit text */
-#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label):not(:is(.action-dropdown, .noclick-dropdown) *) { color: var(--blanc); }
+#content .sticky.bar.fixed :is(h2, h2 a, h3, h3 a, a, .faded, .faded b, label):not(:is(.action-dropdown, .noclick-dropdown, .thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { color: var(--blanc); }
 #content .sticky.bar.fixed :is(.action-dropdown, .noclick-dropdown) { color: var(--nuit); }
-#content .sticky.bar.fixed h2 i { color: var(--cyan); }
+#content .sticky.bar.fixed h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) i { color: var(--cyan); }
 #content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]) { border-color: rgba(255,255,255,.55); background: transparent; color: var(--blanc); }
 #content .sticky.bar.fixed :is(.button, .action-button, input[type=button], input[type=reset]):hover { background: rgba(255,255,255,.12); color: var(--blanc); }
 #content .sticky.bar.fixed .action-button i.icon-caret-down { border-color: rgba(255,255,255,.35); }
@@ -696,9 +739,9 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 
 /* Action bar and title: the action bar keeps the same height in both states
    (see Sticky bar); the subject is the page title */
-#content.cdr-ticket .sticky.bar h2 { font-size: 1rem; line-height: 36px; }
-#content.cdr-ticket .sticky.bar:not(.fixed) h2 a { color: var(--ardoise); }
-#content.cdr-ticket .sticky.bar:not(.fixed) h2 a i { color: var(--cyan-profond); }
+#content.cdr-ticket .sticky.bar h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font-size: 1rem; line-height: 36px; }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a { color: var(--ardoise); }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a i { color: var(--cyan-profond); }
 #content.cdr-ticket > .tixTitle { margin: 6px 0 16px; padding: 0; border: 0; }
 #content.cdr-ticket > .tixTitle h3 { margin: 0; font: 700 1.375rem/1.3 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
 
@@ -772,8 +815,6 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 #content.cdr-ticket #response_options > form { margin: 0; padding: 12px 16px 16px; border: 0; background: transparent; }
 #content.cdr-ticket #response_options > form > table { max-width: 100%; }
 #content.cdr-ticket #response_options > form > p:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px 0 0; }
-/* Redactor (osTicket redactor-osticket.js) writes style="max-width: 950px; margin: auto" on the editable area: on a wide card it floated centred with dead margins. The box already bounds the width. */
-:is(#content, .dialog) .redactor-in[style*="max-width"] { max-width: none !important; margin: 0 !important; }
 #content.cdr.cdr-ticket #response_options.is-note { background: var(--alerte-fond); box-shadow: 0 0 0 1px rgba(122,75,0,.25); }
 #content.cdr-ticket #response_options.is-note > ul#response-tabs { border-bottom-color: rgba(122,75,0,.25); }
 #content.cdr-ticket #response_options.is-note > ul#response-tabs li.active a { border-bottom-color: var(--alerte); color: var(--alerte); }
@@ -858,7 +899,7 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 /* Left-label fields: label column 220 px, controls capped at 520 px */
 #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td:first-child:nth-last-child(2) { width: 220px; padding-top: 14px; font-weight: 600; vertical-align: top; }
 #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td { vertical-align: middle; }
-#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], select, textarea):not([type=checkbox]):not([type=radio]) { max-width: min(520px, 100%); }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td :is(input:not([type]), input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], select, textarea):not([type=checkbox]):not([type=radio]):not(.redactor-source) { max-width: min(520px, 100%); }
 #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td.required:not(:has(span.error))::after { content: " *"; color: var(--erreur); }
 #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .faded { font-size: .8125rem; }
 /* Inline errors (div.error / font.error / span.error): bold red text, the
@@ -928,7 +969,7 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
   /* profile.php: a full-width row (td colspan=2) holds a nested table with an inline width: 760px, beside a floated avatar */
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list))[style*="width"] { width: auto !important; max-width: 100%; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child),
-  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child) > td { display: block; width: auto; box-sizing: border-box; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child) > td { display: block; width: auto; height: auto; box-sizing: border-box; } /* core .form_table td:not(:empty) { height: 20px } on a block cell cut it to 20 px: the editor and the next rows overlapped */
   #content.cdr form.save .avatar.pull-left { float: none; }
   #content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) { padding: 10px 12px; }
 }

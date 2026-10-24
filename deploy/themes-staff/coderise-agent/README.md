@@ -33,7 +33,9 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php` et `tests/test-rail.php` (assistants PHP, en CLI dans l'image de
   démo avec `-d open_basedir=`), `node --check overlay/scp/coderise/js/coderise.js`,
-  `deploy/themes-staff/tests/overflow.js` (débordement, Playwright).
+  `deploy/themes-staff/tests/overflow.js` (débordement, Playwright),
+  `deploy/themes-staff/tests/editor-check.js` (texte saisi dans les éditeurs Redactor de la
+  page courante, Playwright ; voir « Saisie dans les éditeurs » ci-dessous).
 
 ## Fichiers
 
@@ -125,8 +127,11 @@ anglais ; le français n'apparaît que pour un agent réglé en français.
    (pas de cartes empilées comme la maquette sous 760 px, faute d'étiquettes de colonne).
 4. Les erreurs de champ du cœur sont un texte rouge avec astérisque à côté du champ ; le
    champ lui-même n'est pas encadré (le cœur ne marque que le message).
-5. Datepicker jQuery UI, icônes GIF du cœur (calendrier, dossiers de la base de
-   connaissances) : aspect d'origine.
+5. Icônes GIF du cœur (calendrier, dossiers de la base de connaissances) : aspect
+   d'origine. Le calendrier jQuery UI (`#ui-datepicker-div`) est habillé (en-tête nuit,
+   jour courant voile, boutons du thème) ; ses flèches restent les icônes du cœur.
+   Éditeur Redactor en plein écran : la boîte passe sous `<body>` ; le thème n'y garde
+   que la police, la colonne centrée de 950 px et la barre d'outils sont celles du cœur.
 6. Composants non vérifiés en RTL.
 7. Administration : les listes (agents, équipes, départements, sujets d'aide, SLA,
    plugins, formulaires…) prennent le style `table.list` ; les étiquettes d'état et de
@@ -148,7 +153,8 @@ anglais ; le français n'apparaît que pour un agent réglé en français.
 10. Les libellés de sous-menu calculés par le cœur avec un compteur (« My Tasks (3) »,
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
     traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit.
-11. `captures/` pèse environ 11 Mo (102 PNG) dans le dépôt.
+11. `captures/` pèse environ 15 Mo (174 PNG, dont 72 `interaction-*` pour 4,4 Mo) dans le
+    dépôt.
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -217,8 +223,49 @@ Autres éléments non réalisés :
   Tab reste dans l'éditeur Redactor (comportement du cœur) : les 18 éléments qui le suivent
   ont été vérifiés un par un.
 
+### Saisie dans les éditeurs (QA d'interaction, 2026-10-24)
+
+Les audits précédents ne regardaient que des pages statiques ; un texte tapé dans la zone de
+réponse était décalé puis centré (règle `p:last-child` descendante, `max-width: 950px;
+margin: auto` posé par Redactor). Règle depuis : **le contenu saisi ou collé n'est jamais
+restylé**. Toute règle dont un sélecteur descendant peut atteindre un élément que
+l'utilisateur produit (h1-h4, p, em, hr, th, table…) part d'un élément du cœur par des
+combinateurs enfant, ou se termine par
+`:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *)` (même
+liste que `RICH` dans `coderise.js`, qui ne déplace ni n'étiquette rien dedans).
+
+Mesuré avec `tests/editor-check.js` après saisie réelle (deux paragraphes avec Entrée, gras
+et italique par la barre d'outils, liste à puces, titre 2 par le menu « Format », collage
+HTML, perte puis reprise du focus, vue source) à **1280, 1720, 2200 et 390 px**, compte
+administrateur, en anglais : premier et dernier paragraphe à 18 px du bord (le padding),
+`text-align: start`, `display: block`, zone éditable = largeur intérieure du cadre, titre
+sans la police du thème, italique de la couleur du texte, vue source à chasse fixe et
+pleine largeur. Contextes, tous conformes : réponse, note interne, nouveau ticket (réponse
+et note), modification d'un ticket (note), boîte « Edit » d'une entrée du fil, boîte
+« Create Task », réponse à une tâche, réponse type, page du portail, FAQ (largeur fixe de
+670 px voulue par le cœur, `data-width`), modèle d'e-mail, note d'utilisateur et
+d'organisation, signature du profil et du département (éditeurs sans barre d'outils), plein
+écran. Aussi vérifiés à 1280 px : menus « Format » et couleur, brouillon enregistré, zone
+de dépôt (fichier joint), réponse type et collaborateurs (select2), texte indicatif, calendrier,
+`spellcheck`/`lang` de la zone éditable. Écart entre le cadre focalisé (anneau 3 px + 1 px) et
+la zone de dépôt qui le suit : 10 px (réponse, note, nouveau ticket, boîtes de dialogue,
+tâche).
+
+Corrigés pendant ce passage : titres h1-h4, `hr`, `em` des tableaux de formulaire, `th` de
+`table.table` et des boîtes de dialogue, `h3` des boîtes de dialogue, titres de la barre
+collante (la zone de réponse est elle-même un `.sticky.bar`) qui atteignaient le contenu ;
+vue source prise pour un champ du thème (police, fond, bordure, largeur 80 % en ligne) ;
+`em` grisé par le cœur (`.form_table em`, #666) neutralisé ; zone de dépôt collée au cadre
+de l'éditeur ; sous 600 px, cellules de formulaire pleine largeur limitées à 20 px de haut
+par le cœur (l'éditeur et les lignes suivantes se chevauchaient, réponse type et nouveau
+ticket) ; champ de recherche désactivé d'un select2 multiple peint en gris. Règles
+restantes qui atteignent le contenu, voulues : couleur des liens, `img { max-width: 100% }`,
+coupure des mots dans les cellules.
+
 ## Captures
 
 `captures/` : coquille (`shell-*`), connexion (`connexion-*`, `pwreset-*`), composants
 (`components-*`, `dropdown-*`, `typeahead-*`), file (`queue-*`), fiche ticket (`ticket-*`),
-administration (`admin-*`), tableau de bord (`dashboard-*`), à 1280, 820 et 390 px.
+administration (`admin-*`), tableau de bord (`dashboard-*`), à 1280, 820 et 390 px ;
+éditeurs après saisie (`interaction-<contexte>-<largeur>`, 1280, 1720, 2200 et 390 px, plus
+menus, plein écran, calendrier, select2 et zone de dépôt à 1280 px).

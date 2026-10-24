@@ -32,6 +32,11 @@
 
     var countsRequest = null;
 
+    // Containers of user or rich content (thread bodies, Redactor editors,
+    // quick notes, FAQ category descriptions): the theme's DOM changes never
+    // reach inside them. coderise.css excludes the same list.
+    var RICH = '.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc';
+
     function loadCounts() {
         var $counts = $('#cdr-queues .queue-count[data-queue-id]');
         if (!$counts.length)
@@ -72,9 +77,13 @@
     // the dropdowns of fitting tables are never clipped. Hidden tables (inactive
     // tabs) measure 0 and are left alone until a tab click or resize re-runs.
     // table.ticket_info is never wrapped: it holds the user/org stats dropdowns.
+    // Tables typed or pasted by users (thread bodies, editors, notes) are
+    // content, never re-parented.
     function fitTables() {
         $('#content').find('table.list, table.form_table, table.settings_table, table.table')
-            .not('.ticket_info').each(function () {
+            .not('.ticket_info').filter(function () {
+                return !$(this).closest(RICH).length;
+            }).each(function () {
                 var $t = $(this),
                     $p = $t.parent(),
                     wrapped = $p.hasClass('cdr-hscroll'),
@@ -108,8 +117,7 @@
             var prev = this.previousSibling;
             if (this.children.length
                     || !/^\[\d+\]$/.test($.trim($(this).text()))
-                    || $(this).closest('.thread-body, #ticket_thread, .thread-entry, '
-                        + '.redactor-box, [contenteditable]').length)
+                    || $(this).closest('#ticket_thread, .thread-entry, ' + RICH).length)
                 return false;
             return isPageLink(this.previousElementSibling)
                 || isPageLink(this.nextElementSibling)
