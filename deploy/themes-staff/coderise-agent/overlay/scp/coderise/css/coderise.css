@@ -46,6 +46,9 @@ html, body { background: var(--gris); }
 body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: normal; font-variant-numeric: tabular-nums; }
 #container { width: auto; max-width: none; margin: 0; padding: 0; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* Core rules that remove the outline with a stronger selector (keyboard audit) */
+ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; } /* scp.css: ul.tabs li a { outline: none } */
+.redactor-box:has(.redactor-styles:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; } /* the editable area itself has no outline */
 .on-dark { --focus: var(--cyan); }
 .cdr-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 100; background: var(--nuit); color: var(--blanc); padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; }
 .cdr-skip:focus { top: 8px; outline: 3px solid var(--cyan); }
@@ -209,6 +212,7 @@ body { font: 13.5px/1.5 var(--f-texte); color: var(--nuit); letter-spacing: norm
 :is(#error_bar, #warning_bar, #notice_bar) a {
   color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px;
 }
+#content.cdr .filedrop .dropzone { color: var(--ardoise); } /* filedrop.css: #999 on #f2f2f2 (2.6:1) */
 #content.cdr :is(h1, h2, h3):not(.thread-body *) { font-family: var(--f-titre); color: var(--nuit); }
 
 @media (min-width: 921px) {
@@ -525,7 +529,7 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple { min-height: 36px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); }
 .select2-container--default .select2-selection--single { height: 36px; }
-.select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 34px; color: var(--nuit); padding-inline: 10px 28px; }
+.select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 34px; color: var(--nuit); padding-inline: 10px 28px; box-sizing: border-box; } /* scp.css forces width: 100% */
 .select2-container--default .select2-selection--single .select2-selection__placeholder { color: var(--ardoise); }
 .select2-container--default .select2-selection--single .select2-selection__arrow { height: 34px; }
 .select2-container--default .select2-selection--multiple .select2-selection__rendered { padding: 2px 6px; }
@@ -914,6 +918,11 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > :is(thead, tbody) > tr > th { display: block; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) :is(input, select, textarea):not([type=checkbox]):not([type=radio]) { max-width: 100%; }
   #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) .pull-right { float: none; }
+  /* profile.php: a full-width row (td colspan=2) holds a nested table with an inline width: 760px, beside a floated avatar */
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list))[style*="width"] { width: auto !important; max-width: 100%; }
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child),
+  #content.cdr :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr:has(> td:only-child) > td { display: block; width: auto; box-sizing: border-box; }
+  #content.cdr form.save .avatar.pull-left { float: none; }
   #content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) { padding: 10px 12px; }
 }
 
