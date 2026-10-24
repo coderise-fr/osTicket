@@ -952,7 +952,7 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 .cdr-login #loginBox label { display: block; margin: 0 0 4px; font-weight: 600; color: var(--nuit); }
 .cdr-login #loginBox input:not([type=hidden]):not([type=submit]):not([type=checkbox]):not([type=radio]) { display: block; width: 100%; min-height: 42px; margin: 0 0 16px; padding: 6px 10px; border: 1px solid var(--ardoise); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: inherit; box-shadow: none; box-sizing: border-box; }
 .cdr-login #loginBox input::placeholder { color: var(--ardoise); opacity: 1; font-style: normal; }
-.cdr-login #loginBox input:focus { border-color: var(--cyan-profond); box-shadow: none; outline: none; }
+.cdr-login #loginBox input:focus { border-color: var(--cyan-profond); box-shadow: none; outline: 3px solid var(--focus); outline-offset: 1px; } /* same ring as the panel fields, whatever the focus source */
 .cdr-login #loginBox input:focus-visible, .cdr-login #loginBox button:focus-visible, .cdr-login #loginBox a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .cdr-login #loginBox button[type=submit], .cdr-login #loginBox input[type=submit] { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: auto; min-height: 42px; margin: 4px 0 0; padding: 0 14px; float: none; border: 1.5px solid transparent; border-radius: 6px; background: var(--cyan); color: var(--nuit); font: 600 .9375rem/1.2 var(--f-titre); box-shadow: none; cursor: pointer; }
 .cdr-login #loginBox button[type=submit]:hover, .cdr-login #loginBox input[type=submit]:hover, .cdr-login #loginBox input[type=submit]:active { background: var(--nuit); color: var(--blanc); box-shadow: none; }
