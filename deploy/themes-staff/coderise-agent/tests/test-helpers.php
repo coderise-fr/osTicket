@@ -163,6 +163,9 @@ $labels = array(
     // ticket view and queue labels for the JS (header.inc.php data-cdr-*)
     'Properties', 'Client', 'Reply to the client', 'Internal note, not visible to the client',
     'No ticket selected', '%d ticket selected', '%d tickets selected', 'Select all tickets',
+    // ticket identity block and labelled action buttons
+    'Support contract', '%1$s at %2$s', 'Received on %1$s via %2$s.', 'Received on %s.',
+    'Edit ticket', 'Print ticket', 'Mark as resolved',
 );
 $untranslated = array();
 foreach ($labels as $l)
@@ -264,12 +267,142 @@ check('gauge html: done class', strpos($h, 'gauge-done') !== false, true);
 $h = cdr_gauge_html(array('kind' => 'over', 'ratio' => 1.0, 'label' => '<b>"x"'));
 check('gauge html: label escaped', strpos($h, '<b>') === false && strpos($h, '&lt;b&gt;&quot;x&quot;') !== false, true);
 
+// ---------- cdr_ticket_idline (pure builder) ----------
+$full = array('number' => '260418', 'href' => '/scp/tickets.php?id=7', 'reload' => 'Reload',
+    'state' => 'open', 'status' => 'Open', 'plan' => array('level' => 'priority', 'label' => 'Priority'),
+    'urgent' => 'Emergency', 'name' => "L\xC3\xA9a Marchand", 'org' => 'Maison Verdier',
+    'date' => '21/10/2026', 'time' => '08:47', 'source' => 'Web');
+$h = cdr_ticket_idline($full);
+check('idline: section and line', strpos($h, '<section class="cdr-idline"><p class="idline">') === 0, true);
+check('idline: reload link', strpos($h, '<a class="cdr-id" href="/scp/tickets.php?id=7" title="Reload">Ticket #260418</a>') !== false, true);
+check('idline: three separators', substr_count($h, '<span class="sep" aria-hidden="true"></span>'), 3);
+check('idline: state chip with icon', (bool) preg_match('#<span class="status status-open"><svg class="ic ic-inbox"[^>]*>.*?</svg>Open</span>#', $h), true);
+check('idline: priority plan with bolt', (bool) preg_match('#<span class="plan plan-priority" title="Support contract"><svg class="ic ic-bolt"[^>]*>.*?</svg>Priority</span>#', $h), true);
+check('idline: urgency', (bool) preg_match('#<span class="urg" title="Priority"><svg class="ic ic-alert"[^>]*>.*?</svg>Emergency</span>#', $h), true);
+check('idline: order', strpos($h, 'cdr-id') < strpos($h, 'status-open') && strpos($h, 'status-open') < strpos($h, 'plan-priority')
+    && strpos($h, 'plan-priority') < strpos($h, 'class="urg"'), true);
+check('idline: subtitle (en)', strpos($h, "<p class=\"sub cdr-sub\">L\xC3\xA9a Marchand, Maison Verdier. Received on 21/10/2026 at 08:47 via Web.</p></section>") !== false, true);
+$GLOBALS['CDR_TEST_LANG'] = 'fr';
+check('idline: subtitle (fr)', strpos(cdr_ticket_idline($full),
+    "<p class=\"sub cdr-sub\">L\xC3\xA9a Marchand, Maison Verdier. Re\xC3\xA7u le 21/10/2026 \xC3\xA0 08:47 via Web.</p>") !== false, true);
+check('idline: plan title (fr)', strpos(cdr_ticket_idline($full), 'title="Contrat de support"') !== false, true);
+unset($GLOBALS['CDR_TEST_LANG']);
+// Hostile values: every one escaped, none breaks out of its element.
+$evil = '<img src=x onerror=alert(1)>"\'&';
+$h = cdr_ticket_idline(array('number' => $evil, 'href' => 'javascript:"><b>', 'reload' => $evil, 'state' => 'op"en<',
+    'status' => $evil, 'plan' => array('level' => '"><x', 'label' => $evil), 'urgent' => $evil,
+    'name' => $evil, 'org' => $evil, 'date' => $evil, 'time' => $evil, 'source' => $evil));
+check('idline hostile: no raw markup', strpos($h, '<img') === false && strpos($h, '"><b>') === false && strpos($h, '"><x') === false, true);
+check('idline hostile: escaped text', substr_count($h, '&lt;img src=x onerror=alert(1)&gt;&quot;&#039;&amp;') >= 6, true);
+check('idline hostile: state class sanitised', strpos($h, 'class="status status-open"') !== false, true);
+check('idline hostile: unknown plan level = standard', strpos($h, 'class="plan plan-standard"') !== false, true);
+// Missing parts are left out.
+$h = cdr_ticket_idline(array('number' => '1', 'name' => 'Ann', 'date' => '01/02/2026'));
+check('idline minimal: no link without href', strpos($h, '<span class="cdr-id">Ticket #1</span>') !== false, true);
+check('idline minimal: no separator', strpos($h, 'class="sep"'), false);
+check('idline minimal: no status, plan, urgency', strpos($h, 'status') === false && strpos($h, 'plan') === false
+    && strpos($h, 'urg') === false, true);
+check('idline minimal: no org, no time, no source', strpos($h, '<p class="sub cdr-sub">Ann. Received on 01/02/2026.</p>') !== false, true);
+check('idline: name only', strpos(cdr_ticket_idline(array('number' => '1', 'name' => 'Ann', 'org' => 'Acme')),
+    '<p class="sub cdr-sub">Ann, Acme.</p>') !== false, true);
+check('idline: date without name', strpos(cdr_ticket_idline(array('number' => '1', 'date' => 'd', 'time' => 't', 'source' => 'Email')),
+    '<p class="sub cdr-sub">Received on d at t via Email.</p>') !== false, true);
+check('idline: no subtitle at all', strpos(cdr_ticket_idline(array('number' => '1')), 'cdr-sub'), false);
+check('idline: no number = nothing', cdr_ticket_idline(array('name' => 'Ann')), '');
+check('idline: not an array', cdr_ticket_idline(null), '');
+check('idline: closed state icon', strpos(cdr_ticket_idline(array('number' => '1', 'state' => 'closed', 'status' => 'Resolved')),
+    '<span class="status status-closed"><svg class="ic ic-checkc"') !== false, true);
+check('idline: standard plan, no bolt', (bool) preg_match('#<span class="plan plan-standard"[^>]*>Standard</span>#',
+    cdr_ticket_idline(array('number' => '1', 'plan' => array('level' => 'standard', 'label' => 'Standard')))), true);
+check('idline: empty plan label = no chip', strpos(cdr_ticket_idline(array('number' => '1', 'plan' => array('level' => 'priority', 'label' => ' '))), 'plan'), false);
+check('idline: no icon is empty', strpos(cdr_ticket_idline($full), '<svg class="ic ic-') !== false
+    && cdr_icon('inbox') !== '' && cdr_icon('checkc') !== '' && cdr_icon('layers') !== '' && cdr_icon('ban') !== '', true);
+
+// ---------- cdr_ticket_idline_data (stubs of the Ticket API it reads) ----------
+class Format {
+    static function date($d) { return 'D(' . $d . ')'; }
+    static function time($d) { return 'T(' . $d . ')'; }
+}
+class StubStatus {
+    public $n, $s;
+    function __construct($n, $s) { $this->n = $n; $this->s = $s; }
+    function getName() { return $this->n; }
+    function getState() { return $this->s; }
+}
+class StubPriority {
+    public $d, $u;
+    function __construct($d, $u) { $this->d = $d; $this->u = $u; }
+    function getDesc() { return $this->d; }
+    function getUrgency() { return $this->u; }
+}
+class StubOrg { function getName() { return 'Maison <Verdier>'; } }
+class StubOwner {
+    public $org;
+    function getOrganization() { return $this->org; }
+}
+class StubIdTicket {
+    public $status, $priority, $owner, $created = '2026-10-21 06:47:00', $source = 'Web', $level = 'priority',
+        $planLabel = 'Priority', $planSource = 'organisation', $reopened = null, $boom = false;
+    function __construct() {
+        $this->status = new StubStatus('Open', 'open');
+        $this->priority = new StubPriority('Normal', 3);
+        $this->owner = new StubOwner();
+        $this->owner->org = new StubOrg();
+    }
+    function getId() { return 7; }
+    function getNumber() { return '260418'; }
+    function getStatus() { return $this->status; }
+    function getPriority() { if ($this->boom) throw new Exception('db'); return $this->priority; }
+    function getName() { return "L\xC3\xA9a <Marchand>"; }
+    function getOwner() { return $this->owner; }
+    function getCreateDate() { return $this->created; }
+    function getReopenDate() { return $this->reopened; }
+    function getSource() { return $this->source; }
+}
+$t = new StubIdTicket();
+$d = cdr_ticket_idline_data($t);
+check('idline data: no plugin = no plan', array_key_exists('plan', $d), false);
+check('idline data: values', array($d['number'], $d['href'], $d['reload'], $d['status'], $d['state'], $d['name'],
+    $d['org'], $d['date'], $d['time'], $d['source']),
+    array('260418', '/scp/tickets.php?id=7', 'Reload', 'Open', 'open', "L\xC3\xA9a <Marchand>", 'Maison <Verdier>',
+        'D(2026-10-21 06:47:00)', 'T(2026-10-21 06:47:00)', 'Web'));
+check('idline data: normal priority is not urgent', array_key_exists('urgent', $d), false);
+$h = cdr_ticket_idline($d);
+check('idline data: hostile names escaped', strpos($h, "L\xC3\xA9a &lt;Marchand&gt;, Maison &lt;Verdier&gt;.") !== false
+    && strpos($h, '<Marchand>') === false, true);
+$t->priority = new StubPriority('High', 2);
+check('idline data: urgency 2 is urgent', cdr_ticket_idline_data($t)['urgent'] ?? null, 'High');
+$t->priority = new StubPriority('Emergency', 1);
+check('idline data: urgency 1 is urgent', cdr_ticket_idline_data($t)['urgent'] ?? null, 'Emergency');
+$t->priority = new StubPriority('Urgente', 0);
+check('idline data: urgency 0 (unset) is not urgent', array_key_exists('urgent', cdr_ticket_idline_data($t)), false);
+$t->priority = null;
+check('idline data: no priority', array_key_exists('urgent', cdr_ticket_idline_data($t)), false);
+$t->boom = true;
+$d = cdr_ticket_idline_data($t);
+check('idline data: a throwing getter only drops its part', array_key_exists('urgent', $d) === false && $d['number'] === '260418'
+    && $d['source'] === 'Web', true);
+$t->boom = false;
+$t->owner->org = null;
+$t->source = '';
+check('idline data: missing org and source', strpos(cdr_ticket_idline(cdr_ticket_idline_data($t)),
+    "L\xC3\xA9a &lt;Marchand&gt;. Received on D(2026-10-21 06:47:00) at T(2026-10-21 06:47:00).</p>") !== false, true);
+// Reopened: the subtitle keeps the creation date, the state is the current status.
+$t = new StubIdTicket();
+$t->reopened = '2026-10-23 10:00:00';
+$t->status = new StubStatus('Open', 'open');
+$d = cdr_ticket_idline_data($t);
+check('idline data: reopened keeps the creation date', $d['date'] . '|' . $d['state'], 'D(2026-10-21 06:47:00)|open');
+check('idline data: not an object', cdr_ticket_idline_data(null), array());
+check('idline data: unrelated object', cdr_ticket_idline(cdr_ticket_idline_data(new stdClass())), '');
+
 // ---------- cdr_ticket_gauge (stubs; the real queries are not exercised) ----------
 $now = time();
 check('ticket gauge: no plugin function', cdr_ticket_gauge(new Ticket(1, db_dt($now - 600))), null);
 if (!function_exists('coderise_contract_level')) {
     function coderise_contract_level($t) {
-        return array('level' => $t->level, 'source' => 'org', 'label' => '');
+        return array('level' => $t->level, 'source' => isset($t->planSource) ? $t->planSource : 'org',
+            'label' => isset($t->planLabel) ? $t->planLabel : '');
     }
 }
 check('ticket gauge: null input', cdr_ticket_gauge(null), null);
@@ -367,6 +500,16 @@ ThreadEntry::$rows = array(array(db_dt($now - 20000 + 2640), '{"to":[["a@b.c"]]}
 $t = new Ticket(12, db_dt($now - 20000));
 check('ticket gauge plugin: its "no" makes a "to" reply not count', cdr_ticket_gauge($t)['kind'], 'over');
 ThreadEntry::$rows = array();
+
+// ---------- cdr_ticket_idline_data with the plugin (stub above) ----------
+$t = new StubIdTicket();
+check('idline data plugin: priority plan', cdr_ticket_idline_data($t)['plan'] ?? null, array('level' => 'priority', 'label' => 'Priority'));
+$t->level = 'standard';
+$t->planLabel = 'Standard';
+$h = cdr_ticket_idline(cdr_ticket_idline_data($t));
+check('idline data plugin: standard chip', (bool) preg_match('#<span class="plan plan-standard"[^>]*>Standard</span>#', $h), true);
+$t->planSource = 'default';
+check('idline data plugin: no Priority organisation configured = no chip', array_key_exists('plan', cdr_ticket_idline_data($t)), false);
 
 echo $fails ? "\n$fails FAILED\n" : "\nall ok\n";
 exit($fails ? 1 : 0);

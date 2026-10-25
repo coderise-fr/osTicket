@@ -298,6 +298,14 @@ check('fr: pack-translated Users kept', link_of($h, 'Utilisateurs') !== null, tr
 check('fr: renamed tab label kept', link_of($h, 'Docs (plugin)') !== null, true);
 check('fr: crumbs tab from a pack-translated label', strpos(cdr_crumbs(new StubNav($tabs, array(), 'dashboard')),
     '<span aria-current="page">Tableau de bord</span>') !== false, true);
+// Dashboard page: the tab is "Tableau de bord" (theme), its sub-menu item
+// "Tableau de Bord" (pack): one crumb, not both.
+$sub = agent_nav()->submenus;
+$sub['dashboard'][0]['desc'] = 'Dashboard';
+check('fr: dashboard crumb not repeated in another case', cdr_crumbs(new StubNav($tabs, $sub, 'dashboard', 1)),
+    '<nav class="crumbs" aria-label="Fil d&#039;Ariane"><ol><li><span aria-current="page">Tableau de bord</span></li></ol></nav>');
+check('crumbs: different label still added', strpos(cdr_crumbs(new StubNav($tabs, $sub, 'dashboard', 2)),
+    '<span aria-current="page">Annuaire des agents</span>') !== false, true);
 check('tab label: unknown key', cdr_tab_label('zz', 'Dashboard'), 'Tableau de bord');
 check('tab label: numeric key', cdr_tab_label(3, 'Plugin <x>'), 'Plugin <x>');
 $GLOBALS['STUB_PACK'] = null;

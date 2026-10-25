@@ -3,29 +3,100 @@
     'use strict';
     if (!$) return;
 
+    // Identity block (section.cdr-idline, printed by header.inc.php through
+    // the object.view signal, before the action bar): the subject (core
+    // .tixTitle) goes right after the identity line and the client
+    // subtitle after the subject, so the order is the mockup's: identity,
+    // subject, subtitle, then the action bar. Theme node and a core title
+    // without handlers are moved; nothing is copied. Without this script
+    // the subtitle stays under the identity line.
+    function identity() {
+        var $c = $('#content.cdr-ticket'),
+            $idl = $c.children('section.cdr-idline').first(),
+            $title = $c.children('.tixTitle').first();
+        if (!$idl.length || !$title.length) return;
+        if ($idl.next()[0] !== $title[0]) $idl.after($title);
+        var $sub = $idl.children('p.cdr-sub');
+        if ($sub.length) $title.after($sub);
+    }
+
     // Action bar: compact visible labels on the two buttons the mockup
-    // labels (Edit, Print). The text is the button's own tooltip, which the
-    // core already translates (data-original-title once the tooltip plugin
-    // has run, title before). Everything else stays an icon button.
+    // labels (Edit, Print), found by their stable markers (edit href, print
+    // id), never by text. The text is the theme's (data-cdr-label-edit,
+    // data-cdr-label-print on #content: "Modifier", "Imprimer"), else the
+    // button's own core tooltip. Everything else stays an icon button.
     function labelOf($el) {
         var t = $el.attr('data-original-title') || $el.attr('title') || $el.attr('aria-label') || '';
         return $.trim(t);
     }
+    function barOf($c) {
+        return $c.find('.sticky.bar:not(#response_options)').first();
+    }
     function barLabels() {
-        var $bar = $('#content.cdr-ticket .sticky.bar:not(#response_options)');
+        var $c = $('#content.cdr-ticket'), $bar = barOf($c);
         if (!$bar.length) return;
         var targets = [
-            [$bar.find('a.action-button[href*="a=edit"]'), null],
-            [$bar.find('a#ticket-print'), '.action-button']
+            [$bar.find('a.action-button[href*="a=edit"]'), null, 'data-cdr-label-edit'],
+            [$bar.find('a#ticket-print'), '.action-button', 'data-cdr-label-print']
         ];
         $.each(targets, function (_, t) {
             var $a = t[0].first();
             if (!$a.length || $a.children('.cdr-lbl').length) return;
             var $src = t[1] ? $a.closest(t[1]) : $a,
-                text = labelOf($src) || labelOf($a);
+                text = $.trim($c.attr(t[2]) || '') || labelOf($src) || labelOf($a);
             if (!text) return;
             $a.addClass('cdr-has-lbl').append($('<span class="cdr-lbl"></span>').text(text));
+            // the accessible name holds the visible label (core's aria-label
+            // on the print link would hide it)
+            if ($a.is('[aria-label]')) $a.attr('aria-label', text);
         });
+    }
+
+    // "Mark as resolved" (mockup primary button): only when header.inc.php
+    // emitted its label (open ticket) and core's status menu holds a
+    // "closed" entry for this agent (core prints the menu only with the
+    // close permission, in its own sort order: the first closed status,
+    // "Resolved" on a stock install). The button forwards the click to that
+    // core link: core's own handler opens core's status dialog (comment,
+    // confirmation, permission checks on the server). Its title is the
+    // status name the link shows.
+    function closeLink($c) {
+        return $c.find('#action-dropdown-statuses a.ticket-action[href*="/status/close/"]').first();
+    }
+    function resolveButton() {
+        var $c = $('#content.cdr-ticket'), $bar = barOf($c),
+            label = $.trim($c.attr('data-cdr-label-resolve') || ''),
+            $box = $bar.find('.content > .pull-right.flush-right').first();
+        if (!label || !$box.length || $box.children('.cdr-resolve').length) return;
+        var $link = closeLink($c);
+        if (!$link.length) return;
+        var $btn = $('<button type="button" class="btn btn-primary cdr-resolve"><i class="icon-ok-circle"></i></button>');
+        $btn.append($('<span></span>').text(label)).attr('title', $.trim($link.text()));
+        $btn.on('click', function () {
+            var $l = closeLink($('#content.cdr-ticket'));
+            if ($l.length) $l[0].click();
+        });
+        $box.append($btn);
+    }
+
+    // Action bar order (mockup .t-actions: Edit, Print, Mark as resolved,
+    // then the other core actions): the buttons are moved inside their own
+    // container (ids, data-dropdown targets and handlers are kept), so the
+    // focus order is the visual one. Unknown items (plugins) stay after them.
+    var ORDER = ['a.action-button[href*="a=edit"]', '.action-button:has(#ticket-print)', '.cdr-resolve',
+        'a.post-response[href="#post-reply"]', 'a#post-note', '[data-dropdown="#action-dropdown-statuses"]',
+        '[data-dropdown="#action-dropdown-assign"]', 'a#ticket-transfer', '[data-dropdown="#action-dropdown-more"]'];
+    function barOrder() {
+        var $c = $('#content.cdr-ticket');
+        if (!$c.children('section.cdr-idline').length) return;
+        var $box = barOf($c).find('.content > .pull-right.flush-right').first();
+        if (!$box.length || $box.hasClass('cdr-ordered')) return;
+        var moved = [];
+        $.each(ORDER, function (_, sel) {
+            var $el = $box.children().filter(sel).first();
+            if ($el.length) moved.push($el[0]);
+        });
+        $box.prepend(moved).addClass('cdr-ordered');
     }
 
     // Tabs: the trailing "(n)" the core prints in a tab label ("Fil du
@@ -106,8 +177,45 @@
         });
     }
 
+    // The buttons now start at the left of the page: a core menu anchored
+    // to the right of its button (anchor-right, e.g. Print) would open past
+    // the left edge of the content (over the rail, or off screen at 390).
+    // Once core's dropdown plugin has placed the menu (it stops the click
+    // propagation, so a capture listener + timeout runs after it), the menu
+    // is shifted back inside the content area, else inside the viewport.
+    // Only the left offset of the action bar's own menus changes.
+    function keepMenuInView(e) {
+        var t = e.target && e.target.closest && e.target.closest('[data-dropdown]');
+        if (!t || !t.closest('#content.cdr-ticket .sticky.bar')) return;
+        setTimeout(function () {
+            var $dd = $($(t).attr('data-dropdown'));
+            if (!$dd.length || !$dd.is(':visible')) return;
+            // the area: #content in the page, the bar itself once fixed
+            var $bar = $(t).closest('.sticky.bar'),
+                area = $bar.hasClass('fixed') ? $bar[0] : document.getElementById('content'),
+                r = $dd[0].getBoundingClientRect(),
+                cr = area ? area.getBoundingClientRect() : null,
+                vw = document.documentElement.clientWidth,
+                min = 8, max = vw - 8, shift = 0;
+            if (cr && r.width <= Math.min(max, cr.right) - Math.max(min, cr.left)) {
+                min = Math.max(min, cr.left);
+                max = Math.min(max, cr.right);
+            }
+            if (r.left < min) shift = min - r.left;
+            else if (r.right > max) shift = Math.max(max - r.right, min - r.left);
+            if (shift) $dd.css('left', ((parseFloat($dd.css('left')) || 0) + shift) + 'px');
+        }, 0);
+    }
+    if (!window.cdrMenuInView && document.addEventListener) {
+        window.cdrMenuInView = true;
+        document.addEventListener('click', keepMenuInView, true);
+    }
+
     function run() {
+        identity();
         barLabels();
+        resolveButton();
+        barOrder();
         tabCounts();
         watchTabs();
         replyFoot();

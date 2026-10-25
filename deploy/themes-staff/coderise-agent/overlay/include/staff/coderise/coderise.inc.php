@@ -30,6 +30,10 @@
        - cdr_find_queue()      a queue of the loaded queue tree, by id
        - cdr_crumbs()          the breadcrumb of the top bar
        - cdr_content_class()   the classes of #content
+    5. Ticket identity (ticket view, object.view signal)
+       - cdr_ticket_idline()   pure: the identity line and the client
+                               subtitle from plain data
+       - cdr_ticket_idline_data() that data, read from a Ticket
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     vim: expandtab sw=4 ts=4 sts=4:
@@ -54,6 +58,15 @@ if (!defined('CDR_VERSION')) {
      */
     if (!defined('CDR_SLA_PRIORITY'))
         define('CDR_SLA_PRIORITY', 'Priority 4h');
+
+    /*
+     * Ticket priorities whose urgency is at or below this value are shown
+     * as urgent in the identity line of the ticket view (core priorities:
+     * 1 Emergency, 2 High, 3 Normal, 4 Low; the urgency, not the name,
+     * decides, so renamed or translated priorities keep working).
+     */
+    if (!defined('CDR_URGENT_URGENCY'))
+        define('CDR_URGENT_URGENCY', 2);
 
     /* ------------------------------------------------------------------
      * 1. Translation
@@ -696,8 +709,12 @@ if (!defined('CDR_VERSION')) {
                     $current = cdr__($sub[$k]['desc']);
             }
         }
+        // Not repeated when it is the previous crumb's label, whatever the
+        // case: the tab label is the theme's wording ("Tableau de bord"),
+        // the sub-menu item the pack's ("Tableau de Bord").
         if ($current !== null && (string) $current !== ''
-                && (!$crumbs || (string) $current !== $crumbs[count($crumbs) - 1][0]))
+                && (!$crumbs || mb_strtolower(trim((string) $current), 'UTF-8')
+                    !== mb_strtolower(trim((string) $crumbs[count($crumbs) - 1][0]), 'UTF-8')))
             $crumbs[] = array((string) $current, null);
         if (!$nav || !$crumbs)
             return '';
@@ -715,5 +732,130 @@ if (!defined('CDR_VERSION')) {
         $base = preg_replace('/[^a-z0-9_-]/i', '', basename((string) $script, '.php'));
         return 'cdr' . ($base !== '' ? ' cdr-' . $base : '')
             . ($ticketView ? ' cdr-ticket' : '') . ($admin ? ' cdr-is-admin' : '');
+    }
+
+    /* ------------------------------------------------------------------
+     * 5. Ticket identity
+     * ---------------------------------------------------------------- */
+
+    /**
+     * The identity block of the ticket view (mockup .idline and .sub):
+     * "Ticket #N | state | contract | urgency" and "Client, organisation.
+     * Received on <date> at <time> via <source>." Pure: $d is plain data
+     * (see cdr_ticket_idline_data()); every value is escaped here, every
+     * missing part is left out. Keys: number, href, reload (link title),
+     * state (open|closed|archived|deleted), status (status name), plan
+     * (null or array(level, label)), urgent (null or the priority name),
+     * name, org, date, time, source. '' without a number.
+     */
+    function cdr_ticket_idline($d) {
+        $d = is_array($d) ? $d : array();
+        $v = function ($k) use ($d) {
+            return isset($d[$k]) && is_scalar($d[$k]) ? trim((string) $d[$k]) : '';
+        };
+        if ($v('number') === '')
+            return '';
+        $sep = '<span class="sep" aria-hidden="true"></span>';
+        $id = cdr_h(sprintf(cdr__('Ticket #%s'), $v('number')));
+        $parts = array($v('href') !== ''
+            ? '<a class="cdr-id" href="' . cdr_h($v('href')) . '"'
+                . ($v('reload') !== '' ? ' title="' . cdr_h($v('reload')) . '"' : '') . '>' . $id . '</a>'
+            : '<span class="cdr-id">' . $id . '</span>');
+        if ($v('status') !== '') {
+            static $icons = array('open' => 'inbox', 'closed' => 'checkc',
+                'archived' => 'layers', 'deleted' => 'ban');
+            $state = preg_replace('/[^a-z]/', '', strtolower($v('state')));
+            $parts[] = '<span class="status' . ($state !== '' ? ' status-' . $state : '') . '">'
+                . cdr_icon(isset($icons[$state]) ? $icons[$state] : 'flag', 14)
+                . cdr_h($v('status')) . '</span>';
+        }
+        $plan = isset($d['plan']) && is_array($d['plan']) ? $d['plan'] : null;
+        if ($plan && isset($plan['label']) && trim((string) $plan['label']) !== '') {
+            $level = isset($plan['level']) && $plan['level'] === 'priority' ? 'priority' : 'standard';
+            $parts[] = '<span class="plan plan-' . $level . '" title="' . cdr_h(cdr__('Support contract')) . '">'
+                . ($level === 'priority' ? cdr_icon('bolt', 12) : '')
+                . cdr_h(trim((string) $plan['label'])) . '</span>';
+        }
+        if ($v('urgent') !== '')
+            $parts[] = '<span class="urg" title="' . cdr_h(cdr__('Priority')) . '">'
+                . cdr_icon('alert', 15) . cdr_h($v('urgent')) . '</span>';
+
+        // Subtitle: two sentences, each from its own msgid (word order is
+        // the translation's), the parts that are unknown are left out.
+        $sub = array();
+        if ($v('name') !== '')
+            $sub[] = $v('org') !== ''
+                ? sprintf(cdr__('%1$s, %2$s.'), $v('name'), $v('org'))
+                : sprintf(cdr__('%s.'), $v('name'));
+        if ($v('date') !== '') {
+            $at = $v('time') !== '' ? sprintf(cdr__('%1$s at %2$s'), $v('date'), $v('time')) : $v('date');
+            $sub[] = $v('source') !== ''
+                ? sprintf(cdr__('Received on %1$s via %2$s.'), $at, $v('source'))
+                : sprintf(cdr__('Received on %s.'), $at);
+        }
+        return '<section class="cdr-idline"><p class="idline">' . implode($sep, $parts) . '</p>'
+            . ($sub ? '<p class="sub cdr-sub">' . cdr_h(implode(' ', $sub)) . '</p>' : '')
+            . '</section>';
+    }
+
+    /**
+     * The data of cdr_ticket_idline() for a staff ticket view: core's own
+     * values (status name as the properties show it, the creation date in
+     * the agent's date and time formats and time zone, core's source
+     * label), the contract level of the plugin (coderise_contract_level(),
+     * only when the plugin has a Priority organisation to decide from),
+     * urgency from the priority's urgency number (CDR_URGENT_URGENCY).
+     * Never throws: what cannot be read is left out.
+     */
+    function cdr_ticket_idline_data($t) {
+        $d = array();
+        if (!is_object($t))
+            return $d;
+        $read = function ($fn) {
+            try {
+                return $fn();
+            }
+            catch (Throwable $e) {
+                return null;
+            }
+        };
+        $d['number'] = (string) $read(function () use ($t) { return $t->getNumber(); });
+        $id = (int) $read(function () use ($t) { return $t->getId(); });
+        if ($id > 0)
+            $d['href'] = ROOT_PATH . 'scp/tickets.php?id=' . $id;
+        $d['reload'] = cdr__('Reload');
+        $read(function () use ($t, &$d) {
+            if ($s = $t->getStatus()) {
+                $d['status'] = (string) $s->getName();
+                $d['state'] = (string) $s->getState();
+            }
+        });
+        $read(function () use ($t, &$d) {
+            if (($p = $t->getPriority()) && is_object($p)
+                    && ($u = (int) $p->getUrgency()) > 0 && $u <= CDR_URGENT_URGENCY)
+                $d['urgent'] = (string) $p->getDesc();
+        });
+        $read(function () use ($t, &$d) {
+            if (function_exists('coderise_contract_level')
+                    && is_array($l = coderise_contract_level($t))
+                    && isset($l['level'], $l['label'])
+                    && ($l['source'] ?? '') !== 'default')
+                $d['plan'] = array('level' => (string) $l['level'], 'label' => (string) $l['label']);
+        });
+        $read(function () use ($t, &$d) {
+            $d['name'] = (string) $t->getName();
+            if (($o = $t->getOwner()) && ($org = $o->getOrganization()))
+                $d['org'] = (string) $org->getName();
+        });
+        $read(function () use ($t, &$d) {
+            if (($c = $t->getCreateDate()) && class_exists('Format')) {
+                $d['date'] = (string) Format::date($c);
+                $d['time'] = (string) Format::time($c);
+            }
+        });
+        $read(function () use ($t, &$d) {
+            $d['source'] = (string) $t->getSource();
+        });
+        return $d;
     }
 }
