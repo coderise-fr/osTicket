@@ -15,11 +15,11 @@
 @media (max-width: 920px) { .cdr-titlebar { margin: 16px 12px 12px; } }
 
 /* ───────── A10 card: the panel holds the filter row, the bar and the table edge to edge ───────── */
-#content.cdr.cdr-tickets { margin-top: 0; padding: 0; }
-#content.cdr-tickets > :is(#msg_error, #msg_warning, #msg_notice, #msg_info) { margin: 12px 16px; }
+#content.cdr.cdr-tickets:has(#basic_search) { margin-top: 0; padding: 0; } /* queue list only: the ticket view and the new-ticket form share .cdr-tickets */
+#content.cdr-tickets:has(#basic_search) > :is(#msg_error, #msg_warning, #msg_notice, #msg_info) { margin: 12px 16px; }
 #content.cdr-tickets #basic_search { margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--gris); }
 #content.cdr-tickets form#tickets > table.queue { width: 100%; max-width: 100%; margin: 0; }
-@media (max-width: 920px) { #content.cdr.cdr-tickets { margin: 12px; padding: 0; } }
+@media (max-width: 920px) { #content.cdr.cdr-tickets:has(#basic_search) { margin: 12px; padding: 0; } }
 
 /* ───────── A12 search field: no ring on load (queue.js blurs the core autofocus); keyboard focus keeps a ring ───────── */
 #content.cdr-tickets input.basic-search:focus:not(:focus-visible) { outline: 0; box-shadow: none; }
@@ -52,7 +52,7 @@
 #content .sticky.bar.cdr-bulk h2:not(:has(*)) { display: none; }
 
 /* ───────── A18 headers: the arrow only on the sorted column ───────── */
-#content table.queue > thead > tr > th { border-top: 0; font: 600 12px/1.35 var(--f-titre); }
+#content table.queue > thead > tr > th { border-top: 0; font: 600 12px/19px var(--f-titre); } /* 35px row as the mockup (its header check box sets 19px) */
 #content table.queue > thead > tr > th a[href]:not(.asc):not(.desc)::after { content: none; }
 #content table.queue > thead > tr > th a:is(.asc, .desc)::after { font-size: 14px; line-height: 1; }
 
@@ -101,3 +101,25 @@
 #content.cdr-tickets form#tickets > div.cdr-qfoot > a[href]:has(> b, > strong), #content.cdr-tickets form#tickets > div.cdr-qfoot > .cdr-page-current { font-size: 13.5px; }
 /* the table above has no foot border of its own once its selection row is off screen */
 #content.cdr-tickets form#tickets > table.queue > tfoot.cdr-sel-foot td { border-top: 0; }
+
+/* Integration: strings from header.inc.php (data-cdr-*). Selection counter as
+   the mockup's ".bulk b" ("2 tickets sélectionnés", Montserrat 600 13px), and
+   the empty assignee cell as ".data .unassigned" (user icon 14px, italic ardoise). */
+#content .sticky.bar.cdr-bulk .cdr-sel.cdr-sel-text { padding: 0; margin-inline-end: 6px; color: var(--blanc); font: 600 13px var(--f-titre); }
+#content table.queue .cdr-who.cdr-unassigned { gap: 6px; color: var(--ardoise); font-style: italic; white-space: nowrap; }
+#content table.queue .cdr-who.cdr-unassigned i::before { width: 14px; height: 14px; margin-block: 0; }
+
+/* One search per page. The queue (and search results) keeps core's own field
+   (#basic_search: current query, lookup, [Advanced], quick filter, sort),
+   so the identical top bar search (same GET contract) is not shown there;
+   "/" focuses the queue's field instead (footer.inc.php), and queue.js gives
+   it the top bar's placeholder. Every other page keeps the top bar search. */
+.cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .tsearch { display: none; } /* ticket queues only (tasks, agents, dashboard have their own #basic_search) */
+.cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .btn { margin-inline-start: auto; }
+/* Export button: the mockup's upload icon ("Exporter en CSV"), drawn like the icons.css masks */
+.cdr-titlebar #queue-export { display: inline-flex; align-items: center; gap: 8px; }
+.cdr-titlebar #queue-export::before { content: ""; flex: none; width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--cdr-i-upload) center / contain no-repeat; mask: var(--cdr-i-upload) center / contain no-repeat; }
+/* Caret cell of the split buttons: 12px chevron, 6px sides (icons.css draws
+   carets at 14px), so that the counter and the six actions share one row at 1280 */
+#content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down { padding: 0 6px; }
+#content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down::before { width: 12px; height: 12px; }

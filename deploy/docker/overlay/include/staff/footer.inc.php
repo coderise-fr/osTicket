@@ -101,7 +101,10 @@ if(is_object($thisstaff) && $thisstaff->isStaff()) { ?>
         var o = document.getElementById('overlay');
         if (o && window.getComputedStyle(o).display !== 'none')
             return;
+        // the queue's own search when the top bar one is not shown (queue.css)
         var f = document.querySelector('.topbar .tsearch input[type="search"]');
+        if (!f || !f.offsetParent)
+            f = document.querySelector('#basic_search input.basic-search');
         if (!f || !f.offsetParent)
             return;
         e.preventDefault();

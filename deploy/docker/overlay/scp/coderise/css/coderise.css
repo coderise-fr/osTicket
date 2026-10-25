@@ -215,15 +215,9 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
 #content.cdr .filedrop .dropzone { color: var(--ardoise); } /* filedrop.css: #999 on #f2f2f2 (2.6:1) */
 #content.cdr :is(h1, h2, h3):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font-family: var(--f-titre); color: var(--nuit); }
 
-@media (min-width: 921px) {
-  /* The sticky rail stops at the end of #pjax-container; the strip under it
-     (beside #footer) stays nuit */
-  #container { background: linear-gradient(90deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
-  html.rtl #container, [dir="rtl"] #container { background: linear-gradient(270deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
-}
-
-/* Footer: small, under the main column */
-#footer { margin: 0; margin-inline-start: var(--rail-w); padding: 8px 28px 16px; color: var(--ardoise); font-size: 12px; text-align: start; }
+/* Footer: small, at the bottom of the main column (footer.inc.php emits it
+   inside .cdr-main; rail.css pushes it down) */
+#footer { margin: 0; padding: 8px 28px 16px; color: var(--ardoise); font-size: 12px; text-align: start; }
 
 /* ───────── Tablet and mobile: the rail becomes a top bar ───────── */
 @media (max-width: 1180px) {
@@ -241,7 +235,7 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
   .crumbs, .tsearch { display: none; }
   .topbar .btn { margin-inline-start: auto; }
   #content.cdr { margin: 16px 12px 24px; padding: 16px; }
-  #footer { margin-inline-start: 0; padding-inline: 20px; }
+  #footer { padding-inline: 20px; }
 }
 
 /* ═════════ Global components ═════════
@@ -743,7 +737,7 @@ html.rtl #content .gauge-bar i { inset: 0 0 0 auto; }
 #content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a { color: var(--ardoise); }
 #content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a i { color: var(--cyan-profond); }
 #content.cdr-ticket > .tixTitle { margin: 6px 0 16px; padding: 0; border: 0; }
-#content.cdr-ticket > .tixTitle h3 { margin: 0; font: 700 22px/1.3 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
+#content.cdr-ticket > .tixTitle h3 { margin: 0; font: 700 21px/1.25 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
 
 /* Conversation panel: the tab strip (moved into the container) and the tab
    contents are one white panel; the reply area is its own panel below */

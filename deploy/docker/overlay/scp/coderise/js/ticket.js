@@ -8,6 +8,8 @@
       derived from the author's name in the entry header (textContent only);
       client (entry.message) = voile disc, agent (response, note, system)
       = nuit disc. Core's avatar span stays in the DOM, hidden by CSS.
+    - Role label after the author (span.cdr-role), text from #content's
+      data-cdr-role-message|response|note (header.inc.php).
     - Empty entry subtitles are tagged so they do not take a row.
     - Event time (<time> inside the sentence) is moved to the end of the
       event row, where the mockup shows it.
@@ -44,13 +46,36 @@
         return (first + last).toUpperCase();
     }
 
+    // Role label after the author's name, by the entry type core prints
+    // (message = the client's side, response = agent reply, note). Texts
+    // are data-cdr-role-* of #content (header.inc.php); none = no label.
+    var ROLES = ['message', 'response', 'note'];
+
+    function role($e, $content) {
+        if ($e.hasClass('cdr-has-role'))
+            return;
+        var $b = $e.children('.header').children('b').first(), type = null, text, $r;
+        $.each(ROLES, function (_, t) { if (!type && $e.hasClass(t)) type = t; });
+        text = type && $.trim($content.attr('data-cdr-role-' + type) || '');
+        if (!text || !$b.length)
+            return;
+        $r = $('<span class="cdr-role"></span>').addClass('cdr-role-' + type);
+        if (type === 'note')
+            $r.append('<i class="icon-lock" aria-hidden="true"></i>');
+        $r.append(document.createTextNode(text));
+        $b.after($r);
+        $e.addClass('cdr-has-role');
+    }
+
     function decorate() {
         queued = false;
-        var $thread = $('#content.cdr-ticket #thread-items');
+        var $thread = $('#content.cdr-ticket #thread-items'),
+            $content = $('#content.cdr-ticket');
         if (!$thread.length)
             return;
         $thread.find('.thread-entry').each(function () {
             var $e = $(this);
+            role($e, $content);
             if (!$e.children('.cdr-av').length) {
                 var name = $e.children('.header').children('b').first().text();
                 var $av = $('<span class="cdr-av" aria-hidden="true"></span>')

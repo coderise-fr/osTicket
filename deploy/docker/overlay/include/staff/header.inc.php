@@ -158,11 +158,32 @@ if ($cdr_script === 'tickets.php' && empty($GLOBALS['cdr_sla_connected'])) {
             echo cdr_ticket_sla_panel($object);
     });
 }
-// Labels the ticket view's CSS and JS need (no translation in CSS/JS)
+// Labels the ticket view's and the queue's CSS and JS need (no translation
+// in CSS/JS): see cdr_data_attrs()
 $cdr_content_attrs = '';
 if ($cdr_ticket_view)
-    $cdr_content_attrs = ' data-cdr-props="' . cdr_h(cdr__('Ticket properties')) . '"'
+    $cdr_content_attrs = cdr_data_attrs(array(
+            'props' => 'Ticket properties',
+            // panel titles of the properties column (ticket-chrome.js)
+            'title-props' => 'Properties',
+            'title-client' => 'Client',
+            // role next to the author of a thread entry (ticket.js), by
+            // the entry type core prints: message (the client's side),
+            // response (an agent reply, visible to the client), note
+            'role-message' => 'Client',
+            'role-response' => 'Reply to the client',
+            'role-note' => 'Internal note, not visible to the client',
+        ))
         . ' style="--cdr-note-label: ' . cdr_h('"' . addcslashes(cdr__('Internal note'), "\"\\\n\r") . '"') . '"';
+// Queue list: empty assignee cell, selection counter, header check box (queue.js)
+elseif ($cdr_queue_list)
+    $cdr_content_attrs = cdr_data_attrs(array(
+        'unassigned' => 'Not assigned',
+        'sel-zero' => 'No ticket selected',
+        'sel-one' => '%d ticket selected',
+        'sel-many' => '%d tickets selected',
+        'select-all' => 'Select all tickets',
+    ));
 // Admin forms: labels of the changed-field marks and the save bar counter
 // (coderise.js replaces %d with the number of changed settings)
 elseif ($cdr_admin)

@@ -53,6 +53,14 @@
    padding-inline-start). */
 #content.cdr-ticket .thread-entry.note > .header > b::after { margin-inline-start: 10px; padding: 0; border-radius: 0; box-shadow: none; font: 600 12px/20.25px var(--f-titre); vertical-align: baseline; }
 
+/* B12/B16. Role label after the name (mockup .entry .head .role / .note-flag),
+   inserted by ticket.js from data-cdr-role-*: ardoise text; on a note the
+   alerte flag with its lock replaces the "Internal note" ::after fallback. */
+#content.cdr-ticket .thread-entry > .header > .cdr-role { order: 0; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); }
+#content.cdr-ticket .thread-entry > .header > .cdr-role-note { display: inline-flex; gap: 5px; align-items: center; color: var(--alerte); font: 600 12px/20.25px var(--f-titre); }
+#content.cdr-ticket .thread-entry > .header > .cdr-role-note i::before { width: 14px; height: 14px; margin-block: 0; }
+#content.cdr-ticket .thread-entry.note.cdr-has-role > .header > b::after { content: none; display: none; }
+
 /* B15. Events (mockup .event): icon area 14px, text ardoise with bold names,
    time pushed to the right (ticket.js moves the <time> out of the sentence). */
 #content.cdr-ticket .thread-event { align-items: center; padding: 7px 16px 7px 58px; font-size: 13.5px; line-height: 20.25px; }

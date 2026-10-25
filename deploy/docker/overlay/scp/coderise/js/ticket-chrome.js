@@ -35,6 +35,16 @@
         $('#content.cdr-ticket ul#ticket_tabs a').each(function () {
             var $a = $(this);
             if ($a.children('.count').length) return;
+            // "Tâches (<span id=ticket-tasks-count>1</span>)": core updates
+            // that span, so it becomes the pill itself; only the brackets go.
+            var $n = $a.children('span[id$="-count"]').first();
+            if ($n.length) {
+                var prev = $n[0].previousSibling, next = $n[0].nextSibling;
+                if (prev && prev.nodeType === 3) prev.nodeValue = prev.nodeValue.replace(/[\s ]*\(\s*$/, '');
+                if (next && next.nodeType === 3) next.nodeValue = next.nodeValue.replace(/^\s*\)/, '');
+                $n.addClass('count');
+                return;
+            }
             var node = null;
             $.each(this.childNodes, function () { if (this.nodeType === 3 && COUNT.test(this.nodeValue)) node = this; });
             if (!node) return;
