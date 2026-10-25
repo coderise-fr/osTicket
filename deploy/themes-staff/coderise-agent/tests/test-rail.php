@@ -45,8 +45,12 @@ set_error_handler(function ($no, $str, $file, $line) {
     return true;
 });
 
-// osTicket's translator: the stub returns its argument (no language pack).
-function __($msgid) { return $msgid; }
+// osTicket's translator: the stub returns its argument, or the entry of
+// $STUB_PACK (a fake language pack) when one is set.
+function __($msgid) {
+    global $STUB_PACK;
+    return (is_array($STUB_PACK) && isset($STUB_PACK[$msgid])) ? $STUB_PACK[$msgid] : $msgid;
+}
 
 // ---------- stubs ----------
 class StubNav {
@@ -279,6 +283,24 @@ check('fr: crumbs tab with the theme wording', cdr_crumbs(new StubNav(agent_tabs
     '<nav class="crumbs" aria-label="Fil d&#039;Ariane"><ol><li><span aria-current="page">Tableau de bord</span></li></ol></nav>');
 check('fr: profile', link_of($h, 'Mon profil') !== null, true);
 check('fr: menu button', strpos($h, '>Menu</button>') !== false || strpos($h, 'Menu</span></button>') !== false, true);
+// Core builds the tabs with labels already translated by the pack
+// (StaffNav: 'desc' => __('Dashboard') = "Tableau de Bord"): the theme's
+// wording applies by tab key; a label a plugin changed is kept.
+$GLOBALS['STUB_PACK'] = array('Dashboard' => 'Tableau de Bord', 'Users' => 'Utilisateurs');
+$tabs = agent_tabs();
+$tabs['dashboard']['desc'] = 'Tableau de Bord';
+$tabs['users']['desc'] = 'Utilisateurs';
+$tabs['kbase']['desc'] = 'Docs (plugin)';
+$h = cdr_rail(new StubNav($tabs, array(), 'dashboard'), $admin);
+check('fr: pack-translated Dashboard shown in the theme wording', link_of($h, 'Tableau de bord') !== null
+    && strpos($h, 'Tableau de Bord') === false, true);
+check('fr: pack-translated Users kept', link_of($h, 'Utilisateurs') !== null, true);
+check('fr: renamed tab label kept', link_of($h, 'Docs (plugin)') !== null, true);
+check('fr: crumbs tab from a pack-translated label', strpos(cdr_crumbs(new StubNav($tabs, array(), 'dashboard')),
+    '<span aria-current="page">Tableau de bord</span>') !== false, true);
+check('tab label: unknown key', cdr_tab_label('zz', 'Dashboard'), 'Tableau de bord');
+check('tab label: numeric key', cdr_tab_label(3, 'Plugin <x>'), 'Plugin <x>');
+$GLOBALS['STUB_PACK'] = null;
 // Agent sub-menu items are rendered by the core template: labels still go through cdr__.
 $_SERVER['SCRIPT_NAME'] = '/scp/directory.php';
 $h = cdr_rail(new StubNav(agent_tabs(), agent_nav()->submenus, 'dashboard', 2), $admin);

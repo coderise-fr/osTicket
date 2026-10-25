@@ -25,6 +25,7 @@
        - cdr_rail()            the <aside class="rail"> (mode switch, menu,
                                queues, profile and log out)
        - cdr_agent_tabs()      agent tabs in the mockup's order
+       - cdr_tab_label()       label of a tab, in the theme's wording
        - cdr_staff_line()      the department / role line of the rail foot
        - cdr_find_queue()      a queue of the loaded queue tree, by id
        - cdr_crumbs()          the breadcrumb of the top bar
@@ -500,6 +501,25 @@ if (!defined('CDR_VERSION')) {
     }
 
     /**
+     * Label of a rail tab (agent or admin), plain text. Core builds the tabs
+     * with labels already translated (StaffNav/AdminNav: 'desc' =>
+     * __('Dashboard')), so the theme's wording (cdr_t()) can only apply by
+     * tab key, and only while the label is still core's own (a plugin that
+     * renamed a tab keeps its label). Other labels go through cdr__().
+     */
+    function cdr_tab_label($name, $desc) {
+        static $msgids = array('dashboard' => 'Dashboard', 'users' => 'Users',
+            'tasks' => 'Tasks', 'tickets' => 'Tickets', 'kbase' => 'Knowledgebase',
+            'apps' => 'Applications', 'settings' => 'Settings', 'manage' => 'Manage',
+            'emails' => 'Emails', 'staff' => 'Agents');
+        $desc = (string) $desc;
+        if (is_string($name) && isset($msgids[$name])
+                && ($desc === $msgids[$name] || $desc === __($msgids[$name])))
+            return cdr_t($msgids[$name]);
+        return cdr__($desc);
+    }
+
+    /**
      * The second line of the rail foot, plain text (escape to print): the
      * department, followed by the role for an administrator
      * ("Support, administrateur"), as the mockup's "Support Priority,
@@ -576,7 +596,7 @@ if (!defined('CDR_VERSION')) {
                     $o .= '<li><a class="' . $cls . '" href="' . cdr_h(cdr_nav_href($tab['href'])) . '"'
                         . ($cur ? ' aria-current="page"' : '') . '>'
                         . cdr_icon(isset($icons[$name]) ? $icons[$name] : 'layers')
-                        . cdr_h(cdr_t($tab['desc'])) . '</a>';
+                        . cdr_h(cdr_tab_label($name, $tab['desc'])) . '</a>';
                     if ($cur) {
                         // Core sub-navigation (queues, counts, "add personal
                         // queue"), renamed so jb.overflow.menu.js leaves it be.
@@ -603,7 +623,7 @@ if (!defined('CDR_VERSION')) {
                 foreach ($tabs as $name => $tab) {
                     $items = $nav->getSubMenu($name) ?: array();
                     $current = cdr_current_item($nav, $name, $items);
-                    $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr_t($tab['desc'])) . '</p><ul>';
+                    $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr_tab_label($name, $tab['desc'])) . '</p><ul>';
                     foreach ($items as $k => $item) {
                         if (!is_array($item) || !empty($item['droponly']) || !isset($item['href']))
                             continue;
@@ -649,7 +669,7 @@ if (!defined('CDR_VERSION')) {
         if ($nav && ($t = $nav->getActiveTab())) {
             $tabs = $nav->getTabs();
             if (is_array($tabs) && isset($tabs[$t]))
-                $crumbs[] = array(cdr_t($tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
+                $crumbs[] = array(cdr_tab_label($t, $tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
             if (is_array($parent) && isset($parent[0], $parent[1])
                     && (string) $parent[0] !== '')
                 $crumbs[] = array((string) $parent[0], (string) $parent[1]);
