@@ -26,7 +26,7 @@
 /* ───────── Action bar: labelled Edit / Print ───────── */
 #content.cdr-ticket .sticky.bar .cdr-has-lbl { display: inline-flex; align-items: center; gap: 8px; }
 #content.cdr-ticket .sticky.bar .cdr-lbl { font: 600 13px/1.3 var(--f-titre); white-space: nowrap; }
-@media (max-width: 920px) {
+@media (max-width: 1023px) { /* the icon-masked buttons (16px icons, 14px carets) fit one row down to ~930px without the labels */
   #content.cdr-ticket .sticky.bar .cdr-lbl { display: none; }
 }
 

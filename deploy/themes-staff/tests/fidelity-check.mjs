@@ -6,18 +6,19 @@
 // Env:    LOGIN_PASS (required, never printed), LOGIN_USER (dev.admin), BASE (http://127.0.0.1:8480),
 //         PW_CORE (playwright-core module name or path), CHROME (chromium.exe path),
 //         VIEW_W / VIEW_H (1280 / 800), MOCKUP_DIR (default: <repo>/docs/theme-mockups-admin).
-// Output: one line per metric, "OK|DIFF  <name>  mockup=<v>  real=<v>". Exit code = number of DIFF
-//         lines (capped at 125). Exit 2 on configuration or login errors (not counted as diffs).
+// Output: one line per metric, "OK|DIFF  <name>  mockup=<v>  real=<v>", then "OK n  DIFF n
+//         ALLOWED n". Exit code = number of DIFF lines (capped at 125). Exit 2 on configuration
+//         or login errors (not counted as diffs). A missing element prints MISSING (a DIFF).
 //
-// Real-page selectors come from the overlay (coderise.css / coderise.js) and core templates.
-// Chosen: title '#content .tixTitle, #content h2' (core ticket-view uses .tixTitle); props
-// 'aside.cdr-props table.ticket_info th/td' (coderise.js moves ticket_info into the aside);
-// thread '.thread-body' and '.thread-event'; table 'table.list.queue'; tabs 'ul.tabs li a';
-// rail queues '.rail .queues #sub_nav > li > a'. Unverified guesses (may print MISSING):
-// '.mode a', '.topbar .btn', '.gauge-txt', '.panel-h h2', '.crumbs', '.btn'.
+// Real-page selectors (verified on the demo, 25/10/2026) come from the overlay and the core
+// templates: queue title '.cdr-titlebar h1' (queue.js), ticket subject '#content .tixTitle h3',
+// property values 'aside.cdr-props table.ticket_info table td' (inner cells, not the column
+// cells), thread entries '.thread-entry > .header > b|.cdr-role|time', '.cdr-av' (ticket.js),
+// queue '.cdr-bulk .cdr-sel', '.cdr-unassigned', '.cdr-who .cdr-av' (queue.js). Demo data:
+// ticket 2 has a client message, replies and events; ticket 1 the internal note.
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
-import { dirname, join, resolve, isAbsolute } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 // { metric: '<pair name> <property>', reason: '...' }: printed as OK with the reason, not counted.
 const ALLOWED_DIFFS = [];
