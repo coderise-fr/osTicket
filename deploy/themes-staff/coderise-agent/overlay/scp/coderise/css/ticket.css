@@ -1,5 +1,11 @@
 /* coderise-agent: ticket rules (loaded after coderise.css; one workstream owns this file). */
 
+/* Target of the "Skip to content" link (header.inc.php: an empty span right
+   before #content and the queue's title block): focusable by the link only,
+   no ring on an empty box (the next Tab goes to the page's first control) */
+#cdr-start { display: block; width: 0; height: 0; overflow: hidden; }
+#cdr-start:focus { outline: none; }
+
 /* ═════════ Thread (fidelity pass: thread workstream) ═════════
    Overrides of the thread rules of coderise.css, same specificity or higher,
    loaded later. Markup is the core thread-entry / thread-event templates;

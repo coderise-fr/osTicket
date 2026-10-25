@@ -24,7 +24,11 @@
 // 'small.cdr-client', first-reply cell '.cdr-gauge-col', top-level queue counts '.cdr-qcount'
 // (coderise.js). 'row-top' = top of the element minus the top of its table row; 'col-delta' =
 // visible column index of the element's cell minus that of the pair's mockRef / realRef cell
-// (column order, independent of the column widths).
+// (column order, independent of the column widths). 'right' = getBoundingClientRect().right.
+// Wave 4: action group wrappers '.cdr-acts' / '.cdr-tools', title block 'section.cdr-idline'
+// (the subject is moved into it), "Log" tab 'a#cdr-journal-tab', reply options line
+// 'form#reply > .cdr-opts' (ticket-chrome.js). A pair with minWidth / maxWidth is only measured
+// at those viewport widths (layout that differs with the width, like the mockup's title row).
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -97,9 +101,20 @@ const PAIRS = [
   { name: 'idline urgency', kind: 'urgent', mock: '.idline .urg', real: '.cdr-idline .urg', props: ['font-size', 'font-weight', 'color', 'height', 'top'] },
   { name: 'ticket h1 position', kind: 'ticket', mock: 'h1', real: '#content .tixTitle h3', props: ['top', 'left', 'line-height'] },
   { name: 'client subtitle', kind: 'ticket', mock: '.title-row .sub', real: '#content p.cdr-sub', props: ['font-size', 'font-weight', 'line-height', 'color', 'top', 'left'] },
-  { name: 'labelled button (Edit)', kind: 'ticket', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-color', 'border-top-left-radius', 'background-color', 'top', 'left'] },
+  { name: 'labelled button (Edit)', kind: 'ticket', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-color', 'border-top-left-radius', 'background-color', 'top'] },
+  // Action group placement (wave 4). The mockup's .title-row wraps its buttons under the title
+  // block below ~1558 px and puts them at the right of the row above. The real group is wider
+  // (core's print-options caret on Print, +30 px), so its start is compared where it starts the
+  // row (narrow) and its end and the resolve button where they end it (wide).
+  { name: 'labelled button (Edit) start', kind: 'ticket', maxWidth: 1559, mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['left'] },
+  { name: 'action group end', kind: 'note', minWidth: 1560, mock: '.t-actions', real: '#content .sticky.bar .cdr-acts', props: ['right', 'top'] },
+  { name: 'resolve button position', kind: 'note', minWidth: 1560, mock: '.t-actions .btn-primary', real: '#content .sticky.bar .cdr-resolve', props: ['left'] },
+  { name: 'title block', kind: 'ticket', mock: '.title-row > div', real: '#content > section.cdr-idline', props: ['top', 'left'] },
   { name: 'resolve button', kind: 'note', mock: '.t-actions .btn-primary', real: '#content .sticky.bar .cdr-resolve', props: ['font-size', 'font-weight', 'height', 'width', 'background-color', 'color', 'border-top-left-radius', 'top'] },
   { name: 'ticket tabs position', kind: 'ticket', mock: '.tabs', real: 'ul#ticket_tabs', props: ['top', 'left'] },
+  // "Log" tab (ticket-chrome.js) and the line above the reply editor (mockup .compose .to)
+  { name: 'log tab', kind: 'ticket', mock: '.tabs a:nth-child(3)', real: 'ul#ticket_tabs a#cdr-journal-tab', props: ['font-size', 'font-weight', 'font-family', 'color', 'height', 'top'] },
+  { name: 'compose to line', kind: 'ticket', mock: '.compose .to', real: '#response_options > form#reply > .cdr-opts', props: ['font-size', 'line-height', 'color', 'padding-top', 'padding-left', 'border-bottom-width', 'border-bottom-color'] },
   // Queue, wave 3: "Ticket et contrat", "Sujet et client", "Premier retour" after the subject, rail counts.
   { name: 'queue Priority chip', kind: 'queue', mock: '.data .c-n .plan-priority', real: 'table.queue tbody td > .stack .plan-priority', props: ['font-size', 'font-weight', 'font-family', 'padding-left', 'border-top-left-radius', 'background-color', 'color', 'height', 'row-top'] },
   { name: 'queue Standard chip', kind: 'queue', mock: '.data .c-n .plan-standard', real: 'table.queue tbody td > .stack .plan-standard', props: ['font-size', 'color', 'box-shadow', 'height', 'row-top'] },
@@ -151,7 +166,7 @@ async function measure(page, url, targets) {
       for (const p of t.props) {
         if (p === 'height') r[p] = el.getBoundingClientRect().height + 'px';
         else if (p === 'width') r[p] = el.getBoundingClientRect().width + 'px';
-        else if (p === 'top' || p === 'left') r[p] = el.getBoundingClientRect()[p] + 'px';
+        else if (p === 'top' || p === 'left' || p === 'right') r[p] = el.getBoundingClientRect()[p] + 'px';
         else if (p === 'row-top') {
           const tr = el.closest('tr');
           r[p] = tr ? (el.getBoundingClientRect().top - tr.getBoundingClientRect().top) + 'px' : null;
@@ -180,7 +195,9 @@ async function run() {
     await login(page);
     let diffs = 0, oks = 0, allowedN = 0;
     for (const [kind, urls] of Object.entries(KINDS)) {
-      const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind);
+      // minWidth / maxWidth: a pair measured only at the viewport widths where it applies
+      const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind
+        && VIEW_W >= (p.minWidth ?? 0) && VIEW_W <= (p.maxWidth ?? Infinity));
       const mock = await measure(page, pathToFileURL(join(MOCKUP_DIR, urls.mock)).href,
         pairs.map((p) => ({ key: String(p.i), sel: p.mock, ref: p.mockRef, props: p.props })));
       const real = await measure(page, BASE + urls.real,

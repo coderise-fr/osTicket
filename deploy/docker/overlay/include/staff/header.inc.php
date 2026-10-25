@@ -87,7 +87,8 @@ if (osTicket::is_ie())
     ?>
 </head>
 <body>
-<a class="cdr-skip" href="#content"><?php echo cdr_h(cdr__('Skip to content')); ?></a>
+<?php // target: #cdr-start, right before #content (the queue's title block, built by queue.js before #content, comes after it) ?>
+<a class="cdr-skip" href="#cdr-start"><?php echo cdr_h(cdr__('Skip to content')); ?></a>
 <div id="container">
     <?php
     if($ost->getError())
@@ -181,7 +182,25 @@ if ($cdr_ticket_view)
             // them by their href / id, not by their text)
             'label-edit' => 'Edit ticket',
             'label-print' => 'Print ticket',
+            // name of the cluster of core's other actions (ticket-chrome.js)
+            'label-tools' => 'Other ticket actions',
+            // reply and note forms: the "Options" disclosure button that
+            // folds the secondary core fields, its "modified" mark and the
+            // line above the editor (ticket-chrome.js)
+            'opts-reply' => 'Sending options',
+            'opts-note' => 'Note options',
+            'opts-changed' => 'modified',
+            'opts-to' => 'To: %s',
+            'opts-team' => 'Visible to the team only. The client receives nothing.',
+            // "Log" tab: the thread's events only (ticket-chrome.js)
+            'journal-tab' => 'Log',
+            'journal-empty' => 'No event has been recorded for this ticket yet.',
         ))
+        // the agent's default signature (a value, not a label): the default
+        // of the folded Signature field (ticket-chrome.js)
+        . ((isset($thisstaff) && is_object($thisstaff)
+                && ($cdr_sig = (string) $thisstaff->getDefaultSignatureType()) !== '')
+            ? ' data-cdr-sig-default="' . cdr_h($cdr_sig) . '"' : '')
         // "Mark as resolved" (ticket-chrome.js): an open ticket only, and
         // only when the target status is known (cdr_resolve_status_id():
         // the stock "Resolved" status, id 2, else the only closed status).
@@ -231,6 +250,7 @@ elseif ($cdr_admin)
         <?php } ?>
     </header>
 
+        <span id="cdr-start" tabindex="-1"></span>
         <div id="content" class="<?php echo cdr_h(cdr_content_class($cdr_script, $cdr_ticket_view, $cdr_admin)); ?>"<?php echo $cdr_content_attrs; ?>>
         <?php if(isset($errors['err'])) { ?>
             <div id="msg_error"><?php echo $errors['err']; ?></div>

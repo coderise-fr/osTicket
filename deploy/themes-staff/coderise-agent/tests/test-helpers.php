@@ -168,6 +168,10 @@ $labels = array(
     'Edit ticket', 'Print ticket', 'Mark as resolved',
     // queue: client line under the subject
     '%1$s, %2$s',
+    // wave 4: action cluster, reply / note "Options" disclosure, "Log" tab
+    'Other ticket actions', 'Sending options', 'Note options', 'To: %s',
+    'Visible to the team only. The client receives nothing.', 'Log',
+    'No event has been recorded for this ticket yet.',
 );
 $untranslated = array();
 foreach ($labels as $l)
@@ -176,6 +180,22 @@ foreach ($labels as $l)
 // A few labels are written the same in French: they are allowed to equal their msgid.
 $same = array('Client', 'Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins', '%1$s, %2$s');
 check('fr.php: inventory complete', array_values(array_diff($untranslated, $same)), array());
+// Every label header.inc.php passes to cdr_data_attrs() ('key' => 'Msgid' pairs of the
+// file, read from the source) has a French string (or is written the same in French)
+$cdr_hdr = file_get_contents(dirname(__DIR__) . '/overlay/include/staff/header.inc.php');
+preg_match_all("#^\s*'([a-z0-9]+(?:-[a-z0-9]+)*)' => '([^']+)',#m", $cdr_hdr, $cdr_m);
+$cdr_missing = array();
+foreach ($cdr_m[2] as $l)
+    if (cdr__($l) === $l && !in_array($l, $same, true))
+        $cdr_missing[] = $l;
+check('header data attrs: labels found', count($cdr_m[2]) >= 20, true);
+check('header data attrs: every label translated', $cdr_missing, array());
+check('header: skip link targets #cdr-start, emitted before #content',
+    (bool) preg_match('#href="\#cdr-start".*<span id="cdr-start" tabindex="-1"></span>\s*<div id="content"#s', $cdr_hdr), true);
+check('fr: wave 4 strings', implode('|', array(cdr__('Log'), cdr__('Sending options'), cdr__('To: %s'), cdr__('Note options'))),
+    "Journal|Options d'envoi|\xC3\x80 : %s|Options de la note");
+check('data attrs: wave 4 escaped', cdr_data_attrs(array('opts-reply' => 'Sending options', 'opts-team' => 'Visible to the team only. The client receives nothing.')),
+    " data-cdr-opts-reply=\"Options d&#039;envoi\" data-cdr-opts-team=\"Visible de l&#039;\xC3\xA9quipe uniquement. Le client ne re\xC3\xA7oit rien.\"");
 check('fr: sign out wording', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
 check('fr: search placeholder names tickets', cdr__('Search tickets by number, subject or client'),
     "Rechercher un ticket : num\xC3\xA9ro, sujet, client");
