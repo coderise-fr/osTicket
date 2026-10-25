@@ -110,7 +110,7 @@ function demo_config($DEMO) {
         'client_registration' => 'public',
         'ticket_autoresponder' => 1,
         'message_autoresponder' => 1,
-        'enable_avatars' => 0,
+        'enable_avatars' => 1,
         'helpdesk_title' => 'Support Coderise',
         'helpdesk_url' => $DEMO['base_url'],
     );
