@@ -37,9 +37,35 @@
     // reach inside them. coderise.css excludes the same list.
     var RICH = '.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc';
 
+    // The rail item "Tickets" (main menu, not the queue list)
+    function ticketsItem() {
+        return $('.rail nav.menu a.item').filter(function () {
+            return /(^|\/)tickets\.php$/.test((this.getAttribute('href') || '').split(/[?#]/)[0]);
+        }).first();
+    }
+
+    // Neutral pill on the Tickets item: the count of the top "Open" queue (the
+    // id of the top queue link, "1" when the queue list is not on the page).
+    // Core's counts response has no task count: no pill on Tasks.
+    function showTicketsBadge(json) {
+        var $item = ticketsItem();
+        if (!$item.length)
+            return;
+        var id = (/[?&]queue=(\d+)/.exec($('#cdr-queues > ul > li.top-queue > a').first().attr('href') || '') || [])[1] || '1',
+            n = json['q' + id],
+            $b = $item.children('.badge.cdr-badge');
+        if (n === undefined || n === null || !/^\d+$/.test(String(n)) || +n === 0) {
+            $b.remove();
+            return;
+        }
+        if (!$b.length)
+            $b = $('<span class="badge cdr-badge"></span>').appendTo($item);
+        $b.text(n);
+    }
+
     function loadCounts() {
         var $counts = $('#cdr-queues .queue-count[data-queue-id]');
-        if (!$counts.length)
+        if (!$counts.length && !ticketsItem().length)
             return;
         if (countsRequest)
             countsRequest.abort();
@@ -57,6 +83,7 @@
                 });
                 $('#cdr-queues').find('[id="queue-count-bucket"]')
                     .removeClass('hidden').show();
+                showTicketsBadge(json);
             },
             complete: function () {
                 countsRequest = null;
