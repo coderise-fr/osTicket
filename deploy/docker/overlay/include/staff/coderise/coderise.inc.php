@@ -39,7 +39,11 @@
        - cdr_queue_layout()    where the subject, number and client columns
                                are, and where the first-reply cell goes
        - cdr_queue_client()    the "client, organisation" line under the
-                               subject
+                               subject (plain name)
+       - cdr_queue_client_html() the same line from core's rendered "From"
+                               cell (link and annotations kept)
+       - cdr_resolve_status_id() the status of "Mark as resolved" (ticket
+                               view, header.inc.php)
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     vim: expandtab sw=4 ts=4 sts=4:
@@ -919,5 +923,60 @@ if (!defined('CDR_VERSION')) {
             return '';
         return '<small class="cdr-client">' . cdr_h($org !== ''
             ? sprintf(cdr__('%1$s, %2$s'), $name, $org) : $name) . '</small>';
+    }
+
+    /**
+     * The same client line from core's own rendering of the queue's "From"
+     * column ($C->render($T): the name with the column's link filter and
+     * annotations, e.g. the collaborator count), used as is: it is core's
+     * output, exactly what core prints in that column. Only the
+     * organisation is escaped here. '' when the cell has no text and no
+     * markup (nothing to show).
+     */
+    function cdr_queue_client_html($cellHtml, $org=null) {
+        $cellHtml = is_scalar($cellHtml) ? trim((string) $cellHtml) : '';
+        $org = is_scalar($org) ? trim((string) $org) : '';
+        if ($cellHtml === '' || preg_replace('/[\s\x{00A0}]+/u', '',
+                html_entity_decode(strip_tags($cellHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8')) === '')
+            return '';
+        return '<small class="cdr-client">' . ($org !== ''
+            ? sprintf(cdr__('%1$s, %2$s'), $cellHtml, cdr_h($org)) : $cellHtml) . '</small>';
+    }
+
+    /**
+     * The status "Mark as resolved" closes to (ticket view), from the
+     * closed statuses of the install, array(id => state): the stock
+     * "Resolved" status (id 2) when it exists and is a closed status;
+     * otherwise the only closed status when there is exactly one; else 0
+     * (no button: the theme does not guess between several).
+     */
+    function cdr_resolve_status_id($statuses) {
+        $closed = array();
+        foreach ((array) $statuses as $id => $state)
+            if ((int) $id > 0 && $state === 'closed')
+                $closed[] = (int) $id;
+        if (in_array(2, $closed, true))
+            return 2;
+        return count($closed) === 1 ? $closed[0] : 0;
+    }
+
+    /**
+     * cdr_resolve_status_id() for a ticket of the ticket view: 0 unless the
+     * ticket is open; the closed statuses come from core's status list
+     * (TicketStatusList::getStatuses(), the list of core's status menu).
+     * Never throws (0 then: no button).
+     */
+    function cdr_ticket_resolve_status($t) {
+        try {
+            if (!is_object($t) || !$t->isOpen() || !class_exists('TicketStatusList'))
+                return 0;
+            $statuses = array();
+            foreach (TicketStatusList::getStatuses(array('states' => array('closed'))) as $s)
+                $statuses[(int) $s->getId()] = (string) $s->getState();
+            return cdr_resolve_status_id($statuses);
+        }
+        catch (Throwable $e) {
+            return 0;
+        }
     }
 }

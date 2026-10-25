@@ -28,7 +28,10 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   fichiers du cœur dont le thème **dépend** sans les remplacer (pages et gabarits dont la
   feuille de style et `coderise.js` habillent ou déplacent le balisage, classes et routes
   AJAX appelées, feuilles du cœur surchargées, plugin `sla_first_response`) : la liste est
-  `WATCH_FILES` dans le script. Code de sortie 0 = aucune dérive.
+  `WATCH_FILES` dans le script (68 fichiers au 25/10/2026, dont, pour les passes de fidélité,
+  le menu et la liste des états derrière « Marquer comme résolu », les actions groupées
+  derrière « Réclamation », `thread.js`, `tips.js`, les compteurs de files et les jointures
+  utilisateur/organisation de la file). Code de sortie 0 = aucune dérive.
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php` et `tests/test-rail.php` (assistants PHP, en CLI dans l'image de
@@ -111,7 +114,11 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   urgence » et sous-titre « Client, organisation. Reçu le … à … via … » émis par
   `header.inc.php` (`cdr_ticket_idline()`), boutons « Modifier / Imprimer / Marquer comme
   résolu » sous le titre (`ticket-chrome.js` ; « Marquer comme résolu » déclenche le lien de
-  fermeture du menu d'état du cœur, donc son dialogue et ses contrôles). Écarts : à 2000 px les
+  fermeture du menu d'état du cœur, donc son dialogue et ses contrôles). Le statut visé est
+  choisi par `header.inc.php` (`cdr_resolve_status_id()`) : le statut « Resolved » d'origine
+  (id 2) s'il existe et est un état fermé, sinon l'unique statut fermé ; s'il y en a plusieurs
+  sans « Resolved », pas de bouton (le thème ne devine pas). Jamais sur un ticket fermé. Le
+  dialogue du cœur peut encore refuser la fermeture (tâches ouvertes, champs requis). Écarts : à 2000 px les
   7 à 9 actions du cœur restent sous le titre (la maquette met ses 3 boutons à droite) ; la
   barre nuit fixée n'affiche plus « Ticket #N » (le fil d'Ariane le montre) ; le libellé du
   contrat est celui du plugin (« Priorité » avec le pack français, la maquette écrit
@@ -125,14 +132,19 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   côté client reste repérable d'un coup d'œil, comme dans la maquette.
 - File de tickets (`include/staff/templates/queue-tickets.tmpl.php`, gabarit du cœur
   remplacé par le thème ; passe de fidélité 3) : les colonnes configurées de la file et leurs
-  cellules restent celles du cœur ; le thème y ajoute, avec une seule requête par page
-  (propriétaire, nom, organisation et état de chaque ligne) :
+  cellules restent celles du cœur ; le thème y ajoute, avec une requête par page (propriétaire,
+  nom, organisation et état de chaque ligne ; avec le plugin, en plus, une recherche par
+  propriétaire distinct et deux à trois requêtes par ticket ouvert Priority pour la jauge,
+  bornées par la taille de page) :
   - le client et son organisation sous le sujet (« Léa Moreau, Priority », maquette « Sujet et
-    client »), imprimés et échappés par PHP plutôt que recopiés en JS depuis la colonne « From »
-    (indépendant du texte des colonnes, présent sans JS, organisation comprise, que la colonne
-    « From » existe ou non). La colonne « From » du cœur (`user__name`) est alors masquée en CSS
-    (classe `cdr-col-from`, cellules gardées dans le DOM) ; à l'écran, elle perd son tri et la
-    pastille du nombre de collaborateurs ;
+    client »), en PHP plutôt qu'en JS (présent sans JS, organisation comprise). Quand la file a
+    la colonne « From » du cœur (`user__name`), la ligne reprend **le rendu du cœur de cette
+    cellule** (`$C->render($T)` : lien éventuel posé par l'administrateur et pastille du nombre
+    de collaborateurs compris), suivi de l'organisation échappée ; sans cette colonne, le nom
+    du propriétaire, échappé. La colonne « From » est alors masquée en CSS (classe
+    `cdr-col-from`) mais garde sa place dans le DOM (cellules du cœur, lecture sans CSS) ; son
+    lien de tri est repris dans l'en-tête du sujet (« Subject / From ») ; ses styles
+    conditionnels éventuels (gras…) ne sont pas repris sous le sujet ;
   - la colonne « Premier retour » juste après la colonne du sujet, reconnue par son chemin de
     données (`cdata__subject`, jamais par son en-tête) ; sans colonne sujet, en dernière position ;
   - la puce de contrat sous le numéro (colonne `number`) : « Priority » nuit avec éclair,

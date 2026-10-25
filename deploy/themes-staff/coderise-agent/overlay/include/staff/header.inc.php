@@ -182,11 +182,14 @@ if ($cdr_ticket_view)
             'label-edit' => 'Edit ticket',
             'label-print' => 'Print ticket',
         ))
-        // "Mark as resolved" (ticket-chrome.js): an open ticket only; the
-        // button forwards to the first "closed" entry of core's status
-        // menu, which core prints only when the agent may close
-        . ((isset($ticket) && is_object($ticket) && $ticket->isOpen())
-            ? cdr_data_attrs(array('label-resolve' => 'Mark as resolved')) : '')
+        // "Mark as resolved" (ticket-chrome.js): an open ticket only, and
+        // only when the target status is known (cdr_resolve_status_id():
+        // the stock "Resolved" status, id 2, else the only closed status).
+        // The button forwards to that entry of core's status menu, which
+        // core prints only when the agent may close.
+        . (($cdr_resolve_id = cdr_ticket_resolve_status($ticket ?? null))
+            ? cdr_data_attrs(array('label-resolve' => 'Mark as resolved'))
+                . ' data-cdr-resolve-status="' . (int) $cdr_resolve_id . '"' : '')
         . ' style="--cdr-note-label: ' . cdr_h('"' . addcslashes(cdr__('Internal note'), "\"\\\n\r") . '"') . '"';
 // Queue list: empty assignee cell, selection counter, header check box (queue.js)
 elseif ($cdr_queue_list)

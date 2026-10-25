@@ -31,7 +31,10 @@ overlay="$here/overlay"
 # Core files the theme relies on without replacing them: the pages and templates whose
 # markup coderise.css / coderise.js style or move (ids, classes, form actions), the
 # classes and AJAX routes the PHP helpers and coderise.js call, the core style sheets
-# the theme overrides, and the sla_first_response plugin used by the gauge. The
+# the theme overrides, and the sla_first_response plugin used by the gauge (fidelity
+# passes: the status menu and statuses behind "Mark as resolved", the bulk actions
+# behind the claim button, thread.js scrolling, tips.js help tips moved to the title
+# block, the queue counts, the user and organisation joins of the queue). The
 # replaced files themselves are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
@@ -48,6 +51,8 @@ scp/js/scp.js
 scp/js/jb.overflow.menu.js
 scp/js/ticket.js
 scp/js/dashboard.inc.js
+scp/js/thread.js
+scp/js/tips.js
 scp/css/scp.css
 scp/css/dropdown.css
 css/thread.css
@@ -61,6 +66,10 @@ include/class.pagenate.php
 include/class.ticket.php
 include/class.thread.php
 include/class.misc.php
+include/class.list.php
+include/class.search.php
+include/class.user.php
+include/class.organization.php
 include/ajax.tickets.php
 include/ajax.search.php
 include/ajax.config.php
@@ -88,6 +97,8 @@ include/staff/templates/queue-subnavigation.tmpl.php
 include/staff/templates/queue-savedsearches-nav.tmpl.php
 include/staff/templates/queue-quickfilter.tmpl.php
 include/staff/templates/queue-sort.tmpl.php
+include/staff/templates/status-options.tmpl.php
+include/staff/templates/tickets-actions.tmpl.php
 include/staff/templates/dynamic-form-simple.tmpl.php
 include/staff/templates/task-view.tmpl.php
 include/staff/templates/thread-entry.tmpl.php

@@ -565,5 +565,56 @@ check('queue client: fr wording', cdr_queue_client('Camille Roy', "H\xC3\xA9lios
     "<small class=\"cdr-client\">Camille Roy, H\xC3\xA9lios Logistique</small>");
 unset($GLOBALS['CDR_TEST_LANG']);
 
+// ---------- cdr_queue_client_html (core's rendered "From" cell under the subject) ----------
+$cell = '<span class="pull-right"><span class="pull-right faded-more" data-toggle="tooltip" title="2"><i class="icon-group"></i></span></span>L&eacute;a Moreau';
+check('queue client html: core cell kept as is, org escaped', cdr_queue_client_html($cell, 'A & <B>'),
+    '<small class="cdr-client">' . $cell . ', A &amp; &lt;B&gt;</small>');
+check('queue client html: no org', cdr_queue_client_html('<a href="users.php?id=2">Nina Petit</a>', null),
+    '<small class="cdr-client"><a href="users.php?id=2">Nina Petit</a></small>');
+check('queue client html: empty cell', cdr_queue_client_html('', 'Org'), '');
+check('queue client html: markup without text', cdr_queue_client_html('<span class="pull-right"></span> ', 'Org'), '');
+check('queue client html: entity-only blank', cdr_queue_client_html('&nbsp;', 'Org'), '');
+check('queue client html: not scalar', cdr_queue_client_html(array('x'), 'Org'), '');
+
+// ---------- cdr_resolve_status_id / cdr_ticket_resolve_status ("Mark as resolved") ----------
+check('resolve: stock statuses = Resolved (2)', cdr_resolve_status_id(array(2 => 'closed', 3 => 'closed')), 2);
+check('resolve: Resolved first even when Closed comes first', cdr_resolve_status_id(array(3 => 'closed', 2 => 'closed')), 2);
+check('resolve: id 2 not closed is not Resolved', cdr_resolve_status_id(array(2 => 'archived', 3 => 'closed')), 3);
+check('resolve: Resolved deleted, one closed left', cdr_resolve_status_id(array(3 => 'closed')), 3);
+check('resolve: Resolved deleted, several closed = no button', cdr_resolve_status_id(array(3 => 'closed', 7 => 'closed')), 0);
+check('resolve: none closed', cdr_resolve_status_id(array(1 => 'open', 4 => 'archived')), 0);
+check('resolve: empty / not an array', cdr_resolve_status_id(null), 0);
+check('resolve: bad ids ignored', cdr_resolve_status_id(array(0 => 'closed', -1 => 'closed', 9 => 'closed')), 9);
+if (!class_exists('TicketStatusList', false)) {
+    class StubListStatus {
+        public $id, $state;
+        function __construct($id, $state) { $this->id = $id; $this->state = $state; }
+        function getId() { return $this->id; }
+        function getState() { return $this->state; }
+    }
+    class TicketStatusList {
+        static $items = array();
+        static $seen = null;
+        static function getStatuses($criteria=array()) {
+            self::$seen = $criteria;
+            if (self::$items === 'throw')
+                throw new Exception('db');
+            return self::$items;
+        }
+    }
+}
+TicketStatusList::$items = array(new StubListStatus(2, 'closed'), new StubListStatus(3, 'closed'));
+$t = new Ticket(201, db_dt($now));
+check('ticket resolve: open ticket, stock statuses', cdr_ticket_resolve_status($t), 2);
+check('ticket resolve: asks core for the closed statuses', TicketStatusList::$seen, array('states' => array('closed')));
+$t->open = false;
+check('ticket resolve: closed ticket = no button', cdr_ticket_resolve_status($t), 0);
+$t->open = true;
+TicketStatusList::$items = array(new StubListStatus(3, 'closed'), new StubListStatus(8, 'closed'));
+check('ticket resolve: no Resolved, two closed = no button', cdr_ticket_resolve_status($t), 0);
+TicketStatusList::$items = 'throw';
+check('ticket resolve: core error = no button', cdr_ticket_resolve_status($t), 0);
+check('ticket resolve: no ticket', cdr_ticket_resolve_status(null), 0);
+
 echo $fails ? "\n$fails FAILED\n" : "\nall ok\n";
 exit($fails ? 1 : 0);

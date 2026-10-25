@@ -53,15 +53,19 @@
     }
 
     // "Mark as resolved" (mockup primary button): only when header.inc.php
-    // emitted its label (open ticket) and core's status menu holds a
-    // "closed" entry for this agent (core prints the menu only with the
-    // close permission, in its own sort order: the first closed status,
-    // "Resolved" on a stock install). The button forwards the click to that
-    // core link: core's own handler opens core's status dialog (comment,
-    // confirmation, permission checks on the server). Its title is the
-    // status name the link shows.
+    // emitted its label and the target status (open ticket; the stock
+    // "Resolved" status, id 2, else the only closed status: never a guess
+    // between several) and core's status menu holds that exact entry for
+    // this agent (core prints the menu only with the close permission).
+    // The button forwards the click to that core link: core's own handler
+    // opens core's status dialog (comment, confirmation, permission checks
+    // on the server). Its title is the status name the link shows.
     function closeLink($c) {
-        return $c.find('#action-dropdown-statuses a.ticket-action[href*="/status/close/"]').first();
+        var id = String($c.attr('data-cdr-resolve-status') || '');
+        if (!/^[1-9][0-9]*$/.test(id)) return $();
+        return $c.find('#action-dropdown-statuses a.ticket-action').filter(function () {
+            return new RegExp('/status/close/' + id + '$').test(this.getAttribute('href') || '');
+        }).first();
     }
     function resolveButton() {
         var $c = $('#content.cdr-ticket'), $bar = barOf($c),
