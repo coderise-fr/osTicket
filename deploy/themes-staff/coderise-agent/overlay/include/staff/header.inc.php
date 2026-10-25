@@ -71,9 +71,11 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/rail.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/icons.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket.css')); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket-chrome.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/queue.css')); ?>"/>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/coderise.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket.js')); ?>"></script>
+    <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket-chrome.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/queue.js')); ?>"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="<?php echo cdr_h(cdr_asset('img/favicon.svg')); ?>" />
