@@ -124,6 +124,18 @@ return array(
     'Reply to the client' => 'Réponse au client',
     'Internal note, not visible to the client' => 'Note interne, invisible du client',
 
+    // Ticket view: identity line and client subtitle (cdr_ticket_idline:
+    // "Léa Marchand, Maison Verdier. Reçu le 21/10/2026 à 08:47 via Web.")
+    'Support contract' => 'Contrat de support',
+    '%1$s at %2$s' => '%1$s à %2$s',
+    'Received on %1$s via %2$s.' => 'Reçu le %1$s via %2$s.',
+    'Received on %s.' => 'Reçu le %s.',
+    // Ticket view: labelled buttons of the action bar (ticket-chrome.js);
+    // own msgids, the pack's "Edit" is "Éditer"
+    'Edit ticket' => 'Modifier',
+    'Print ticket' => 'Imprimer',
+    'Mark as resolved' => 'Marquer comme résolu',
+
     // Queue list (queue.js): selection counter, header check box
     'No ticket selected' => 'Aucune sélection', // short: the bar holds 6 actions at 1280
     '%d ticket selected' => '%d ticket sélectionné',

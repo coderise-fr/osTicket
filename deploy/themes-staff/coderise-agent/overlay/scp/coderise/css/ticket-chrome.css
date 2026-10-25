@@ -65,3 +65,41 @@
 #content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a { color: var(--ardoise); text-decoration: none; }
 #content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a:is(:hover, :focus-visible) { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
 #content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a > i.icon-refresh { display: none; }
+
+/* ───────── Identity block (cdr_ticket_idline, header.inc.php) ─────────
+   Mockup .title-row: identity line (.idline), subject (core .tixTitle h3,
+   moved after the line by ticket-chrome.js), client subtitle (.sub), then
+   the action buttons (.t-actions) in a row under them. Only when the theme
+   block is in the page (:has guard); otherwise the rules above apply. */
+#content.cdr-ticket > section.cdr-idline { margin: 0; }
+#content.cdr-ticket .cdr-idline .idline { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 4px; color: var(--ardoise); font: 600 13.5px/20.25px var(--f-texte); }
+#content.cdr-ticket .cdr-idline .idline .sep { flex: none; width: 1px; height: 14px; background: rgba(0,15,38,.25); }
+#content.cdr-ticket .cdr-idline .idline a.cdr-id { color: var(--ardoise); text-decoration: none; }
+#content.cdr-ticket .cdr-idline .idline a.cdr-id:is(:hover, :focus-visible) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket .cdr-idline .ic { flex: none; }
+#content.cdr-ticket .cdr-idline .status { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px/1.5 var(--f-titre); white-space: nowrap; }
+#content.cdr-ticket .cdr-idline .status-open .ic { color: var(--cyan-profond); }
+#content.cdr-ticket .cdr-idline .status-closed .ic { color: var(--succes); }
+#content.cdr-ticket .cdr-idline .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 12px/1.5 var(--f-titre); white-space: nowrap; }
+#content.cdr-ticket .cdr-idline .plan-priority { background: var(--nuit); color: var(--blanc); }
+#content.cdr-ticket .cdr-idline .plan-priority .ic { color: var(--cyan); }
+#content.cdr-ticket .cdr-idline .plan-standard { box-shadow: inset 0 0 0 1px var(--ardoise); color: var(--ardoise); }
+#content.cdr-ticket .cdr-idline .urg { display: inline-flex; align-items: center; gap: 4px; color: var(--erreur); font-weight: 700; }
+/* subject right under the line, subtitle under the subject (mockup .sub) */
+#content.cdr-ticket:has(> .cdr-idline) > .tixTitle { margin: 0; }
+#content.cdr-ticket > p.cdr-sub, #content.cdr-ticket .cdr-idline p.cdr-sub { margin: 2px 0 0; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); overflow-wrap: anywhere; }
+
+/* Action bar under the title block (mockup: 16 px above and below). The
+   core "⟳ Ticket #N" heading is not shown in either state: the identity
+   line carries the same reload link, and the bar keeps one height whether
+   it is in the page or fixed (see Sticky bar in coderise.css). */
+#content.cdr-ticket:has(> .cdr-idline) > div:has(> .sticky.bar) { margin: 16px 0; }
+#content.cdr-ticket:has(> .cdr-idline) .sticky.bar .flush-left > h2 { display: none; }
+#content.cdr-ticket:has(> .cdr-idline) .sticky.bar > .content > .pull-right.flush-right { float: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#content.cdr-ticket:has(> .cdr-idline) .sticky.bar > .content > .pull-right.flush-right > :not(.action-dropdown) { float: none; margin: 0; }
+/* Edit / Print with labels: mockup .btn-line (nuit border, 16 px icon) */
+#content.cdr-ticket .sticky.bar:not(.fixed) .action-button { border-color: var(--nuit); }
+/* Mark as resolved: mockup .btn-primary (cyan, nuit text), its label stays */
+#content.cdr-ticket .sticky.bar .cdr-resolve { gap: 8px; }
+#content.cdr-ticket .sticky.bar .cdr-resolve i { margin: 0; color: inherit; }
+#content.cdr-ticket .sticky.bar.fixed .cdr-resolve:hover { background: var(--blanc); color: var(--nuit); }
