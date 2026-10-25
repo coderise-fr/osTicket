@@ -177,6 +177,40 @@
         });
     }
 
+    // The buttons now start at the left of the page: a core menu anchored
+    // to the right of its button (anchor-right, e.g. Print) would open past
+    // the left edge of the content (over the rail, or off screen at 390).
+    // Once core's dropdown plugin has placed the menu (it stops the click
+    // propagation, so a capture listener + timeout runs after it), the menu
+    // is shifted back inside the content area, else inside the viewport.
+    // Only the left offset of the action bar's own menus changes.
+    function keepMenuInView(e) {
+        var t = e.target && e.target.closest && e.target.closest('[data-dropdown]');
+        if (!t || !t.closest('#content.cdr-ticket .sticky.bar')) return;
+        setTimeout(function () {
+            var $dd = $($(t).attr('data-dropdown'));
+            if (!$dd.length || !$dd.is(':visible')) return;
+            // the area: #content in the page, the bar itself once fixed
+            var $bar = $(t).closest('.sticky.bar'),
+                area = $bar.hasClass('fixed') ? $bar[0] : document.getElementById('content'),
+                r = $dd[0].getBoundingClientRect(),
+                cr = area ? area.getBoundingClientRect() : null,
+                vw = document.documentElement.clientWidth,
+                min = 8, max = vw - 8, shift = 0;
+            if (cr && r.width <= Math.min(max, cr.right) - Math.max(min, cr.left)) {
+                min = Math.max(min, cr.left);
+                max = Math.min(max, cr.right);
+            }
+            if (r.left < min) shift = min - r.left;
+            else if (r.right > max) shift = Math.max(max - r.right, min - r.left);
+            if (shift) $dd.css('left', ((parseFloat($dd.css('left')) || 0) + shift) + 'px');
+        }, 0);
+    }
+    if (!window.cdrMenuInView && document.addEventListener) {
+        window.cdrMenuInView = true;
+        document.addEventListener('click', keepMenuInView, true);
+    }
+
     function run() {
         identity();
         barLabels();

@@ -16,6 +16,10 @@
 // cells), thread entries '.thread-entry > .header > b|.cdr-role|time', '.cdr-av' (ticket.js),
 // queue '.cdr-bulk .cdr-sel', '.cdr-unassigned', '.cdr-who .cdr-av' (queue.js). Demo data:
 // ticket 2 has a client message, replies and events; ticket 1 the internal note.
+// Identity block: '.cdr-idline .idline|.cdr-id|.sep|.status|.plan|.urg', '#content p.cdr-sub'
+// (header.inc.php, cdr_ticket_idline), labelled buttons 'a.action-button.cdr-has-lbl' and
+// '.cdr-resolve' (ticket-chrome.js; ticket 1 is open). Ticket 45 is open, Standard and High
+// (urgent). Props 'top'/'left'/'width' are getBoundingClientRect() values at scroll 0.
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -39,6 +43,8 @@ const KINDS = {
   ticket: { mock: 'ticket.html', real: '/scp/tickets.php?id=2' },
   // demo ticket 1 holds the internal note
   note: { mock: 'ticket.html', real: '/scp/tickets.php?id=1' },
+  // demo ticket 45: open, Standard contract, High priority (urgent)
+  urgent: { mock: 'ticket.html', real: '/scp/tickets.php?id=45' },
 };
 
 // name, kind, mock/real selector, css properties, px tolerance (default 0.5).
@@ -74,6 +80,18 @@ const PAIRS = [
   { name: 'event', kind: 'ticket', mock: '.event', real: '.thread-event', props: ['font-size'] },
   { name: 'button', kind: 'ticket', mock: '.btn', real: '.btn', props: ['font-size'] },
   { name: 'breadcrumb', kind: 'ticket', mock: '.crumbs', real: '.crumbs', props: ['font-size'] },
+  // Identity block (cdr_ticket_idline) and labelled action buttons. top/left: layout (viewport px).
+  { name: 'idline', kind: 'ticket', mock: '.idline', real: '.cdr-idline .idline', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'column-gap', 'top', 'left'] },
+  { name: 'idline number', kind: 'ticket', mock: '.idline > span:first-child', real: '.cdr-idline .cdr-id', props: ['font-size', 'font-weight', 'color', 'height'] },
+  { name: 'idline separator', kind: 'ticket', mock: '.idline .sep', real: '.cdr-idline .sep', props: ['width', 'height', 'background-color', 'top'] },
+  { name: 'idline state', kind: 'ticket', mock: '.idline .status', real: '.cdr-idline .status', props: ['font-size', 'font-weight', 'font-family', 'height', 'top'] },
+  { name: 'idline contract', kind: 'ticket', mock: '.idline .plan', real: '.cdr-idline .plan', props: ['font-size', 'font-weight', 'font-family', 'padding-left', 'border-radius', 'background-color', 'color', 'height', 'top'] },
+  { name: 'idline urgency', kind: 'urgent', mock: '.idline .urg', real: '.cdr-idline .urg', props: ['font-size', 'font-weight', 'color', 'height', 'top'] },
+  { name: 'ticket h1 position', kind: 'ticket', mock: 'h1', real: '#content .tixTitle h3', props: ['top', 'left', 'line-height'] },
+  { name: 'client subtitle', kind: 'ticket', mock: '.title-row .sub', real: '#content p.cdr-sub', props: ['font-size', 'font-weight', 'line-height', 'color', 'top', 'left'] },
+  { name: 'labelled button (Edit)', kind: 'ticket', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-color', 'border-top-left-radius', 'background-color', 'top', 'left'] },
+  { name: 'resolve button', kind: 'note', mock: '.t-actions .btn-primary', real: '#content .sticky.bar .cdr-resolve', props: ['font-size', 'font-weight', 'height', 'width', 'background-color', 'color', 'border-top-left-radius', 'top'] },
+  { name: 'ticket tabs position', kind: 'ticket', mock: '.tabs', real: 'ul#ticket_tabs', props: ['top', 'left'] },
 ];
 
 async function login(page) {
@@ -92,6 +110,9 @@ async function login(page) {
 async function measure(page, url, targets) {
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForTimeout(500);
+  // top/left are viewport positions: measured from the top of the page (thread.js scrolls)
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(400);
   return page.evaluate((targets) => {
     const res = {};
     for (const t of targets) {
@@ -100,6 +121,8 @@ async function measure(page, url, targets) {
       const cs = getComputedStyle(el), r = {};
       for (const p of t.props) {
         if (p === 'height') r[p] = el.getBoundingClientRect().height + 'px';
+        else if (p === 'width') r[p] = el.getBoundingClientRect().width + 'px';
+        else if (p === 'top' || p === 'left') r[p] = el.getBoundingClientRect()[p] + 'px';
         else if (p === 'font-family') r[p] = cs.fontFamily.split(',')[0].trim().replace(/["']/g, '');
         else r[p] = cs.getPropertyValue(p);
       }

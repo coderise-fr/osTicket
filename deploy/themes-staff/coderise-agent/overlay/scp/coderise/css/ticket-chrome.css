@@ -77,10 +77,10 @@
 #content.cdr-ticket .cdr-idline .idline a.cdr-id { color: var(--ardoise); text-decoration: none; }
 #content.cdr-ticket .cdr-idline .idline a.cdr-id:is(:hover, :focus-visible) { color: var(--nuit); text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
 #content.cdr-ticket .cdr-idline .ic { flex: none; }
-#content.cdr-ticket .cdr-idline .status { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px/1.5 var(--f-titre); white-space: nowrap; }
+#content.cdr-ticket .cdr-idline .status { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px/normal var(--f-titre); white-space: nowrap; }
 #content.cdr-ticket .cdr-idline .status-open .ic { color: var(--cyan-profond); }
 #content.cdr-ticket .cdr-idline .status-closed .ic { color: var(--succes); }
-#content.cdr-ticket .cdr-idline .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 12px/1.5 var(--f-titre); white-space: nowrap; }
+#content.cdr-ticket .cdr-idline .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 12px/normal var(--f-titre); white-space: nowrap; }
 #content.cdr-ticket .cdr-idline .plan-priority { background: var(--nuit); color: var(--blanc); }
 #content.cdr-ticket .cdr-idline .plan-priority .ic { color: var(--cyan); }
 #content.cdr-ticket .cdr-idline .plan-standard { box-shadow: inset 0 0 0 1px var(--ardoise); color: var(--ardoise); }
@@ -103,3 +103,5 @@
 #content.cdr-ticket .sticky.bar .cdr-resolve { gap: 8px; }
 #content.cdr-ticket .sticky.bar .cdr-resolve i { margin: 0; color: inherit; }
 #content.cdr-ticket .sticky.bar.fixed .cdr-resolve:hover { background: var(--blanc); color: var(--nuit); }
+/* the print link inside its dropdown button: the button's text colour, not a link colour */
+#content.cdr-ticket .sticky.bar .action-button > a#ticket-print { color: inherit; text-decoration: none; }
