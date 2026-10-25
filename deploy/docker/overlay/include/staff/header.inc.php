@@ -143,19 +143,23 @@ elseif ($cdr_ticket_view && isset($ticket) && is_object($ticket)) {
             ROOT_PATH . 'scp/tickets.php?queue=' . (int) $cdr_q->getId());
 }
 
-// Ticket view: the "First reply" panel. ticket-view.inc.php sends
+// Ticket view: the "First reply" panel and the identity block (state,
+// contract, urgency, client subtitle). ticket-view.inc.php sends
 // object.view with array('type' => 'viewed') right after this header opened
-// #content, so the panel lands at the top of #content; coderise.js moves it
-// into the properties column. The same signal is sent for tasks
-// (task-view.tmpl.php) and on the client portal: only a staff Ticket view
-// prints. Registered once per request (header.inc.php is included once per
-// request, PJAX included; the flag guards a second include).
+// #content, so both land at the top of #content; coderise.js moves the
+// panel into the properties column, ticket-chrome.js puts the subject
+// between the identity line and the subtitle. The same signal is sent for
+// tasks (task-view.tmpl.php) and on the client portal: only a staff Ticket
+// view prints. Registered once per request (header.inc.php is included
+// once per request, PJAX included; the flag guards a second include).
 if ($cdr_script === 'tickets.php' && empty($GLOBALS['cdr_sla_connected'])) {
     $GLOBALS['cdr_sla_connected'] = true;
     Signal::connect('object.view', function ($object, $type) {
         if ($object instanceof Ticket && is_array($type)
-                && ($type['type'] ?? '') === 'viewed')
+                && ($type['type'] ?? '') === 'viewed') {
             echo cdr_ticket_sla_panel($object);
+            echo cdr_ticket_idline(cdr_ticket_idline_data($object));
+        }
     });
 }
 // Labels the ticket view's and the queue's CSS and JS need (no translation
@@ -173,7 +177,16 @@ if ($cdr_ticket_view)
             'role-message' => 'Client',
             'role-response' => 'Reply to the client',
             'role-note' => 'Internal note, not visible to the client',
+            // labelled buttons of the action bar (ticket-chrome.js finds
+            // them by their href / id, not by their text)
+            'label-edit' => 'Edit ticket',
+            'label-print' => 'Print ticket',
         ))
+        // "Mark as resolved" (ticket-chrome.js): an open ticket only; the
+        // button forwards to the first "closed" entry of core's status
+        // menu, which core prints only when the agent may close
+        . ((isset($ticket) && is_object($ticket) && $ticket->isOpen())
+            ? cdr_data_attrs(array('label-resolve' => 'Mark as resolved')) : '')
         . ' style="--cdr-note-label: ' . cdr_h('"' . addcslashes(cdr__('Internal note'), "\"\\\n\r") . '"') . '"';
 // Queue list: empty assignee cell, selection counter, header check box (queue.js)
 elseif ($cdr_queue_list)

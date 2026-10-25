@@ -80,7 +80,7 @@
 #content table.queue > tbody > tr > td:has(> .truncate, > div > .truncate) { min-width: 180px; }
 #content table.queue > tbody > tr > td .truncate a { text-decoration: none; }
 #content table.queue > tbody > tr > td .truncate a:hover { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
-#content table.queue > tbody > tr > td { padding: 8px 12px; line-height: 1.4; }
+#content table.queue > tbody > tr > td { padding: 8px 12px; line-height: 1.5; } /* mockup .data td: 13.5 / 20.25 px */
 #content table.queue > tbody > tr > td :is(.pull-right) { margin-inline-start: 8px; }
 #content table.queue > tbody > tr > td :is(.pull-left) { margin-inline-end: 6px; }
 
@@ -123,3 +123,14 @@
    carets at 14px), so that the counter and the six actions share one row at 1280 */
 #content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down { padding: 0 6px; }
 #content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down::before { width: 12px; height: 12px; }
+
+/* ───────── Wave 3: mockup columns "Ticket et contrat" and "Sujet et client" (queue-tickets.tmpl.php) ─────────
+   Contract chip under the number (mockup .data .stack + .plan), client and organisation under the
+   subject (mockup .subj small), core's "From" column hidden once the client is printed there. */
+#content table.queue > tbody > tr > td > .stack { display: block; margin-top: 4px; }
+#content table.queue .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 12px/normal var(--f-titre); white-space: nowrap; }
+#content table.queue .plan-priority { background: var(--nuit); color: var(--blanc); }
+#content table.queue .plan-priority .ic { color: var(--cyan); }
+#content table.queue .plan-standard { box-shadow: inset 0 0 0 1px var(--ardoise); color: var(--ardoise); }
+#content table.queue > tbody > tr > td > small.cdr-client { display: block; clear: none; margin: 0; color: var(--ardoise); font: 400 12.5px/1.5 var(--f-texte); overflow-wrap: break-word; }
+#content table.queue > :is(thead, tbody) > tr > .cdr-col-from { display: none; }

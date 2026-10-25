@@ -46,7 +46,7 @@ Fichiers du cœur remplacés (empreintes dans `BASE.sha256`) :
 | `include/staff/header.inc.php` | Coquille : rail (navigation du cœur reprise par `cdr_rail()`), barre haute, lien d'évitement, feuille et script du thème ; garde `#pjax-container`, `#content`, les compteurs de files et le reste des contrats du JavaScript du cœur. |
 | `include/staff/footer.inc.php` | Ferme la coquille ; mêmes scripts et configuration que le pied du cœur. |
 | `include/staff/login.header.php`, `include/staff/login.tpl.php` | Connexion et pages de mot de passe oublié en carte sur fond nuit (mêmes ids et champs). |
-| `include/staff/templates/queue-tickets.tmpl.php` | File de tickets : colonne « Premier retour » (jauge) ajoutée en dernière position ; le reste est le gabarit du cœur. |
+| `include/staff/templates/queue-tickets.tmpl.php` | File de tickets dans l'ordre de la maquette : puce de contrat sous le numéro, client et organisation sous le sujet, colonne « Premier retour » (jauge) juste après le sujet ; les cellules des colonnes configurées restent celles du cœur (`$C->render($T)`). |
 
 Fichiers ajoutés : `include/staff/coderise/coderise.inc.php` (traductions `cdr__()`, rail,
 jauge), `include/staff/coderise/i18n/fr.php` (catalogue français), `scp/coderise/css/coderise.css`,
@@ -107,12 +107,15 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   tri) et prend le libellé de la barre haute ; la recherche de la barre haute, identique
   (même requête GET), n'y est pas affichée ; la touche « / » va au champ de la file. Partout
   ailleurs, la recherche est dans la barre haute comme la maquette.
-- Fiche ticket : la ligne « Ticket #… » est le titre de la barre d'actions du cœur, stylé comme
-  la ligne d'identité de la maquette (Inter 600, ardoise, sans icône) ; les boutons restent à
-  sa droite et le sujet passe dessous. La ligne d'identité complète (état, contrat, urgence),
-  le sous-titre client et les boutons libellés « Modifier / Imprimer / Marquer comme résolu »
-  sont de la classe 1 (le thème remplace déjà `header.inc.php`, qui dispose du ticket) : en
-  cours dans la passe de fidélité 2, pas encore faits.
+- Fiche ticket (passe de fidélité 2) : ligne d'identité « Ticket #N | état | contrat |
+  urgence » et sous-titre « Client, organisation. Reçu le … à … via … » émis par
+  `header.inc.php` (`cdr_ticket_idline()`), boutons « Modifier / Imprimer / Marquer comme
+  résolu » sous le titre (`ticket-chrome.js` ; « Marquer comme résolu » déclenche le lien de
+  fermeture du menu d'état du cœur, donc son dialogue et ses contrôles). Écarts : à 2000 px les
+  7 à 9 actions du cœur restent sous le titre (la maquette met ses 3 boutons à droite) ; la
+  barre nuit fixée n'affiche plus « Ticket #N » (le fil d'Ariane le montre) ; le libellé du
+  contrat est celui du plugin (« Priorité » avec le pack français, la maquette écrit
+  « Priority ») ; l'état est le nom du statut en base (« Open »).
 - Rôle des entrées du fil, d'après le type d'entrée du cœur : « Client » (message),
   « Réponse au client » (réponse d'agent : toujours visible du client, mais pas toujours
   envoyée par e-mail, d'où pas « envoyée »), « Note interne, invisible du client ». Le
@@ -121,13 +124,27 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   #E3F8FB très pâle ; libellé ardoise à 5,3:1 dessus) plutôt qu'un en-tête seul teinté : le
   côté client reste repérable d'un coup d'œil, comme dans la maquette.
 - File de tickets (`include/staff/templates/queue-tickets.tmpl.php`, gabarit du cœur
-  remplacé par le thème) : seule une colonne « Premier retour » est ajoutée, pour l'instant en
-  dernière position ; les colonnes configurées de la file et leurs cellules restent celles du
-  cœur. La place de la colonne (3e), la puce de contrat sous le numéro et le client sous le
-  sujet sont de la classe 1 (gabarit déjà remplacé) : en cours dans la passe de fidélité 2.
-  La jauge n'apparaît que si le plugin sla_first_response est actif, et seulement pour les
-  tickets **ouverts** d'un propriétaire Priority ; ticket fermé ou client Standard : « — »
-  (« Sans objet »).
+  remplacé par le thème ; passe de fidélité 3) : les colonnes configurées de la file et leurs
+  cellules restent celles du cœur ; le thème y ajoute, avec une seule requête par page
+  (propriétaire, nom, organisation et état de chaque ligne) :
+  - le client et son organisation sous le sujet (« Léa Moreau, Priority », maquette « Sujet et
+    client »), imprimés et échappés par PHP plutôt que recopiés en JS depuis la colonne « From »
+    (indépendant du texte des colonnes, présent sans JS, organisation comprise, que la colonne
+    « From » existe ou non). La colonne « From » du cœur (`user__name`) est alors masquée en CSS
+    (classe `cdr-col-from`, cellules gardées dans le DOM) ; à l'écran, elle perd son tri et la
+    pastille du nombre de collaborateurs ;
+  - la colonne « Premier retour » juste après la colonne du sujet, reconnue par son chemin de
+    données (`cdata__subject`, jamais par son en-tête) ; sans colonne sujet, en dernière position ;
+  - la puce de contrat sous le numéro (colonne `number`) : « Priority » nuit avec éclair,
+    « Standard » au contour, libellé du plugin, seulement si le plugin a une organisation
+    Priority pour décider (comme la ligne d'identité).
+
+  Puce et jauge n'apparaissent que si le plugin sla_first_response est actif ; la jauge
+  seulement pour les tickets **ouverts** d'un propriétaire Priority ; ticket fermé ou client
+  Standard : « — » (« Sans objet »). Les autres colonnes et leur ordre (« Last Updated » entre
+  le numéro et le sujet sur la démo, « Priority », en-têtes anglais) sont des réglages de la
+  file (classe 3). « Dernière activité : Sacha, 12 min » n'est pas fait : l'auteur de la
+  dernière activité n'est pas dans la ligne (il faudrait une requête par ticket).
 - Administration (tâche 8) : la sous-navigation reste dans les groupes du rail
   (Paramètres, Gérer, E-mails, Agents, comme les onglets d'administration du cœur), pas
   dans la bande d'onglets horizontale de la maquette.
@@ -154,11 +171,11 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    « Propriétés » / « Client » avec icône, libellés « Éditer » et « Imprimer » dans la barre,
    éditeur 10/12 px, état et boutons d'envoi sur une ligne alignée à droite, défilement à
    l'ouverture qui ne cache plus l'en-tête de la dernière entrée.
-   - Classe 1 (faisable dans le thème, `header.inc.php` étant déjà remplacé), **en cours**
-     dans la passe 2, non faits : ligne d'identité (état, contrat, urgence), sous-titre
-     client, boutons « Modifier / Imprimer / Marquer comme résolu » sous le titre ; plus
-     tard, si on l'accepte : libellés du pack (« Éditer », « Réclamation », « Fil du ticket »),
-     sujet d'entrée masqué quand il égale celui du ticket, boutons par entrée au survol.
+   - Fait dans la passe 2 (classe 1, `header.inc.php` étant déjà remplacé) : ligne d'identité
+     (état, contrat, urgence), sous-titre client, boutons « Modifier / Imprimer / Marquer comme
+     résolu » sous le titre (voir « Écart assumé »). Classe 1 possible mais non faite, à
+     décider : libellés du pack (« Éditer » ailleurs, « Réclamation », « Fil du ticket »), sujet
+     d'entrée masqué quand il égale celui du ticket, boutons par entrée au survol.
    - Demanderait de remplacer un autre gabarit du cœur (`ticket-view.inc.php`,
      `thread-entry.tmpl.php`), **non fait par décision** : panneau d'actions, ordre et
      contenu des propriétés, zone de réponse compacte.
@@ -171,10 +188,11 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    barre d'actions groupées libellée avec compteur de sélection et « Réclamation » (le
    libellé du pack pour Claim), case « tout sélectionner », numéro « #… » souligné, sujet
    non tronqué, assigné avec initiales ou « Non assigné », flèche de tri sur la seule
-   colonne triée, pied avec pagination, pastille de compteur du rail.
-   - Classe 1, **en cours** dans la passe 2, non faits : « Premier retour » en 3e colonne,
-     puce de contrat sous le numéro, client sous le sujet (`queue-tickets.tmpl.php` est déjà
-     remplacé par le thème et calcule le niveau de contrat de chaque ligne).
+   colonne triée, pied avec pagination, pastille de compteur du rail ; passe 3 : puce de
+   contrat sous le numéro, client et organisation sous le sujet (colonne « From » masquée),
+   « Premier retour » juste après le sujet, lignes de 75 px comme la maquette, compteurs sur
+   les files de premier niveau du rail (« Open 41 », même réponse `ajax.php/queue/counts`).
+   - Non fait : « Dernière activité » relative avec auteur (l'auteur n'est pas dans la ligne).
    - Classe 3 (configuration ou données du cœur) : colonnes, ordre et en-têtes (éditeur de
      colonnes des files, Administration), noms des files, couleurs de priorité ; filtres
      « Contrat / Département / Assigné à / Reçus » (n'existent pas dans le cœur), sous-titre
@@ -184,7 +202,8 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
      le tableau défile latéralement dans `.cdr-hscroll` (pas de cartes empilées comme la
      maquette sous 760 px, faute d'étiquettes de colonne).
    - Pastilles du rail : « Tickets » porte le compteur de la file Open sur toutes les pages
-     (une requête `ajax.php/queue/counts`) ; « Tâches » n'en a pas, le cœur ne renvoie aucun
+     (une requête `ajax.php/queue/counts`, qui donne aussi ceux des files de premier niveau ;
+     une file vide n'a pas de pastille) ; « Tâches » n'en a pas, le cœur ne renvoie aucun
      compteur de tâches dans cette réponse (le sous-menu des tâches garde le sien).
 4. Les erreurs de champ du cœur sont un texte rouge avec astérisque à côté du champ ; le
    champ lui-même n'est pas encadré (le cœur ne marque que le message).
@@ -254,10 +273,15 @@ Autres éléments non réalisés :
 
 ## Fidélité à la maquette (25/10/2026)
 
-Passe « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà (`header.inc.php`,
-`queue-tickets.tmpl.php`, …) ; aucun gabarit du cœur de plus. Les écarts restants sont classés dans
-les lacunes 2 et 3 : classe 1 en cours (passe 2), autre gabarit à remplacer (non fait par
-décision), ou configuration/absent du cœur. Tailles en px (le cœur fixe `html` à 14 px).
+Trois passes « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà
+(`header.inc.php`, `queue-tickets.tmpl.php`, …) ; aucun gabarit du cœur de plus. Passe 1 :
+tailles, polices, icônes, bloc titre et barre groupée de la file, fil. Passe 2 : ligne
+d'identité, sous-titre client et boutons libellés de la fiche, pastilles et « Ajouter une
+file » du rail, exclusion du contenu riche d'`icons.css`. Passe 3 : colonnes de la file dans
+l'ordre de la maquette (puce de contrat, client sous le sujet, « Premier retour » après le
+sujet), compteurs des files de premier niveau. Les écarts restants sont classés dans les
+lacunes 2 et 3 : autre gabarit à remplacer (non fait par décision), ou configuration/absent
+du cœur. Tailles en px (le cœur fixe `html` à 14 px).
 
 Contrôle de non-régression : `deploy/themes-staff/tests/fidelity-check.mjs` compare les styles
 calculés de la maquette (`docs/theme-mockups-admin/tickets.html`, `ticket.html`) et de la démo

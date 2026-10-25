@@ -255,9 +255,10 @@ if ($queue->id > 0 && $queue->isOwner($thisstaff)) { ?>
 // The rows of $tickets are cached by the QuerySet, so the table below does
 // not query them again. The columns are found by their data path
 // (cdr_queue_layout()): the gauge cell follows the subject column, the
-// chip goes under the number; core's "From" column (user__name) is hidden
-// by queue.css once the client is printed under the subject (class
-// cdr-client-stacked), and stays in the DOM (sort link, no-CSS reading).
+// chip goes under the number; core's "From" column (user__name) gets the
+// class cdr-col-from once the client is printed under the subject (a
+// subject column exists and the query succeeded): queue.css hides it, it
+// stays in the DOM (its cells, sort link and no-CSS reading are core's).
 $cdrGauge = function_exists('coderise_contract_level');
 $cdrGauges = $cdrPlans = $cdrClients = array();
 $cdrPrimaries = array();
