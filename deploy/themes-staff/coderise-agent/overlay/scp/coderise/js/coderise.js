@@ -291,8 +291,10 @@
             $box.prepend($tabs);
         var $parts = $c.children('section.cdr-sla, table.ticket_info');
         if ($parts.length && !$aside.length) {
-            $aside = $('<aside class="cdr-props"></aside>')
-                .attr('aria-label', $c.attr('data-cdr-props') || '');
+            $aside = $('<aside class="cdr-props"></aside>');
+            // named from data-cdr-props; no name rather than an empty one
+            if ($.trim($c.attr('data-cdr-props') || ''))
+                $aside.attr('aria-label', $c.attr('data-cdr-props'));
             if ($box.length)
                 $aside.insertAfter($box);
             else
@@ -334,20 +336,26 @@
                 || $r.children('form#note').is(':visible')));
     }
 
-    // The aside sticks under the top bar and core's floating action bar
-    // (~130 px). A sticky box is released at the end of its grid area, so
-    // at the bottom of the page its top sits at (viewport - space under
-    // #content - its height): when that would slide under the floating bar,
-    // or when it is simply taller than the window, it scrolls with the page
-    // instead (.cdr-tall).
+    // The aside sticks under the top bar and core's floating action bar.
+    // A sticky box is released at the end of its grid area, so at the
+    // bottom of the page its top sits at (viewport - space under #content -
+    // its height): when that would slide under the floating bar, or when it
+    // is simply taller than the window, it scrolls with the page instead
+    // (.cdr-tall). Space taken above it = the measured top bar + the floating
+    // bar (its height once floated, --cdr-fixed-bar-h from ticket-chrome.js,
+    // else the bar's height in the page) + 16 px above and below.
     function fitProps() {
         var $a = $('#content.cdr-ticket > aside.cdr-props');
         if (!$a.length)
             return;
         var $c = $a.parent(),
-            tail = $(document).height() - ($c.offset().top + $c.outerHeight());
+            tail = $(document).height() - ($c.offset().top + $c.outerHeight()),
+            top = $('.topbar').first().outerHeight() || 0,
+            bar = parseFloat(window.getComputedStyle($c[0])
+                .getPropertyValue('--cdr-fixed-bar-h'))
+                || $c.find('.sticky.bar').first().outerHeight() || 0;
         $a.removeClass('cdr-tall');
-        if ($a[0].offsetHeight > window.innerHeight - 140 - Math.max(0, tail))
+        if ($a[0].offsetHeight > window.innerHeight - (top + bar + 32) - Math.max(0, tail))
             $a.addClass('cdr-tall');
     }
 
@@ -601,8 +609,8 @@
     // Dashboard activity chart (core's js/dashboard.inc.js draws it with
     // Raphael into #line-chart-here and rebuilds the legend on every refresh).
     // - x axis: the date labels are the <text> elements sharing one y; every
-    //   second one of the lowest row is tagged .cdr-skip, which coderise.css hides below 500 px
-    //   (they overlap there);
+    //   second one of the lowest row is tagged .cdr-skip, which coderise.css
+    //   hides up to 780 px (they overlap there);
     // - legend: each series label toggles its series through jQuery click
     //   handlers bound by the core script, so it becomes a keyboard button
     //   (tabindex, role, aria-pressed; Enter and Space trigger the click).

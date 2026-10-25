@@ -28,10 +28,12 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   fichiers du cœur dont le thème **dépend** sans les remplacer (pages et gabarits dont la
   feuille de style et `coderise.js` habillent ou déplacent le balisage, classes et routes
   AJAX appelées, feuilles du cœur surchargées, plugin `sla_first_response`) : la liste est
-  `WATCH_FILES` dans le script (68 fichiers au 25/10/2026, dont, pour les passes de fidélité,
+  `WATCH_FILES` dans le script (72 fichiers au 25/10/2026, dont, pour les passes de fidélité,
   le menu et la liste des états derrière « Marquer comme résolu », les actions groupées
   derrière « Réclamation », `thread.js`, `tips.js`, les compteurs de files et les jointures
-  utilisateur/organisation de la file). Code de sortie 0 = aucune dérive.
+  utilisateur/organisation de la file ; passe 4 : le plugin de menus `jquery.dropdown.js`,
+  `thread-entries.tmpl.php` de l'onglet « Journal », `redactor-osticket.js` et
+  `class.staff.php` pour la signature par défaut). Code de sortie 0 = aucune dérive.
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php` et `tests/test-rail.php` (assistants PHP, en CLI dans l'image de
@@ -109,7 +111,10 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   le champ de la file du cœur reste (requête en cours, saisie semi-automatique, « Avancé »,
   tri) et prend le libellé de la barre haute ; la recherche de la barre haute, identique
   (même requête GET), n'y est pas affichée ; la touche « / » va au champ de la file. Partout
-  ailleurs, la recherche est dans la barre haute comme la maquette.
+  ailleurs, la recherche est dans la barre haute comme la maquette ; sous 920 px, le champ y
+  est replié derrière un bouton loupe (`.cdr-search-toggle`, nom accessible du champ,
+  `aria-expanded`) qui l'affiche sur une ligne sous la barre ; Échap le referme, et « / »
+  passe par ce bouton.
 - Fiche ticket (passe de fidélité 2) : ligne d'identité « Ticket #N | état | contrat |
   urgence » et sous-titre « Client, organisation. Reçu le … à … via … » émis par
   `header.inc.php` (`cdr_ticket_idline()`), boutons « Modifier / Imprimer / Marquer comme
@@ -252,7 +257,8 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
      maquette sous 760 px, faute d'étiquettes de colonne).
    - Pastilles du rail : « Tickets » porte le compteur de la file Open sur toutes les pages
      (une requête `ajax.php/queue/counts`, qui donne aussi ceux des files de premier niveau ;
-     une file vide n'a pas de pastille) ; « Tâches » n'en a pas, le cœur ne renvoie aucun
+     une file vide n'a pas de pastille ; la réponse est gardée 60 s dans le `sessionStorage`
+     de l'onglet, par session d'agent, donc la navigation PJAX ne la redemande pas) ; « Tâches » n'en a pas, le cœur ne renvoie aucun
      compteur de tâches dans cette réponse (le sous-menu des tâches garde le sien).
 4. Les erreurs de champ du cœur sont un texte rouge avec astérisque à côté du champ ; le
    champ lui-même n'est pas encadré (le cœur ne marque que le message).
@@ -269,24 +275,30 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    texte brut sans classe), pas plus que l'avatar d'initiales, les filtres « Statut » et
    le pied « N agents ». Les champs en erreur gardent le message du cœur (texte rouge en
    gras), sans cadre rouge. Marques « modifié » : barre cyan et texte sous le libellé de
-   la ligne (pas sur le champ lui-même comme la maquette) ; un éditeur riche (Redactor)
-   n'est suivi que s'il déclenche `input`/`change` sur son `textarea`.
+   la ligne (pas sur le champ lui-même comme la maquette) ; un éditeur riche (Redactor) est
+   suivi par les frappes dans sa zone éditable (sa source, réécrite par Redactor au
+   démarrage, sert de référence) ; revenir exactement au texte initial ne retire pas
+   toujours la marque.
 8. Tableau de bord (tâche 9, `dashboard.php` ; `logs.php` reprend `table.list`) : le
    graphique reste celui du cœur (Raphael) ; les couleurs des séries sont posées par le
    script et ne sont pas modifiables en CSS (le panneau, la police et la légende le sont :
-   pastille de la série + texte nuit, barré quand la série est masquée). Sous ~500 px les
-   dates de l'axe horizontal se chevauchent (le script du cœur ne redessine pas au
-   redimensionnement). La légende reste cliquable à la souris seulement (éléments `span`).
-9. Logo : le rail et la page de connexion affichent le logo Coderise du thème ; le réglage
+   pastille de la série + texte nuit, barré quand la série est masquée). Jusqu'à 780 px, une
+   date sur deux de l'axe horizontal est masquée (elles se chevauchaient ; le script du cœur
+   ne redessine pas au redimensionnement). Les étiquettes de la légende sont des boutons au
+   clavier (`tabindex`, `role="button"`, `aria-pressed`, Entrée et Espace).
+9. Logo : le rail, la page de connexion et les pages de réinitialisation du mot de passe
+   (bandeau nuit, l'image du cœur restant dans le DOM pour son `alt`) affichent le logo
+   Coderise du thème ; le réglage
    « logo du panneau agent » de l'administration n'a plus d'effet visible (le logo
    `logo.php?login` du cœur reste seulement dans le titre masqué de la connexion).
 10. Les libellés de sous-menu calculés par le cœur avec un compteur (« My Tasks (3) »,
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
     traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit (c'est le cas
     depuis l'ajout de `fr.phar` à l'image).
-11. `captures/` pèse environ 21 Mo (218 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
-    `fr-*` pour 1,6 Mo, 9 `fidelity-*` pour 1,6 Mo, 8 `fidelity-w3-*` pour 1,4 Mo et 8
-    `fidelity-w4-*` pour 1,1 Mo) dans le dépôt.
+11. `captures/` pèse environ 19 Mo (194 PNG, dont 56 `interaction-*` pour 3,4 Mo, 19
+    `fr-*` pour 1,5 Mo, 5 `fidelity-*` des passes 1-2 pour 0,9 Mo, 8 `fidelity-w3-*` pour
+    1,4 Mo et 8 `fidelity-w4-*` pour 1,1 Mo) dans le dépôt ; 24 captures redondantes ou
+    périmées ont été retirées le 25/10/2026 (au moins une capture par écran est gardée).
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -359,13 +371,13 @@ sujet) tant que la démo garde les colonnes d'origine.
 
 ## Fidélité à la maquette (25/10/2026)
 
-Trois passes « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà
+Quatre passes « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà
 (`header.inc.php`, `queue-tickets.tmpl.php`, …) ; aucun gabarit du cœur de plus. Passe 1 :
 tailles, polices, icônes, bloc titre et barre groupée de la file, fil. Passe 2 : ligne
 d'identité, sous-titre client et boutons libellés de la fiche, pastilles et « Ajouter une
 file » du rail, exclusion du contenu riche d'`icons.css`. Passe 3 : colonnes de la file dans
 l'ordre de la maquette (puce de contrat, client sous le sujet, « Premier retour » après le
-sujet), compteurs des files de premier niveau. Les écarts restants sont classés dans les
+sujet), compteurs des files de premier niveau. Passe 4 : voir ci-dessous. Les écarts restants sont classés dans les
 lacunes 2 et 3 : autre gabarit à remplacer (non fait par décision), ou configuration/absent
 du cœur. Tailles en px (le cœur fixe `html` à 14 px).
 
@@ -519,14 +531,13 @@ agents en `fr` ; comptes jetables `dev.agent` (non administrateur) et `dev.admin
 `captures/` : coquille (`shell-*`), connexion (`connexion-*`, `pwreset-*`), composants
 (`components-*`, `dropdown-*`, `typeahead-*`), file (`queue-*`), fiche ticket (`ticket-*`),
 administration (`admin-*`), tableau de bord (`dashboard-*`), à 1280, 820 et 390 px ;
-éditeurs après saisie (`interaction-<contexte>-<largeur>`, 1280, 1720, 2200 et 390 px, plus
+éditeurs après saisie (`interaction-<contexte>-<largeur>`, 1280, 2200 et 390 px, plus
 menus, plein écran, calendrier, select2 et zone de dépôt à 1280 px) ; interface en français
 (`fr-*`, 1280 et 390 px : connexion, file, rail mobile, fiche ticket et propriétés, éditeur
 de réponse, barre d'enregistrement, nouveau ticket avec tableau collé, et portail client
 Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès) ; passe de fidélité
-(`fidelity-*`, 25/10/2026, avatars activés : file et ticket 2 à 1280 et 2000 px, note interne
-du ticket 1, sélection et barre flottante de la file, file à 390 px, ticket à 820 px, RTL
-forcé) ; passe 3 (`fidelity-w3-*`) : file à 1280, 2000 et 390 px, sélection et menu Assigner,
+(`fidelity-*`, 25/10/2026, avatars activés : ticket 2 à 1280, 2000 et 820 px, note interne
+du ticket 1, ticket 2 en RTL forcé ; la file est dans `fidelity-w3-*`) ; passe 3 (`fidelity-w3-*`) : file à 1280, 2000 et 390 px, sélection et menu Assigner,
 file vide, RTL forcé, interface anglaise, maquette et file côte à côte à 1280 px ; passe 4
 (`fidelity-w4-*`) : fiche à 2000 px (groupe à droite du titre) et barre flottante, onglet
 « Journal », zone de réponse repliée et ouverte (« modifié »), note repliée, RTL forcé à

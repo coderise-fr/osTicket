@@ -203,7 +203,11 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
    #content itself never scrolls or clips (dropdowns, tips, outlines). */
 #content.cdr .cdr-hscroll { overflow-x: auto; }
 #content.cdr .select2-container { max-width: 100%; } /* inline widths set by select2 (collaborators: 350 px) */
-#content.cdr a { color: var(--cyan-profond); }
+/* Default link colour. :where() keeps it at core's own weight (0,0,1, wins
+   on order only), so every more specific rule (core's .disabled, Redactor's
+   air toolbar, the theme's dropdown, tab and button rules) decides its own
+   colour instead of being overridden by the id. */
+:where(#content.cdr) a { color: var(--cyan-profond); }
 /* Cyan-profond passes 4.5:1 on white only (4.91; on gris 4.14, voile ~4.4,
    the état backgrounds ~4.1-4.4). On tinted areas links are nuit with a
    cyan-profond underline, as in the mockup's tables. */
@@ -813,12 +817,12 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 #content.cdr-ticket #response_options.is-note > ul#response-tabs { border-bottom-color: rgba(122,75,0,.25); }
 #content.cdr-ticket #response_options.is-note > ul#response-tabs li.active a { border-bottom-color: var(--alerte); color: var(--alerte); }
 
-/* Properties column: one sticky aside (top under the top bar, lower while
-   core's action bar floats), each table.ticket_info a panel of .props rows
-   (label left, value right, alternating rows). A column taller than the
-   window is not sticky (.cdr-tall), so its end stays reachable. */
+/* Properties column: one sticky aside (top under the top bar; lower while
+   core's action bar floats: measured offset in ticket-chrome.css), each
+   table.ticket_info a panel of .props rows (label left, value right,
+   alternating rows). A column taller than the window is not sticky
+   (.cdr-tall), so its end stays reachable. */
 #content.cdr-ticket > aside.cdr-props { display: grid; gap: 16px; align-content: start; position: sticky; top: calc(var(--topbar-h) + 16px); }
-#content.cdr-ticket:has(.sticky.bar.fixed) > aside.cdr-props { top: calc(var(--topbar-h) + 72px); }
 #content.cdr-ticket > aside.cdr-props.cdr-tall { position: static; }
 #content.cdr-ticket aside.cdr-props > .panel { margin: 0; }
 #content.cdr-ticket aside.cdr-props .panel-h h2 { margin: 0; font: 700 15px/1.3 var(--f-titre); }
@@ -937,10 +941,13 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > :is(td, th):first-child
 #content.cdr-is-admin .cdr-savebar-count { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: auto; font-weight: 600; }
 #content.cdr-is-admin .cdr-savebar-count:not(:empty)::before { content: ""; flex: none; width: 16px; height: 16px; background: var(--cyan); -webkit-mask: var(--cdr-ic-pencil) center / contain no-repeat; mask: var(--cdr-ic-pencil) center / contain no-repeat; }
 
-/* Narrow screens: the top bar of the admin panel holds nothing below 920 px
-   (crumbs and search hidden, no "New ticket"): no empty white band */
+/* Narrow screens: crumbs and search are hidden below 920 px; a top bar that then
+   holds nothing (no "New ticket", no compact search button added by coderise.js)
+   is not shown: no empty white band. The button is not added on pages whose
+   own search replaces the top bar one (ticket queues), nor on the admin side
+   without JS, so this applies to those and to a missing script only. */
 @media (max-width: 920px) {
-  .topbar:not(:has(> .btn)) { display: none; }
+  .topbar:not(:has(> .btn, > .cdr-search-toggle)) { display: none; }
 }
 /* Agent edit (staff.inc.php): the nested field table has an inline 760 px
    width beside the 100 px avatar; it takes what is left of the card */
@@ -988,6 +995,12 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 .cdr-login #loginBox:after { display: none; }
 .cdr-login #logo a { height: 72px; }
 .cdr-login #loginBox #logo a { display: block; margin-bottom: 12px; text-decoration: none; }
+/* Password reset pages (pwreset*.php, core markup: #loginBox is a child of body, its h1#logo
+   shows logo.php?login, the osTicket default): the Coderise logo (white on nuit, as on the
+   login art panel) sits on a nuit band instead. The core <img> stays in the DOM, visually
+   hidden, for its alt text; only #loginBox as a direct child of body (not the login page, whose box is inside .login-wrap) is concerned. */
+body.cdr-login > #loginBox > #logo a { position: relative; display: block; height: 64px; margin-bottom: 18px; border-radius: 8px; background: var(--nuit) url("../img/logo-horizontal-sombre.png") no-repeat center / auto 30px; text-decoration: none; }
+body.cdr-login > #loginBox > #logo a img { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); opacity: 0; }
 .cdr-login #loginBox > h3 { margin: 0 0 18px; color: var(--nuit); font: 600 15px/1.45 var(--f-texte); text-align: start; }
 .cdr-login #loginBox form { width: auto; margin: 0; }
 .cdr-login #loginBox fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
@@ -1095,3 +1108,9 @@ html.rtl .cdr-login #poweredBy:focus-within { inset: auto auto 12px 12px; }
 /* System logs filter (syslogs.inc.php): core fixes the strip at 25px, so it overflowed when wrapping */
 #content #basic_search:has(> div > #filter > form[action="logs.php"]) > div { height: auto !important; }
 #content #filter > form[action="logs.php"] > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+/* Dashboard chart: x axis labels thinned out up to 780 px (coderise.js tags every second one). Raphael
+   draws 5 dates in a card under ~440 px and 9 above: measured gaps between neighbours were -10 px
+   at 360 px and -17 px at 480 px, -12 at 520, -2 at 600, -1 at 700, +14 at 820. Keyboard legend. */
+@media (max-width: 780px) { #content #line-chart-here svg text.cdr-skip { display: none; } }
+#content #line-chart-legend span.label[role=button] { cursor: pointer; }
+#content #line-chart-legend span.label[role=button]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }

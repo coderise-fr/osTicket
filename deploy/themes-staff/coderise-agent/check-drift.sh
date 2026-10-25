@@ -34,7 +34,11 @@ overlay="$here/overlay"
 # the theme overrides, and the sla_first_response plugin used by the gauge (fidelity
 # passes: the status menu and statuses behind "Mark as resolved", the bulk actions
 # behind the claim button, thread.js scrolling, tips.js help tips moved to the title
-# block, the queue counts, the user and organisation joins of the queue). The
+# block, the queue counts, the user and organisation joins of the queue; fourth
+# pass: the dropdown plugin, which places a menu from its trigger's positioned
+# parent (the action-group wrappers), the thread entries/events order of the
+# "Log" tab, the editor setup behind the reply area and the change tracker, the
+# agent's default signature of the folded reply options). The
 # replaced files themselves are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
@@ -53,6 +57,8 @@ scp/js/ticket.js
 scp/js/dashboard.inc.js
 scp/js/thread.js
 scp/js/tips.js
+scp/js/jquery.dropdown.js
+js/redactor-osticket.js
 scp/css/scp.css
 scp/css/dropdown.css
 css/thread.css
@@ -70,6 +76,7 @@ include/class.list.php
 include/class.search.php
 include/class.user.php
 include/class.organization.php
+include/class.staff.php
 include/ajax.tickets.php
 include/ajax.search.php
 include/ajax.config.php
@@ -101,6 +108,7 @@ include/staff/templates/status-options.tmpl.php
 include/staff/templates/tickets-actions.tmpl.php
 include/staff/templates/dynamic-form-simple.tmpl.php
 include/staff/templates/task-view.tmpl.php
+include/staff/templates/thread-entries.tmpl.php
 include/staff/templates/thread-entry.tmpl.php
 include/staff/templates/thread-event.tmpl.php
 contrib/sla-first-response/plugin/sla_first_response/sla_first_response.php

@@ -417,11 +417,6 @@
     }
     function propsTitles() {
         var $c = $('#content.cdr-ticket'), titles = [$c.attr('data-cdr-title-props'), $c.attr('data-cdr-title-client')];
-        // coderise.js names the aside from data-cdr-props, else with an
-        // empty aria-label (an empty name): no name is better than ""
-        $c.children('aside.cdr-props').filter(function () {
-            return this.hasAttribute('aria-label') && !$.trim(this.getAttribute('aria-label'));
-        }).removeAttr('aria-label');
         var $t = $c.find('aside.cdr-props > table.ticket_info:not(.custom-data)').first();
         if (!$t.length) return;
         $t.children('tbody').children('tr').first().children('td').each(function (i) {

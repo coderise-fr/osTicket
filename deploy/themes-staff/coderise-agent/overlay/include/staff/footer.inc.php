@@ -7,7 +7,8 @@
     .cdr-main, in PJAX responses too, so #pjax-container ends at the
     bottom of the page and the sticky rail never scrolls up (the autocron
     image is taken out of the flow for the same reason). The "/" key
-    focuses the top bar search (bound once, full page loads only).
+    focuses the top bar search, or opens it through the compact search
+    button below 920 px (bound once, full page loads only).
     Everything else (autocron image, #overlay, #loading, #popup, #alert,
     scripts, getConfig().resolve(), i18n script) is kept as is.
     Shipped by deploy/themes-staff/coderise-agent (osTicket core untouched).
@@ -105,6 +106,13 @@ if(is_object($thisstaff) && $thisstaff->isStaff()) { ?>
         var f = document.querySelector('.topbar .tsearch input[type="search"]');
         if (!f || !f.offsetParent)
             f = document.querySelector('#basic_search input.basic-search');
+        // below 920 px: the compact search button (coderise.js) reveals and focuses the field
+        var b = document.querySelector('.topbar .cdr-search-toggle');
+        if ((!f || !f.offsetParent) && b && b.offsetParent) {
+            e.preventDefault();
+            b.click();
+            return;
+        }
         if (!f || !f.offsetParent)
             return;
         e.preventDefault();

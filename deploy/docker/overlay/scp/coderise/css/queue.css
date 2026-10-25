@@ -116,6 +116,7 @@
    it the top bar's placeholder. Every other page keeps the top bar search. */
 .cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .tsearch { display: none; } /* ticket queues only (tasks, agents, dashboard have their own #basic_search) */
 .cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .btn { margin-inline-start: auto; }
+.cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .cdr-search-toggle { display: none; }
 /* Export button: the mockup's upload icon ("Exporter en CSV"), drawn like the icons.css masks */
 .cdr-titlebar #queue-export { display: inline-flex; align-items: center; gap: 8px; }
 .cdr-titlebar #queue-export::before { content: ""; flex: none; width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--cdr-i-upload) center / contain no-repeat; mask: var(--cdr-i-upload) center / contain no-repeat; }

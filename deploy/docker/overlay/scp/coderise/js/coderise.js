@@ -7,7 +7,8 @@
     - Queue counts of the rail. The rail renames core's #customQ_nav to
       #cdr-queues (so jb.overflow.menu.js leaves it alone), which also
       unbinds core's hover-triggered count loader: fetch the counts here,
-      on load and after every PJAX navigation. The same response gives the
+      on load and after every PJAX navigation (at most once a minute: the
+      response is kept in sessionStorage). The same response gives the
       top-level queues a count too (core shows none there).
     - "Menu" button of the rail below 920 px (aria-expanded).
     - The top bar search submits through PJAX, as core's #basic_search does.
@@ -17,6 +18,8 @@
     - Core pagination links are tagged (.cdr-pager, .cdr-page-current).
     - Ticket view: the properties column (aside.cdr-props), the latest
       thread entry, the note mode of the reply area.
+    - Compact search button of the top bar below 920 px.
+    - Dashboard chart: readable x axis on narrow screens, keyboard legend.
     - Admin forms: changed-field marks and the save bar counter.
 
     Every handler is delegated and bound once; init() only reads the DOM
@@ -83,10 +86,73 @@
         });
     }
 
+    // The counts are fetched once per minute at most: the response is kept in
+    // sessionStorage (per tab) for COUNTS_TTL ms, so PJAX navigations and
+    // reloads reuse it instead of calling ajax.php/queue/counts on every page
+    // (core caches them for five minutes on the server anyway). The entry is
+    // tied to the signed-in session (a hash of the sign-out link, which carries
+    // the session's token: the token itself is not stored), and ignored when a
+    // queue shown in the rail has no count in it (a queue added meanwhile).
+    // Every storage access is guarded: private windows, blocked storage and a
+    // full quota only mean "no cache".
+    var COUNTS_KEY = 'cdr.queueCounts', COUNTS_TTL = 60000;
+
+    function sessionKey() {
+        var s = $('.rail .foot a[href*="logout.php"]').first().attr('href') || '',
+            h = 5381, i;
+        for (i = 0; i < s.length; i++)
+            h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+        return s ? String(h) : '';
+    }
+    function readCounts($counts) {
+        var k = sessionKey(), c, ok = true;
+        if (!k)
+            return null;
+        try {
+            c = JSON.parse(window.sessionStorage.getItem(COUNTS_KEY) || 'null');
+        } catch (e) {
+            return null;
+        }
+        if (!c || c.k !== k || !c.json || typeof c.json !== 'object'
+                || !(Date.now() - c.t < COUNTS_TTL) || Date.now() < c.t)
+            return null;
+        $counts.each(function () {
+            if (c.json['q' + $(this).data('queueId')] === undefined)
+                ok = false;
+        });
+        return ok ? c.json : null;
+    }
+    function storeCounts(json) {
+        var k = sessionKey();
+        if (!k || !json || typeof json !== 'object')
+            return;
+        try {
+            window.sessionStorage.setItem(COUNTS_KEY,
+                JSON.stringify({ k: k, t: Date.now(), json: json }));
+        } catch (e) { /* no storage: the next page fetches again */ }
+    }
+    function showCounts(json, $counts) {
+        $counts.each(function () {
+            var $e = $(this),
+                n = json['q' + $e.data('queueId')];
+            if (n !== undefined && n !== null)
+                $e.text(n).toggleClass('cdr-zero', +n === 0);
+        });
+        $('#cdr-queues').find('[id="queue-count-bucket"]')
+            .removeClass('hidden').show();
+        showTopCounts(json);
+        showTicketsBadge(json);
+    }
+
     function loadCounts() {
         var $counts = $('#cdr-queues .queue-count[data-queue-id]');
         if (!$counts.length && !ticketsItem().length)
             return;
+        var cached = readCounts($counts);
+        if (cached) {
+            showCounts(cached, $counts);
+            return;
+        }
         if (countsRequest)
             countsRequest.abort();
         countsRequest = $.ajax({
@@ -95,16 +161,8 @@
             success: function (json) {
                 if (!json)
                     return;
-                $counts.each(function () {
-                    var $e = $(this),
-                        n = json['q' + $e.data('queueId')];
-                    if (n !== undefined && n !== null)
-                        $e.text(n).toggleClass('cdr-zero', +n === 0);
-                });
-                $('#cdr-queues').find('[id="queue-count-bucket"]')
-                    .removeClass('hidden').show();
-                showTopCounts(json);
-                showTicketsBadge(json);
+                storeCounts(json);
+                showCounts(json, $counts);
             },
             complete: function () {
                 countsRequest = null;
@@ -121,12 +179,34 @@
     // .form_table take the card width (width="940" neutralised); a table whose
     // content still does not fit (many columns at 390 px) scrolls sideways in
     // its own .cdr-hscroll wrapper. A scroll box clips vertically too, so a
-    // table is wrapped only while it overflows and unwrapped once it fits:
-    // the dropdowns of fitting tables are never clipped. Hidden tables (inactive
-    // tabs) measure 0 and are left alone until a tab click or resize re-runs.
-    // table.ticket_info is never wrapped: it holds the user/org stats dropdowns.
-    // Tables typed or pasted by users (thread bodies, editors, notes) are
-    // content, never re-parented.
+    // table is wrapped only while it overflows and unwrapped once it fits.
+    // Core menus are absolutely positioned against body (the dropdown plugin
+    // uses the trigger's offset parent): the wrapper is not their containing
+    // block, so a menu opened from a wrapped table is not cut (measured with
+    // an injected menu on the last row of a wrapped list at 390 px).
+    // Hidden tables (inactive tabs) measure 0 and are left alone until a tab
+    // click or resize re-runs. table.ticket_info is never wrapped: it holds
+    // the user/org stats dropdowns. Tables typed or pasted by users (thread
+    // bodies, editors, notes) are content, never re-parented.
+    // Moving a table drops the focus of the field inside it (the queue editor
+    // autofocuses its first field): the focus and caret are restored.
+    function refocus(el) {
+        var s = null, e = null;
+        try {
+            s = el.selectionStart;
+            e = el.selectionEnd;
+        } catch (x) { /* types without a selection */ }
+        return function () {
+            if (document.activeElement === el || !$.contains(document, el))
+                return;
+            el.focus({ preventScroll: true });
+            if (s !== null) {
+                try {
+                    el.setSelectionRange(s, e);
+                } catch (x) { /* ignore */ }
+            }
+        };
+    }
     function fitTables() {
         $('#content').find('table.list, table.form_table, table.settings_table, table.table')
             .not('.ticket_info').filter(function () {
@@ -136,16 +216,20 @@
                     $p = $t.parent(),
                     wrapped = $p.hasClass('cdr-hscroll'),
                     box = wrapped ? $p[0] : $t[0].parentNode;
-                // Never re-parent a table while focus is inside it (moving the
-                // node would drop the focus of the field being typed in)
-                if (!this.offsetWidth || !box
-                        || $.contains(this, document.activeElement))
+                if (!this.offsetWidth || !box)
                     return;
                 var over = this.offsetWidth > box.clientWidth + 1;
-                if (over && !wrapped)
+                if (over === wrapped)
+                    return;
+                var active = $.contains(this, document.activeElement)
+                        ? document.activeElement : null,
+                    restore = active ? refocus(active) : null;
+                if (over)
                     $t.wrap('<div class="cdr-hscroll"></div>');
-                else if (!over && wrapped)
+                else
                     $t.unwrap();
+                if (restore)
+                    restore();
             });
     }
 
@@ -153,8 +237,9 @@
     // "Page:" then "<a href="...&p=1"><b>1</b></a>", "<b>[2]</b>" (current)
     // and "<a ...><strong>&raquo;</strong></a>". Tag the container and the
     // current page (brackets dropped) only for that exact shape: a bare <b>[n]</b>
-    // next to a page link (href with p=) or right after the "Page:" label,
-    // never inside user content (thread bodies, editors).
+    // next to a page link (href with p=), or <b>[1]</b> right after the one-word
+    // "Page:" label (single page), never inside user content (thread bodies,
+    // editors).
     function isPageLink(el) {
         return !!el && el.tagName === 'A'
             && /[?&](amp;)?p=\d+/.test(el.getAttribute('href') || '')
@@ -167,9 +252,13 @@
                     || !/^\[\d+\]$/.test($.trim($(this).text()))
                     || $(this).closest('#ticket_thread, .thread-entry, ' + RICH).length)
                 return false;
+            // No neighbouring page link means a single page: core then prints
+            // "Page:" (one short word and the colon, maybe after &nbsp;) and
+            // "[1]", never another number
             return isPageLink(this.previousElementSibling)
                 || isPageLink(this.nextElementSibling)
-                || (prev && prev.nodeType === 3 && /:\s*$/.test(prev.nodeValue));
+                || (prev && prev.nodeType === 3 && $.trim($(this).text()) === '[1]'
+                    && /(^|[\s\u00a0])[^\s:\u00a0]{1,24}:\s*$/.test(prev.nodeValue));
         }).each(function () {
             var $b = $(this);
             $b.text($.trim($b.text()).slice(1, -1))
@@ -202,8 +291,10 @@
             $box.prepend($tabs);
         var $parts = $c.children('section.cdr-sla, table.ticket_info');
         if ($parts.length && !$aside.length) {
-            $aside = $('<aside class="cdr-props"></aside>')
-                .attr('aria-label', $c.attr('data-cdr-props') || '');
+            $aside = $('<aside class="cdr-props"></aside>');
+            // named from data-cdr-props; no name rather than an empty one
+            if ($.trim($c.attr('data-cdr-props') || ''))
+                $aside.attr('aria-label', $c.attr('data-cdr-props'));
             if ($box.length)
                 $aside.insertAfter($box);
             else
@@ -245,20 +336,26 @@
                 || $r.children('form#note').is(':visible')));
     }
 
-    // The aside sticks under the top bar and core's floating action bar
-    // (~130 px). A sticky box is released at the end of its grid area, so
-    // at the bottom of the page its top sits at (viewport - space under
-    // #content - its height): when that would slide under the floating bar,
-    // or when it is simply taller than the window, it scrolls with the page
-    // instead (.cdr-tall).
+    // The aside sticks under the top bar and core's floating action bar.
+    // A sticky box is released at the end of its grid area, so at the
+    // bottom of the page its top sits at (viewport - space under #content -
+    // its height): when that would slide under the floating bar, or when it
+    // is simply taller than the window, it scrolls with the page instead
+    // (.cdr-tall). Space taken above it = the measured top bar + the floating
+    // bar (its height once floated, --cdr-fixed-bar-h from ticket-chrome.js,
+    // else the bar's height in the page) + 16 px above and below.
     function fitProps() {
         var $a = $('#content.cdr-ticket > aside.cdr-props');
         if (!$a.length)
             return;
         var $c = $a.parent(),
-            tail = $(document).height() - ($c.offset().top + $c.outerHeight());
+            tail = $(document).height() - ($c.offset().top + $c.outerHeight()),
+            top = $('.topbar').first().outerHeight() || 0,
+            bar = parseFloat(window.getComputedStyle($c[0])
+                .getPropertyValue('--cdr-fixed-bar-h'))
+                || $c.find('.sticky.bar').first().outerHeight() || 0;
         $a.removeClass('cdr-tall');
-        if ($a[0].offsetHeight > window.innerHeight - 140 - Math.max(0, tail))
+        if ($a[0].offsetHeight > window.innerHeight - (top + bar + 32) - Math.max(0, tail))
             $a.addClass('cdr-tall');
     }
 
@@ -387,26 +484,196 @@
         }
         $count[0].textContent = rows.length
             ? label(rows.length === 1 ? 'one' : 'many')
-                .replace('%d', String(rows.length))
+                .replace(/%d/g, String(rows.length))
             : '';
     }
     var trackTimer = null;
-    function scheduleTrack(form) {
+    function scheduleTrack(form, delay) {
         clearTimeout(trackTimer);
         trackTimer = setTimeout(function () {
             if (form && $.contains(document, form))
                 trackForm(form);
-        }, 0);
+        }, delay || 0);
     }
     $(document).on('focusin.cdr', ADMIN_FORM + ' :input', function () {
         snapshot(this);
     });
+    // select2 reports through "change" on the underlying <select> (jQuery
+    // trigger: it bubbles to this delegated handler)
     $(document).on('input.cdr change.cdr', ADMIN_FORM + ' :input', function () {
         scheduleTrack(this.form || $(this).closest('form')[0]);
+    });
+    // Redactor: the editor is a contenteditable <div>, not a form field; the
+    // value that is submitted is its source textarea (.redactor-source), which
+    // Redactor rewrites (normalised markup) right after it starts, and keeps in
+    // sync a moment after each edit. The textarea is therefore recorded again
+    // when its editor appears or gets the focus, until the first edit, and
+    // compared a little after each edit.
+    function editorField(el) {
+        return $(el).closest('.redactor-box').find('textarea[name]').first()[0];
+    }
+    function snapshotEditor(ta) {
+        if (!ta || !trackable(ta) || $.data(ta, 'cdrEdited'))
+            return;
+        $.data(ta, 'cdrInit', fieldValue(ta));
+    }
+    $(document).on('focusin.cdr', ADMIN_FORM + ' .redactor-in', function () {
+        snapshotEditor(editorField(this));
+    });
+    $(document).on('input.cdr keyup.cdr', ADMIN_FORM + ' .redactor-in', function (e) {
+        var ta = editorField(this);
+        if (!ta || !trackable(ta))
+            return;
+        // keyup alone (arrows, Tab) is no edit: wait for a source change
+        if (e.type === 'input')
+            $.data(ta, 'cdrEdited', true);
+        if ($.data(ta, 'cdrEdited'))
+            scheduleTrack(ta.form || $(ta).closest('form')[0], 250);
     });
     // Native reset restores the values after the event: re-check afterwards
     $(document).on('reset.cdr', ADMIN_FORM, function () {
         scheduleTrack(this);
+    });
+    // Fields and editors added after the page is ready (AJAX, select2 and
+    // Redactor start-up): recorded when they appear, not on their first focus.
+    var fieldsTimer = null,
+        fieldsObserver = null;
+    function watchFields() {
+        if (fieldsObserver || !window.MutationObserver)
+            return;
+        fieldsObserver = new MutationObserver(function (list) {
+            var found = false;
+            $.each(list, function (i, m) {
+                $.each(m.addedNodes, function (j, n) {
+                    if (n.nodeType === 1 && (/^(INPUT|SELECT|TEXTAREA)$/.test(n.tagName)
+                            || n.querySelector('input, select, textarea, .redactor-box')))
+                        found = true;
+                });
+            });
+            if (!found || !document.querySelector(ADMIN_FORM))
+                return;
+            clearTimeout(fieldsTimer);
+            fieldsTimer = setTimeout(function () {
+                snapshotForms();
+                $(ADMIN_FORM).find('.redactor-box textarea[name]').each(function () {
+                    snapshotEditor(this);
+                });
+            }, 80);
+        });
+        fieldsObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // Compact search below 920 px: the top bar search is hidden there, a
+    // button (the search icon of the field, labelled with the field's own
+    // aria-label) reveals it. Not added where the queue's own search is the
+    // page's (its top bar field is hidden for good). Idempotent: the header
+    // is re-emitted by every PJAX response, the button is only added when
+    // missing.
+    function searchToggle() {
+        var $bar = $('.cdr-main > .topbar').first(),
+            $form = $bar.children('form.tsearch').first(),
+            $input = $form.find('input[type=search]').first();
+        if (!$form.length || !$input.length || $bar.children('.cdr-search-toggle').length
+                || $('#content.cdr-tickets #basic_search').length)
+            return;
+        var id = $form.attr('id') || 'cdr-tsearch',
+            name = $input.attr('aria-label') || '',
+            $btn = $('<button type="button" class="btn btn-ghost icon-btn cdr-search-toggle"></button>')
+                .attr({ 'aria-expanded': 'false', 'aria-controls': id,
+                    'aria-label': name, title: name });
+        $form.attr('id', id);
+        $form.children('.ic').first().clone().attr('aria-hidden', 'true').appendTo($btn);
+        $btn.insertAfter($form);
+    }
+    function setSearch($bar, open) {
+        $bar.toggleClass('cdr-search-open', open)
+            .children('.cdr-search-toggle').attr('aria-expanded', open ? 'true' : 'false');
+        if (open)
+            $bar.find('form.tsearch input[type=search]').first().trigger('focus');
+    }
+    $(document).on('click.cdr', '.topbar .cdr-search-toggle', function () {
+        var $bar = $(this).closest('.topbar');
+        setSearch($bar, !$bar.hasClass('cdr-search-open'));
+    });
+    // Escape closes the field and gives the focus back to the button. Core's
+    // typeahead stops keydown on its input from bubbling, hence the capture
+    // phase (bound once: the whole file is guarded by window.cdrBound).
+    document.addEventListener('keydown', function (e) {
+        var $bar = $(e.target).closest('.topbar.cdr-search-open');
+        if (e.key === 'Escape' && $bar.length && $(e.target).closest('form.tsearch').length) {
+            setSearch($bar, false);
+            $bar.children('.cdr-search-toggle').trigger('focus');
+        }
+    }, true);
+
+    // Dashboard activity chart (core's js/dashboard.inc.js draws it with
+    // Raphael into #line-chart-here and rebuilds the legend on every refresh).
+    // - x axis: the date labels are the <text> elements sharing one y; every
+    //   second one of the lowest row is tagged .cdr-skip, which coderise.css
+    //   hides up to 780 px (they overlap there);
+    // - legend: each series label toggles its series through jQuery click
+    //   handlers bound by the core script, so it becomes a keyboard button
+    //   (tabindex, role, aria-pressed; Enter and Space trigger the click).
+    // A MutationObserver re-applies both after each redraw; the series colours
+    // are set inline by the core script and stay as they are.
+    function tagAxis() {
+        var rows = {}, low = -1;
+        $('#line-chart-here svg text').each(function () {
+            var y = this.getAttribute('y');
+            low = Math.max(low, +y);
+            (rows[y] = rows[y] || []).push(this);
+        });
+        // the lowest row of text is the x axis (hover tags sit above it)
+        $.each(rows, function (y, list) {
+            if (+y !== low || list.length < 3)
+                return;
+            list.sort(function (a, b) {
+                return (+a.getAttribute('x')) - (+b.getAttribute('x'));
+            });
+            $.each(list, function (i, t) {
+                if (i % 2)
+                    t.setAttribute('class', 'cdr-skip');
+                else
+                    t.removeAttribute('class');
+            });
+        });
+    }
+    function enhanceLegend() {
+        $('#line-chart-legend span.label').each(function () {
+            $(this).attr({ tabindex: '0', role: 'button',
+                'aria-pressed': $(this).hasClass('disabled') ? 'false' : 'true' });
+        });
+    }
+    function initChart() {
+        var host = document.getElementById('line-chart-here'),
+            legend = document.getElementById('line-chart-legend');
+        if (!host || !window.MutationObserver)
+            return;
+        if (!$.data(host, 'cdrObserved')) {
+            $.data(host, 'cdrObserved', true);
+            var timer = null,
+                obs = new MutationObserver(function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        tagAxis();
+                        enhanceLegend();
+                    }, 80);
+                });
+            obs.observe(host, { childList: true, subtree: true, characterData: true });
+            if (legend)
+                obs.observe(legend, { childList: true });
+        }
+        tagAxis();
+        enhanceLegend();
+    }
+    $(document).on('keydown.cdr', '#line-chart-legend span.label', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            $(this).trigger('click');
+        }
+    });
+    $(document).on('click.cdr', '#line-chart-legend span.label', function () {
+        $(this).attr('aria-pressed', $(this).hasClass('disabled') ? 'false' : 'true');
     });
 
     var refreshTimer = null;
@@ -423,9 +690,12 @@
         ticketLayout();
         fitTables();
         tagPagers();
+        searchToggle();
+        initChart();
         loadCounts();
         // After the page's own ready/pjax:end handlers (select2, previews)
         setTimeout(snapshotForms, 0);
+        watchFields();
     }
 
     // Rail "Menu" button (mobile)
