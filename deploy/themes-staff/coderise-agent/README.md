@@ -52,6 +52,14 @@ Fichiers ajoutés : `include/staff/coderise/coderise.inc.php` (traductions `cdr_
 jauge), `include/staff/coderise/i18n/fr.php` (catalogue français), `scp/coderise/css/coderise.css`,
 `scp/coderise/js/coderise.js` (compteurs des files, fiche ticket, barre d'enregistrement,
 tableaux larges), polices Montserrat et Inter locales avec leurs licences OFL, logo et favicon.
+Passe de fidélité (25/10/2026), chargés après `coderise.css` / `coderise.js` : `rail.css`
+(rail, barre haute, pied), `icons.css` (icônes Font Awesome et GIF du cœur remplacées par les
+icônes au trait de la maquette, en masques CSS), `ticket.css` + `ticket.js` (fil : initiales,
+rôle, en-tête d'entrée, événements, défilement), `ticket-chrome.css` + `ticket-chrome.js`
+(onglets, barre d'actions, colonne de propriétés, zone de réponse), `queue.css` + `queue.js`
+(bloc titre, barre d'actions groupées, assigné, sélection, pied). Les textes dont ces scripts
+ont besoin arrivent traduits par des attributs `data-cdr-*` de `#content` (`header.inc.php`,
+`cdr_data_attrs()`).
 Toutes les autres pages (administration, utilisateurs, base de connaissances, tâches,
 tableau de bord, journaux…) ne sont habillées que par la feuille de style.
 
@@ -92,7 +100,24 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
 - Barre collante (`div.sticky.bar` du cœur) : toujours affichée avec son titre et ses
   actions, comme dans le cœur (la maquette ne montre la barre d'actions groupées qu'une
   fois une ligne cochée). Elle prend l'aspect de la barre nuit une fois flottante ; sur
-  la file de tickets, elle est toujours la barre nuit (tâche 6).
+  la file de tickets, elle est toujours la barre nuit (tâche 6), avec « Aucune sélection »
+  ou « N tickets sélectionnés ».
+- Recherche : une seule par page. Sur les files de tickets (et les résultats de recherche),
+  le champ de la file du cœur reste (requête en cours, saisie semi-automatique, « Avancé »,
+  tri) et prend le libellé de la barre haute ; la recherche de la barre haute, identique
+  (même requête GET), n'y est pas affichée ; la touche « / » va au champ de la file. Partout
+  ailleurs, la recherche est dans la barre haute comme la maquette.
+- Fiche ticket : la ligne « Ticket #… » est le titre de la barre d'actions du cœur, stylé comme
+  la ligne d'identité de la maquette (Inter 600, ardoise, sans icône) ; les boutons restent à
+  sa droite et le sujet passe dessous (la maquette les place à droite du sujet ; l'état, le
+  contrat et l'urgence de la ligne d'identité n'existent pas dans ce balisage).
+- Rôle des entrées du fil, d'après le type d'entrée du cœur : « Client » (message),
+  « Réponse au client » (réponse d'agent : toujours visible du client, mais pas toujours
+  envoyée par e-mail, d'où pas « envoyée »), « Note interne, invisible du client ». Le
+  masculin générique remplace « Cliente » (le thème ne connaît pas le genre).
+- Message client long : l'aplat voile de la maquette est conservé (rangée plate, teinte
+  #E3F8FB très pâle ; libellé ardoise à 5,3:1 dessus) plutôt qu'un en-tête seul teinté : le
+  côté client reste repérable d'un coup d'œil, comme dans la maquette.
 - File de tickets (`include/staff/templates/queue-tickets.tmpl.php`, gabarit du cœur
   remplacé) : seule une colonne « Premier retour » est ajoutée, en dernière position
   (la maquette la place après le sujet) ; les colonnes configurées de la file et leurs
@@ -117,24 +142,34 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    `form.save`) empilent le libellé au-dessus du champ. Les listes à nombreuses colonnes
    (`table.list`) et les tableaux à plus de deux cellules par ligne défilent encore
    latéralement dans leur propre conteneur (`.cdr-hscroll`) ; aucune page ne déborde.
-2. Fiche ticket (tâche 7) : le gabarit du cœur est conservé ; `coderise.js` déplace la
-   bande d'onglets dans `#ticket_tabs_container` et regroupe le panneau « Premier retour »
-   et les tableaux `table.ticket_info` dans une colonne `aside.cdr-props`. Écarts avec la
-   maquette : pas de ligne d'identité (état, contrat, urgence) ni de sous-titre client
-   sous le sujet ; les actions restent les boutons-icônes de la barre du cœur (pas de
-   « Modifier / Imprimer / Marquer comme résolu ») ; les propriétés sont des liens
-   d'édition du cœur, pas des listes déroulantes, sans titre de panneau (« Propriétés »,
-   « Client ») ni panneau d'actions ; les avatars sont un disque avec une icône (pas
-   d'initiales, aucune donnée pour le CSS) ; pas de compteur dans les onglets ni d'onglet
-   « Journal » ; la zone de réponse garde les champs du cœur (De, Destinataires, Répondre
-   à, Réponse type, Signature, État). La colonne n'est collante que si elle tient dans
-   la fenêtre sous la barre d'actions flottante, sinon elle défile avec la page.
-3. File de tickets : pas de puce de contrat sous le numéro, pas d'avatar d'initiales
-   pour l'assigné, pas de filtres « Contrat / Département / Assigné à / Reçus » ni de
-   compteur de sélection : les cellules sont rendues par les colonnes configurables du
-   cœur (`$C->render()`), inchangées. La priorité devient une étiquette qui garde la
-   couleur du cœur. Sous ~1180 px, le tableau défile latéralement dans `.cdr-hscroll`
-   (pas de cartes empilées comme la maquette sous 760 px, faute d'étiquettes de colonne).
+2. Fiche ticket (tâche 7, passe de fidélité du 25/10/2026) : le gabarit du cœur
+   (`ticket-view.inc.php`, `thread-entry.tmpl.php`) est conservé. Fait côté thème :
+   initiales dans le disque d'avatar, rôle et heure à droite dans l'en-tête d'entrée,
+   texte Inter 13,5 px, événements à icône de 14 px et heure à droite, note « Note interne,
+   invisible du client » avec cadenas, onglets à icône et pastille de compteur, titres
+   « Propriétés » / « Client » avec icône, libellés « Éditer » et « Imprimer » dans la barre,
+   éditeur 10/12 px, état et boutons d'envoi sur une ligne alignée à droite, défilement à
+   l'ouverture qui ne cache plus l'en-tête de la dernière entrée. Restent (classe 2 :
+   il faudrait remplacer `ticket-view.inc.php` ou `thread-entry.tmpl.php`) : état, contrat
+   et urgence dans la ligne d'identité, sous-titre client, bouton « Marquer comme résolu »,
+   panneau d'actions, ordre et contenu des propriétés, zone de réponse compacte ; et
+   (classe 3) : propriétés en liens d'édition plutôt qu'en listes, onglet « Journal », champs
+   De / Répondre à / Signature, boutons par entrée, barre de Redactor. Le sujet de chaque
+   entrée (donnée du cœur) s'affiche sous le nom. La colonne n'est collante que si elle tient
+   dans la fenêtre sous la barre d'actions flottante, sinon elle défile avec la page.
+3. File de tickets : fait côté thème : bloc titre (nom de la file, texte « Visible 1 - 25
+   sur environ N » du cœur, Actualiser, Exporter), tableau bord à bord dans le panneau,
+   barre d'actions groupées libellée avec compteur de sélection et « Réclamation » (le
+   libellé du pack pour Claim), case « tout sélectionner », numéro « #… » souligné, sujet
+   non tronqué, assigné avec initiales ou « Non assigné », flèche de tri sur la seule
+   colonne triée, pied avec pagination. Restent : puce de contrat et client sous le sujet,
+   « Premier retour » en 3e colonne (classe 2, `queue-tickets.tmpl.php`), filtres
+   « Contrat / Département / Assigné à / Reçus », sous-titre « 24 tickets, triés par… »
+   (le total du cœur est approché, « environ »), « Enregistrer la recherche », colonnes,
+   noms des files et couleurs de priorité (classe 3 : configuration ou données du cœur).
+   Le numéro reste en gras sur les tickets que le cœur marque non répondus. Sous ~1180 px,
+   le tableau défile latéralement dans `.cdr-hscroll` (pas de cartes empilées comme la
+   maquette sous 760 px, faute d'étiquettes de colonne).
 4. Les erreurs de champ du cœur sont un texte rouge avec astérisque à côté du champ ; le
    champ lui-même n'est pas encadré (le cœur ne marque que le message).
 5. Icônes GIF du cœur (calendrier, dossiers de la base de connaissances) : aspect
@@ -142,7 +177,8 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    jour courant voile, boutons du thème) ; ses flèches restent les icônes du cœur.
    Éditeur Redactor en plein écran : la boîte passe sous `<body>` ; le thème n'y garde
    que la police, la colonne centrée de 950 px et la barre d'outils sont celles du cœur.
-6. Composants non vérifiés en RTL.
+6. RTL : vérifié seulement en forçant `dir="rtl"` sur la file et la fiche (rail à droite,
+   pas de débordement, propriétés logiques) ; aucune langue RTL n'est installée sur la démo.
 7. Administration : les listes (agents, équipes, départements, sujets d'aide, SLA,
    plugins, formulaires…) prennent le style `table.list` ; les étiquettes d'état et de
    rôle de la maquette ne sont **pas faisables en CSS** (« Active / Disabled » sont du
@@ -196,7 +232,21 @@ Autres éléments non réalisés :
   chaînes du thème passent par `cdr__()` et son catalogue. Les contenus en base créés en
   anglais à l'installation (noms et colonnes des files, statuts, priorités…) restent en
   anglais : liste dans `docs/guide-utilisateur.md`, « Interface en français ».
-- RTL non vérifié (voir lacune 6).
+- RTL vérifié en forçant `dir="rtl"` seulement (voir lacune 6).
+
+## Fidélité à la maquette (25/10/2026)
+
+Passe « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà ; aucun gabarit
+du cœur de plus. Ce qui reste demanderait de remplacer un gabarit (classe 2) ou n'existe pas
+dans osTicket (classe 3) : voir les lacunes 2 et 3. Tailles en px (le cœur fixe `html` à 14 px).
+
+Contrôle de non-régression : `deploy/themes-staff/tests/fidelity-check.mjs` compare les styles
+calculés de la maquette (`docs/theme-mockups-admin/tickets.html`, `ticket.html`) et de la démo
+(file, tickets 2 et 1) : tailles, graisses, polices, couleurs et hauteurs de 31 éléments.
+`LOGIN_PASS=… PW_CORE=<chemin de playwright-core> node deploy/themes-staff/tests/fidelity-check.mjs`
+(compte `dev.admin`, 1280 × 800) ; une ligne `OK|DIFF` par mesure, puis le total ; code de sortie
+= nombre de `DIFF`. Un écart voulu s'ajoute à `ALLOWED_DIFFS` avec sa raison. État au
+25/10/2026 : 62 OK, 0 DIFF.
 
 ## Vérifications (tâche 10)
 
