@@ -235,8 +235,8 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
     traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit (c'est le cas
     depuis l'ajout de `fr.phar` à l'image).
-11. `captures/` pèse environ 19 Mo (202 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
-    `fr-*` pour 1,6 Mo et 9 `fidelity-*` pour 1,6 Mo) dans le dépôt.
+11. `captures/` pèse environ 20 Mo (210 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
+    `fr-*` pour 1,6 Mo, 9 `fidelity-*` pour 1,6 Mo et 8 `fidelity-w3-*` pour 1,4 Mo) dans le dépôt.
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -285,11 +285,16 @@ du cœur. Tailles en px (le cœur fixe `html` à 14 px).
 
 Contrôle de non-régression : `deploy/themes-staff/tests/fidelity-check.mjs` compare les styles
 calculés de la maquette (`docs/theme-mockups-admin/tickets.html`, `ticket.html`) et de la démo
-(file, tickets 2 et 1) : tailles, graisses, polices, couleurs et hauteurs de 31 éléments.
+(file, tickets 2, 1 et 45) : tailles, graisses, polices, couleurs et hauteurs de 51 éléments, et
+des mesures de mise en page (`top`/`left`, position dans la ligne `row-top`, ordre des colonnes
+`col-delta`).
 `LOGIN_PASS=… PW_CORE=<chemin de playwright-core> node deploy/themes-staff/tests/fidelity-check.mjs`
 (compte `dev.admin`, 1280 × 800) ; une ligne `OK|DIFF` par mesure, puis le total ; code de sortie
 = nombre de `DIFF`. Un écart voulu s'ajoute à `ALLOWED_DIFFS` avec sa raison. État au
-25/10/2026 : 62 OK, 0 DIFF.
+25/10/2026 (démo 16f92cfe, 1280 × 800) : 157 OK, 0 DIFF, 1 ALLOWED (« Last Updated » entre le
+numéro et le sujet : réglage de la file). À 2000 × 1000 (`VIEW_W=2000 VIEW_H=1000`) : 4 DIFF de
+position, les boutons de la fiche restent sous le titre au lieu d'être à sa droite (voir « Écart
+assumé »).
 
 ## Vérifications (tâche 10)
 
@@ -427,4 +432,5 @@ de réponse, barre d'enregistrement, nouveau ticket avec tableau collé, et port
 Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès) ; passe de fidélité
 (`fidelity-*`, 25/10/2026, avatars activés : file et ticket 2 à 1280 et 2000 px, note interne
 du ticket 1, sélection et barre flottante de la file, file à 390 px, ticket à 820 px, RTL
-forcé).
+forcé) ; passe 3 (`fidelity-w3-*`) : file à 1280, 2000 et 390 px, sélection et menu Assigner,
+file vide, RTL forcé, interface anglaise, maquette et file côte à côte à 1280 px.
