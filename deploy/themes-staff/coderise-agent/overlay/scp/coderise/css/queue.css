@@ -106,7 +106,7 @@
    the mockup's ".bulk b" ("2 tickets sélectionnés", Montserrat 600 13px), and
    the empty assignee cell as ".data .unassigned" (user icon 14px, italic ardoise). */
 #content .sticky.bar.cdr-bulk .cdr-sel.cdr-sel-text { padding: 0; margin-inline-end: 6px; color: var(--blanc); font: 600 13px var(--f-titre); }
-#content table.queue .cdr-who.cdr-unassigned { gap: 6px; color: var(--ardoise); font-style: italic; }
+#content table.queue .cdr-who.cdr-unassigned { gap: 6px; color: var(--ardoise); font-style: italic; white-space: nowrap; }
 #content table.queue .cdr-who.cdr-unassigned i::before { width: 14px; height: 14px; margin-block: 0; }
 
 /* One search per page. The queue (and search results) keeps core's own field
@@ -114,8 +114,8 @@
    so the identical top bar search (same GET contract) is not shown there;
    "/" focuses the queue's field instead (footer.inc.php), and queue.js gives
    it the top bar's placeholder. Every other page keeps the top bar search. */
-.cdr-main:has(> #content #basic_search) > .topbar > .tsearch { display: none; }
-.cdr-main:has(> #content #basic_search) > .topbar > .btn { margin-inline-start: auto; }
+.cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .tsearch { display: none; } /* ticket queues only (tasks, agents, dashboard have their own #basic_search) */
+.cdr-main:has(> #content.cdr-tickets #basic_search) > .topbar > .btn { margin-inline-start: auto; }
 /* Export button: the mockup's upload icon ("Exporter en CSV"), drawn like the icons.css masks */
 .cdr-titlebar #queue-export { display: inline-flex; align-items: center; gap: 8px; }
 .cdr-titlebar #queue-export::before { content: ""; flex: none; width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--cdr-i-upload) center / contain no-repeat; mask: var(--cdr-i-upload) center / contain no-repeat; }
