@@ -42,3 +42,15 @@
 .tsearch input[type="search"] { padding-inline-end: 40px; }
 .tsearch kbd { position: absolute; inset-inline-end: 9px; top: 7px; box-sizing: border-box; min-width: 22px; padding: 0 6px; border: 1px solid var(--ardoise); border-radius: 5px; background: var(--blanc); color: var(--ardoise); font: 600 12px/15px var(--f-texte); text-align: center; pointer-events: none; }
 .tsearch input[type="search"]:focus ~ kbd, .tsearch input[type="search"]:not(:placeholder-shown) ~ kbd { display: none; }
+
+/* Compact search below 920 px (coderise.js adds .cdr-search-toggle after the
+   field; the field is hidden under 920 px by coderise.css and revealed on a
+   full row under the bar when the button is pressed). */
+.topbar .cdr-search-toggle { display: none; }
+.topbar .cdr-search-toggle[aria-expanded=true] { background: var(--voile); }
+@media (max-width: 920px) {
+  .topbar { flex-wrap: wrap; }
+  .topbar .cdr-search-toggle, .topbar > .tsearch ~ .btn.cdr-search-toggle { display: inline-flex; margin-inline-start: auto; } /* beats .tsearch ~ .btn { margin: 0 } */
+  .topbar .cdr-search-toggle ~ .btn { margin-inline-start: 0; }
+  .topbar.cdr-search-open > .tsearch { display: block; flex: 1 1 100%; max-width: none; order: 9; }
+}
