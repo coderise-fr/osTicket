@@ -104,6 +104,44 @@ check('duration: 2 h 00', cdr_duration(7200), '2 h 00');
 // ---------- cdr_asset / cdr_icon ----------
 check('asset: url and version', cdr_asset('css/x.css'), '/scp/coderise/css/x.css?v=' . CDR_VERSION);
 check('constant: version', CDR_VERSION, '1.0.0');
+
+// ---------- cdr_layout_version (PJAX version: core's + the theme's assets) ----------
+$lv = sys_get_temp_dir() . '/cdr-layout-' . getmypid();
+@mkdir($lv . '/css', 0777, true);
+@mkdir($lv . '/js', 0777, true);
+file_put_contents($lv . '/css/a.css', 'a{}');
+file_put_contents($lv . '/js/b.js', 'b();');
+touch($lv . '/css/a.css', 1700000000);
+touch($lv . '/js/b.js', 1700000100);
+clearstatcache();
+$v1 = cdr_layout_version($lv . '/');
+check('layout version: format (no GIT_VERSION in the CLI)', (bool) preg_match('/^-cdr[0-9a-f]{8}$/', $v1), true);
+check('layout version: stable', cdr_layout_version($lv . '/'), $v1);
+check('layout version: trailing slash ignored', cdr_layout_version($lv), $v1);
+touch($lv . '/js/b.js', 1700000200);
+clearstatcache();
+$v2 = cdr_layout_version($lv . '/');
+check('layout version: changes when an asset mtime changes', $v2 !== $v1, true);
+check('layout version: stable after the change', cdr_layout_version($lv . '/'), $v2);
+file_put_contents($lv . '/css/c.css', 'c{}');
+touch($lv . '/css/c.css', 1700000000);
+clearstatcache();
+check('layout version: changes when an asset is added', cdr_layout_version($lv . '/') !== $v2, true);
+unlink($lv . '/css/c.css');
+clearstatcache();
+check('layout version: back when the asset is removed', cdr_layout_version($lv . '/'), $v2);
+file_put_contents($lv . '/css/a.css', 'a{color:red}');
+touch($lv . '/css/a.css', 1700000000);
+clearstatcache();
+check('layout version: changes with the size at the same mtime', cdr_layout_version($lv . '/') !== $v2, true);
+$none = cdr_layout_version($lv . '/missing/');
+check('layout version: missing folder = fallback', $none, '-cdr' . substr(md5(CDR_VERSION), 0, 8));
+check('layout version: default (installed tree) is cached', cdr_layout_version(), cdr_layout_version());
+foreach (array('/css/a.css', '/js/b.js') as $f)
+    @unlink($lv . $f);
+@rmdir($lv . '/css');
+@rmdir($lv . '/js');
+@rmdir($lv);
 check('constant: first response hours', CDR_FIRST_RESPONSE_HOURS, 4);
 $svg = cdr_icon('inbox', 20);
 check('icon: svg markup', strpos($svg, '<svg ') === 0 && strpos($svg, 'stroke-width="1.75"') !== false

@@ -34,6 +34,12 @@
 /* Tab strips: mockup .tabs a (11/12/10) and .compose .modes a (11/14/10) */
 #content.cdr.cdr-ticket ul#ticket_tabs li a { padding: 11px 12px 10px; line-height: 16px; }
 #content.cdr.cdr-ticket ul#response-tabs li a { padding: 11px 14px 10px; line-height: 16px; }
+/* phones: the three tabs (thread, tasks, log) fit without scrolling the strip (it scrolled by 1 px
+   at 390 px, 31 px at 360 px) */
+@media (max-width: 419px) {
+  #content.cdr.cdr-ticket #ticket_tabs_container > ul#ticket_tabs { padding-inline: 4px; }
+  #content.cdr.cdr-ticket ul#ticket_tabs li a { padding-inline: 8px; }
+}
 #content.cdr.cdr-ticket ul#ticket_tabs a .count { padding: 0 6px; border-radius: 999px; background: var(--gris); color: var(--nuit); font: 600 11px/14px var(--f-titre); }
 #content.cdr.cdr-ticket ul#response-tabs li:not(.active) a { color: var(--ardoise); }
 #content.cdr.cdr-ticket ul#response-tabs li:not(.active) a:hover { color: var(--nuit); }

@@ -236,6 +236,52 @@ if (!defined('CDR_VERSION')) {
         return ROOT_PATH . 'scp/coderise/' . $path . '?v=' . $v;
     }
 
+    /**
+     * Layout version for PJAX (the x-pjax-version meta of a full page and
+     * the X-PJAX-Version header of a PJAX response, which jquery.pjax
+     * compares). Core sends GIT_VERSION, the literal '$git' in every build,
+     * so a tab opened before a deploy or a rollback would receive the new
+     * markup under its old stylesheets and scripts. The theme appends a
+     * short hash of its assets (name, mtime and size of each file under
+     * scp/coderise/css and js, and of this file): any rebuild changes it and
+     * an old tab hard-loads the next page instead. Computed once per request
+     * for the installed tree; $dir (tests) is never cached. A missing folder
+     * or file only drops out of the hash (CDR_VERSION stays in it).
+     */
+    function cdr_layout_version($dir = null) {
+        static $cached = null;
+        $base = defined('GIT_VERSION') ? GIT_VERSION : '';
+        if ($dir === null) {
+            if ($cached !== null)
+                return $cached;
+            $self = __FILE__;
+            $dir = defined('ROOT_DIR') ? ROOT_DIR . 'scp/coderise/' : '';
+        } else {
+            $self = null;
+        }
+        $parts = array(CDR_VERSION);
+        $files = array();
+        if ($dir !== '') {
+            foreach (array('css/*.css', 'js/*.js') as $pattern) {
+                $found = @glob(rtrim($dir, '/') . '/' . $pattern);
+                if (is_array($found))
+                    $files = array_merge($files, $found);
+            }
+        }
+        sort($files);
+        if ($self)
+            $files[] = $self;
+        foreach ($files as $f) {
+            $t = @filemtime($f);
+            if ($t !== false)
+                $parts[] = basename($f) . ':' . $t . ':' . (int) @filesize($f);
+        }
+        $v = $base . '-cdr' . substr(md5(implode('|', $parts)), 0, 8);
+        if ($self)
+            $cached = $v;
+        return $v;
+    }
+
     /** "44 min", "3 h 27", "1 h 05": whole minutes (seconds are dropped). */
     function cdr_duration($seconds) {
         $m = (int) floor(max(0, (int) $seconds) / 60);

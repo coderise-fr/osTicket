@@ -252,6 +252,25 @@
         });
     }
 
+    // ───────── Subject annotations placed "after" the subject ─────────
+    // The subject link is clamped to two lines (queue.css), so it is a block:
+    // core's annotations printed after it (attachment clip, collaborators…)
+    // would fall on a line of their own. They are moved, unchanged (nodes,
+    // tooltips), into one wrapper before the subject, floated to the end of
+    // the line like core's pull-right badges. Nothing of the theme (.cdr-*)
+    // is moved; a second run finds nothing left to move.
+    function subjectAnnotations($form) {
+        $form.find('table.queue > tbody > tr > td .truncate').each(function () {
+            var $s = $(this),
+                $after = $s.nextAll().filter(function () {
+                    return !/(^|\s)cdr-/.test(this.className || '');
+                });
+            if (!$after.length || $s.children('a').length !== 1)
+                return;
+            $('<span class="cdr-after"></span>').append($after).insertBefore($s);
+        });
+    }
+
     // ───────── Search field: core autofocus, A12 ─────────
     // The queue's field replaces the top bar search on this page (queue.css):
     // same placeholder, accessible name and "/" shortcut (texts from the top bar).
@@ -286,6 +305,7 @@
             buildBulk($content, $form);
             buildSelectAll($form);
             buildAssignee($form);
+            subjectAnnotations($form);
             updateSelection();
         }
         searchField();

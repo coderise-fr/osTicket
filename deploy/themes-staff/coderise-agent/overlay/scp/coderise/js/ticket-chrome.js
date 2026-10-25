@@ -352,6 +352,27 @@
                 if ($parts.has(e.target).length) update();
             });
             $f.on('reset.cdropts', function () { setTimeout(update, 0); });
+            // A value the browser restores without a change event (back /
+            // forward cache, form restore) is caught again on pageshow and
+            // just before a submit: the mark is recomputed and the panel
+            // opens if a folded field differs or shows an error; it is never
+            // folded again by this. Visibility only: the submit listener
+            // (capture, bound once per form) never blocks or alters the post.
+            var recheck = function () {
+                update();
+                if (fieldsChanged($parts, sigDefault) || partsError($parts)) set(true);
+            };
+            $f.data('cdrOptsCheck', recheck);
+            this.addEventListener('submit', function () { try { recheck(); } catch (e) { /* never in the way of a post */ } }, true);
+        });
+    }
+    if (!window.cdrOptsPageshow) {
+        window.cdrOptsPageshow = true;
+        window.addEventListener('pageshow', function () {
+            $('#content.cdr-ticket #response_options > form').each(function () {
+                var fn = $(this).data('cdrOptsCheck');
+                if (typeof fn === 'function') fn();
+            });
         });
     }
 

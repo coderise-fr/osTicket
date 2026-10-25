@@ -48,7 +48,7 @@ Fichiers du cœur remplacés (empreintes dans `BASE.sha256`) :
 
 | Fichier | Pourquoi |
 |---|---|
-| `include/staff/header.inc.php` | Coquille : rail (navigation du cœur reprise par `cdr_rail()`), barre haute, lien d'évitement, feuille et script du thème ; garde `#pjax-container`, `#content`, les compteurs de files et le reste des contrats du JavaScript du cœur. |
+| `include/staff/header.inc.php` | Coquille : rail (navigation du cœur reprise par `cdr_rail()`), barre haute, lien d'évitement, feuille et script du thème ; garde `#pjax-container`, `#content`, les compteurs de files et le reste des contrats du JavaScript du cœur. Version PJAX (`x-pjax-version`, `X-PJAX-Version`) = celle du cœur (`$git`, la même dans toutes les images) + une empreinte des fichiers du thème (`cdr_layout_version()`) : après un déploiement ou un retour arrière, un onglet resté ouvert recharge entièrement sa page suivante au lieu de mêler nouveau balisage et anciens CSS/JS. |
 | `include/staff/footer.inc.php` | Ferme la coquille ; mêmes scripts et configuration que le pied du cœur. |
 | `include/staff/login.header.php`, `include/staff/login.tpl.php` | Connexion et pages de mot de passe oublié en carte sur fond nuit (mêmes ids et champs). |
 | `include/staff/templates/queue-tickets.tmpl.php` | File de tickets dans l'ordre de la maquette : puce de contrat sous le numéro, client et organisation sous le sujet, colonne « Premier retour » (jauge) juste après le sujet ; les cellules des colonnes configurées restent celles du cœur (`$C->render($T)`). |
@@ -147,7 +147,9 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   formulaire, aucun nom ni identifiant ne change, le formulaire envoie les mêmes valeurs
   (vérifié avec `FormData`). Le panneau s'ouvre de lui-même si un champ replié n'a pas sa
   valeur par défaut (première option pour De et Répondre à, signature par défaut de l'agent,
-  collaborateurs de la page, titre vide) ou affiche une erreur du serveur ; tant qu'un champ
+  collaborateurs de la page, titre vide) ou affiche une erreur du serveur (décidé au
+  chargement, revu à `pageshow`, retour arrière du navigateur compris, et juste avant l'envoi,
+  sans jamais bloquer ni modifier l'envoi) ; tant qu'un champ
   replié diffère de sa valeur par défaut, le bouton porte la marque « modifié ». Restent
   visibles : réponses types, éditeur (barre Redactor complète, composant tiers), zone de
   dépôt, état et boutons d'envoi.
@@ -241,7 +243,9 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    sur environ N » du cœur, Actualiser, Exporter), tableau bord à bord dans le panneau,
    barre d'actions groupées libellée avec compteur de sélection et « Réclamation » (le
    libellé du pack pour Claim), case « tout sélectionner », numéro « #… » souligné, sujet
-   non tronqué, assigné avec initiales ou « Non assigné », flèche de tri sur la seule
+   sur deux lignes au plus (points de suspension au-delà, texte complet dans le DOM ; les
+   annotations du cœur placées après le sujet, trombone des pièces jointes…, sont déplacées
+   en fin de première ligne avec les autres pastilles), assigné avec initiales ou « Non assigné », flèche de tri sur la seule
    colonne triée, pied avec pagination, pastille de compteur du rail ; passe 3 : puce de
    contrat sous le numéro, client et organisation sous le sujet (colonne « From » masquée),
    « Premier retour » juste après le sujet, lignes de 75 px comme la maquette, compteurs sur
@@ -301,6 +305,16 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
     périmées ont été retirées le 25/10/2026 (au moins une capture par écran est gardée).
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
+13. Avatars : le thème affiche des initiales (`ticket.js`, quel que soit le réglage) et masque
+    les images d'avatar du cœur, mais le cœur les **charge** quand les avatars sont activés ;
+    avec une source Gravatar (défaut d'osTicket, « Gravatar / L'homme mystérieux »), chaque
+    fiche envoie à `www.gravatar.com` (en HTTP) l'empreinte de l'e-mail de chaque auteur. Pour
+    l'éviter, en production (interface française, relevé sur la démo) : **Administration >
+    Paramètres > Agents**, « Source de l'avatar » = **« Intégré / Membre de la team Oscar »**
+    (images locales), et de même **Administration > Paramètres > Utilisateurs**, « Source de
+    l'avatar » ; ou bien **Administration > Paramètres > Système**, décocher « Voir les
+    avatars » (« Voir les avatars sur les vues de fils. »), ce qui supprime aussi les images.
+    Le thème ne peut pas empêcher ce chargement sans modifier le cœur.
 
 ## Non réalisé (Not done)
 

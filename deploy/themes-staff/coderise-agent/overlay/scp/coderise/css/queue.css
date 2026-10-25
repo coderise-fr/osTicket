@@ -79,6 +79,13 @@
 #content table.queue > tbody > tr > td .truncate { display: inline; max-width: none !important; overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: break-word; }
 #content table.queue > tbody > tr > td:has(> .truncate, > div > .truncate) { min-width: 180px; }
 #content table.queue > tbody > tr > td .truncate a { text-decoration: none; }
+/* at most two lines per subject (a 300-character subject made a row 4 to 8 lines high); the link
+   itself is clamped (its focus outline is not clipped), the full text stays in the DOM; core's
+   inline display:inline on the link is overridden */
+#content table.queue > tbody > tr > td .truncate > a { display: -webkit-box !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+/* core's annotations printed after the subject (attachment clip…), moved by queue.js into
+   .cdr-after before it: at the end of the first line, like the pull-right badges */
+#content table.queue > tbody > tr > td .cdr-after { float: inline-end; margin-inline-start: 6px; }
 #content table.queue > tbody > tr > td .truncate a:hover { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
 #content table.queue > tbody > tr > td { padding: 8px 12px; line-height: 1.5; } /* mockup .data td: 13.5 / 20.25 px */
 #content table.queue > tbody > tr > td :is(.pull-right) { margin-inline-start: 8px; }

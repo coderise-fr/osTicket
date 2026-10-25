@@ -40,7 +40,7 @@ if (osTicket::is_ie())
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="x-pjax-version" content="<?php echo GIT_VERSION; ?>">
+    <meta http-equiv="x-pjax-version" content="<?php echo cdr_h(cdr_layout_version()); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#000F26">
     <title><?php echo Format::htmlchars($title); ?></title>
@@ -100,7 +100,8 @@ if (osTicket::is_ie())
     ?>
     <div id="pjax-container" class="<?php if ($_POST) echo 'no-pjax'; ?>">
 <?php } else {
-    header('X-PJAX-Version: ' . GIT_VERSION);
+    // same value as the meta of a full page: core's version + the theme's assets
+    header('X-PJAX-Version: ' . cdr_layout_version());
     if ($pjax = $ost->getExtraPjax()) { ?>
     <script type="text/javascript">
     <?php foreach (array_filter($pjax) as $s) echo $s.";"; ?>
