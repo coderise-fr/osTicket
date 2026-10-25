@@ -8,6 +8,10 @@ include/staff/login.header.php
 include/staff/login.tpl.php
 include/staff/templates/queue-tickets.tmpl.php
 scp/coderise/css/coderise.css
+scp/coderise/css/icons.css
+scp/coderise/css/queue.css
+scp/coderise/css/rail.css
+scp/coderise/css/ticket.css
 scp/coderise/fonts/OFL-inter.txt
 scp/coderise/fonts/OFL-montserrat.txt
 scp/coderise/fonts/inter-latin-400-normal.woff2
@@ -25,3 +29,5 @@ scp/coderise/fonts/montserrat-latin-ext-800-normal.woff2
 scp/coderise/img/favicon.svg
 scp/coderise/img/logo-horizontal-sombre.png
 scp/coderise/js/coderise.js
+scp/coderise/js/queue.js
+scp/coderise/js/ticket.js
