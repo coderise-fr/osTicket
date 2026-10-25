@@ -123,3 +123,14 @@
    carets at 14px), so that the counter and the six actions share one row at 1280 */
 #content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down { padding: 0 6px; }
 #content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down::before { width: 12px; height: 12px; }
+
+/* ───────── Wave 3: mockup columns "Ticket et contrat" and "Sujet et client" (queue-tickets.tmpl.php) ─────────
+   Contract chip under the number (mockup .data .stack + .plan), client and organisation under the
+   subject (mockup .subj small), core's "From" column hidden once the client is printed there. */
+#content table.queue > tbody > tr > td > .stack { display: block; margin-top: 4px; line-height: normal; }
+#content table.queue .plan { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 4px; font: 600 12px/normal var(--f-titre); white-space: nowrap; }
+#content table.queue .plan-priority { background: var(--nuit); color: var(--blanc); }
+#content table.queue .plan-priority .ic { color: var(--cyan); }
+#content table.queue .plan-standard { box-shadow: inset 0 0 0 1px var(--ardoise); color: var(--ardoise); }
+#content table.queue > tbody > tr > td > small.cdr-client { display: block; clear: none; margin: 0; color: var(--ardoise); font: 400 12.5px/1.4 var(--f-texte); overflow-wrap: break-word; }
+#content table.queue > :is(thead, tbody) > tr > .cdr-col-from { display: none; }

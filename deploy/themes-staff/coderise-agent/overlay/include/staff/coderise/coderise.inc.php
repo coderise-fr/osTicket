@@ -34,6 +34,12 @@
        - cdr_ticket_idline()   pure: the identity line and the client
                                subtitle from plain data
        - cdr_ticket_idline_data() that data, read from a Ticket
+       - cdr_plan_chip()       the contract chip (Priority / Standard)
+    6. Queue (templates/queue-tickets.tmpl.php)
+       - cdr_queue_layout()    where the subject, number and client columns
+                               are, and where the first-reply cell goes
+       - cdr_queue_client()    the "client, organisation" line under the
+                               subject
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
     vim: expandtab sw=4 ts=4 sts=4:
@@ -770,12 +776,8 @@ if (!defined('CDR_VERSION')) {
                 . cdr_h($v('status')) . '</span>';
         }
         $plan = isset($d['plan']) && is_array($d['plan']) ? $d['plan'] : null;
-        if ($plan && isset($plan['label']) && trim((string) $plan['label']) !== '') {
-            $level = isset($plan['level']) && $plan['level'] === 'priority' ? 'priority' : 'standard';
-            $parts[] = '<span class="plan plan-' . $level . '" title="' . cdr_h(cdr__('Support contract')) . '">'
-                . ($level === 'priority' ? cdr_icon('bolt', 12) : '')
-                . cdr_h(trim((string) $plan['label'])) . '</span>';
-        }
+        if ($plan && ($chip = cdr_plan_chip($plan)) !== '')
+            $parts[] = $chip;
         if ($v('urgent') !== '')
             $parts[] = '<span class="urg" title="' . cdr_h(cdr__('Priority')) . '">'
                 . cdr_icon('alert', 15) . cdr_h($v('urgent')) . '</span>';
@@ -857,5 +859,65 @@ if (!defined('CDR_VERSION')) {
             $d['source'] = (string) $t->getSource();
         });
         return $d;
+    }
+
+    /**
+     * The contract chip of the mockup (.plan): "Priority" on nuit with a
+     * bolt, "Standard" outlined. $plan = array(level, label), as
+     * coderise_contract_level() returns it; any level other than
+     * "priority" is Standard. '' without a label. Escaped here.
+     */
+    function cdr_plan_chip($plan) {
+        if (!is_array($plan) || !isset($plan['label']) || !is_scalar($plan['label'])
+                || trim((string) $plan['label']) === '')
+            return '';
+        $level = isset($plan['level']) && $plan['level'] === 'priority' ? 'priority' : 'standard';
+        return '<span class="plan plan-' . $level . '" title="' . cdr_h(cdr__('Support contract')) . '">'
+            . ($level === 'priority' ? cdr_icon('bolt', 12) : '')
+            . cdr_h(trim((string) $plan['label'])) . '</span>';
+    }
+
+    /* ------------------------------------------------------------------
+     * 6. Queue
+     * ---------------------------------------------------------------- */
+
+    /**
+     * Layout of the queue table from the data paths of its configured
+     * columns (QueueColumn::$primary, in display order). The columns are
+     * found by what they show, never by their heading (translated, renamed
+     * by the admin) or their id (a custom queue has its own columns):
+     *   number  'number'                  ticket number (contract chip)
+     *   subject 'cdata__subject'          subject (client line, gauge)
+     *   user    'user__name'              core's "From" column
+     * Each is the index of the first matching column, or null. 'gauge' is
+     * the index of the column the first-reply cell follows: the subject
+     * (mockup order: Ticket, Subject, First reply, ...), else the last
+     * column; -1 when there is no column (the cell comes first).
+     */
+    function cdr_queue_layout($primaries) {
+        $out = array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1);
+        $roles = array('number' => 'number', 'cdata__subject' => 'subject', 'subject' => 'subject',
+            'user__name' => 'user');
+        $i = -1;
+        foreach (array_values((array) $primaries) as $i => $p) {
+            $p = is_scalar($p) ? strtolower(trim((string) $p)) : '';
+            if (isset($roles[$p]) && $out[$roles[$p]] === null)
+                $out[$roles[$p]] = $i;
+        }
+        $out['gauge'] = $out['subject'] !== null ? $out['subject'] : $i;
+        return $out;
+    }
+
+    /**
+     * The mockup's client line under the subject (.subj small): "Client,
+     * organisation" (or the client alone), escaped. '' without a name.
+     */
+    function cdr_queue_client($name, $org=null) {
+        $name = is_scalar($name) ? trim((string) $name) : '';
+        $org = is_scalar($org) ? trim((string) $org) : '';
+        if ($name === '')
+            return '';
+        return '<small class="cdr-client">' . cdr_h($org !== ''
+            ? sprintf(cdr__('%1$s, %2$s'), $name, $org) : $name) . '</small>';
     }
 }

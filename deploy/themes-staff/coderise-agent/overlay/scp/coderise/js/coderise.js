@@ -7,7 +7,8 @@
     - Queue counts of the rail. The rail renames core's #customQ_nav to
       #cdr-queues (so jb.overflow.menu.js leaves it alone), which also
       unbinds core's hover-triggered count loader: fetch the counts here,
-      on load and after every PJAX navigation.
+      on load and after every PJAX navigation. The same response gives the
+      top-level queues a count too (core shows none there).
     - "Menu" button of the rail below 920 px (aria-expanded).
     - The top bar search submits through PJAX, as core's #basic_search does.
     - Empty queues: the rail count is tagged .cdr-zero (no "0" badge).
@@ -63,6 +64,25 @@
         $b.text(n);
     }
 
+    // Counts of the top-level queues (mockup "Ouverts 24"): core prints a
+    // count on sub-queues only, but the same response has every queue id.
+    // The id is read from the link (tickets.php?queue=N; the search entry
+    // has none). Own class: core's loader rewrites every li span.queue-count.
+    function showTopCounts(json) {
+        $('#cdr-queues > ul > li.top-queue > a[href]').each(function () {
+            var m = /[?&]queue=(\d+)(&|#|$)/.exec(this.getAttribute('href') || ''),
+                n = m ? json['q' + m[1]] : null,
+                $c = $(this).children('.cdr-qcount');
+            if (n === undefined || n === null || !/^\d+$/.test(String(n))) {
+                $c.remove();
+                return;
+            }
+            if (!$c.length)
+                $c = $('<span class="cdr-qcount"></span>').appendTo(this);
+            $c.text(n).toggleClass('cdr-zero', +n === 0);
+        });
+    }
+
     function loadCounts() {
         var $counts = $('#cdr-queues .queue-count[data-queue-id]');
         if (!$counts.length && !ticketsItem().length)
@@ -83,6 +103,7 @@
                 });
                 $('#cdr-queues').find('[id="queue-count-bucket"]')
                     .removeClass('hidden').show();
+                showTopCounts(json);
                 showTicketsBadge(json);
             },
             complete: function () {

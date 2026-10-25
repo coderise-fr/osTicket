@@ -25,6 +25,10 @@
 #cdr-queues .add-queue a:hover { background: rgba(255,255,255,.1); color: var(--blanc) !important; }
 #cdr-queues .add-queue a:focus-visible { outline: 2px solid var(--focus, var(--cyan)); outline-offset: -2px; }
 
+/* Counts of the top-level queues (coderise.js .cdr-qcount: core prints none there), the sub-queue pill */
+#cdr-queues > ul > li.top-queue > a > .cdr-qcount { flex: none; min-width: 20px; margin: 0; margin-inline-start: auto; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.16); color: var(--blanc); font-size: 11px; font-weight: 600; line-height: 1.5; text-align: center; font-variant-numeric: tabular-nums; box-sizing: border-box; }
+#cdr-queues > ul > li.top-queue > a > .cdr-qcount.cdr-zero { display: none; }
+
 /* Counter pill of the Tickets item (coderise.js; the .rail .badge look of coderise.css, mockup .rail .badge) */
 .rail a.item .badge.cdr-badge { flex: none; line-height: 20px; font-variant-numeric: tabular-nums; }
 

@@ -166,13 +166,15 @@ $labels = array(
     // ticket identity block and labelled action buttons
     'Support contract', '%1$s at %2$s', 'Received on %1$s via %2$s.', 'Received on %s.',
     'Edit ticket', 'Print ticket', 'Mark as resolved',
+    // queue: client line under the subject
+    '%1$s, %2$s',
 );
 $untranslated = array();
 foreach ($labels as $l)
     if (cdr__($l) === $l)
         $untranslated[] = $l;
 // A few labels are written the same in French: they are allowed to equal their msgid.
-$same = array('Client', 'Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins');
+$same = array('Client', 'Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins', '%1$s, %2$s');
 check('fr.php: inventory complete', array_values(array_diff($untranslated, $same)), array());
 check('fr: sign out wording', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
 check('fr: search placeholder names tickets', cdr__('Search tickets by number, subject or client'),
@@ -510,6 +512,58 @@ $h = cdr_ticket_idline(cdr_ticket_idline_data($t));
 check('idline data plugin: standard chip', (bool) preg_match('#<span class="plan plan-standard"[^>]*>Standard</span>#', $h), true);
 $t->planSource = 'default';
 check('idline data plugin: no Priority organisation configured = no chip', array_key_exists('plan', cdr_ticket_idline_data($t)), false);
+
+// ---------- cdr_plan_chip (queue and identity line) ----------
+check('plan chip: priority', cdr_plan_chip(array('level' => 'priority', 'label' => 'Priority')),
+    '<span class="plan plan-priority" title="Support contract">' . cdr_icon('bolt', 12) . 'Priority</span>');
+check('plan chip: standard, no icon', cdr_plan_chip(array('level' => 'standard', 'label' => ' Standard ')),
+    '<span class="plan plan-standard" title="Support contract">Standard</span>');
+check('plan chip: unknown level = standard', strpos(cdr_plan_chip(array('level' => '"><x', 'label' => 'S')), 'class="plan plan-standard"') !== false, true);
+check('plan chip: no label', cdr_plan_chip(array('level' => 'priority', 'label' => ' ')), '');
+check('plan chip: label not scalar', cdr_plan_chip(array('level' => 'priority', 'label' => array('x'))), '');
+check('plan chip: not an array', cdr_plan_chip(null), '');
+check('plan chip: hostile label escaped', cdr_plan_chip(array('level' => 'priority', 'label' => $evil)),
+    '<span class="plan plan-priority" title="Support contract">' . cdr_icon('bolt', 12)
+    . '&lt;img src=x onerror=alert(1)&gt;&quot;&#039;&amp;</span>');
+$GLOBALS['CDR_TEST_LANG'] = 'fr';
+check('plan chip: title (fr)', strpos(cdr_plan_chip(array('level' => 'standard', 'label' => 'Standard')), 'title="Contrat de support"') !== false, true);
+unset($GLOBALS['CDR_TEST_LANG']);
+check('plan chip: same markup as the identity line', strpos(cdr_ticket_idline(array('number' => '1',
+    'plan' => array('level' => 'priority', 'label' => 'Priority'))),
+    cdr_plan_chip(array('level' => 'priority', 'label' => 'Priority'))) !== false, true);
+
+// ---------- cdr_queue_layout (columns found by data path) ----------
+// Seeded "Open" queue: Ticket, Last Updated, Subject, From, Priority, Assigned To
+check('queue layout: seeded open queue', cdr_queue_layout(array('number', 'lastupdate', 'cdata__subject', 'user__name', 'cdata__priority', 'assignee')),
+    array('number' => 0, 'subject' => 2, 'user' => 3, 'gauge' => 2));
+check('queue layout: mockup order', cdr_queue_layout(array('number', 'cdata__subject', 'status__id', 'assignee', 'lastupdate')),
+    array('number' => 0, 'subject' => 1, 'user' => null, 'gauge' => 1));
+check('queue layout: no subject = gauge last', cdr_queue_layout(array('number', 'created', 'assignee')),
+    array('number' => 0, 'subject' => null, 'user' => null, 'gauge' => 2));
+check('queue layout: no column = gauge first', cdr_queue_layout(array()),
+    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1));
+check('queue layout: first match wins, case and spaces ignored', cdr_queue_layout(array('assignee', ' CDATA__Subject', 'cdata__subject', 'user__name', 'user__name')),
+    array('number' => null, 'subject' => 1, 'user' => 3, 'gauge' => 1));
+check('queue layout: subject-like paths are not the subject', cdr_queue_layout(array('cdata__subject_extra', 'thread__lastmessage', 'user__email')),
+    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => 2));
+check('queue layout: non-scalar paths skipped', cdr_queue_layout(array(null, array('x'), 'subject')),
+    array('number' => null, 'subject' => 2, 'user' => null, 'gauge' => 2));
+check('queue layout: associative input', cdr_queue_layout(array('a' => 'number', 'b' => 'user__name')),
+    array('number' => 0, 'subject' => null, 'user' => 1, 'gauge' => 1));
+
+// ---------- cdr_queue_client (client line under the subject) ----------
+check('queue client: name and org', cdr_queue_client("L\xC3\xA9a Marchand", 'Maison Verdier'),
+    "<small class=\"cdr-client\">L\xC3\xA9a Marchand, Maison Verdier</small>");
+check('queue client: name only', cdr_queue_client('Hugo Bernard', null), '<small class="cdr-client">Hugo Bernard</small>');
+check('queue client: blank org', cdr_queue_client('Hugo Bernard', '  '), '<small class="cdr-client">Hugo Bernard</small>');
+check('queue client: no name', cdr_queue_client('', 'Org'), '');
+check('queue client: null name', cdr_queue_client(null, 'Org'), '');
+check('queue client: hostile values escaped', cdr_queue_client($evil, '</small><b>'),
+    '<small class="cdr-client">&lt;img src=x onerror=alert(1)&gt;&quot;&#039;&amp;, &lt;/small&gt;&lt;b&gt;</small>');
+$GLOBALS['CDR_TEST_LANG'] = 'fr';
+check('queue client: fr wording', cdr_queue_client('Camille Roy', "H\xC3\xA9lios Logistique"),
+    "<small class=\"cdr-client\">Camille Roy, H\xC3\xA9lios Logistique</small>");
+unset($GLOBALS['CDR_TEST_LANG']);
 
 echo $fails ? "\n$fails FAILED\n" : "\nall ok\n";
 exit($fails ? 1 : 0);
