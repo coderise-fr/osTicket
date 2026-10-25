@@ -39,6 +39,21 @@
             || $el.attr('aria-label') || '');
     }
 
+    // Translated labels emitted by header.inc.php on #content (data-cdr-*).
+    function label(key) {
+        return txt($('#content.cdr-tickets').attr('data-cdr-' + key));
+    }
+
+    // "No ticket selected" / "1 ticket selected" / "N tickets selected".
+    function selText(n) {
+        var zero = label('sel-zero'), one = label('sel-one'), many = label('sel-many');
+        if (!many)
+            return '';
+        if (n === 0 && zero)
+            return zero;
+        return (n === 1 && one ? one : many).replace('%d', String(n));
+    }
+
     function initials(name) {
         var parts = txt(name).split(' ').filter(Boolean), first, last;
         if (!parts.length)
@@ -159,9 +174,15 @@
         if (!$left.length)
             $left = $('<div class="pull-left flush-left"></div>').prependTo($bar.children('.content').first());
         $sel = $('<span class="cdr-sel" aria-live="polite"></span>');
-        $('<span class="cdr-sel-l"></span>').text(selectionLabel($form)).appendTo($sel);
-        $('<b>0</b>').appendTo($sel);
-        $sel.children('.cdr-sel-l').filter(function () { return !$(this).text(); }).remove();
+        if (selText(0)) {
+            // The mockup's "N tickets selected" (header.inc.php labels)
+            $sel.addClass('cdr-sel-text').text(selText(0));
+        } else {
+            // Fallback: core's own "Select:" word and a count pill
+            $('<span class="cdr-sel-l"></span>').text(selectionLabel($form)).appendTo($sel);
+            $('<b>0</b>').appendTo($sel);
+            $sel.children('.cdr-sel-l').filter(function () { return !$(this).text(); }).remove();
+        }
         $left.append($sel);
     }
 
@@ -169,7 +190,13 @@
         var $form = $('form#tickets'), n = $form.find('input.ckb:checked').length,
             total = $form.find('input.ckb:enabled').length,
             $all = $form.find('input.cdr-ckb-all');
-        $('.cdr-bulk .cdr-sel').toggleClass('is-on', n > 0).children('b').text(n);
+        $('.cdr-bulk .cdr-sel').toggleClass('is-on', n > 0).each(function () {
+            var $s = $(this);
+            if ($s.hasClass('cdr-sel-text'))
+                $s.text(selText(n));
+            else
+                $s.children('b').text(n);
+        });
         if ($all.length) {
             $all.prop('checked', total > 0 && n === total);
             $all.prop('indeterminate', n > 0 && n < total);
@@ -183,7 +210,7 @@
         if (!$th.length || !$all.length || !$none.length || $th.find('input').length)
             return;
         $('<input type="checkbox" class="cdr-ckb-all">')
-            .attr('aria-label', txt($all.text()))
+            .attr('aria-label', label('select-all') || txt($all.text()))
             .appendTo($th);
         $all.closest('tfoot').addClass('cdr-sel-foot');
     }
@@ -191,7 +218,8 @@
     // ───────── Assignee, A25 ─────────
     // Seeded core column 8 ("Assignee", primary "assignee"); other columns are left alone.
     function buildAssignee($form) {
-        var $table = $form.find('table.queue').first(), $ths, idx;
+        var $table = $form.find('table.queue').first(), $ths, idx,
+            none = label('unassigned');
         if (!$table.length)
             return;
         $ths = $table.find('> thead > tr > th');
@@ -205,7 +233,14 @@
             name = txt($td.text());
             $td.addClass('cdr-who-done');
             if (!name) {
-                // Nobody assigned: a dashed placeholder disc (no string to show).
+                // Nobody assigned: the "Not assigned" label of header.inc.php
+                // (user icon, italic), else a dashed placeholder disc.
+                if (none) {
+                    $td.append($('<span class="cdr-who is-none cdr-unassigned"></span>')
+                        .append('<i class="icon-user" aria-hidden="true"></i>')
+                        .append(document.createTextNode(none)));
+                    return;
+                }
                 $td.append($('<span class="cdr-who is-none" aria-hidden="true"></span>')
                     .append('<span class="cdr-av"></span>'));
                 return;

@@ -101,3 +101,10 @@
 #content.cdr-tickets form#tickets > div.cdr-qfoot > a[href]:has(> b, > strong), #content.cdr-tickets form#tickets > div.cdr-qfoot > .cdr-page-current { font-size: 13.5px; }
 /* the table above has no foot border of its own once its selection row is off screen */
 #content.cdr-tickets form#tickets > table.queue > tfoot.cdr-sel-foot td { border-top: 0; }
+
+/* Integration: strings from header.inc.php (data-cdr-*). Selection counter as
+   the mockup's ".bulk b" ("2 tickets sélectionnés", Montserrat 600 13px), and
+   the empty assignee cell as ".data .unassigned" (user icon 14px, italic ardoise). */
+#content .sticky.bar.cdr-bulk .cdr-sel.cdr-sel-text { padding: 0; margin-inline-end: 6px; color: var(--blanc); font: 600 13px var(--f-titre); }
+#content table.queue .cdr-who.cdr-unassigned { gap: 6px; color: var(--ardoise); font-style: italic; }
+#content table.queue .cdr-who.cdr-unassigned i::before { width: 14px; height: 14px; margin-block: 0; }

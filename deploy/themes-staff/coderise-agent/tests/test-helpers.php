@@ -160,17 +160,28 @@ $labels = array(
     '%s left', 'Over by %s', 'Met in %s', 'Returned %s late',
     // ticket view
     'Priority contract: first reply to the client within %s.', 'Ticket properties',
+    // ticket view and queue labels for the JS (header.inc.php data-cdr-*)
+    'Properties', 'Client', 'Reply to the client', 'Internal note, not visible to the client',
+    'No ticket selected', '%d ticket selected', '%d tickets selected', 'Select all tickets',
 );
 $untranslated = array();
 foreach ($labels as $l)
     if (cdr__($l) === $l)
         $untranslated[] = $l;
 // A few labels are written the same in French: they are allowed to equal their msgid.
-$same = array('Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins');
+$same = array('Client', 'Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins');
 check('fr.php: inventory complete', array_values(array_diff($untranslated, $same)), array());
 check('fr: sign out wording', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
 check('fr: search placeholder names tickets', cdr__('Search tickets by number, subject or client'),
     "Rechercher un ticket : num\xC3\xA9ro, sujet, client");
+// data-cdr-* attributes (header.inc.php): translated, escaped, bad keys skipped
+check('data attrs: fr', cdr_data_attrs(array('role-note' => 'Internal note, not visible to the client', 'sel-many' => '%d tickets selected')),
+    " data-cdr-role-note=\"Note interne, invisible du client\" data-cdr-sel-many=\"%d tickets s\xC3\xA9lectionn\xC3\xA9s\"");
+check('data attrs: escaped', cdr_data_attrs(array('x' => '"<a>" & \'b\'')), ' data-cdr-x="&quot;&lt;a&gt;&quot; &amp; &#039;b&#039;"');
+check('data attrs: invalid keys skipped', cdr_data_attrs(array('A' => 'x', 'a b' => 'x', 'a"' => 'x', '-a' => 'x', 'a--b' => 'x', 0 => 'x')), ' data-cdr-0="x"');
+check('data attrs: empty', cdr_data_attrs(array()), '');
+check('fr: selection counter one/zero', str_replace('%d', '1', cdr__('%d ticket selected')) . '|' . cdr__('No ticket selected'),
+    "1 ticket s\xC3\xA9lectionn\xC3\xA9|Aucun ticket s\xC3\xA9lectionn\xC3\xA9");
 check('cdr_t: test language = catalogue', cdr_t('Dashboard'), 'Tableau de bord');
 check('cdr_t: unknown msgid', cdr_t('No such msgid zz'), 'No such msgid zz');
 
@@ -190,6 +201,14 @@ check('pack: no theme catalogue, no pack entry = msgid', cdr_t('Sign Out'), 'Sig
 Internationalization::$lang = 'en_US';
 $GLOBALS['STUB_PACK'] = null;
 check('pack: English = msgid', cdr_t('Dashboard') . '|' . cdr__('Sign Out'), 'Dashboard|Sign Out');
+check('data attrs: English = msgid', cdr_data_attrs(array('role-response' => 'Reply to the client')), ' data-cdr-role-response="Reply to the client"');
+// The pack wins for msgids it has (Properties, Client): same wording as fr.php
+Internationalization::$lang = 'fr';
+$GLOBALS['STUB_PACK'] = array('Properties' => "Propri\xC3\xA9t\xC3\xA9s (pack)");
+check('data attrs: pack wins', cdr_data_attrs(array('title-props' => 'Properties', 'role-response' => 'Reply to the client')),
+    " data-cdr-title-props=\"Propri\xC3\xA9t\xC3\xA9s (pack)\" data-cdr-role-response=\"R\xC3\xA9ponse au client\"");
+Internationalization::$lang = 'en_US';
+$GLOBALS['STUB_PACK'] = null;
 $GLOBALS['CDR_TEST_LANG'] = 'fr';
 
 // ---------- cdr_gauge_state (French rendering) ----------

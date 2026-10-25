@@ -126,6 +126,22 @@ if (!defined('CDR_VERSION')) {
         return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Translated labels for the theme's JS, as data-cdr-<key> attributes
+     * (leading space included): array('<key>' => '<English msgid>'), each
+     * value translated with cdr__() and escaped. Keys outside [a-z0-9-] are
+     * skipped.
+     */
+    function cdr_data_attrs($labels) {
+        $out = '';
+        foreach ((array) $labels as $key => $msgid) {
+            if (!preg_match('/^[a-z0-9]+(-[a-z0-9]+)*$/', (string) $key))
+                continue;
+            $out .= ' data-cdr-' . $key . '="' . cdr_h(cdr__((string) $msgid)) . '"';
+        }
+        return $out;
+    }
+
     /** Line icon (24 grid, constant 1.75 stroke, rounded ends), decorative. */
     function cdr_icon($name, $size=18) {
         static $paths = array(

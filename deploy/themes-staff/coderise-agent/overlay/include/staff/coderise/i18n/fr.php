@@ -115,6 +115,20 @@ return array(
     // Ticket view (header.inc.php, coderise.js)
     'Priority contract: first reply to the client within %s.' => 'Contrat Priority : premier retour au client sous %s.',
     'Ticket properties' => 'Propriétés du ticket',
+    // Panel titles of the properties column (the pack has the same wording)
+    'Properties' => 'Propriétés',
+    'Client' => 'Client',
+    // Role next to the author of a thread entry (ticket.js). A reply is
+    // always visible to the client, but may not be e-mailed ("Do Not Email
+    // Reply"): no "envoyée"
+    'Reply to the client' => 'Réponse au client',
+    'Internal note, not visible to the client' => 'Note interne, invisible du client',
+
+    // Queue list (queue.js): selection counter, header check box
+    'No ticket selected' => 'Aucun ticket sélectionné',
+    '%d ticket selected' => '%d ticket sélectionné',
+    '%d tickets selected' => '%d tickets sélectionnés',
+    'Select all tickets' => 'Tout sélectionner',
 
     // Login page (login.tpl.php)
     'Presentation' => 'Présentation',
