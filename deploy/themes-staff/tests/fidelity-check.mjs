@@ -25,6 +25,8 @@
 // (coderise.js). 'row-top' = top of the element minus the top of its table row; 'col-delta' =
 // visible column index of the element's cell minus that of the pair's mockRef / realRef cell
 // (column order, independent of the column widths). 'right' = getBoundingClientRect().right.
+// 'text-row-top' = top of the element's first text line (Range) minus the top of its row: the
+// queue subject link is a block since it is clamped to two lines (queue.css), the mockup's inline.
 // Wave 4: action group wrappers '.cdr-acts' / '.cdr-tools', title block 'section.cdr-idline'
 // (the subject is moved into it), "Log" tab 'a#cdr-journal-tab', reply options line
 // 'form#reply > .cdr-opts' (ticket-chrome.js). A pair with minWidth / maxWidth is only measured
@@ -118,7 +120,7 @@ const PAIRS = [
   // Queue, wave 3: "Ticket et contrat", "Sujet et client", "Premier retour" after the subject, rail counts.
   { name: 'queue Priority chip', kind: 'queue', mock: '.data .c-n .plan-priority', real: 'table.queue tbody td > .stack .plan-priority', props: ['font-size', 'font-weight', 'font-family', 'padding-left', 'border-top-left-radius', 'background-color', 'color', 'height', 'row-top'] },
   { name: 'queue Standard chip', kind: 'queue', mock: '.data .c-n .plan-standard', real: 'table.queue tbody td > .stack .plan-standard', props: ['font-size', 'color', 'box-shadow', 'height', 'row-top'] },
-  { name: 'queue subject link', kind: 'queue', mock: '.data .subj a', real: 'table.queue tbody td .truncate a', props: ['font-size', 'font-weight', 'row-top'] },
+  { name: 'queue subject link', kind: 'queue', mock: '.data .subj a', real: 'table.queue tbody td .truncate a', props: ['font-size', 'font-weight', 'text-row-top'] },
   { name: 'queue client line', kind: 'queue', mock: '.data .subj small', real: 'table.queue tbody td > small.cdr-client', props: ['font-size', 'font-weight', 'font-family', 'color', 'display'] },
   { name: 'queue first reply follows subject', kind: 'queue', mock: '.data thead th[aria-sort]', mockRef: '.data thead th:nth-child(3)', real: 'table.queue thead th.cdr-gauge-col', realRef: 'table.queue thead th[data-id="3"]', props: ['col-delta'] },
   { name: 'queue first reply cell follows the client cell', kind: 'queue', mock: '.data tbody tr:first-child td:has(.gauge)', mockRef: '.data tbody tr:first-child td.subj', real: 'table.queue tbody tr:has(small.cdr-client) td.cdr-gauge-col', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', props: ['col-delta', 'padding-top'] },
@@ -170,6 +172,14 @@ async function measure(page, url, targets) {
         else if (p === 'row-top') {
           const tr = el.closest('tr');
           r[p] = tr ? (el.getBoundingClientRect().top - tr.getBoundingClientRect().top) + 'px' : null;
+        }
+        else if (p === 'text-row-top') {
+          // first line of the element's text (a Range), so an inline link and a block one
+          // (the clamped queue subject) compare by where the text is, not by the box
+          const tr = el.closest('tr'), rg = document.createRange();
+          rg.selectNodeContents(el);
+          const first = rg.getClientRects()[0];
+          r[p] = tr && first ? (first.top - tr.getBoundingClientRect().top) + 'px' : null;
         }
         else if (p === 'col-delta') {
           const ref = t.ref ? document.querySelector(t.ref) : null, a = colIndex(el), b = colIndex(ref);
