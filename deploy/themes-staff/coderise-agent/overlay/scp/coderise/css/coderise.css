@@ -215,15 +215,9 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
 #content.cdr .filedrop .dropzone { color: var(--ardoise); } /* filedrop.css: #999 on #f2f2f2 (2.6:1) */
 #content.cdr :is(h1, h2, h3):not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font-family: var(--f-titre); color: var(--nuit); }
 
-@media (min-width: 921px) {
-  /* The sticky rail stops at the end of #pjax-container; the strip under it
-     (beside #footer) stays nuit */
-  #container { background: linear-gradient(90deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
-  html.rtl #container, [dir="rtl"] #container { background: linear-gradient(270deg, var(--nuit) var(--rail-w), transparent var(--rail-w)); }
-}
-
-/* Footer: small, under the main column */
-#footer { margin: 0; margin-inline-start: var(--rail-w); padding: 8px 28px 16px; color: var(--ardoise); font-size: 12px; text-align: start; }
+/* Footer: small, at the bottom of the main column (footer.inc.php emits it
+   inside .cdr-main; rail.css pushes it down) */
+#footer { margin: 0; padding: 8px 28px 16px; color: var(--ardoise); font-size: 12px; text-align: start; }
 
 /* ───────── Tablet and mobile: the rail becomes a top bar ───────── */
 @media (max-width: 1180px) {
@@ -241,7 +235,7 @@ ul.tabs li a:focus-visible { outline: 3px solid var(--focus); outline-offset: -3
   .crumbs, .tsearch { display: none; }
   .topbar .btn { margin-inline-start: auto; }
   #content.cdr { margin: 16px 12px 24px; padding: 16px; }
-  #footer { margin-inline-start: 0; padding-inline: 20px; }
+  #footer { padding-inline: 20px; }
 }
 
 /* ═════════ Global components ═════════

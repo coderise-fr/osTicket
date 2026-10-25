@@ -50,3 +50,18 @@
 #content.cdr.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr > td { display: block; overflow: hidden; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
 #content.cdr.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) > tbody > tr > td:not(:has(tr)) { display: none; }
 #content.cdr.cdr-ticket aside.cdr-props .cdr-title { margin: 0; padding: 11px 16px; border-bottom: 1px solid var(--gris); font: 700 15px/18px var(--f-titre); color: var(--nuit); }
+/* Panel title icons (mockup .panel-h h2 .ic: 18px, cyan-profond, gap 8):
+   sliders for the properties, user for the client (icons.css variables). */
+#content.cdr.cdr-ticket aside.cdr-props .cdr-title { display: flex; align-items: center; gap: 8px; }
+#content.cdr.cdr-ticket aside.cdr-props .cdr-title::before { content: ""; flex: none; width: 18px; height: 18px; background: var(--cyan-profond); -webkit-mask: var(--cdr-i-sliders) center / contain no-repeat; mask: var(--cdr-i-sliders) center / contain no-repeat; }
+#content.cdr.cdr-ticket aside.cdr-props > table.ticket_info > tbody > tr > td + td > .cdr-title::before { -webkit-mask-image: var(--cdr-i-user); mask-image: var(--cdr-i-user); }
+
+/* Identity line (mockup .idline: Inter 600 13.5px ardoise, no icon) for the
+   core "Ticket #N" heading of the action bar while it is in the page; once
+   the bar is fixed (nuit) it stays the bar's title (coderise.css). The link
+   (reload) is kept, underlined on hover only. */
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font: 600 13.5px/20px var(--f-texte); }
+#content.cdr-ticket > .tixTitle { margin-top: 2px; } /* under the action bar (mockup: identity line 79, title 103; the core bar is a row of its own) */
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a { color: var(--ardoise); text-decoration: none; }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a:is(:hover, :focus-visible) { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; }
+#content.cdr-ticket .sticky.bar:not(.fixed) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) a > i.icon-refresh { display: none; }

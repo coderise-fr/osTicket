@@ -181,7 +181,7 @@ check('data attrs: escaped', cdr_data_attrs(array('x' => '"<a>" & \'b\'')), ' da
 check('data attrs: invalid keys skipped', cdr_data_attrs(array('A' => 'x', 'a b' => 'x', 'a"' => 'x', '-a' => 'x', 'a--b' => 'x', 0 => 'x')), ' data-cdr-0="x"');
 check('data attrs: empty', cdr_data_attrs(array()), '');
 check('fr: selection counter one/zero', str_replace('%d', '1', cdr__('%d ticket selected')) . '|' . cdr__('No ticket selected'),
-    "1 ticket s\xC3\xA9lectionn\xC3\xA9|Aucun ticket s\xC3\xA9lectionn\xC3\xA9");
+    "1 ticket s\xC3\xA9lectionn\xC3\xA9|Aucune s\xC3\xA9lection");
 check('cdr_t: test language = catalogue', cdr_t('Dashboard'), 'Tableau de bord');
 check('cdr_t: unknown msgid', cdr_t('No such msgid zz'), 'No such msgid zz');
 

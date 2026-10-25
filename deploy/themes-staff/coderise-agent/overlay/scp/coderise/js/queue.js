@@ -253,6 +253,20 @@
     }
 
     // ───────── Search field: core autofocus, A12 ─────────
+    // The queue's field replaces the top bar search on this page (queue.css):
+    // same placeholder, accessible name and "/" shortcut (texts from the top bar).
+    function searchField() {
+        var $f = $('#content.cdr-tickets #basic_search input.basic-search').first(),
+            $top = $('.topbar .tsearch input[type="search"]').first();
+        if (!$f.length || !$top.length)
+            return;
+        if (!$f.attr('placeholder') && $top.attr('placeholder'))
+            $f.attr('placeholder', $top.attr('placeholder'));
+        if (!$f.attr('aria-label') && $top.attr('aria-label'))
+            $f.attr('aria-label', $top.attr('aria-label'));
+        $f.attr('aria-keyshortcuts', '/');
+    }
+
     function dropAutofocus() {
         var f = $('#content.cdr-tickets input.basic-search')[0];
         setTimeout(function () {
@@ -274,6 +288,7 @@
             buildAssignee($form);
             updateSelection();
         }
+        searchField();
         dropAutofocus();
     }
 

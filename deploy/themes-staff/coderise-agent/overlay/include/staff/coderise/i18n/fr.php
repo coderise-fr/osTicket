@@ -125,7 +125,7 @@ return array(
     'Internal note, not visible to the client' => 'Note interne, invisible du client',
 
     // Queue list (queue.js): selection counter, header check box
-    'No ticket selected' => 'Aucun ticket sélectionné',
+    'No ticket selected' => 'Aucune sélection', // short: the bar holds 6 actions at 1280
     '%d ticket selected' => '%d ticket sélectionné',
     '%d tickets selected' => '%d tickets sélectionnés',
     'Select all tickets' => 'Tout sélectionner',

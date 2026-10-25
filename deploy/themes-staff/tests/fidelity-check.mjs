@@ -36,6 +36,8 @@ const MOCKUP_DIR = env.MOCKUP_DIR || join(HERE, '..', '..', '..', 'docs', 'theme
 const KINDS = {
   queue: { mock: 'tickets.html', real: '/scp/tickets.php' },
   ticket: { mock: 'ticket.html', real: '/scp/tickets.php?id=2' },
+  // demo ticket 1 holds the internal note
+  note: { mock: 'ticket.html', real: '/scp/tickets.php?id=1' },
 };
 
 // name, kind, mock/real selector, css properties, px tolerance (default 0.5).
@@ -49,9 +51,22 @@ const PAIRS = [
   { name: 'table row td padding', kind: 'queue', mock: '.data tbody td', real: 'table.list.queue tbody td', props: ['padding-top', 'padding-left'] },
   { name: 'table row td', kind: 'queue', mock: '.data tbody td', real: 'table.list.queue tbody td', props: ['font-size'] },
   { name: 'gauge text', kind: 'queue', mock: '.gauge-txt', real: '.gauge-txt', props: ['font-size'] },
+  { name: 'queue subtitle', kind: 'queue', mock: '.title-row .sub', real: '.cdr-titlebar .sub', props: ['font-size', 'color'] },
+  { name: 'title button', kind: 'queue', mock: '.title-row .btn', real: '.cdr-titlebar .btn', props: ['font-size', 'font-weight', 'height'] },
+  { name: 'bulk counter', kind: 'queue', mock: '.bulk b', real: '.cdr-bulk .cdr-sel', props: ['font-size', 'font-weight', 'font-family', 'color'] },
+  { name: 'bulk button', kind: 'queue', mock: '.bulk .btn', real: '.cdr-bulk .action-button', props: ['font-size', 'height'] },
+  { name: 'ticket number link', kind: 'queue', mock: '.data .c-n a', real: 'table.queue tbody a.preview', props: ['font-size', 'color'] },
+  { name: 'unassigned', kind: 'queue', mock: '.data .unassigned', real: 'table.queue .cdr-unassigned', props: ['font-style', 'color'] },
+  { name: 'assignee avatar', kind: 'queue', mock: '.data .avatar', real: 'table.queue .cdr-who:not(.is-none) .cdr-av', props: ['width', 'font-size'] },
   { name: 'ticket h1 title', kind: 'ticket', mock: 'h1', real: '#content .tixTitle h3', props: ['font-size', 'font-weight', 'font-family'] },
-  { name: 'tabs link', kind: 'ticket', mock: '.tabs a', real: 'ul.tabs li a', props: ['font-size'] },
+  { name: 'tabs link', kind: 'ticket', mock: '.tabs a', real: 'ul.tabs li a', props: ['font-size', 'height'] },
   { name: 'panel title', kind: 'ticket', mock: '.panel-h h2', real: '.panel-h h2', props: ['font-size'] },
+  { name: 'props panel title', kind: 'ticket', mock: '.panel-h h2', real: 'aside.cdr-props h2.cdr-title', props: ['font-size', 'font-weight'] },
+  { name: 'entry avatar', kind: 'ticket', mock: '.entry .avatar', real: '.thread-entry > .cdr-av', props: ['width', 'font-size'] },
+  { name: 'entry author', kind: 'ticket', mock: '.entry .head strong', real: '.thread-entry > .header > b', props: ['font-size', 'font-family'] },
+  { name: 'entry role', kind: 'ticket', mock: '.entry .head .role', real: '.thread-entry > .header > .cdr-role', props: ['font-size', 'color'] },
+  { name: 'entry time', kind: 'ticket', mock: '.entry .head time', real: '.thread-entry > .header time', props: ['font-size', 'color'] },
+  { name: 'note flag', kind: 'note', mock: '.note-flag', real: '.thread-entry > .header > .cdr-role-note', props: ['font-size', 'font-weight', 'color'] },
   { name: 'props label', kind: 'ticket', mock: '.props dt', real: 'aside.cdr-props table.ticket_info th', props: ['font-size', 'color'] },
   { name: 'props value', kind: 'ticket', mock: '.props dd', real: 'aside.cdr-props table.ticket_info table td', props: ['font-size', 'font-weight'] },
   { name: 'thread body', kind: 'ticket', mock: '.entry .body', real: '.thread-body', props: ['font-size', 'font-family'] },
@@ -102,7 +117,7 @@ async function run() {
     const context = await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' });
     const page = await context.newPage();
     await login(page);
-    let diffs = 0;
+    let diffs = 0, oks = 0, allowedN = 0;
     for (const [kind, urls] of Object.entries(KINDS)) {
       const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind);
       const mock = await measure(page, pathToFileURL(join(MOCKUP_DIR, urls.mock)).href,
@@ -121,11 +136,15 @@ async function run() {
           const allowed = ALLOWED_DIFFS.find((d) => d.metric === name);
           const ok = same || !!allowed;
           if (!ok) diffs++;
+          else if (same) oks++;
+          else allowedN++;
           const note = allowed && !same ? `  (allowed: ${allowed.reason})` : '';
           console.log(`${ok ? 'OK' : 'DIFF'}  ${name}  mockup=${a}  real=${b}${note}`);
         }
       }
     }
+    console.log(`
+OK ${oks}  DIFF ${diffs}  ALLOWED ${allowedN}`);
     return diffs;
   } finally {
     await browser.close();
