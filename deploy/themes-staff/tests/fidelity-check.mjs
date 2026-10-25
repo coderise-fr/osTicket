@@ -20,12 +20,20 @@
 // (header.inc.php, cdr_ticket_idline), labelled buttons 'a.action-button.cdr-has-lbl' and
 // '.cdr-resolve' (ticket-chrome.js; ticket 1 is open). Ticket 45 is open, Standard and High
 // (urgent). Props 'top'/'left'/'width' are getBoundingClientRect() values at scroll 0.
+// Queue columns (queue-tickets.tmpl.php): contract chip 'td > .stack .plan', client line
+// 'small.cdr-client', first-reply cell '.cdr-gauge-col', top-level queue counts '.cdr-qcount'
+// (coderise.js). 'row-top' = top of the element minus the top of its table row; 'col-delta' =
+// visible column index of the element's cell minus that of the pair's mockRef / realRef cell
+// (column order, independent of the column widths).
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 // { metric: '<pair name> <property>', reason: '...' }: printed as OK with the reason, not counted.
-const ALLOWED_DIFFS = [];
+const ALLOWED_DIFFS = [
+  { metric: 'queue number to subject columns col-delta',
+    reason: 'the demo queue has "Last Updated" between them: column set and order are queue settings (admin, class 3)' },
+];
 
 const env = process.env;
 const PW_CORE = env.PW_CORE || 'playwright-core';
@@ -92,6 +100,16 @@ const PAIRS = [
   { name: 'labelled button (Edit)', kind: 'ticket', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-color', 'border-top-left-radius', 'background-color', 'top', 'left'] },
   { name: 'resolve button', kind: 'note', mock: '.t-actions .btn-primary', real: '#content .sticky.bar .cdr-resolve', props: ['font-size', 'font-weight', 'height', 'width', 'background-color', 'color', 'border-top-left-radius', 'top'] },
   { name: 'ticket tabs position', kind: 'ticket', mock: '.tabs', real: 'ul#ticket_tabs', props: ['top', 'left'] },
+  // Queue, wave 3: "Ticket et contrat", "Sujet et client", "Premier retour" after the subject, rail counts.
+  { name: 'queue Priority chip', kind: 'queue', mock: '.data .c-n .plan-priority', real: 'table.queue tbody td > .stack .plan-priority', props: ['font-size', 'font-weight', 'font-family', 'padding-left', 'border-top-left-radius', 'background-color', 'color', 'height', 'row-top'] },
+  { name: 'queue Standard chip', kind: 'queue', mock: '.data .c-n .plan-standard', real: 'table.queue tbody td > .stack .plan-standard', props: ['font-size', 'color', 'box-shadow', 'height', 'row-top'] },
+  { name: 'queue subject link', kind: 'queue', mock: '.data .subj a', real: 'table.queue tbody td .truncate a', props: ['font-size', 'font-weight', 'row-top'] },
+  { name: 'queue client line', kind: 'queue', mock: '.data .subj small', real: 'table.queue tbody td > small.cdr-client', props: ['font-size', 'font-weight', 'font-family', 'color', 'display'] },
+  { name: 'queue first reply follows subject', kind: 'queue', mock: '.data thead th[aria-sort]', mockRef: '.data thead th:nth-child(3)', real: 'table.queue thead th.cdr-gauge-col', realRef: 'table.queue thead th[data-id="3"]', props: ['col-delta'] },
+  { name: 'queue first reply cell follows the client cell', kind: 'queue', mock: '.data tbody tr:first-child td:has(.gauge)', mockRef: '.data tbody tr:first-child td.subj', real: 'table.queue tbody tr:has(small.cdr-client) td.cdr-gauge-col', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', props: ['col-delta', 'padding-top'] },
+  { name: 'queue number to subject columns', kind: 'queue', mock: '.data tbody tr:first-child td.subj', mockRef: '.data tbody tr:first-child td.c-n', real: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(a.preview)', props: ['col-delta'] },
+  { name: 'queue From column hidden', kind: 'queue', mock: '.data thead th:nth-child(3)', real: 'table.queue thead th.cdr-col-from', props: ['display'], expect: { mock: 'table-cell', real: 'none' } },
+  { name: 'rail top-level queue count', kind: 'queue', mock: '.rail .queues .badge', real: '#cdr-queues .cdr-qcount:not(.cdr-zero)', props: ['font-size', 'font-weight', 'height', 'min-width', 'background-color'] },
 ];
 
 async function login(page) {
@@ -123,11 +141,25 @@ async function measure(page, url, targets) {
     for (const t of targets) {
       const el = document.querySelector(t.sel);
       if (!el) { res[t.key] = null; continue; }
+      // visible column index of the cell holding el (cells hidden by CSS are not columns)
+      const colIndex = (node) => {
+        const cell = node && node.closest('td, th');
+        if (!cell) return null;
+        return [...cell.parentElement.children].filter((c) => getComputedStyle(c).display !== 'none').indexOf(cell);
+      };
       const cs = getComputedStyle(el), r = {};
       for (const p of t.props) {
         if (p === 'height') r[p] = el.getBoundingClientRect().height + 'px';
         else if (p === 'width') r[p] = el.getBoundingClientRect().width + 'px';
         else if (p === 'top' || p === 'left') r[p] = el.getBoundingClientRect()[p] + 'px';
+        else if (p === 'row-top') {
+          const tr = el.closest('tr');
+          r[p] = tr ? (el.getBoundingClientRect().top - tr.getBoundingClientRect().top) + 'px' : null;
+        }
+        else if (p === 'col-delta') {
+          const ref = t.ref ? document.querySelector(t.ref) : null, a = colIndex(el), b = colIndex(ref);
+          r[p] = a === null || b === null || a < 0 || b < 0 ? null : String(a - b);
+        }
         else if (p === 'font-family') r[p] = cs.fontFamily.split(',')[0].trim().replace(/["']/g, '');
         else r[p] = cs.getPropertyValue(p);
       }
@@ -150,16 +182,17 @@ async function run() {
     for (const [kind, urls] of Object.entries(KINDS)) {
       const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind);
       const mock = await measure(page, pathToFileURL(join(MOCKUP_DIR, urls.mock)).href,
-        pairs.map((p) => ({ key: String(p.i), sel: p.mock, props: p.props })));
+        pairs.map((p) => ({ key: String(p.i), sel: p.mock, ref: p.mockRef, props: p.props })));
       const real = await measure(page, BASE + urls.real,
-        pairs.map((p) => ({ key: String(p.i), sel: p.real, props: p.props })));
+        pairs.map((p) => ({ key: String(p.i), sel: p.real, ref: p.realRef, props: p.props })));
       for (const p of pairs) {
         for (const prop of p.props) {
           const name = `${p.name} ${prop}`;
           const a = mock[p.i]?.[prop] ?? 'MISSING';
           const b = real[p.i]?.[prop] ?? 'MISSING';
           let same;
-          if (a === 'MISSING' || b === 'MISSING') same = false;
+          if (p.expect) same = a === p.expect.mock && b === p.expect.real;
+          else if (a === 'MISSING' || b === 'MISSING') same = false;
           else if (/px$/.test(a) && /px$/.test(b)) same = Math.abs(parseFloat(a) - parseFloat(b)) <= (p.tol ?? 0.5);
           else same = a === b;
           const allowed = ALLOWED_DIFFS.find((d) => d.metric === name);
