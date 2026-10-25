@@ -8,6 +8,8 @@
     1. Translation
        - cdr__()               osTicket's __() first, then the theme's own
                                catalogue (i18n/<lang>.php), else the msgid
+       - cdr_t()               the theme's catalogue first, then cdr__()
+       - cdr_catalog()         the theme catalogue of the current language
     2. Output helpers
        - cdr_h()               HTML escaping
        - cdr_icon()            inline line icons (no icon font, no request)
@@ -22,6 +24,10 @@
     4. Shell (header.inc.php)
        - cdr_rail()            the <aside class="rail"> (mode switch, menu,
                                queues, profile and log out)
+       - cdr_agent_tabs()      agent tabs in the mockup's order
+       - cdr_tab_label()       label of a tab, in the theme's wording
+       - cdr_staff_line()      the department / role line of the rail foot
+       - cdr_find_queue()      a queue of the loaded queue tree, by id
        - cdr_crumbs()          the breadcrumb of the top bar
        - cdr_content_class()   the classes of #content
 
@@ -62,18 +68,40 @@ if (!defined('CDR_VERSION')) {
      */
     function cdr__($msgid) {
         global $CDR_TEST_LANG; // not $GLOBALS: setup/test UnitializedVars flags it
-        static $catalogs = array();
-        $lang = '';
-        if (isset($CDR_TEST_LANG)) {
-            $lang = (string) $CDR_TEST_LANG;
-        }
-        else {
+        if (!isset($CDR_TEST_LANG)) {
             $text = __($msgid);
             if ($text !== $msgid)
                 return $text;
-            if (class_exists('Internationalization'))
-                $lang = (string) Internationalization::getCurrentLanguage();
         }
+        $catalog = cdr_catalog();
+        return isset($catalog[$msgid]) ? $catalog[$msgid] : $msgid;
+    }
+
+    /**
+     * Translate with the theme's wording first: the theme catalogue of the
+     * current language wins over osTicket's pack, which still serves the
+     * languages the theme has no catalogue for (then the msgid). Only for
+     * labels whose pack wording differs from the mockup's (the rail tabs and
+     * the crumbs: the pack's "Tableau de Bord" vs "Tableau de bord").
+     */
+    function cdr_t($msgid) {
+        $catalog = cdr_catalog();
+        return isset($catalog[$msgid]) ? $catalog[$msgid] : cdr__($msgid);
+    }
+
+    /**
+     * The theme catalogue of the current language (i18n/<lang>.php, e.g.
+     * fr_FR then fr), array() when there is none. $GLOBALS['CDR_TEST_LANG'],
+     * when set, replaces the current language (tests only).
+     */
+    function cdr_catalog() {
+        global $CDR_TEST_LANG;
+        static $catalogs = array();
+        $lang = '';
+        if (isset($CDR_TEST_LANG))
+            $lang = (string) $CDR_TEST_LANG;
+        elseif (class_exists('Internationalization'))
+            $lang = (string) Internationalization::getCurrentLanguage();
         if (!isset($catalogs[$lang])) {
             $catalogs[$lang] = array();
             foreach (array($lang, substr($lang, 0, 2)) as $code) {
@@ -86,7 +114,7 @@ if (!defined('CDR_VERSION')) {
                 }
             }
         }
-        return isset($catalogs[$lang][$msgid]) ? $catalogs[$lang][$msgid] : $msgid;
+        return $catalogs[$lang];
     }
 
     /* ------------------------------------------------------------------
@@ -454,6 +482,79 @@ if (!defined('CDR_VERSION')) {
     }
 
     /**
+     * Agent tabs in the mockup's order: Dashboard, Tickets, Tasks, Users,
+     * Knowledgebase (core: Dashboard, Users, Tasks, Tickets, Knowledgebase),
+     * then any other tab (applications, plugins) in core's order. Keys and
+     * tab arrays are kept as they are.
+     */
+    function cdr_agent_tabs($tabs) {
+        if (!is_array($tabs))
+            return array();
+        $out = array();
+        foreach (array('dashboard', 'tickets', 'tasks', 'users', 'kbase') as $k)
+            if (isset($tabs[$k]))
+                $out[$k] = $tabs[$k];
+        foreach ($tabs as $k => $tab)
+            if (!array_key_exists($k, $out))
+                $out[$k] = $tab;
+        return $out;
+    }
+
+    /**
+     * Label of a rail tab (agent or admin), plain text. Core builds the tabs
+     * with labels already translated (StaffNav/AdminNav: 'desc' =>
+     * __('Dashboard')), so the theme's wording (cdr_t()) can only apply by
+     * tab key, and only while the label is still core's own (a plugin that
+     * renamed a tab keeps its label). Other labels go through cdr__().
+     */
+    function cdr_tab_label($name, $desc) {
+        static $msgids = array('dashboard' => 'Dashboard', 'users' => 'Users',
+            'tasks' => 'Tasks', 'tickets' => 'Tickets', 'kbase' => 'Knowledgebase',
+            'apps' => 'Applications', 'settings' => 'Settings', 'manage' => 'Manage',
+            'emails' => 'Emails', 'staff' => 'Agents');
+        $desc = (string) $desc;
+        if (is_string($name) && isset($msgids[$name])
+                && ($desc === $msgids[$name] || $desc === __($msgids[$name])))
+            return cdr_t($msgids[$name]);
+        return cdr__($desc);
+    }
+
+    /**
+     * The second line of the rail foot, plain text (escape to print): the
+     * department, followed by the role for an administrator
+     * ("Support, administrateur"), as the mockup's "Support Priority,
+     * administratrice". '' when there is nothing to say.
+     */
+    function cdr_staff_line($staff) {
+        if (!is_object($staff))
+            return '';
+        $dept = ($d = $staff->getDept()) ? trim((string) $d->getName()) : '';
+        if (!$staff->isAdmin())
+            return $dept;
+        return $dept !== '' ? sprintf(cdr__('%s, administrator'), $dept)
+            : cdr__('Administrator');
+    }
+
+    /**
+     * The queue with id $id in core's queue tree (CustomQueue::
+     * getHierarchicalQueues(): a list of array($queue, $children)), or null.
+     * No query: the tree is the one scp/tickets.php already loaded.
+     */
+    function cdr_find_queue($tree, $id) {
+        if (!is_array($tree) || !is_numeric($id) || (int) $id <= 0)
+            return null;
+        foreach ($tree as $node) {
+            if (!is_array($node) || !isset($node[0]) || !is_object($node[0]))
+                continue;
+            if ((int) $node[0]->getId() === (int) $id)
+                return $node[0];
+            if (isset($node[1]) && ($q = cdr_find_queue($node[1], $id)))
+                return $q;
+        }
+        return null;
+    }
+
+    /**
      * The rail of the staff panel. $nav (StaffNav or AdminNav) may be null
      * (profile.php); $staff is the logged-in agent. Admin mode is the
      * ADMINPAGE constant set by scp/admin.inc.php. One markup for every
@@ -489,13 +590,13 @@ if (!defined('CDR_VERSION')) {
                 static $icons = array('dashboard' => 'chart', 'users' => 'users',
                     'tasks' => 'tasks', 'tickets' => 'ticket', 'kbase' => 'book');
                 $o .= '<div class="group"><ul>';
-                foreach ($tabs as $name => $tab) {
+                foreach (cdr_agent_tabs($tabs) as $name => $tab) {
                     $cur = !empty($tab['active']) || $name === $active;
                     $cls = trim('item ' . (isset($tab['class']) ? preg_replace('/[^a-z0-9_ -]/i', '', $tab['class']) : ''));
                     $o .= '<li><a class="' . $cls . '" href="' . cdr_h(cdr_nav_href($tab['href'])) . '"'
                         . ($cur ? ' aria-current="page"' : '') . '>'
                         . cdr_icon(isset($icons[$name]) ? $icons[$name] : 'layers')
-                        . cdr_h(cdr__($tab['desc'])) . '</a>';
+                        . cdr_h(cdr_tab_label($name, $tab['desc'])) . '</a>';
                     if ($cur) {
                         // Core sub-navigation (queues, counts, "add personal
                         // queue"), renamed so jb.overflow.menu.js leaves it be.
@@ -522,7 +623,7 @@ if (!defined('CDR_VERSION')) {
                 foreach ($tabs as $name => $tab) {
                     $items = $nav->getSubMenu($name) ?: array();
                     $current = cdr_current_item($nav, $name, $items);
-                    $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr__($tab['desc'])) . '</p><ul>';
+                    $o .= '<div class="group"><p class="group-title">' . cdr_h(cdr_tab_label($name, $tab['desc'])) . '</p><ul>';
                     foreach ($items as $k => $item) {
                         if (!is_array($item) || !empty($item['droponly']) || !isset($item['href']))
                             continue;
@@ -539,15 +640,17 @@ if (!defined('CDR_VERSION')) {
 
         // Foot: who is logged in, profile, log out.
         $name = is_object($staff) ? (string) $staff->getName() : '';
-        $dept = (is_object($staff) && ($d = $staff->getDept())) ? (string) $d->getName() : '';
+        $line = cdr_staff_line($staff);
         $token = is_object($ost) ? $ost->getLinkToken() : '';
+        // "Sign Out" (pack: "Se déconnecter", the mockup's wording) rather
+        // than core's "Log Out" ("Déconnexion")
         $o .= '<div class="foot"><div class="me"><span class="avatar" aria-hidden="true">'
             . cdr_h(cdr_initials($name)) . '</span><span><b>' . cdr_h($name) . '</b>'
-            . ($dept !== '' ? '<small>' . cdr_h($dept) . '</small>' : '') . '</span></div>'
+            . ($line !== '' ? '<small>' . cdr_h($line) . '</small>' : '') . '</span></div>'
             . '<a class="item" href="' . ROOT_PATH . 'scp/profile.php">' . cdr_icon('user')
             . cdr_h(cdr__('My Profile')) . '</a>'
             . '<a class="item no-pjax" href="' . ROOT_PATH . 'scp/logout.php?auth=' . cdr_h($token) . '">'
-            . cdr_icon('logout') . cdr_h(cdr__('Log Out')) . '</a></div>';
+            . cdr_icon('logout') . cdr_h(cdr__('Sign Out')) . '</a></div>';
 
         return $o . '</div></aside>';
     }
@@ -555,17 +658,21 @@ if (!defined('CDR_VERSION')) {
     /**
      * Breadcrumb of the top bar: [Administration /] active tab / $current
      * (queue name, "Ticket #123"), or the active sub-menu item when
-     * $current is null. $current is plain text (escaped here). '' when
-     * there is nothing to show.
+     * $current is null. $parent, array(label, href), is a crumb between the
+     * tab and $current (the queue the ticket was opened from). Labels are
+     * plain text (escaped here). '' when there is nothing to show.
      */
-    function cdr_crumbs($nav, $current=null, $admin=false) {
+    function cdr_crumbs($nav, $current=null, $admin=false, $parent=null) {
         $crumbs = array();
         if ($admin)
             $crumbs[] = array(cdr__('Administration'), ROOT_PATH . 'scp/admin.php');
         if ($nav && ($t = $nav->getActiveTab())) {
             $tabs = $nav->getTabs();
             if (is_array($tabs) && isset($tabs[$t]))
-                $crumbs[] = array(cdr__($tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
+                $crumbs[] = array(cdr_tab_label($t, $tabs[$t]['desc']), cdr_nav_href($tabs[$t]['href']));
+            if (is_array($parent) && isset($parent[0], $parent[1])
+                    && (string) $parent[0] !== '')
+                $crumbs[] = array((string) $parent[0], (string) $parent[1]);
             if ($current === null) {
                 $sub = $nav->getSubMenu($t);
                 $k = cdr_current_item($nav, $t, $sub);
