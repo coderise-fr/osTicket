@@ -1,1 +1,103 @@
-/* coderise-agent: queue rules (loaded after coderise.css; one workstream owns this file). */
+/* coderise-agent: queue rules (loaded after coderise.css; one workstream owns this file).
+   Queue page (/scp/tickets.php, mockup tickets.html). px only: the core sets html at 14px.
+   Every rule starts from #content.cdr-tickets or from a class coderise.js / queue.js adds, so no other page is touched. */
+
+/* ───────── A9 title block (built by queue.js before #content) ───────── */
+.cdr-titlebar { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px 24px; margin: 22px 28px 16px; }
+.cdr-titlebar .cdr-tt { min-width: 0; }
+.cdr-titlebar h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; padding: 0; color: var(--nuit); font: 700 21px/1.25 var(--f-titre); }
+.cdr-titlebar h1 > i { font-size: 14px; }
+.cdr-titlebar .sub { margin: 2px 0 0; color: var(--ardoise); font: 400 13.5px/1.5 var(--f-texte); }
+.cdr-titlebar .cdr-tact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cdr-titlebar .cdr-tact .btn { text-decoration: none; }
+.cdr-titlebar .cdr-tact .help-tip { color: var(--ardoise); cursor: pointer; }
+.cdr-titlebar .cdr-tact .btn > i { color: inherit; }
+@media (max-width: 920px) { .cdr-titlebar { margin: 16px 12px 12px; } }
+
+/* ───────── A10 card: the panel holds the filter row, the bar and the table edge to edge ───────── */
+#content.cdr.cdr-tickets { margin-top: 0; padding: 0; }
+#content.cdr-tickets > :is(#msg_error, #msg_warning, #msg_notice, #msg_info) { margin: 12px 16px; }
+#content.cdr-tickets #basic_search { margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--gris); }
+#content.cdr-tickets form#tickets > table.queue { width: 100%; max-width: 100%; margin: 0; }
+@media (max-width: 920px) { #content.cdr.cdr-tickets { margin: 12px; padding: 0; } }
+
+/* ───────── A12 search field: no ring on load (queue.js blurs the core autofocus); keyboard focus keeps a ring ───────── */
+#content.cdr-tickets input.basic-search:focus:not(:focus-visible) { outline: 0; box-shadow: none; }
+#content.cdr-tickets input.basic-search:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* ───────── A13 bulk bar (always visible, core bar kept): counter, labelled actions, claim ───────── */
+#content .sticky.bar.cdr-bulk { border-radius: 0; }
+#content .sticky.bar.cdr-bulk > .content { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 16px; }
+#content .sticky.bar.cdr-bulk > .content::after { content: none; }
+#content .sticky.bar.cdr-bulk > .content > .pull-left { float: none; order: 1; margin: 0; }
+#content .sticky.bar.cdr-bulk > .content > .configureQ { float: none; order: 0; margin: 0; min-height: 30px; }
+#content .sticky.bar.cdr-bulk > .content > .pull-right { float: none; order: 2; flex: 1 1 auto; margin: 0; }
+#content .sticky.bar.cdr-bulk > .content > .pull-left:not(:has(*)) { display: none; }
+#content .sticky.bar.cdr-bulk .pull-right.flush-right { align-items: center; gap: 8px; }
+#content .sticky.bar.cdr-bulk .cdr-sel { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0 6px; color: var(--blanc); font: 600 13px var(--f-titre); white-space: nowrap; }
+#content .sticky.bar.cdr-bulk .cdr-sel b { display: inline-block; min-width: 22px; padding: 0 7px; border-radius: 999px; background: var(--blanc); color: var(--nuit); font: 700 12px/20px var(--f-titre); text-align: center; box-sizing: border-box; }
+#content .sticky.bar.cdr-bulk .cdr-sel.is-on b { background: var(--cyan); }
+/* action buttons: white label next to the icon, outline on nuit (mockup .btn-on-dark) */
+#content .sticky.bar.cdr-bulk .pull-right :is(span.action-button, a.action-button) { display: inline-flex; align-items: center; gap: 0; min-height: 30px; box-sizing: border-box; margin: 0; padding: 0; border: 1.5px solid rgba(255,255,255,.55); border-radius: 6px; background: transparent; color: var(--blanc); font: 600 12.5px var(--f-titre); }
+#content .sticky.bar.cdr-bulk .pull-right :is(span.action-button, a.action-button):hover { background: rgba(255,255,255,.12); }
+#content .sticky.bar.cdr-bulk .pull-right span.action-button > a { display: inline-flex; align-items: center; gap: 6px; min-height: 27px; padding: 0 10px; color: var(--blanc); text-decoration: none; order: 1; }
+#content .sticky.bar.cdr-bulk .pull-right a.action-button { gap: 6px; padding: 0 10px; text-decoration: none; }
+#content .sticky.bar.cdr-bulk .pull-right span.action-button > i.icon-caret-down { float: none; order: 2; align-self: stretch; display: inline-flex; align-items: center; padding: 0 8px; border-inline-start: 1px solid rgba(255,255,255,.35); }
+#content .sticky.bar.cdr-bulk .cdr-lbl { color: var(--blanc); font: 600 12.5px var(--f-titre); white-space: nowrap; }
+#content .sticky.bar.cdr-bulk .pull-right a.cdr-claim { margin-inline-start: auto; border-color: var(--cyan); background: var(--cyan); color: var(--nuit); }
+#content .sticky.bar.cdr-bulk .pull-right a.cdr-claim:hover { background: var(--blanc); border-color: var(--blanc); }
+#content .sticky.bar.cdr-bulk .pull-right a.cdr-claim :is(i, .cdr-lbl) { color: var(--nuit); }
+#content .sticky.bar.cdr-bulk .pull-right a.red.button { border-color: rgba(255,255,255,.55) !important; }
+/* the queue name moved to the title block: nothing left in the h2 */
+#content .sticky.bar.cdr-bulk h2:not(:has(*)) { display: none; }
+
+/* ───────── A18 headers: the arrow only on the sorted column ───────── */
+#content table.queue > thead > tr > th { border-top: 0; font: 600 12px/1.35 var(--f-titre); }
+#content table.queue > thead > tr > th a[href]:not(.asc):not(.desc)::after { content: none; }
+#content table.queue > thead > tr > th a:is(.asc, .desc)::after { font-size: 14px; line-height: 1; }
+
+/* ───────── A29 selection: header check box wired to #selectAll / #selectNone, 13 px boxes ───────── */
+#content table.queue :is(input.ckb, input.cdr-ckb-all) { width: 13px; height: 13px; margin: 0; vertical-align: middle; accent-color: var(--nuit); }
+#content table.queue > thead > tr > th:first-child:not([data-id]) { width: 1%; padding-inline-end: 0; }
+#content table.queue > tbody > tr > td:first-child:has(> input.ckb) { padding-inline-end: 0; }
+#content table.queue > tbody > tr > td > input.ckb { margin-top: 3px; }
+/* core's "Select: All None Toggle" row stays in the DOM and reachable from the keyboard, off screen until it takes focus */
+#content table.queue > tfoot.cdr-sel-foot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#content table.queue > tfoot.cdr-sel-foot:focus-within { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+
+/* ───────── A19 weights: subject 600, other cells 400 (mockup); core's "unanswered" bold survives on the number ───────── */
+#content table.queue > tbody > tr > td[style*="font-weight"], #content table.queue > tbody > tr > td[style*="font-weight"] > div { font-weight: 400 !important; }
+#content table.queue > tbody > tr > td .truncate, #content table.queue > tbody > tr > td .truncate a { font-weight: 600 !important; }
+#content table.queue > tbody > tr:has(> td[style*="font-weight"]) a.preview { font-weight: 600; }
+
+/* ───────── A20 ticket number: "#767979", the source GIF hidden ───────── */
+#content table.queue > tbody > tr > td > .Icon:has(+ a.preview), #content table.queue > tbody > tr > td > div > .Icon:has(+ a.preview) { display: none; }
+#content table.queue > tbody > tr > td a.preview::before { content: "#"; }
+#content table.queue > tbody > tr > td a.preview { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-underline-offset: 2px; white-space: nowrap; }
+
+/* ───────── A23 / A24 subject wraps (core: one line, 275 px, ellipsis); rows grow with their content ───────── */
+#content table.queue > tbody > tr > td .truncate { display: inline; max-width: none !important; overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: break-word; }
+#content table.queue > tbody > tr > td:has(> .truncate, > div > .truncate) { min-width: 180px; }
+#content table.queue > tbody > tr > td .truncate a { text-decoration: none; }
+#content table.queue > tbody > tr > td .truncate a:hover { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
+#content table.queue > tbody > tr > td { padding: 8px 12px; line-height: 1.4; }
+#content table.queue > tbody > tr > td :is(.pull-right) { margin-inline-start: 8px; }
+#content table.queue > tbody > tr > td :is(.pull-left) { margin-inline-end: 6px; }
+
+/* ───────── A25 assignee: initials disc + name (queue.js) ───────── */
+#content table.queue .cdr-who { display: inline-flex; align-items: center; gap: 8px; }
+#content table.queue .cdr-who .cdr-av { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--nuit); color: var(--blanc); font: 700 10px var(--f-titre); }
+#content table.queue .cdr-who .cdr-name { line-height: 1.25; }
+#content table.queue .cdr-who.is-none .cdr-av { width: 20px; height: 20px; background: none; border: 1.5px dashed var(--ardoise); box-sizing: border-box; }
+
+/* ───────── A28 first-reply column flexible, 12 px text ───────── */
+#content table.queue > :is(thead, tbody) > tr > .cdr-gauge-col { width: 14%; min-width: 136px; white-space: nowrap; }
+#content table.queue .gauge { min-width: 100px; }
+#content table.queue .gauge-none { font-size: 12px; }
+
+/* ───────── A30 footer: "Visible 1 - 25 sur ~41" left, pager right, inside the panel ───────── */
+#content.cdr-tickets form#tickets > div.cdr-qfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0; padding: 9px 16px; border-top: 1px solid var(--gris); border-radius: 0 0 10px 10px; color: var(--ardoise); font-size: 0; }
+#content.cdr-tickets form#tickets > div.cdr-qfoot > .faded { order: -1; float: none; margin-inline-end: auto; padding-inline-end: 12px; color: var(--ardoise); font: 400 13.5px/1.5 var(--f-texte); }
+#content.cdr-tickets form#tickets > div.cdr-qfoot > a[href]:has(> b, > strong), #content.cdr-tickets form#tickets > div.cdr-qfoot > .cdr-page-current { font-size: 13.5px; }
+/* the table above has no foot border of its own once its selection row is off screen */
+#content.cdr-tickets form#tickets > table.queue > tfoot.cdr-sel-foot td { border-top: 0; }

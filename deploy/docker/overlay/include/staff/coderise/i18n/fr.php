@@ -4,7 +4,8 @@
 
     French catalogue of the "coderise-agent" staff theme, keyed by the
     English msgid (see cdr__() in ../coderise.inc.php). osTicket's own
-    language pack, when installed, wins over this file.
+    language pack, when installed, wins over this file, except for the
+    labels printed through cdr_t() (rail tabs, crumbs: "Tableau de bord").
 
     Inventory: every label the rail can show (agent and admin tabs and all
     their sub-menus, as defined in include/class.nav.php), the chrome of
@@ -81,6 +82,10 @@ return array(
     // Chrome of the theme
     'Profile' => 'Profil',
     'Log Out' => 'Déconnexion',
+    'Sign Out' => 'Se déconnecter',
+    // Rail foot: department, then the role of an administrator
+    '%s, administrator' => '%s, administrateur',
+    'Administrator' => 'Administrateur',
     'New Ticket' => 'Nouveau ticket',
     'New ticket' => 'Nouveau ticket',
     'Not assigned' => 'Non assigné',
@@ -91,6 +96,9 @@ return array(
     'Agent' => 'Agent',
     'Panel' => 'Panneau',
     'Search tickets' => 'Rechercher un ticket',
+    // Top bar search: the results are tickets (keywords also match the
+    // client's name and e-mail), so the wording names tickets only
+    'Search tickets by number, subject or client' => 'Rechercher un ticket : numéro, sujet, client',
     'Skip to content' => 'Aller au contenu',
     'Breadcrumb' => "Fil d'Ariane",
     'Upgrader' => 'Mise à jour',

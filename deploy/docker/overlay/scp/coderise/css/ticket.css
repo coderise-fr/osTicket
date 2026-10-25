@@ -1,1 +1,69 @@
 /* coderise-agent: ticket rules (loaded after coderise.css; one workstream owns this file). */
+
+/* ═════════ Thread (fidelity pass: thread workstream) ═════════
+   Overrides of the thread rules of coderise.css, same specificity or higher,
+   loaded later. Markup is the core thread-entry / thread-event templates;
+   ticket.js only adds the initials disc (.cdr-av), tags empty subtitles and
+   moves the event time next to the event. */
+
+/* B1. Core scp.css `.avatar { border-radius: 12% }` also hits the whole entry
+   block when avatars are on (`thread-entry message avatar`): percentage radii
+   are elliptical on a wide block. The small disc keeps its own 50%. */
+#content.cdr-ticket .thread-entry.avatar { border-radius: 0; }
+#content.cdr-ticket .thread-entry > .avatar { border-radius: 50%; }
+
+/* B2. Client message = flat voile row (the mockup .entry.from-client): square
+   corners, the grey rule from #thread-items > [id^="thread-entry-"], cyan
+   bar on the latest entry only (coderise.css). Nothing to override. */
+
+/* B11. Initials disc (mockup .avatar / .av-team). ticket.js inserts
+   span.cdr-av as the first child of the entry; core's avatar span (Gravatar
+   image, loaded from the network) stays in the DOM but is not displayed. The
+   CSS person disc (::before) remains the fallback when ticket.js did not run. */
+#content.cdr-ticket .thread-entry.cdr-has-av::before { content: none; display: none; }
+#content.cdr-ticket .thread-entry.cdr-has-av > .avatar { display: none; }
+#content.cdr-ticket .thread-entry > .cdr-av { grid-column: 1; grid-row: 1 / span 2; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; flex: none; overflow: hidden; background: var(--voile); color: var(--nuit); box-shadow: inset 0 0 0 1.5px var(--cyan-profond); font: 700 11px/1 var(--f-titre); letter-spacing: 0; text-transform: uppercase; user-select: none; }
+#content.cdr-ticket .thread-entry > .cdr-av.cdr-av-team { background: var(--nuit); color: var(--blanc); box-shadow: none; }
+
+/* B12. Entry header (mockup .entry .head): the core sentence is
+   "<b>Name</b> posted <a><time>…</time></a>". The words between the elements
+   are bare text nodes: the container is font-size 0 (they take no room, they
+   stay readable by screen readers) and every child element sets its own 13.5px.
+   The head is a wrapping flex row: name, entry subtitle on its own line below,
+   time pushed to the right in ardoise, then core's action buttons. */
+#content.cdr-ticket .thread-entry > .header { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; font-size: 0; }
+#content.cdr-ticket .thread-entry > .header > * { font-size: 13.5px; line-height: 20.25px; }
+#content.cdr-ticket .thread-entry > .header > b { order: 0; }
+#content.cdr-ticket .thread-entry > .header > a[href^="#entry-"] { order: 1; margin-inline-start: auto; }
+#content.cdr-ticket .thread-entry > .header > .pull-right { order: 2; align-self: center; margin: -4px 0; }
+#content.cdr-ticket .thread-entry > .header > .title { order: 3; flex: 1 0 100%; min-width: 0; margin: 0; color: var(--ardoise); }
+#content.cdr-ticket .thread-entry > .header > .title.cdr-empty { display: none; }
+#content.cdr-ticket .thread-entry > .header time { color: inherit; font: 400 13.5px/20.25px var(--f-texte); }
+#content.cdr-ticket .thread-entry.note > .header time { color: var(--alerte); }
+
+/* B13. Message body: Inter 13.5/20.25 on the container only (core thread.css
+   forces Helvetica 14px !important); rich content with inline styles wins. */
+#content.cdr-ticket .thread-entry > .thread-body { font-family: var(--f-texte); font-size: 13.5px !important; line-height: 20.25px; }
+#content.cdr-ticket .thread-entry > .thread-body p { margin: 0 0 .6em; }
+#content.cdr-ticket .thread-entry > .thread-body p:last-child { margin-bottom: 0; }
+
+/* B16. Internal note label (mockup .note-flag): plain alerte text, Montserrat
+   600 12px, no frame. The text is --cdr-note-label from header.inc.php. A lock
+   icon can be added by the icons rules on this same ::after (background +
+   padding-inline-start). */
+#content.cdr-ticket .thread-entry.note > .header > b::after { margin-inline-start: 10px; padding: 0; border-radius: 0; box-shadow: none; font: 600 12px/20.25px var(--f-titre); vertical-align: baseline; }
+
+/* B15. Events (mockup .event): icon area 14px, text ardoise with bold names,
+   time pushed to the right (ticket.js moves the <time> out of the sentence). */
+#content.cdr-ticket .thread-event { align-items: center; padding: 7px 16px 7px 58px; font-size: 13.5px; line-height: 20.25px; }
+html.rtl #content.cdr-ticket .thread-event { padding: 7px 58px 7px 16px; }
+#content.cdr-ticket .thread-event .type-icon { display: grid; place-items: center; width: 14px; height: 14px; font-size: 14px; line-height: 14px; }
+#content.cdr-ticket .thread-event .description { font-size: 13.5px; line-height: 20.25px; }
+#content.cdr-ticket .thread-event .description :is(b, strong) { font-weight: 600; }
+#content.cdr-ticket .thread-event > time { flex: none; margin-inline-start: auto; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); white-space: nowrap; }
+#content.cdr-ticket .thread-event img.avatar { display: none; } /* the mockup shows names only */
+
+@media (max-width: 760px) {
+  #content.cdr-ticket .thread-entry > .cdr-av { display: none; }
+  #content.cdr-ticket .thread-event { padding: 7px 14px; }
+}
