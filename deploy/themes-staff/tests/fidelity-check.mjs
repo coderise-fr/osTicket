@@ -111,8 +111,13 @@ async function measure(page, url, targets) {
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForTimeout(500);
   // top/left are viewport positions: measured from the top of the page (thread.js scrolls)
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(400);
+  // (thread.js scrolls to the last entry after load, with an animation): back to the top until it stays
+  for (let i = 0, still = 0; i < 20 && still < 2; i++) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(300);
+    still = (await page.evaluate(() => window.scrollY)) === 0 ? still + 1 : 0;
+  }
+  await page.waitForTimeout(300);
   return page.evaluate((targets) => {
     const res = {};
     for (const t of targets) {
