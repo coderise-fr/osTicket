@@ -135,6 +135,18 @@ return array(
     'Edit ticket' => 'Modifier',
     'Print ticket' => 'Imprimer',
     'Mark as resolved' => 'Marquer comme résolu',
+    // the cluster of core's other actions (reply, note, status, assign...)
+    'Other ticket actions' => 'Autres actions sur le ticket',
+    // Reply and note forms: "Options" disclosure and the line above the
+    // editor (mockup .compose .to); "modified" (below) marks a folded field
+    // that differs from its default
+    'Sending options' => "Options d'envoi",
+    'Note options' => 'Options de la note',
+    'To: %s' => 'À : %s',
+    'Visible to the team only. The client receives nothing.' => "Visible de l'équipe uniquement. Le client ne reçoit rien.",
+    // "Log" tab of the ticket view (the thread's events only)
+    'Log' => 'Journal',
+    'No event has been recorded for this ticket yet.' => "Aucun événement n'a encore été enregistré pour ce ticket.",
 
     // Queue list (queue.js): selection counter, header check box
     'No ticket selected' => 'Aucune sélection', // short: the bar holds 6 actions at 1280

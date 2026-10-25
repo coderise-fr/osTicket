@@ -118,11 +118,43 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   choisi par `header.inc.php` (`cdr_resolve_status_id()`) : le statut « Resolved » d'origine
   (id 2) s'il existe et est un état fermé, sinon l'unique statut fermé ; s'il y en a plusieurs
   sans « Resolved », pas de bouton (le thème ne devine pas). Jamais sur un ticket fermé. Le
-  dialogue du cœur peut encore refuser la fermeture (tâches ouvertes, champs requis). Écarts : à 2000 px les
-  7 à 9 actions du cœur restent sous le titre (la maquette met ses 3 boutons à droite) ; la
+  dialogue du cœur peut encore refuser la fermeture (tâches ouvertes, champs requis).
+  Disposition (passe 4) : les trois boutons libellés forment le groupe de la maquette, les
+  autres actions du cœur (répondre, note, état, assigner, transférer, plus) un groupe
+  d'icônes compact de 32 px juste après (deux enveloppes du thème, `span.cdr-acts` et
+  `span.cdr-tools`, autour des nœuds du cœur déplacés : identifiants, menus et gestionnaires
+  intacts). À partir de 1560 px (largeur à laquelle la maquette passe ses boutons à droite du
+  titre), le groupe est à droite du bloc titre, sur deux rangées (libellés, puis icônes) aussi
+  hautes que le bloc titre ; en dessous, sous le titre comme avant. Même conteneur et même
+  barre collante du cœur : la cellule garde sa largeur quand la barre flotte (aucun
+  déplacement de la page) et la barre flottante aligne ses boutons à droite. Écarts : le groupe
+  libellé est 30 px plus large que celui de la maquette (le bouton Imprimer garde le chevron
+  du menu d'impression du cœur), il commence donc 30 px plus à gauche à 2000 px ; la
   barre nuit fixée n'affiche plus « Ticket #N » (le fil d'Ariane le montre) ; le libellé du
   contrat est celui du plugin (« Priorité » avec le pack français, la maquette écrit
   « Priority ») ; l'état est le nom du statut en base (« Open »).
+- Zone de réponse (passe 4) : une ligne au-dessus de l'éditeur, comme la maquette
+  (« À : » suivi du client et de son adresse pour la réponse, « Visible de l'équipe uniquement. Le client ne
+  reçoit rien. » pour la note), avec un bouton « Options d'envoi » / « Options de la note »
+  (`aria-expanded`, `aria-controls`) qui replie les champs secondaires du cœur : De,
+  Destinataires et collaborateurs, Répondre à, Signature (réponse), titre de la note (note).
+  Seule leur visibilité change (une classe sur le formulaire) : aucun champ ne sort du
+  formulaire, aucun nom ni identifiant ne change, le formulaire envoie les mêmes valeurs
+  (vérifié avec `FormData`). Le panneau s'ouvre de lui-même si un champ replié n'a pas sa
+  valeur par défaut (première option pour De et Répondre à, signature par défaut de l'agent,
+  collaborateurs de la page, titre vide) ou affiche une erreur du serveur ; tant qu'un champ
+  replié diffère de sa valeur par défaut, le bouton porte la marque « modifié ». Restent
+  visibles : réponses types, éditeur (barre Redactor complète, composant tiers), zone de
+  dépôt, état et boutons d'envoi.
+- Onglet « Journal » (passe 4) : ajouté après les onglets du cœur, même balisage
+  (`ul#ticket_tabs > li > a`), il montre le même contenu que « Fil du ticket » en mode
+  journal : seulement les événements (`.thread-event`), en liste compacte, ou « Aucun
+  événement n'a encore été enregistré pour ce ticket. ». Son lien (`#cdr-journal`) a son
+  propre gestionnaire, qui arrête le clic avant celui des onglets du cœur ; tout autre onglet
+  (et les boutons Répondre / Note du cœur, qui cliquent l'onglet du fil) quitte le mode ;
+  l'adresse `#cdr-journal` le rouvre au rechargement. La zone de réponse reste affichée (elle
+  est hors des onglets dans la maquette ; la cacher ferait aussi casser Redactor, qui mesure
+  son éditeur à travers les parents masqués au chargement et les laisse `display: none`).
 - Rôle des entrées du fil, d'après le type d'entrée du cœur : « Client » (message),
   « Réponse au client » (réponse d'agent : toujours visible du client, mais pas toujours
   envoyée par e-mail, d'où pas « envoyée »), « Note interne, invisible du client ». Le
@@ -188,12 +220,17 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
      résolu » sous le titre (voir « Écart assumé »). Classe 1 possible mais non faite, à
      décider : libellés du pack (« Éditer » ailleurs, « Réclamation », « Fil du ticket »), sujet
      d'entrée masqué quand il égale celui du ticket, boutons par entrée au survol.
+   - Fait dans la passe 4 : groupe d'actions à droite du titre à partir de 1560 px, actions
+     du cœur en groupe d'icônes compact, champs secondaires de la réponse et de la note
+     repliés derrière « Options », onglet « Journal » (voir « Écart assumé »).
    - Demanderait de remplacer un autre gabarit du cœur (`ticket-view.inc.php`,
      `thread-entry.tmpl.php`), **non fait par décision** : panneau d'actions, ordre et
-     contenu des propriétés, zone de réponse compacte.
+     contenu des propriétés, zone de réponse réécrite (pied « Joindre un fichier | Passer
+     l'état à | Publier » avec bouton de pièce jointe au lieu de la zone de dépôt du cœur,
+     champs supprimés plutôt que repliés).
    - Impossible ou configuration du cœur (classe 3) : propriétés en liens d'édition plutôt
-     qu'en listes, onglet « Journal », champs De / Répondre à / Signature, barre de Redactor
-     complète. La colonne n'est collante que si elle tient dans la fenêtre sous la barre
+     qu'en listes, barre de Redactor complète (15 boutons du cœur au lieu de 7), les six
+     actions du cœur en plus des trois boutons de la maquette (fonctions réelles, gardées). La colonne n'est collante que si elle tient dans la fenêtre sous la barre
      d'actions flottante, sinon elle défile avec la page.
 3. File de tickets : fait côté thème : bloc titre (nom de la file, texte « Visible 1 - 25
    sur environ N » du cœur, Actualiser, Exporter), tableau bord à bord dans le panneau,
@@ -247,8 +284,9 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
     traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit (c'est le cas
     depuis l'ajout de `fr.phar` à l'image).
-11. `captures/` pèse environ 20 Mo (210 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
-    `fr-*` pour 1,6 Mo, 9 `fidelity-*` pour 1,6 Mo et 8 `fidelity-w3-*` pour 1,4 Mo) dans le dépôt.
+11. `captures/` pèse environ 21 Mo (218 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
+    `fr-*` pour 1,6 Mo, 9 `fidelity-*` pour 1,6 Mo, 8 `fidelity-w3-*` pour 1,4 Mo et 8
+    `fidelity-w4-*` pour 1,1 Mo) dans le dépôt.
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -283,6 +321,42 @@ Autres éléments non réalisés :
   anglais : liste dans `docs/guide-utilisateur.md`, « Interface en français ».
 - RTL vérifié en forçant `dir="rtl"` seulement (voir lacune 6).
 
+## Configurer les colonnes de la file pour coller à la maquette
+
+La maquette montre les colonnes « Ticket », « Sujet » (client dessous), « Premier retour »,
+« État », « Assigné à », « Dernière activité ». Les colonnes d'une file sont un **réglage de
+la file** (en base), pas du thème : un administrateur les change sans code. Chemin relevé sur
+la démo (compte administrateur, interface en français, 25/10/2026) :
+
+1. Basculer sur « Administration » (en haut du rail), puis groupe **Paramètres > Tickets**.
+2. Onglet **« files »** (liste « file de ticket » : Open, Open / Open, Open / Answered,
+   Open / Overdue, My Tickets…, Closed…). Cliquer le nom de la file, par exemple **« Open »**.
+3. Page « file de ticket › Gérer une file personnalisée — Open » : onglet **« Colonnes »**
+   (« Gérer les colonnes de cette file »). Chaque ligne a un champ d'en-tête, une largeur, un
+   bouton « Configuration », une case « Triable » et une corbeille ; la poignée ⇕ à gauche
+   déplace la ligne.
+4. Renommer en tapant dans le champ d'en-tête : « Last Updated » → **« Dernière activité »**,
+   et, pour des en-têtes en français, « Subject » → « Sujet », « Assigned To » → « Assigné à »
+   (c'est le seul moyen de traduire un en-tête : il est stocké tel que saisi, dans une seule
+   langue pour tous les agents).
+5. Ajouter l'état : liste « — Ajouter une colonne — » sous les lignes, choisir **« Status »**,
+   bouton **« Ajouter »**, puis renommer son en-tête « État ».
+6. Retirer **« Priority »** avec sa corbeille.
+7. Ordonner avec les poignées : **Ticket, Sujet, État, Assigné à, Dernière activité**. Garder
+   la colonne « From » (n'importe où) : le thème la masque et affiche son contenu sous le sujet
+   (lien et pastille de collaborateurs compris) ; sans elle, le nom du client reste affiché sous
+   le sujet, mais en texte simple. « Premier retour » n'est pas une colonne de la file : le thème
+   l'insère toujours juste après le sujet.
+8. **« Enregistrer les changements »**.
+
+Le réglage vaut **pour une file** : chaque file (et chaque sous-file) a ses propres colonnes.
+Sur la démo, les sous-files (« Open / Open », « Open / Answered »…) ont la case « Hériter les
+colonnes de la file parente » décochée : il faut soit refaire les étapes pour chacune, soit
+cocher cette case dans leur onglet « Colonnes » pour qu'elles suivent « Open ». Les files
+personnelles des agents ne sont pas touchées. Capture : `captures/fidelity-w4-queue-columns-admin.png`.
+Le contrôle `fidelity-check.mjs` garde une exception (« Last Updated » entre le numéro et le
+sujet) tant que la démo garde les colonnes d'origine.
+
 ## Fidélité à la maquette (25/10/2026)
 
 Trois passes « classe 1 » : CSS et JS du thème, et les fichiers qu'il remplace déjà
@@ -307,6 +381,14 @@ des mesures de mise en page (`top`/`left`, position dans la ligne `row-top`, ord
 numéro et le sujet : réglage de la file). À 2000 × 1000 (`VIEW_W=2000 VIEW_H=1000`) : 4 DIFF de
 position, les boutons de la fiche restent sous le titre au lieu d'être à sa droite (voir « Écart
 assumé »).
+
+Passe 4 (démo 3d0bf444) : groupe d'actions à droite du titre au-delà de 1560 px, zone de
+réponse repliée, onglet « Journal », lien d'évitement qui atterrit avant le bloc titre de la file.
+Paires ajoutées : bloc titre, fin du groupe d'actions et position de « Marquer comme résolu »
+(mesurées seulement à partir de 1560 px, `minWidth`), début du groupe (jusqu'à 1559 px,
+`maxWidth` : le groupe réel est plus large de 30 px, chevron d'Imprimer), onglet « Journal »,
+ligne « À : … » de la zone de réponse. Résultat : **1280 × 800 : 172 OK, 0 DIFF, 1 ALLOWED** ;
+**2000 × 1000 : 174 OK, 0 DIFF, 1 ALLOWED** (avant : 153 OK, 4 DIFF).
 
 ## Vérifications (tâche 10)
 
@@ -445,4 +527,7 @@ Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès) ; passe de
 (`fidelity-*`, 25/10/2026, avatars activés : file et ticket 2 à 1280 et 2000 px, note interne
 du ticket 1, sélection et barre flottante de la file, file à 390 px, ticket à 820 px, RTL
 forcé) ; passe 3 (`fidelity-w3-*`) : file à 1280, 2000 et 390 px, sélection et menu Assigner,
-file vide, RTL forcé, interface anglaise, maquette et file côte à côte à 1280 px.
+file vide, RTL forcé, interface anglaise, maquette et file côte à côte à 1280 px ; passe 4
+(`fidelity-w4-*`) : fiche à 2000 px (groupe à droite du titre) et barre flottante, onglet
+« Journal », zone de réponse repliée et ouverte (« modifié »), note repliée, RTL forcé à
+2000 px, éditeur de colonnes d'une file (administration).

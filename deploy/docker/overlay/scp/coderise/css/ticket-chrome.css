@@ -15,6 +15,21 @@
 #content.cdr-ticket #ticket-tasks-tab { --tc-ic: var(--tc-ic-tasks); }
 #content.cdr-ticket #post-reply-tab { --tc-ic: var(--tc-ic-reply); }
 #content.cdr-ticket #post-note-tab { --tc-ic: var(--tc-ic-note); }
+/* "Log" tab (ticket-chrome.js), mockup's list icon */
+#content.cdr-ticket #cdr-journal-tab { --tc-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01'/%3E%3C/svg%3E"); }
+#content.cdr-ticket #cdr-journal-tab::before {
+  content: ""; flex: none; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: var(--tc-ic) center / contain no-repeat; mask: var(--tc-ic) center / contain no-repeat;
+}
+/* Log view of the thread tab: events only, a compact list (no avatar
+   column), the entries hidden; empty state otherwise hidden. The reply
+   area stays (the mockup's composer is outside the tabs; hiding it would
+   also break Redactor, which measures its editor through hidden ancestors
+   at load and leaves them display:none). */
+#content.cdr-ticket #ticket_thread.cdr-journal #thread-items > [id^="thread-entry-"] { display: none; }
+#content.cdr-ticket #ticket_thread.cdr-journal .thread-event { padding-inline: 16px; }
+#content.cdr-ticket #ticket_thread:not(.cdr-journal) > .cdr-journal-empty { display: none; }
+#content.cdr-ticket #ticket_thread > .cdr-journal-empty { margin: 0; padding: 16px; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); }
 
 /* Tab strips: mockup .tabs a (11/12/10) and .compose .modes a (11/14/10) */
 #content.cdr.cdr-ticket ul#ticket_tabs li a { padding: 11px 12px 10px; line-height: 16px; }
@@ -40,6 +55,29 @@
 #content.cdr-ticket #response_options .cdr-state label, #content.cdr-ticket #response_options .cdr-state strong { font-weight: 600; }
 #content.cdr-ticket #response_options tr.cdr-moved { display: none; }
 #content.cdr-ticket #response_options .cdr-state .faded:empty { display: none; }
+
+/* "Options" disclosure (ticket-chrome.js): a full-width line above the
+   fields (mockup .compose .to: 8/16 px, gris rule, ardoise text, 16 px icon)
+   with the summary ("To: ...", "Visible to the team only...") and the
+   button; the folded rows (.cdr-fold) are hidden while the form is
+   .cdr-opts-closed. Visibility only: the fields stay in the form. */
+#content.cdr-ticket #response_options > form > .cdr-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: -12px -16px 12px; padding: 8px 16px; border-bottom: 1px solid var(--gris); color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); }
+#content.cdr-ticket #response_options.is-note > form > .cdr-opts { border-bottom-color: rgba(122,75,0,.25); }
+#content.cdr-ticket #response_options > form > .cdr-opts::before { content: ""; flex: none; width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--tc-ic-reply) center / contain no-repeat; mask: var(--tc-ic-reply) center / contain no-repeat; }
+#content.cdr-ticket #response_options > form > .cdr-opts-note::before { -webkit-mask-image: var(--tc-ic-note); mask-image: var(--tc-ic-note); }
+#content.cdr-ticket #response_options > form > .cdr-opts-note .cdr-opts-sum { color: var(--nuit); font-weight: 600; }
+#content.cdr-ticket #response_options .cdr-opts-sum { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; unicode-bidi: plaintext; } /* "To: "Name" <address>" keeps its own direction in RTL */
+#content.cdr-ticket #response_options .cdr-opts-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; margin: 0; padding: 0 10px; border: 1.5px solid var(--nuit); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: 600 12.5px/1.2 var(--f-titre); cursor: pointer; }
+#content.cdr-ticket #response_options .cdr-opts-btn:hover { background: var(--voile); }
+#content.cdr-ticket #response_options .cdr-opts-btn:focus-visible { outline: 2px solid var(--focus, var(--cyan-profond)); outline-offset: 2px; }
+#content.cdr-ticket #response_options .cdr-opts-btn::after { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s; }
+#content.cdr-ticket #response_options .cdr-opts-btn[aria-expanded="true"]::after { transform: rotate(180deg); }
+#content.cdr-ticket #response_options .cdr-opts-mod { padding: 0 6px; border-radius: 4px; background: var(--alerte-fond); box-shadow: inset 0 0 0 1px var(--alerte); color: var(--alerte); font: 600 11px/16px var(--f-titre); }
+#content.cdr-ticket #response_options .cdr-opts-mod[hidden] { display: none; }
+#content.cdr-ticket #response_options > form.cdr-opts-closed .cdr-fold { display: none; }
+@media (max-width: 760px) {
+  #content.cdr-ticket #response_options > form > .cdr-opts { margin: -10px -12px 10px; padding: 8px 12px; }
+}
 
 /* ───────── Properties column ───────── */
 /* One card per core cell (properties, client, ...) instead of one box: the
@@ -88,6 +126,11 @@
 /* subject right under the line, subtitle under the subject (mockup .sub) */
 #content.cdr-ticket:has(> .cdr-idline) > .tixTitle { margin: 0; }
 #content.cdr-ticket > p.cdr-sub, #content.cdr-ticket .cdr-idline p.cdr-sub { margin: 2px 0 0; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); overflow-wrap: anywhere; }
+/* ticket-chrome.js moves the subject into the section (between the line
+   and the subtitle): same values as the subject under #content (mockup h1,
+   Montserrat 700 21/26.25) */
+#content.cdr-ticket > .cdr-idline > .tixTitle { margin: 0; padding: 0; border: 0; }
+#content.cdr-ticket > .cdr-idline > .tixTitle h3 { margin: 0; font: 700 21px/1.25 var(--f-titre); color: var(--nuit); overflow-wrap: anywhere; }
 
 /* Action bar under the title block (mockup: 16 px above and below). The
    core "⟳ Ticket #N" heading is not shown in either state: the identity
@@ -105,3 +148,40 @@
 #content.cdr-ticket .sticky.bar.fixed .cdr-resolve:hover { background: var(--blanc); color: var(--nuit); }
 /* the print link inside its dropdown button: the button's text colour, not a link colour */
 #content.cdr-ticket .sticky.bar .action-button > a#ticket-print { color: inherit; text-decoration: none; }
+
+/* Properties column under the floating bar: its measured height
+   (--cdr-fixed-bar-h, ticket-chrome.js) instead of a fixed 56 px, + 16 px */
+#content.cdr-ticket:has(.sticky.bar.fixed) > aside.cdr-props { top: calc(var(--topbar-h) + var(--cdr-fixed-bar-h, 56px) + 16px); }
+
+/* Wrappers built by ticket-chrome.js (static, unpositioned): .cdr-acts =
+   Edit, Print, Mark as resolved (mockup .t-actions, 36 px line buttons);
+   .cdr-tools = core's other actions (reply, note, status, assign, transfer,
+   more) as a compact icon cluster: 32 px line buttons, 4 px apart. */
+#content.cdr-ticket .sticky.bar :is(.cdr-acts, .cdr-tools) { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#content.cdr-ticket .sticky.bar .cdr-tools { gap: 4px; }
+#content.cdr-ticket .sticky.bar :is(.cdr-acts, .cdr-tools) > * { float: none; margin: 0; }
+#content.cdr-ticket .sticky.bar .cdr-tools > .action-button { min-height: 32px; min-width: 32px; padding: 0 7px; }
+
+/* Wide screens: the mockup's .title-row (flex, wrap, space-between) puts
+   its buttons to the right of the title block once both fit side by side
+   (from about 1558 px with its own title); below, under the title block,
+   as before. Here the title block is section.cdr-idline (one grid item,
+   ticket-chrome.js) and the bar's core container (the bare div holding the
+   placeholder and .sticky.bar) is the next grid item, in an auto column that
+   ends over the properties column: the same DOM nodes, scp.js's sticky
+   logic unchanged. The two rows of buttons (labelled, then the cluster) are
+   as tall as the title block (36 + 4 + 32 = 72 px <= 72.75 px), and the
+   container keeps that height when the bar floats (min-height), so the page
+   never moves when the bar becomes fixed. Its .content takes the width of
+   its buttons (core's inline width, measured once, is not used here). */
+@media (min-width: 1560px) {
+  #content.cdr.cdr-ticket:has(> .cdr-idline > .tixTitle) { grid-template-columns: minmax(0, 1fr) auto 330px; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) > #ticket_tabs_container { grid-column: 1 / 3; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) > aside.cdr-props { grid-column: 3; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) > section.cdr-idline { grid-column: 1; margin: 0 0 16px; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) > div:has(> .sticky.bar) { grid-column: 2 / 4; justify-self: end; align-self: start; min-height: 72px; margin: 0 0 16px; padding-inline-start: 8px; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar > .content { width: auto !important; } /* scp.js inline width */
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) > .content > .pull-right.flush-right { flex-direction: column; align-items: flex-end; gap: 4px; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) :is(.cdr-acts, .cdr-tools) { flex-wrap: nowrap; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar.fixed > .content > .pull-right.flush-right { justify-content: flex-end; }
+}
