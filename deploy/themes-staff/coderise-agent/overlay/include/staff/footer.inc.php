@@ -2,10 +2,14 @@
 /*********************************************************************
     include/staff/footer.inc.php  (coderise-agent staff theme)
 
-    Core's footer; only the closing tags follow the theme header:
-    #content, .cdr-main, #pjax-container. Everything else (copyright,
-    autocron image, #overlay, #loading, #popup, #alert, scripts,
-    getConfig().resolve(), i18n script) is kept as is.
+    Core's footer; the closing tags follow the theme header: #content,
+    .cdr-main, #pjax-container. The copyright line (#footer) is inside
+    .cdr-main, in PJAX responses too, so #pjax-container ends at the
+    bottom of the page and the sticky rail never scrolls up (the autocron
+    image is taken out of the flow for the same reason). The "/" key
+    focuses the top bar search (bound once, full page loads only).
+    Everything else (autocron image, #overlay, #loading, #popup, #alert,
+    scripts, getConfig().resolve(), i18n script) is kept as is.
     Shipped by deploy/themes-staff/coderise-agent (osTicket core untouched).
 
     Released under the GNU General Public License WITHOUT ANY WARRANTY.
@@ -14,16 +18,16 @@
 if (!defined('INCLUDE_DIR')) die('Access Denied');
 ?>
 </div><!-- #content -->
-</div><!-- .cdr-main -->
-</div><!-- #pjax-container -->
-<?php if (!isset($_SERVER['HTTP_X_PJAX'])) { ?>
     <div id="footer">
         <?php echo __('Copyright &copy;') ?> 2006-<?php echo date('Y'); ?>&nbsp;<?php
         echo Format::htmlchars((string) $ost->company ?: 'osTicket.com'); ?>&nbsp;<?php echo __('All Rights Reserved.'); ?>
     </div>
+</div><!-- .cdr-main -->
+</div><!-- #pjax-container -->
+<?php if (!isset($_SERVER['HTTP_X_PJAX'])) { ?>
 <?php
 if(is_object($thisstaff) && $thisstaff->isStaff()) { ?>
-    <div>
+    <div class="cdr-autocron">
         <!-- Do not remove <img src="autocron.php" alt="" width="1" height="1" border="0" /> or your auto cron will cease to function -->
         <img src="<?php echo ROOT_PATH; ?>scp/autocron.php" alt="" width="1" height="1" border="0" />
         <!-- Do not remove <img src="autocron.php" alt="" width="1" height="1" border="0" /> or your auto cron will cease to function -->
@@ -80,6 +84,31 @@ if(is_object($thisstaff) && $thisstaff->isStaff()) { ?>
         $api = new ConfigAjaxAPI();
         print $api->scp(false);
     ?>);
+</script>
+<script type="text/javascript">
+// Coderise: "/" focuses the top bar search (the <kbd> hint of header.inc.php),
+// unless the key is typed in a field, an editor or under an open dialog.
+(function () {
+    if (window.cdrSlashBound)
+        return;
+    window.cdrSlashBound = true;
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented)
+            return;
+        var t = e.target;
+        if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))
+            return;
+        var o = document.getElementById('overlay');
+        if (o && window.getComputedStyle(o).display !== 'none')
+            return;
+        var f = document.querySelector('.topbar .tsearch input[type="search"]');
+        if (!f || !f.offsetParent)
+            return;
+        e.preventDefault();
+        f.focus();
+        f.select();
+    });
+})();
 </script>
 <?php
 if ($thisstaff

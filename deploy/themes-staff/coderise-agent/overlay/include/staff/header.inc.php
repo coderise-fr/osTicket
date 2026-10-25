@@ -123,13 +123,25 @@ $cdr_admin = defined('ADMINPAGE');
 $cdr_ticket_view = ($cdr_inc !== '')
     ? ($cdr_inc === 'ticket-view.inc.php')
     : ($cdr_script === 'tickets.php' && isset($_REQUEST['id']) && !isset($_REQUEST['a']));
-// Queue list (and search results): the page renders its own #basic_search
+// Queue list (and search results)
 $cdr_queue_list = ($cdr_script === 'tickets.php' && $cdr_inc === 'templates/queue-tickets.tmpl.php');
 $cdr_current = null;
+$cdr_parent = null;
 if ($cdr_queue_list && isset($queue) && is_object($queue))
     $cdr_current = (string) $queue->getName();
-elseif ($cdr_ticket_view && isset($ticket) && is_object($ticket))
+elseif ($cdr_ticket_view && isset($ticket) && is_object($ticket)) {
     $cdr_current = sprintf(cdr__('Ticket #%s'), $ticket->getNumber());
+    // The queue the agent came from: scp/tickets.php keeps the last queue
+    // in the session (::Q:T, the "sticky" queue core returns to) and has
+    // already loaded the queue tree ($queues): no query here. Ad hoc
+    // searches ("adhoc,<key>") and unknown ids give no crumb.
+    $cdr_qkey = '::Q:' . (defined('ObjectModel::OBJECT_TYPE_TICKET')
+        ? ObjectModel::OBJECT_TYPE_TICKET : 'T');
+    if (isset($_SESSION[$cdr_qkey], $queues)
+            && ($cdr_q = cdr_find_queue($queues, $_SESSION[$cdr_qkey])))
+        $cdr_parent = array((string) $cdr_q->getName(),
+            ROOT_PATH . 'scp/tickets.php?queue=' . (int) $cdr_q->getId());
+}
 
 // Ticket view: the "First reply" panel. ticket-view.inc.php sends
 // object.view with array('type' => 'viewed') right after this header opened
@@ -161,19 +173,20 @@ elseif ($cdr_admin)
     <?php echo cdr_rail(isset($nav) ? $nav : null, $thisstaff); ?>
     <div class="cdr-main">
     <header class="topbar">
-        <?php echo cdr_crumbs(isset($nav) ? $nav : null, $cdr_current, $cdr_admin); ?>
-        <?php
-        if (!$cdr_queue_list) { ?>
+        <?php echo cdr_crumbs(isset($nav) ? $nav : null, $cdr_current, $cdr_admin, $cdr_parent); ?>
+        <?php // On every page, the queue list included (its own #basic_search stays in the page). The "/" key focuses it (footer.inc.php). ?>
         <form class="tsearch" action="<?php echo ROOT_PATH; ?>scp/tickets.php" method="get" role="search">
             <input type="hidden" name="a" value="search">
             <input type="hidden" name="search-type" value="">
             <?php echo cdr_icon('search', 18); ?>
             <input type="search" class="basic-search" data-url="ajax.php/tickets/lookup" name="query"
-                placeholder="<?php echo cdr_h(cdr__('Search tickets')); ?>"
-                aria-label="<?php echo cdr_h(cdr__('Search tickets')); ?>"
+                placeholder="<?php echo cdr_h(cdr__('Search tickets by number, subject or client')); ?>"
+                aria-label="<?php echo cdr_h(cdr__('Search tickets by number, subject or client')); ?>"
+                aria-keyshortcuts="/"
                 autocomplete="off" autocorrect="off" autocapitalize="off">
+            <kbd aria-hidden="true">/</kbd>
         </form>
-        <?php }
+        <?php
         if (!$cdr_admin && is_object($thisstaff) && class_exists('Ticket')
                 && $thisstaff->hasPerm(Ticket::PERM_CREATE, false)) { ?>
         <a class="btn btn-primary" href="<?php echo ROOT_PATH; ?>scp/tickets.php?a=open"><?php

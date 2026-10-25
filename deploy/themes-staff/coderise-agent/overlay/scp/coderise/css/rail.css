@@ -1,1 +1,31 @@
-/* coderise-agent: rail rules (loaded after coderise.css; one workstream owns this file). */
+/* coderise-agent: rail rules (loaded after coderise.css; one workstream owns this file).
+   Rail, top bar and footer placement, measured against the mockup
+   (docs/theme-mockups-admin/theme.css, .rail / .topbar / .tsearch). */
+
+/* The rail's grid tracks never grow past the rail: a long queue name or
+   "Add personal queue" (white-space: nowrap in core) used to widen every
+   item to 227 px (mockup 208) and push the content under the rail's edge. */
+.rail nav.menu, .rail .group, .rail ul { grid-template-columns: minmax(0, 1fr); }
+.rail .queues, .rail .queues #sub_nav > li, #cdr-queues .customQ-dropdown { min-width: 0; }
+
+/* Nested queues (mockup .rail .queues a: 13 px, 30 px high, padding 0 10 px,
+   radius 6; counters .badge 11 px). Core's sub-queue links are block links
+   with an ellipsis, so the 30 px come from the line height. */
+#cdr-queues .customQ-dropdown ul li > a { min-height: 30px; padding: 0 10px; border-radius: 6px; font-size: 13px; line-height: 30px; }
+#cdr-queues .queue-count { line-height: 1.5; }
+#cdr-queues .customQ-dropdown ul li > span.queue-count { margin-inline-end: 10px; } /* inside the item's 10 px, as the mockup's badge inside its link */
+
+/* "Add personal queue": the ghost button keeps the rail's width and the
+   queue links' height and size */
+#cdr-queues .add-queue a { align-items: center; min-height: 30px; padding: 4px 8px; font-size: 12px; line-height: 1.4; white-space: normal; text-align: center; }
+
+/* The footer (#footer) is inside .cdr-main (footer.inc.php): it sits at the
+   bottom of the main column, and #pjax-container, which holds the sticky
+   rail, now reaches the end of the page. */
+.cdr-main > #footer { margin: auto 0 0; }
+.cdr-autocron { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* Top bar search: room for the "/" hint (mockup .tsearch kbd) */
+.tsearch input[type="search"] { padding-inline-end: 40px; }
+.tsearch kbd { position: absolute; inset-inline-end: 9px; top: 7px; min-width: 22px; padding: 0 6px; border: 1px solid var(--ardoise); border-radius: 5px; background: var(--blanc); color: var(--ardoise); font: 600 12px/15px var(--f-texte); text-align: center; pointer-events: none; }
+.tsearch input:focus ~ kbd, .tsearch input:not(:placeholder-shown) ~ kbd { display: none; }

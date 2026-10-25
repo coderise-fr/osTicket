@@ -33,8 +33,16 @@ function check_near($name, $got, $want) {
     check($name, is_float($got) && abs($got - $want) < 1e-9, true);
 }
 
-// osTicket's translator: the stub returns its argument (no language pack).
-function __($msgid) { return $msgid; }
+// osTicket's translator: the stub returns its argument, or the entry of
+// $STUB_PACK (a fake language pack) when one is set.
+function __($msgid) {
+    global $STUB_PACK;
+    return (is_array($STUB_PACK) && isset($STUB_PACK[$msgid])) ? $STUB_PACK[$msgid] : $msgid;
+}
+class Internationalization {
+    static $lang = 'en_US';
+    static function getCurrentLanguage() { return self::$lang; }
+}
 
 // ---------- stubs of the osTicket classes the gauge reads ----------
 class Misc {
@@ -146,6 +154,7 @@ $labels = array(
     // chrome
     'Profile', 'Log Out', 'New Ticket', 'New ticket', 'Not assigned', 'Internal note', 'Menu',
     'Administration', 'Agent', 'Panel', 'Search tickets', 'Skip to content', 'Main menu',
+    'Sign Out', '%s, administrator', 'Administrator', 'Search tickets by number, subject or client',
     'First reply', 'At risk', 'Not applicable',
     // gauge
     '%s left', 'Over by %s', 'Met in %s', 'Returned %s late',
@@ -159,6 +168,29 @@ foreach ($labels as $l)
 // A few labels are written the same in French: they are allowed to equal their msgid.
 $same = array('Agent', 'Agents', 'Tickets', 'Applications', 'SLA', 'API', 'Administration', 'Diagnostic', 'Menu', 'Pages', 'Plugins');
 check('fr.php: inventory complete', array_values(array_diff($untranslated, $same)), array());
+check('fr: sign out wording', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
+check('fr: search placeholder names tickets', cdr__('Search tickets by number, subject or client'),
+    "Rechercher un ticket : num\xC3\xA9ro, sujet, client");
+check('cdr_t: test language = catalogue', cdr_t('Dashboard'), 'Tableau de bord');
+check('cdr_t: unknown msgid', cdr_t('No such msgid zz'), 'No such msgid zz');
+
+// ---------- pack precedence (real path: __() then the catalogue) ----------
+unset($GLOBALS['CDR_TEST_LANG']);
+$GLOBALS['STUB_PACK'] = array('Dashboard' => 'Tableau de Bord', 'Log Out' => "D\xC3\xA9connexion (pack)",
+    'Sign Out' => "Se d\xC3\xA9connecter");
+Internationalization::$lang = 'fr';
+check('pack: cdr__ prefers the pack', cdr__('Dashboard'), 'Tableau de Bord');
+check('pack: cdr_t prefers the theme wording', cdr_t('Dashboard'), 'Tableau de bord');
+check('pack: cdr__ falls back to the catalogue', cdr__('Main menu'), 'Menu principal');
+check('pack: Sign Out from the pack', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
+Internationalization::$lang = 'de';
+$GLOBALS['STUB_PACK'] = array('Dashboard' => '&Uuml;bersicht');
+check('pack: no theme catalogue, cdr_t uses the pack', cdr_t('Dashboard'), '&Uuml;bersicht');
+check('pack: no theme catalogue, no pack entry = msgid', cdr_t('Sign Out'), 'Sign Out');
+Internationalization::$lang = 'en_US';
+$GLOBALS['STUB_PACK'] = null;
+check('pack: English = msgid', cdr_t('Dashboard') . '|' . cdr__('Sign Out'), 'Dashboard|Sign Out');
+$GLOBALS['CDR_TEST_LANG'] = 'fr';
 
 // ---------- cdr_gauge_state (French rendering) ----------
 $g = cdr_gauge_state(0, 14400, null, 1980);

@@ -187,15 +187,16 @@ $h = cdr_rail(agent_nav(), $admin);
 check('agent: aside.rail', strpos($h, '<aside class="rail') === 0, true);
 check('agent: nav closure receives the real nav (type-hinted)', StubNav::$seen, array('StubNav'));
 preg_match_all('#<a class="item[^"]*" href="([^"]+)"[^>]*>(<svg class="ic ic-([a-z]+))?#', $h, $m);
-check('agent: items, order and hrefs', $m[1], array('/scp/dashboard.php', '/scp/users.php', '/scp/tasks.php',
-    '/scp/tickets.php', '/scp/kb.php', '/scp/apps.php', '/scp/profile.php', '/scp/logout.php?auth=TOKEN123'));
-check('agent: icons by tab key', array_slice($m[3], 0, 6), array('chart', 'users', 'tasks', 'ticket', 'book', 'layers'));
+// Mockup order: Dashboard, Tickets, Tasks, Users, Knowledgebase, then the rest
+check('agent: items, order and hrefs', $m[1], array('/scp/dashboard.php', '/scp/tickets.php', '/scp/tasks.php',
+    '/scp/users.php', '/scp/kb.php', '/scp/apps.php', '/scp/profile.php', '/scp/logout.php?auth=TOKEN123'));
+check('agent: icons by tab key', array_slice($m[3], 0, 6), array('chart', 'ticket', 'tasks', 'users', 'book', 'layers'));
 check('agent: Dashboard item is no-pjax', strpos(link_of($h, 'Dashboard'), 'no-pjax') !== false, true);
 check('agent: Tickets item is not no-pjax', strpos(link_of($h, 'Tickets'), 'no-pjax'), false);
 check('agent: active tab marked', current_labels($h), array('Tickets'));
 check('agent: one .queues block', substr_count($h, 'class="queues"'), 1);
 check('agent: .queues under the active tab', strpos($h, 'class="queues"') > strpos($h, '/scp/tickets.php')
-    && strpos($h, 'class="queues"') < strpos($h, '/scp/kb.php'), true);
+    && strpos($h, 'class="queues"') < strpos($h, '/scp/tasks.php'), true);
 check('agent: customQ_nav renamed', strpos($h, 'customQ_nav'), false);
 check('agent: cdr-queues id', substr_count($h, 'id="cdr-queues"'), 1);
 check('agent: no jb-overflowmenu class', strpos($h, 'jb-overflowmenu'), false);
@@ -205,9 +206,10 @@ check('agent: mode switch present for an admin', strpos($h, 'class="mode"') !== 
 check('agent: Agent segment current', (bool) preg_match('#<a [^>]*href="/scp/index.php"[^>]*aria-current="true"#', $h), true);
 check('agent: Administration segment not current', (bool) preg_match('#<a [^>]*href="/scp/admin.php"[^>]*aria-current#', $h), false);
 check('agent: mode links are no-pjax', preg_match_all('#<a class="no-pjax" href="/scp/(index|admin)\.php"#', $h), 2);
-check('agent: logout no-pjax with token', strpos(link_of($h, 'Log Out'), 'no-pjax') !== false
+check('agent: logout no-pjax with token', strpos(link_of($h, 'Sign Out'), 'no-pjax') !== false
     && strpos($h, 'href="/scp/logout.php?auth=TOKEN123"') !== false, true);
 check('agent: foot initials and name', strpos($h, '>NB</span>') !== false && strpos($h, 'Nora Benali') !== false, true);
+check('agent: foot line = department, administrator', strpos($h, '<small>Support, administrator</small>') !== false, true);
 check('agent: mobile toggle', (bool) preg_match('#<button type="button" class="menu-toggle" aria-expanded="false" aria-controls="cdr-rail-menu"#', $h), true);
 check('agent: no duplicate ids', dup_ids($h), array());
 
@@ -226,6 +228,28 @@ $h = cdr_rail(agent_nav(), $agent);
 check('non-admin: no mode switch', strpos($h, 'class="mode"'), false);
 check('non-admin: no Administration', strpos($h, 'Administration'), false);
 check('non-admin: no admin.php link', strpos($h, 'admin.php'), false);
+check('non-admin: foot line = department only', strpos($h, '<small>Support</small>') !== false, true);
+check('staff line: admin without department', cdr_staff_line(new StubStaff('A B', true, null)), 'Administrator');
+check('staff line: agent without department', cdr_staff_line(new StubStaff('A B', false, null)), '');
+check('staff line: no staff', cdr_staff_line(null), '');
+$h = cdr_rail(agent_nav(), new StubStaff('A B', false, null));
+check('non-admin without department: no <small>', strpos($h, '<small>'), false);
+
+// Plugin / app tabs keep core's order after Knowledgebase, wherever core put them.
+$tabs = array('apps' => array('desc' => 'Applications', 'href' => 'apps.php'))
+    + array_slice(agent_tabs(), 0, 2, true)
+    + array('plug' => array('desc' => 'Plugin', 'href' => '/x/plug.php'))
+    + array_slice(agent_tabs(), 2, 3, true);
+check('tab order: plugin tabs after the five', array_keys(cdr_agent_tabs($tabs)),
+    array('dashboard', 'tickets', 'tasks', 'users', 'kbase', 'apps', 'plug'));
+check('tab order: missing tabs skipped', array_keys(cdr_agent_tabs(array('kbase' => array(), 'users' => array()))),
+    array('users', 'kbase'));
+check('tab order: not an array', cdr_agent_tabs(null), array());
+$_SERVER['SCRIPT_NAME'] = '/scp/tasks.php';
+$h = cdr_rail(new StubNav(agent_tabs(), array(), 'tasks'), $agent);
+check('tab order: active state kept on Tasks', current_labels($h), array('Tasks'));
+check('tab order: Dashboard still no-pjax', strpos(link_of($h, 'Dashboard'), 'no-pjax') !== false, true);
+$_SERVER['SCRIPT_NAME'] = '/scp/tickets.php';
 
 // $nav null (profile.php guards "if ($nav)").
 $h = cdr_rail(null, $agent);
@@ -249,7 +273,10 @@ check('hostile: initials', strpos($h, '>D&amp;</span>') !== false || strpos($h, 
 $GLOBALS['CDR_TEST_LANG'] = 'fr';
 $h = cdr_rail(agent_nav(), $admin);
 check('fr: tab label', link_of($h, 'Tableau de bord') !== null, true);
-check('fr: log out', link_of($h, "D\xC3\xA9connexion") !== null, true);
+check('fr: log out', link_of($h, "Se d\xC3\xA9connecter") !== null, true);
+check('fr: foot line', strpos($h, '<small>Support, administrateur</small>') !== false, true);
+check('fr: crumbs tab with the theme wording', cdr_crumbs(new StubNav(agent_tabs(), agent_nav()->submenus, 'dashboard', 1)),
+    '<nav class="crumbs" aria-label="Fil d&#039;Ariane"><ol><li><span aria-current="page">Tableau de bord</span></li></ol></nav>');
 check('fr: profile', link_of($h, 'Mon profil') !== null, true);
 check('fr: menu button', strpos($h, '>Menu</button>') !== false || strpos($h, 'Menu</span></button>') !== false, true);
 // Agent sub-menu items are rendered by the core template: labels still go through cdr__.
@@ -287,7 +314,40 @@ check('crumbs: no current = active sub-item', cdr_crumbs(new StubNav(agent_tabs(
     . '<li><span aria-current="page">Agent Directory</span></li></ol></nav>');
 check('crumbs: same label not repeated', cdr_crumbs(new StubNav(agent_tabs(), $nav->submenus, 'dashboard', 1)),
     '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><span aria-current="page">Dashboard</span></li></ol></nav>');
-check('content class: queue list', cdr_content_class('/scp/tickets.php', false, false), 'cdr cdr-tickets');
+// Ticket view: the queue the ticket was opened from, between the tab and the ticket.
+check('crumbs: originating queue', cdr_crumbs($nav, 'Ticket #260418', false, array('My <Tickets>', '/scp/tickets.php?queue=5&x="y"')),
+    '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/scp/tickets.php">Tickets</a></li>'
+    . '<li><a href="/scp/tickets.php?queue=5&amp;x=&quot;y&quot;">My &lt;Tickets&gt;</a></li>'
+    . '<li><span aria-current="page">Ticket #260418</span></li></ol></nav>');
+check('crumbs: empty parent ignored', cdr_crumbs($nav, 'Ticket #1', false, array('', '/x')),
+    cdr_crumbs($nav, 'Ticket #1'));
+check('crumbs: malformed parent ignored', cdr_crumbs($nav, 'Ticket #1', false, 'oops'),
+    cdr_crumbs($nav, 'Ticket #1'));
+check('crumbs: parent without nav', cdr_crumbs(null, 'Ticket #1', false, array('Open', '/q')), '');
+
+class StubQueue {
+    public $id, $name;
+    function __construct($id, $name) { $this->id = $id; $this->name = $name; }
+    function getId() { return $this->id; }
+    function getName() { return $this->name; }
+}
+$tree = array(
+    array(new StubQueue(1, 'Open'), array(
+        array(new StubQueue(2, 'Open'), array()),
+        array(new StubQueue(3, 'Answered'), array(array(new StubQueue(30, 'Deep'), array()))),
+    )),
+    array(new StubQueue(5, 'My Tickets'), array()),
+    'junk', array('no object'),
+);
+check('find queue: top level', cdr_find_queue($tree, 5)->getName(), 'My Tickets');
+check('find queue: child', cdr_find_queue($tree, '3')->getName(), 'Answered');
+check('find queue: grandchild', cdr_find_queue($tree, 30)->getName(), 'Deep');
+check('find queue: unknown id', cdr_find_queue($tree, 99), null);
+check('find queue: adhoc search key', cdr_find_queue($tree, 'adhoc,abc'), null);
+check('find queue: no tree', cdr_find_queue(null, 1), null);
+check('find queue: zero', cdr_find_queue($tree, 0), null);
+
+check('content class: queue list',cdr_content_class('/scp/tickets.php', false, false), 'cdr cdr-tickets');
 check('content class: ticket view', cdr_content_class('/scp/tickets.php', true, false), 'cdr cdr-tickets cdr-ticket');
 check('content class: sanitised', cdr_content_class('/scp/a"b<c>.php', false, true), 'cdr cdr-abc cdr-is-admin');
 
