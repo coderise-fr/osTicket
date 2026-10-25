@@ -200,8 +200,8 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
     composé de `__('My Tasks')` et du nombre dans `scp/tasks.php`) ne peuvent pas être
     traduits par `i18n/fr.php` : seul le pack de langue d'osTicket les traduit (c'est le cas
     depuis l'ajout de `fr.phar` à l'image).
-11. `captures/` pèse environ 17 Mo (193 PNG, dont 72 `interaction-*` pour 4,4 Mo et 19
-    `fr-*` pour 1,6 Mo) dans le dépôt.
+11. `captures/` pèse environ 19 Mo (202 PNG, dont 72 `interaction-*` pour 4,4 Mo, 19
+    `fr-*` pour 1,6 Mo et 9 `fidelity-*` pour 1,6 Mo) dans le dépôt.
 12. Démonstration locale : le thème agent par défaut de `local-demo.sh` est `none` ; sur un
     `up` neuf, passer `--staff-theme coderise-agent` (ensuite `local-demo.sh` garde le choix).
 
@@ -381,4 +381,7 @@ administration (`admin-*`), tableau de bord (`dashboard-*`), à 1280, 820 et 390
 menus, plein écran, calendrier, select2 et zone de dépôt à 1280 px) ; interface en français
 (`fr-*`, 1280 et 390 px : connexion, file, rail mobile, fiche ticket et propriétés, éditeur
 de réponse, barre d'enregistrement, nouveau ticket avec tableau collé, et portail client
-Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès).
+Parcours : accueil, ouverture de ticket, ticket vu par lien d'accès) ; passe de fidélité
+(`fidelity-*`, 25/10/2026, avatars activés : file et ticket 2 à 1280 et 2000 px, note interne
+du ticket 1, sélection et barre flottante de la file, file à 390 px, ticket à 820 px, RTL
+forcé).
