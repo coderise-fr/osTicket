@@ -165,21 +165,50 @@ sécurité du lien entre l'URL et le fichier. Ici, la règle reste dans le bloc 
 aucune nouvelle section n'accorde d'accès, les refus (`include/`, `.htaccess`, `*.inc.php`, sauvegardes,
 `bootstrap.php`, `manage.php`) sont fusionnés après elle et l'emportent toujours. `PUT`, `PATCH`,
 `OPTIONS`, `PROPFIND`, etc. restent refusés partout (403), `TRACE` aussi (405, `TraceEnable Off`).
+La règle échoue en position fermée : un passage futur à PHP-FPM (`ProxyPassMatch`) changerait
+`REQUEST_FILENAME` en `proxy:fcgi://…` et `DELETE` serait de nouveau refusé, sans rien ouvrir ; à
+reprendre lors d'une telle migration.
 
 Ce que `DELETE` expose : les routes `url_delete` de `scp/ajax.php` (`draft/<id>`, `note/<id>`,
 `form/answer/<entry>/<field>`, `orgs/<id>/delete`, `tickets/search/<id>`) et de `ajax.php`
-(`draft/<id>`). Rien de nouveau en pratique : le répartiteur d'osTicket accepte déjà
-`POST` + `_method=DELETE` sur ces mêmes routes (`include/class.dispatcher.php`), et `scp/staff.inc.php`
-et `client.inc.php` exigent le jeton CSRF pour `DELETE` comme pour `POST` (400 côté agent, redirection
-côté portail). Les routes vérifient ensuite la connexion et les permissions (par exemple
-`org.delete`). La route `tickets/search/<id>` pointe vers une méthode absente du cœur (500 « Dispatcher
-compile error ») : l'interface supprime les recherches enregistrées par `POST queue/<id>/delete`,
-jamais touché par la règle.
+(`draft/<id>`), **mais aussi** toutes les routes déclarées par `url()` sans méthode imposée (une
+soixantaine dans `scp/ajax.php`, par exemple `tickets/<id>/assign`, `staff/<id>/set-password`,
+`queue/<id>/delete`). Pour celles-ci, un vrai `DELETE` arrive avec `$_POST` vide : les gestionnaires
+suivent le chemin « affichage », comme un `GET`, avec en plus le jeton CSRF exigé ; seul
+`ajax.orgs.php` agit sur `REQUEST_METHOD == 'DELETE'` (et exige `org.delete`). Rien de nouveau en
+pratique : le répartiteur d'osTicket accepte déjà `POST` + `_method=DELETE` sur toutes ces routes
+(`include/class.dispatcher.php`), dont un vrai `DELETE` est un sous-ensemble (même méthode vue par PHP,
+sans corps de formulaire), et `scp/staff.inc.php` et `client.inc.php` exigent le jeton CSRF pour
+`DELETE` comme pour `POST` (400 côté agent, redirection côté portail). Un `DELETE` venu d'un autre
+site est de toute façon impossible : il exige une pré-requête `OPTIONS`, refusée (403). Chaque
+gestionnaire applique ensuite **ses propres** contrôles, vérifiés à la lecture : `deleteDraft`
+(agent connecté, propriétaire du brouillon), `deleteNote` (propriétaire ou administrateur),
+`OrgsAjaxAPI::delete` (permission `org.delete`). La route `tickets/search/<id>` pointe vers une
+méthode absente du cœur (500 « Dispatcher compile error ») : l'interface supprime les recherches
+enregistrées par `POST queue/<id>/delete`, jamais touché par la règle.
+
+Deux faiblesses **du cœur d'osTicket**, hors périmètre de ce correctif, existent déjà aujourd'hui par
+`POST` + `_method=DELETE` (ou `POST`) et ne sont pas introduites par lui (à signaler en amont ou à
+corriger à part) :
+
+- `include/ajax.forms.php` `deleteAnswer` ne vérifie que la connexion : tout agent connecté peut
+  supprimer n'importe quelle réponse de formulaire dynamique, sans contrôle d'accès à l'objet.
+- `include/ajax.draft.php` (l. 185-219, `updateDraftClient` et `deleteDraftClient`) compare
+  l'identifiant du client connecté à la colonne `staff_id` du brouillon, où osTicket range aussi bien
+  un identifiant d'agent que de client : le client d'identifiant N peut supprimer ou réécrire les
+  brouillons de l'agent d'identifiant N (constat de lecture du code, non reproduit).
 
 **Test.** `tests/test-methods.sh <URL>` rejoue 113 requêtes (116 avec `OST_SESSID=<cookie d'un agent>`,
 qui ajoute le refus d'un `DELETE` sans jeton CSRF ou avec un jeton forgé) et indique pour chacune si
-Apache a répondu (page d'erreur) ou osTicket. Sans effet sur les données : identifiants inexistants,
-pas de jeton. Code de sortie = nombre d'écarts. Résultat du 27/10/2026, image de la démo
+Apache a répondu (page d'erreur) ou osTicket. Sans effet sur les tickets, brouillons, notes et
+organisations (identifiants inexistants, pas de jeton), mais **pas sans écriture** : chaque jeton
+refusé ajoute un avertissement « Invalid CSRF Token » au journal système (`ost_syslog` : 1 ligne, 4
+avec `OST_SESSID`) et les requêtes qui atteignent PHP peuvent créer des lignes de session. En
+production, le lancer en connaissance de cause et purger ces lignes au besoin. Le cookie de
+`OST_SESSID` est lu dans l'environnement et passé à curl par un fichier d'en-têtes privé (mode 600,
+`-H @fichier`, curl 7.55 ou plus), jamais sur une ligne de commande visible dans `ps` : utiliser une
+session d'agent jetable et la fermer ensuite. Un serveur injoignable ou muet (code `000`, délai de 10 s
+par requête) compte comme un écart. Code de sortie = nombre d'écarts. Résultat du 27/10/2026, image de la démo
 (commit `f30e2429`, avant) contre l'image corrigée (après) :
 
 | Méthode | Chemin | Avant | Après |
@@ -193,6 +222,7 @@ pas de jeton. Code de sortie = nombre d'écarts. Résultat du 27/10/2026, image 
 | `DELETE` | `/scp/ajax.php/..%2f..%2finclude/…`, `/scp/ajax.php%00/…` | 404 | 404 |
 | `PUT`, `PATCH`, `OPTIONS`, `PROPFIND`, `MKCOL`, `COPY`, `MOVE` | routeurs AJAX, `/scp/tickets.php`, `/index.php`, `/api/tickets.json` | 403 | 403 |
 | `TRACE` | idem | 405 | 405 |
+| `CONNECT` | idem | 400 | 400 |
 | `GET` | `/include/…`, `*.inc.php`, `/manage.php`, `/bootstrap.php`, `/.htaccess`, `/README.md` | 403 | 403 |
 | `GET` | `/setup/…` (absent de l'image `runtime`) | 404 | 404 |
 

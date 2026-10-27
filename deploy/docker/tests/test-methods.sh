@@ -4,20 +4,30 @@
 #   deploy/docker/tests/test-methods.sh http://127.0.0.1:8080
 #   OST_SESSID=<OSTSESSID cookie of a logged-in agent> deploy/docker/tests/test-methods.sh <base>
 #
-# Read-only for the application: the DELETE requests target ids that do not exist
-# (999999999) and run without a CSRF token, so osTicket refuses them before acting.
+# No effect on tickets, drafts, notes or organisations: the DELETE requests target ids
+# that do not exist (999999999) and run without a CSRF token, so osTicket refuses them
+# before acting. It is NOT free of writes, though: each refused token adds an "Invalid
+# CSRF Token" warning to the system log (ost_syslog; 1 line without OST_SESSID, 4 with
+# it), and requests that reach PHP may create session rows. Run it on production
+# knowingly, and remove those log lines afterwards if needed.
 # Each line: expected, method, path, HTTP status, who answered ("apache" = Apache error
 # page, the request never reached PHP; "php" = osTicket answered).
 #   deny  Apache must refuse it (403, 404 or 405 error page, PHP never runs)
 #   php   Apache must let it through to osTicket (any status, not an Apache error page)
+# Status 000 (server unreachable, timeout) is always a failure.
 # With OST_SESSID, also checks that osTicket rejects an agent DELETE without a CSRF token
-# (400 "Valid CSRF Token Required"). Exit status: number of mismatches.
+# (400 "Valid CSRF Token Required"). The cookie is read from the environment and handed
+# to curl through a private header file (mode 600), never on a command line, so it does
+# not show in `ps`. Use a throwaway agent session and log it out afterwards.
+# Exit status: number of mismatches.
 set -u
 
 base="${1:?usage: $0 <base URL, e.g. http://127.0.0.1:8080>}"
 base="${base%/}"
+umask 077
 body="$(mktemp)"
-trap 'rm -f "$body"' EXIT INT TERM
+hdr="$(mktemp)"
+trap 'rm -f "$body" "$hdr"' EXIT INT TERM
 fail=0
 n=0
 
@@ -25,10 +35,11 @@ n=0
 check() {
     exp="$1"; m="$2"; p="$3"; shift 3
     if [ "$m" = HEAD ]; then
-        code="$(curl -s -o "$body" -w '%{http_code}' -I --path-as-is "$@" "$base$p")"
+        code="$(curl -s -m 10 -o "$body" -w '%{http_code}' -I --path-as-is "$@" "$base$p")"
     else
-        code="$(curl -s -o "$body" -w '%{http_code}' -X "$m" --path-as-is "$@" "$base$p")"
+        code="$(curl -s -m 10 -o "$body" -w '%{http_code}' -X "$m" --path-as-is "$@" "$base$p")"
     fi
+    [ -n "$code" ] || code=000
     if grep -q '<h1>\(Forbidden\|Not Found\|Method Not Allowed\|Bad Request\)</h1>' "$body" \
             || { [ "$m" = HEAD ] && [ "$code" = 403 ]; }; then
         who=apache
@@ -36,6 +47,7 @@ check() {
         who=php
     fi
     case "$exp:$who:$code" in
+        *:*:000) ok=FAIL; who="no-response(server unreachable or timeout)"; fail=$((fail + 1)) ;;
         deny:apache:403|deny:apache:404|deny:apache:405|deny:apache:400) ok=ok ;;
         php:php:*) ok=ok ;;
         csrf:php:400) ok=ok ;;
@@ -101,9 +113,12 @@ check php POST "/scp/ajax.php/draft/$id"
 
 if [ -n "${OST_SESSID:-}" ]; then
     # Logged-in agent, no CSRF token: osTicket must refuse the DELETE (400).
-    check csrf DELETE "/scp/ajax.php/draft/$id" -H "Cookie: OSTSESSID=$OST_SESSID"
-    check csrf DELETE "/scp/ajax.php/note/$id" -H "Cookie: OSTSESSID=$OST_SESSID"
-    check csrf DELETE "/scp/ajax.php/draft/$id" -H "Cookie: OSTSESSID=$OST_SESSID" -H "X-CSRFToken: forged"
+    # printf is a shell builtin: the cookie never appears in a process argument list.
+    printf 'Cookie: OSTSESSID=%s\n' "$OST_SESSID" > "$hdr"
+    check csrf DELETE "/scp/ajax.php/draft/$id" -H "@$hdr"
+    check csrf DELETE "/scp/ajax.php/note/$id" -H "@$hdr"
+    check csrf DELETE "/scp/ajax.php/draft/$id" -H "@$hdr" -H "X-CSRFToken: forged"
+    : > "$hdr"
 fi
 
 echo "$n checks, $fail mismatch(es)"
