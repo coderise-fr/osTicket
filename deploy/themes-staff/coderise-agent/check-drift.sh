@@ -40,8 +40,13 @@ overlay="$here/overlay"
 # "Log" tab, the editor setup behind the reply area and the change tracker, the
 # agent's default signature of the folded reply options; fifth pass: the file
 # upload widget and its script behind the "Attach a file" button of the reply
-# footer, the tooltip plugin whose tip is hidden while a menu is open). The
-# replaced files themselves are in BASE.sha256 (computed from overlay/).
+# footer, the tooltip plugin whose tip is hidden while a menu is open; the
+# dashboard panels of coderise/dashboard.inc.php: the report period, help topic,
+# date/number formats and default queue helpers it calls, the schema signature
+# of the tables its aggregate queries read, the first-response definition of the
+# SLA contrib it repeats; the admin list templates whose status / name columns
+# admin.js dresses, the plugins title it trims). The replaced files themselves
+# are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
 scp/tickets.php
@@ -82,12 +87,28 @@ include/class.search.php
 include/class.user.php
 include/class.organization.php
 include/class.staff.php
+include/class.report.php
+include/class.topic.php
+include/class.format.php
+include/class.config.php
+include/upgrader/streams/core.sig
 include/ajax.tickets.php
 include/ajax.search.php
 include/ajax.config.php
 include/staff/ticket-view.inc.php
 include/staff/dashboard.inc.php
 include/staff/syslogs.inc.php
+include/staff/staffmembers.inc.php
+include/staff/departments.inc.php
+include/staff/helptopics.inc.php
+include/staff/slaplans.inc.php
+include/staff/teams.inc.php
+include/staff/filters.inc.php
+include/staff/pages.inc.php
+include/staff/templates.inc.php
+include/staff/apikeys.inc.php
+include/staff/banlist.inc.php
+include/staff/plugins.inc.php
 include/staff/profile.inc.php
 include/staff/settings-agents.inc.php
 include/staff/settings-alerts.inc.php
@@ -118,6 +139,7 @@ include/staff/templates/thread-entry.tmpl.php
 include/staff/templates/thread-event.tmpl.php
 contrib/sla-first-response/plugin/sla_first_response/sla_first_response.php
 contrib/sla-first-response/plugin/sla_first_response/contract_level.php
+contrib/sla-first-response/sql/premiere-reponse.sql
 "
 
 sha() {
