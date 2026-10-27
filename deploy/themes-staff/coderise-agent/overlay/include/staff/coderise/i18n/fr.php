@@ -144,6 +144,13 @@ return array(
     'Note options' => 'Options de la note',
     'To: %s' => 'À : %s',
     'Visible to the team only. The client receives nothing.' => "Visible de l'équipe uniquement. Le client ne reçoit rien.",
+    'Visible to the team only.' => "Visible de l'équipe uniquement.",
+    'The client receives nothing.' => 'Le client ne reçoit rien.',
+    // footer of the reply and note forms (mockup .compose-foot) and the
+    // first entry of the canned response select (mockup "Réponses types")
+    'Attach a file' => 'Joindre un fichier',
+    'Set the status to' => "Passer l'état à",
+    'Canned responses' => 'Réponses types',
     // "Log" tab of the ticket view (the thread's events only)
     'Log' => 'Journal',
     'No event has been recorded for this ticket yet.' => "Aucun événement n'a encore été enregistré pour ce ticket.",

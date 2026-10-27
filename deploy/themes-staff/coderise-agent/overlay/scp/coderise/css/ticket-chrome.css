@@ -62,6 +62,64 @@
 #content.cdr-ticket #response_options tr.cdr-moved { display: none; }
 #content.cdr-ticket #response_options .cdr-state .faded:empty { display: none; }
 
+/* Footer arrangement (mockup .compose-foot: gap 12/16 px; "Joindre un
+   fichier" at the start, "Passer l'état à [select]" and the button at the
+   end). ticket-chrome.js moves core's attachments block first, adds the
+   theme's status label (core's is hidden) and marks the lone "*". */
+#content.cdr-ticket #response_options > form > p.cdr-foot { gap: 12px 16px; }
+#content.cdr-ticket #response_options .cdr-state > .cdr-core-lbl,
+#content.cdr-ticket #response_options .cdr-state .error.cdr-req { display: none; }
+#content.cdr-ticket #response_options .cdr-state .cdr-state-lbl { font: 600 13.5px/20.25px var(--f-texte); color: var(--nuit); }
+#content.cdr-ticket #response_options .cdr-state select { min-height: 34px; width: auto; }
+/* Reset (not in the mockup): a 36 px ghost icon button (mockup .btn-ghost,
+   "undo" arrow), so the footer holds on one line like the mockup's and the
+   primary button stands alone. Its value stays its accessible name (and
+   its tooltip, ticket-chrome.js); the text is transparent. */
+#content.cdr-ticket #response_options p.cdr-foot > input.cdr-reset { width: 36px; min-width: 36px; margin: 0; padding: 0; overflow: hidden; border-color: transparent; color: transparent; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000F26' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14 4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E") center / 16px no-repeat; }
+#content.cdr-ticket #response_options p.cdr-foot > input.cdr-reset:hover { background-color: rgba(0,15,38,.07); color: transparent; }
+html.rtl #content.cdr-ticket #response_options p.cdr-foot > input.cdr-reset { transform: scaleX(-1); }
+#content.cdr-ticket #response_options p.cdr-foot > input[type=submit] { margin: 0; }
+/* Attachments: core's drop zone as the mockup's .btn-line.btn-sm
+   ("Joindre un fichier", 14 px paper clip, 30 px high): still the drop
+   target (core's handlers on it) and its link still opens the file picker;
+   core's hint text is hidden (font-size 0, it is the zone's tooltip). The
+   attached files (core's list) show under the button. */
+#content.cdr-ticket #response_options p.cdr-foot > .cdr-attach { flex: 0 1 auto; min-width: 0; margin: 0; margin-inline-end: auto; }
+#content.cdr-ticket #response_options p.cdr-foot > .cdr-attach > .filedrop { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 0; padding: 0; }
+#content.cdr-ticket #response_options p.cdr-foot > .cdr-attach > .filedrop > .files { order: 2; align-self: stretch; }
+#content.cdr-ticket #response_options p.cdr-foot > .cdr-attach > .filedrop > .files:empty { display: none; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone { display: inline-flex; align-items: stretch; box-sizing: border-box; min-height: 30px; margin: 0; padding: 0; border: 1.5px solid var(--nuit); border-radius: 6px; background: var(--blanc); color: var(--nuit); font-size: 0; line-height: 0; text-align: start; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .filedrop .files:not(:empty) + .dropzone { border-top: 1.5px solid var(--nuit); border-radius: 6px; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone:is(:hover, .hover, .dragover) { background: var(--voile); }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone > i { display: none; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone > a.manual { display: inline-flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 5px; color: var(--nuit); font-size: 0; line-height: 1; text-decoration: none; white-space: nowrap; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone > a.manual::before { content: ""; flex: none; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 11.5 12 19.5a5 5 0 0 1-7-7l8-8a3.4 3.4 0 0 1 4.8 4.8l-8 8a1.8 1.8 0 0 1-2.6-2.6l7-7'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 11.5 12 19.5a5 5 0 0 1-7-7l8-8a3.4 3.4 0 0 1 4.8 4.8l-8 8a1.8 1.8 0 0 1-2.6-2.6l7-7'/%3E%3C/svg%3E") center / contain no-repeat; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .dropzone > a.manual:focus-visible { outline: 2px solid var(--focus, var(--cyan-profond)); outline-offset: 3px; }
+#content.cdr.cdr-ticket #response_options p.cdr-foot > .cdr-attach .cdr-attach-lbl { font: 600 12.5px/1.2 var(--f-titre); }
+
+/* Canned responses (reply): compact row (mockup: a small "Réponses
+   types" button at the right of the editor's toolbar). Core's "Response:"
+   label cell is hidden; the select2 box is right-aligned, 30 px high, with
+   the mockup's copy icon; its first entry reads "Réponses types". */
+#content.cdr-ticket #response_options tr.cdr-canned > td:first-child { visibility: hidden; padding: 0; } /* keeps the label column's width: the select stays in the field column */
+#content.cdr-ticket #response_options tr.cdr-canned > td:last-child { padding: 0 0 8px; text-align: end; }
+#content.cdr-ticket #response_options tr.cdr-canned > td:last-child > .error { text-align: start; }
+#content.cdr-ticket #response_options tr.cdr-canned .select2-container { width: 220px !important; max-width: 100%; } /* select2 writes width: 350px inline */
+#content.cdr-ticket #response_options tr.cdr-canned .select2-selection--single { height: 30px; min-height: 30px; border-color: transparent; background: transparent; }
+#content.cdr-ticket #response_options tr.cdr-canned .select2-selection--single:hover { background: rgba(0,15,38,.07); }
+#content.cdr-ticket #response_options tr.cdr-canned .select2-selection__rendered { display: flex; align-items: center; gap: 8px; height: 30px; padding-inline: 10px 26px; color: var(--nuit); font: 600 12.5px/30px var(--f-titre); }
+#content.cdr-ticket #response_options tr.cdr-canned .select2-selection__rendered::before { content: ""; flex: none; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='12' rx='1.5'/%3E%3Cpath d='M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='12' rx='1.5'/%3E%3Cpath d='M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8'/%3E%3C/svg%3E") center / contain no-repeat; }
+#content.cdr-ticket #response_options tr.cdr-canned .select2-selection__arrow { height: 28px; }
+/* the empty line core puts between the canned row and the editor */
+#content.cdr-ticket #response_options > form#reply tbody#resp_sec > tr > td[colspan] > br { display: none; }
+
+/* Redactor's toolbar (third party, kept) in the mockup's .editor-bar
+   look: 4 px padding, buttons 30 x 30 px 1 px apart, 16 px icons (the
+   colours and the hover come from coderise.css) */
+#content.cdr-ticket #response_options .redactor-toolbar { line-height: 0; } /* Redactor shows and hides it with an inline display: kept */
+#content.cdr-ticket #response_options .redactor-toolbar a.re-button-icon { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 30px; min-width: 30px; height: 30px; margin: 0; margin-inline-end: 1px; padding: 0; vertical-align: top; }
+#content.cdr-ticket #response_options .redactor-toolbar a.re-button-icon i { font-size: 16px; line-height: 1; }
+
 /* "Options" disclosure (ticket-chrome.js): a full-width line above the
    fields (mockup .compose .to: 8/16 px, gris rule, ardoise text, 16 px icon)
    with the summary ("To: ...", "Visible to the team only...") and the
@@ -71,7 +129,7 @@
 #content.cdr-ticket #response_options.is-note > form > .cdr-opts { border-bottom-color: rgba(122,75,0,.25); }
 #content.cdr-ticket #response_options > form > .cdr-opts::before { content: ""; flex: none; width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--tc-ic-reply) center / contain no-repeat; mask: var(--tc-ic-reply) center / contain no-repeat; }
 #content.cdr-ticket #response_options > form > .cdr-opts-note::before { -webkit-mask-image: var(--tc-ic-note); mask-image: var(--tc-ic-note); }
-#content.cdr-ticket #response_options > form > .cdr-opts-note .cdr-opts-sum { color: var(--nuit); font-weight: 600; }
+#content.cdr-ticket #response_options > form > .cdr-opts-note .cdr-opts-sum b { color: var(--nuit); font-weight: 600; } /* mockup: "<b>Visible de l'équipe uniquement.</b> Le client ne reçoit rien." */
 #content.cdr-ticket #response_options .cdr-opts-sum { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; unicode-bidi: plaintext; } /* "To: "Name" <address>" keeps its own direction in RTL */
 #content.cdr-ticket #response_options .cdr-opts-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; margin: 0; padding: 0 10px; border: 1.5px solid var(--nuit); border-radius: 6px; background: var(--blanc); color: var(--nuit); font: 600 12.5px/1.2 var(--f-titre); cursor: pointer; }
 #content.cdr-ticket #response_options .cdr-opts-btn:hover { background: var(--voile); }
@@ -167,6 +225,26 @@
 #content.cdr-ticket .sticky.bar .cdr-tools { gap: 4px; }
 #content.cdr-ticket .sticky.bar :is(.cdr-acts, .cdr-tools) > * { float: none; margin: 0; }
 #content.cdr-ticket .sticky.bar .cdr-tools > .action-button { min-height: 32px; min-width: 32px; padding: 0 7px; }
+/* menu triggers of the cluster (status, assign, more): a 12 px caret with a
+   short separator, so the cluster stays compact (as the bulk bar of the queue) */
+#content.cdr-ticket .sticky.bar .cdr-tools > .action-button:has(> i.icon-caret-down) { gap: 4px; padding-inline: 7px 5px; }
+#content.cdr-ticket .sticky.bar .cdr-tools > .action-button > i.icon-caret-down { margin: 0; padding-inline-start: 4px; }
+#content.cdr-ticket .sticky.bar .cdr-tools > .action-button > i.icon-caret-down::before { width: 12px; height: 12px; }
+
+/* Labelled Print (mockup .btn-line "Imprimer", 14 px padding each side, no
+   caret): core's print-options caret stays (it is the only visible way to
+   the print options menu, which opens on a click anywhere on the button
+   outside the print link) but takes the place of the mockup's right
+   padding: 12 px start padding, 6 px icon gap, a 10 px caret 3 px after the
+   label, 5 px end padding. Same outer width as the mockup's button, so the
+   group (Edit, Print, Mark as resolved) has the mockup's width. Only while
+   the labels show (>= 1024 px). */
+@media (min-width: 1024px) {
+  #content.cdr-ticket .sticky.bar .cdr-acts > .action-button:has(> a#ticket-print.cdr-has-lbl) { column-gap: 3px; padding-inline: 12px 5px; }
+  #content.cdr-ticket .sticky.bar .cdr-acts > .action-button > a#ticket-print.cdr-has-lbl { gap: 6px; }
+  #content.cdr-ticket .sticky.bar .cdr-acts > .action-button:has(> a#ticket-print.cdr-has-lbl) > i.icon-caret-down { margin: 0; padding: 0; border: 0; }
+  #content.cdr-ticket .sticky.bar .cdr-acts > .action-button:has(> a#ticket-print.cdr-has-lbl) > i.icon-caret-down::before { width: 10px; height: 10px; }
+}
 
 /* Wide screens: the mockup's .title-row (flex, wrap, space-between) puts
    its buttons to the right of the title block once both fit side by side
@@ -190,4 +268,13 @@
   #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) > .content > .pull-right.flush-right { flex-direction: column; align-items: flex-end; gap: 4px; }
   #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) :is(.cdr-acts, .cdr-tools) { flex-wrap: nowrap; }
   #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar.fixed > .content > .pull-right.flush-right { justify-content: flex-end; }
+}
+/* Wider still (room for the title block and all the buttons on one line):
+   one row at the top of the title row, like the mockup's single row of
+   buttons. The labelled group ends the row (its place in the mockup) and
+   the icon cluster comes before it (ticket-chrome.js puts .cdr-tools before
+   .cdr-acts in the DOM at this width, so the focus order is the visual one). */
+@media (min-width: 1840px) {
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) > .content > .pull-right.flush-right { flex-direction: row; align-items: center; gap: 8px 12px; }
+  #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar > .content > .pull-right.flush-right { gap: 8px 12px; }
 }
