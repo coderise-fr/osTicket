@@ -63,7 +63,7 @@
    inserted by ticket.js from data-cdr-role-*: ardoise text; on a note the
    alerte flag with its lock replaces the "Internal note" ::after fallback. */
 #content.cdr-ticket .thread-entry > .header > .cdr-role { order: 0; color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); }
-#content.cdr-ticket .thread-entry > .header > .cdr-role-note { display: inline-flex; gap: 5px; align-items: center; color: var(--alerte); font: 600 12px/20.25px var(--f-titre); }
+#content.cdr-ticket .thread-entry > .header > .cdr-role-note { display: inline-flex; gap: 5px; align-items: center; color: var(--alerte); align-self: flex-start; margin-top: .5px; font: 600 12px/normal var(--f-titre); } /* mockup .note-flag: line-height normal (the header line stays 20.25 px), its box 0.5 px under the line top (its first item, an svg, sets its baseline) */
 #content.cdr-ticket .thread-entry > .header > .cdr-role-note i::before { width: 14px; height: 14px; margin-block: 0; }
 #content.cdr-ticket .thread-entry.note.cdr-has-role > .header > b::after { content: none; display: none; }
 
@@ -81,3 +81,10 @@ html.rtl #content.cdr-ticket .thread-event { padding: 7px 58px 7px 16px; }
   #content.cdr-ticket .thread-entry > .cdr-av { display: none; }
   #content.cdr-ticket .thread-event { padding: 7px 14px; }
 }
+
+/* B17. Attachment chips of an entry (mockup .attachment: 12.5 px text with
+   the body's 1.5 line height, 14 px paper clip, the size in 13 px ardoise):
+   core's .truncate link (line-height 21 px) and .faded size (10.6 px) */
+#content.cdr-ticket .thread-entry .attachment-info > :is(a, small) { line-height: 1.5; }
+#content.cdr-ticket .thread-entry .attachment-info > small.filesize { color: var(--ardoise); font-size: 13px; }
+#content.cdr-ticket .thread-entry .attachment-info > i.icon-paperclip::before { width: 14px; height: 14px; margin-block: 0; }

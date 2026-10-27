@@ -10,7 +10,8 @@
       = nuit disc. Core's avatar span stays in the DOM, hidden by CSS.
     - Role label after the author (span.cdr-role), text from #content's
       data-cdr-role-message|response|note (header.inc.php).
-    - Empty entry subtitles are tagged so they do not take a row.
+    - Empty entry subtitles, and those equal to the ticket's subject, are
+      tagged so they do not take a row.
     - Event time (<time> inside the sentence) is moved to the end of the
       event row, where the mockup shows it.
     - Scroll correction: core's scp/js/thread.js scrolls to the latest entry
@@ -73,6 +74,11 @@
             $content = $('#content.cdr-ticket');
         if (!$thread.length)
             return;
+        // an entry title equal to the ticket's subject (core gives the first
+        // message the subject as its title) repeats the title block: tagged
+        // like an empty one (the mockup's entries have no title)
+        var norm = function (s) { return $.trim(String(s || '')).replace(/\s+/g, ' '); },
+            subject = norm($content.find('.tixTitle h3').first().text());
         $thread.find('.thread-entry').each(function () {
             var $e = $(this);
             role($e, $content);
@@ -84,7 +90,8 @@
                 $e.prepend($av).addClass('cdr-has-av');
             }
             $e.children('.header').children('.title').each(function () {
-                $(this).toggleClass('cdr-empty', !$.trim($(this).text()));
+                var t = norm($(this).text());
+                $(this).toggleClass('cdr-empty', !t || (!!subject && t === subject));
             });
         });
         $thread.find('.thread-event').each(function () {
