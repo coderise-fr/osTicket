@@ -31,6 +31,11 @@
 // (the subject is moved into it), "Log" tab 'a#cdr-journal-tab', reply options line
 // 'form#reply > .cdr-opts' (ticket-chrome.js). A pair with minWidth / maxWidth is only measured
 // at those viewport widths (layout that differs with the width, like the mockup's title row).
+// Wave 5: 'center-y' = vertical centre of the box (the icon cluster, 32 px, against the mockup's
+// 36 px button row); 'entry-top' = top of the element minus the top of its thread entry. Reply
+// and note footer (attach button '.cdr-attach .dropzone', status label '.cdr-state-lbl'),
+// Redactor toolbar, compact canned responses row 'tr.cdr-canned', note line in two weights,
+// attachment chips (demo ticket 3), queue state cell 'td .status' (cdr_queue_status_html).
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -38,7 +43,7 @@ import { dirname, join, resolve } from 'node:path';
 // { metric: '<pair name> <property>', reason: '...' }: printed as OK with the reason, not counted.
 const ALLOWED_DIFFS = [
   { metric: 'queue number to subject columns col-delta',
-    reason: 'the demo queue has "Last Updated" between them: column set and order are queue settings (admin, class 3)' },
+    reason: 'a queue with the default columns of core has "Last Updated" between them: column set and order are queue settings (admin, class 3; the demo follows the README guide since 27/10/2026)' },
 ];
 
 const env = process.env;
@@ -59,6 +64,8 @@ const KINDS = {
   note: { mock: 'ticket.html', real: '/scp/tickets.php?id=1' },
   // demo ticket 45: open, Standard contract, High priority (urgent)
   urgent: { mock: 'ticket.html', real: '/scp/tickets.php?id=45' },
+  // demo ticket 3: an entry with an attachment
+  att: { mock: 'ticket.html', real: '/scp/tickets.php?id=3' },
 };
 
 // name, kind, mock/real selector, css properties, px tolerance (default 0.5).
@@ -105,10 +112,13 @@ const PAIRS = [
   { name: 'client subtitle', kind: 'ticket', mock: '.title-row .sub', real: '#content p.cdr-sub', props: ['font-size', 'font-weight', 'line-height', 'color', 'top', 'left'] },
   { name: 'labelled button (Edit)', kind: 'ticket', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-color', 'border-top-left-radius', 'background-color', 'top'] },
   // Action group placement (wave 4). The mockup's .title-row wraps its buttons under the title
-  // block below ~1558 px and puts them at the right of the row above. The real group is wider
-  // (core's print-options caret on Print, +30 px), so its start is compared where it starts the
-  // row (narrow) and its end and the resolve button where they end it (wide).
-  { name: 'labelled button (Edit) start', kind: 'ticket', maxWidth: 1559, mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['left'] },
+  // block below ~1558 px and puts them at the right of the row above. Wave 5: the group has the
+  // mockup's width (core's print caret takes the place of Print's end padding), so its start is
+  // compared at every width; from 1840 px the icon cluster shares the row, before the group,
+  // centred on it.
+  { name: 'labelled button (Edit) start', kind: 'note', mock: '.t-actions .btn-line', real: '#content .sticky.bar a.action-button.cdr-has-lbl', props: ['left', 'top'] },
+  { name: 'labelled button (Print)', kind: 'note', minWidth: 1024, mock: '.t-actions .btn-line:nth-child(2)', real: '#content .sticky.bar .cdr-acts > .action-button:has(#ticket-print)', props: ['width', 'height', 'left', 'top'] },
+  { name: 'icon cluster on the title row', kind: 'note', minWidth: 1840, mock: '.t-actions', real: '#content .sticky.bar .cdr-tools', props: ['center-y'] },
   { name: 'action group end', kind: 'note', minWidth: 1560, mock: '.t-actions', real: '#content .sticky.bar .cdr-acts', props: ['right', 'top'] },
   { name: 'resolve button position', kind: 'note', minWidth: 1560, mock: '.t-actions .btn-primary', real: '#content .sticky.bar .cdr-resolve', props: ['left'] },
   { name: 'title block', kind: 'ticket', mock: '.title-row > div', real: '#content > section.cdr-idline', props: ['top', 'left'] },
@@ -117,6 +127,21 @@ const PAIRS = [
   // "Log" tab (ticket-chrome.js) and the line above the reply editor (mockup .compose .to)
   { name: 'log tab', kind: 'ticket', mock: '.tabs a:nth-child(3)', real: 'ul#ticket_tabs a#cdr-journal-tab', props: ['font-size', 'font-weight', 'font-family', 'color', 'height', 'top'] },
   { name: 'compose to line', kind: 'ticket', mock: '.compose .to', real: '#response_options > form#reply > .cdr-opts', props: ['font-size', 'line-height', 'color', 'padding-top', 'padding-left', 'border-bottom-width', 'border-bottom-color'] },
+  // Wave 5: reply / note area (ticket-chrome.js / .css). The note line: bold lead, ardoise rest.
+  { name: 'compose note line lead', kind: 'ticket', mock: '.compose .to b', real: '#response_options > form#note > .cdr-opts .cdr-opts-sum b', props: ['font-size', 'font-weight', 'color'] },
+  { name: 'compose note line rest', kind: 'ticket', mock: '.compose .to span', real: '#response_options > form#note > .cdr-opts .cdr-opts-sum', props: ['font-weight', 'color'] },
+  { name: 'compose attach button', kind: 'ticket', mock: '.compose-foot .btn-line', real: '#response_options form#reply p.cdr-foot > .cdr-attach .dropzone', props: ['height', 'border-top-color', 'border-top-left-radius'] },
+  { name: 'compose attach label', kind: 'ticket', mock: '.compose-foot .btn-line', real: '#response_options form#reply .cdr-attach-lbl', props: ['font-size', 'font-weight', 'font-family'] },
+  { name: 'compose state label', kind: 'ticket', mock: '.inline-field label', real: '#response_options form#reply .cdr-state-lbl', props: ['font-size', 'font-weight', 'font-family', 'color'] },
+  { name: 'compose state select', kind: 'ticket', mock: '.inline-field select', real: '#response_options form#reply .cdr-state select', props: ['height'] },
+  { name: 'editor toolbar', kind: 'ticket', mock: '.editor-bar', real: '#response_options form#reply .redactor-toolbar', props: ['height', 'padding-top', 'background-color'] },
+  { name: 'editor toolbar button', kind: 'ticket', mock: '.editor-bar button', real: '#response_options form#reply .redactor-toolbar a.re-button-icon', props: ['width', 'height', 'border-top-left-radius'] },
+  { name: 'canned responses control', kind: 'ticket', mock: '.editor-bar .canned', real: '#response_options form#reply tr.cdr-canned .select2-selection__rendered', props: ['height', 'font-size', 'font-weight'] },
+  // Thread (wave 5): positions inside the entry ('entry-top': top minus the entry's top)
+  { name: 'note flag position', kind: 'note', mock: '.entry.note .note-flag', real: '.thread-entry.note > .header > .cdr-role-note', props: ['entry-top', 'height'] },
+  { name: 'client message body position', kind: 'ticket', mock: '.entry.from-client .body', real: '.thread-entry.message > .thread-body', props: ['entry-top'] },
+  { name: 'attachment chip', kind: 'att', mock: '.entry .attachment', real: '.thread-entry .attachment-info', props: ['height', 'padding-left', 'font-size', 'box-shadow', 'border-top-left-radius'] },
+  { name: 'attachment size', kind: 'att', mock: '.entry .attachment small', real: '.thread-entry .attachment-info small', props: ['font-size', 'color'] },
   // Queue, wave 3: "Ticket et contrat", "Sujet et client", "Premier retour" after the subject, rail counts.
   { name: 'queue Priority chip', kind: 'queue', mock: '.data .c-n .plan-priority', real: 'table.queue tbody td > .stack .plan-priority', props: ['font-size', 'font-weight', 'font-family', 'padding-left', 'border-top-left-radius', 'background-color', 'color', 'height', 'row-top'] },
   { name: 'queue Standard chip', kind: 'queue', mock: '.data .c-n .plan-standard', real: 'table.queue tbody td > .stack .plan-standard', props: ['font-size', 'color', 'box-shadow', 'height', 'row-top'] },
@@ -126,6 +151,8 @@ const PAIRS = [
   { name: 'queue first reply cell follows the client cell', kind: 'queue', mock: '.data tbody tr:first-child td:has(.gauge)', mockRef: '.data tbody tr:first-child td.subj', real: 'table.queue tbody tr:has(small.cdr-client) td.cdr-gauge-col', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', props: ['col-delta', 'padding-top'] },
   { name: 'queue number to subject columns', kind: 'queue', mock: '.data tbody tr:first-child td.subj', mockRef: '.data tbody tr:first-child td.c-n', real: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(a.preview)', props: ['col-delta'] },
   { name: 'queue From column hidden', kind: 'queue', mock: '.data thead th:nth-child(3)', real: 'table.queue thead th.cdr-col-from', props: ['display'], expect: { mock: 'table-cell', real: 'none' } },
+  // Queue state cell (wave 5): core's Status column with the state icon (cdr_queue_status_html)
+  { name: 'queue state cell', kind: 'queue', mock: '.data tbody td .status', real: 'table.queue tbody td .status', props: ['font-size', 'font-weight', 'font-family', 'column-gap', 'color'] },
   { name: 'rail top-level queue count', kind: 'queue', mock: '.rail .queues .badge', real: '#cdr-queues .cdr-qcount:not(.cdr-zero)', props: ['font-size', 'font-weight', 'height', 'min-width', 'background-color'] },
 ];
 
@@ -169,6 +196,11 @@ async function measure(page, url, targets) {
         if (p === 'height') r[p] = el.getBoundingClientRect().height + 'px';
         else if (p === 'width') r[p] = el.getBoundingClientRect().width + 'px';
         else if (p === 'top' || p === 'left' || p === 'right') r[p] = el.getBoundingClientRect()[p] + 'px';
+        else if (p === 'center-y') { const b = el.getBoundingClientRect(); r[p] = (b.top + b.height / 2) + 'px'; }
+        else if (p === 'entry-top') {
+          const box = el.closest('.entry, .thread-entry');
+          r[p] = box ? (el.getBoundingClientRect().top - box.getBoundingClientRect().top) + 'px' : null;
+        }
         else if (p === 'row-top') {
           const tr = el.closest('tr');
           r[p] = tr ? (el.getBoundingClientRect().top - tr.getBoundingClientRect().top) + 'px' : null;
