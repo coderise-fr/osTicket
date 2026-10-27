@@ -79,6 +79,7 @@ if (osTicket::is_ie())
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket-chrome.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/queue.js')); ?>"></script>
+    <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/admin.js')); ?>"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="<?php echo cdr_h(cdr_asset('img/favicon.svg')); ?>" />
 
@@ -166,6 +167,15 @@ if ($cdr_script === 'tickets.php' && empty($GLOBALS['cdr_sla_connected'])) {
         }
     });
 }
+// Dashboard (dashboard.php): the title, alert strip, indicators and the risk, topic and
+// agent panels the mockup has around core's chart. Data read here, once, by a few
+// aggregate queries (coderise/dashboard.inc.php); the panels are put into the page's
+// output buffer around core's form (the period form and the chart stay core's).
+if ($cdr_script === 'dashboard.php' && empty($GLOBALS['cdr_dash_started'])) {
+    $GLOBALS['cdr_dash_started'] = true;
+    require_once INCLUDE_DIR . 'staff/coderise/dashboard.inc.php';
+    cdr_dash_start(isset($thisstaff) ? $thisstaff : null);
+}
 // Labels the ticket view's and the queue's CSS and JS need (no translation
 // in CSS/JS): see cdr_data_attrs()
 $cdr_content_attrs = '';
@@ -195,6 +205,18 @@ if ($cdr_ticket_view)
             'opts-changed' => 'modified',
             'opts-to' => 'To: %s',
             'opts-team' => 'Visible to the team only. The client receives nothing.',
+            // the same line in two parts (mockup: the first sentence bold)
+            'opts-team-lead' => 'Visible to the team only.',
+            'opts-team-rest' => 'The client receives nothing.',
+            // reply and note footer (mockup .compose-foot): the attachment
+            // drop zone as a button, the status select's label; the canned
+            // response select's first entry (ticket-chrome.js)
+            'attach' => 'Attach a file',
+            'state-label' => 'Set the status to',
+            'canned' => 'Canned responses',
+            // name of core's untitled menu buttons (a thread entry's
+            // chevron), made keyboard buttons by coderise.js
+            'menu-label' => 'More actions',
             // "Log" tab: the thread's events only (ticket-chrome.js)
             'journal-tab' => 'Log',
             'journal-empty' => 'No event has been recorded for this ticket yet.',

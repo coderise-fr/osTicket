@@ -16,6 +16,26 @@ require_once INCLUDE_DIR . 'staff/coderise/coderise.inc.php';
 
 header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src 'self' 'unsafe-inline'; object-src 'none'");
 
+// pwreset.sent.php hard-codes an English sentence and the label "Login", absent from core's language packs:
+// translated from the theme catalogue when the panel language has an entry (exact-string replacement of
+// trusted catalogue text, only on the password reset script; no entry = the page is left as core renders it).
+if (!function_exists('cdr_login_translate')) {
+    function cdr_login_translate($html) {
+        $pairs = array(
+            'If the information provided is valid a password reset email will be sent to the email address you have on file. Follow the link in the email to reset your password.'
+                => cdr_t('If the information provided is valid a password reset email will be sent to the email address you have on file. Follow the link in the email to reset your password.'),
+            'name="submit" value="Login"' => 'name="submit" value="' . Format::htmlchars(cdr_t('Log In')) . '"',
+        );
+        foreach ($pairs as $from => $to) {
+            if ($from !== $to)
+                $html = str_replace($from, $to, $html);
+        }
+        return $html;
+    }
+}
+if (basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) === 'pwreset.php')
+    ob_start('cdr_login_translate');
+
 $cdr_html = '';
 if (($cdr_lang = Internationalization::getCurrentLanguage())) {
     if (($cdr_info = Internationalization::getLanguageInfo($cdr_lang))
