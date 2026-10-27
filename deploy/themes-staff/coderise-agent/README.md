@@ -571,6 +571,13 @@ l'entrée), les pièces jointes (ticket 3) et la cellule d'état de la file. Ré
 1600 × 1000 : 221 OK ; 1840 × 1000 : 222 OK (l'exception « Last Updated » ne sert plus sur
 la démo : la mesure est conforme).
 
+Passe 5, intégration (démo 42781531, les trois chantiers fusionnés) : types `login` (déconnecté),
+`dash`, `agents` et `settings` en plus ; `ONLY=<type>,…` limite la mesure à certains types,
+`OVERLAY_DIR` sert un paquet plus récent que la démo. Résultat : **1280 × 800 : 505 OK, 0 DIFF,
+0 ALLOWED** ; **2000 × 1000 : 509 OK, 0 DIFF, 0 ALLOWED**. Par type (1280 / 2000) : file 71 / 71,
+fiche 116 / 116, note 19 / 23, urgent 5 / 5, pièce jointe 7 / 7, connexion 63 / 63, tableau de
+bord 105 / 105, agents 57 / 57, Paramètres > Tickets 62 / 62.
+
 ## Vérifications (tâche 10)
 
 Comptes utilisés : `dev.admin` (administrateur) et `dev.agent` (agent non administrateur) sont
@@ -579,8 +586,8 @@ des comptes jetables créés à la main dans la base de la démo locale pour ces
 
 - Débordement horizontal (`tests/overflow.js`, largeur utile sans la barre de défilement),
   à 390, 820 et 1280 px : aucun. La liste ci-dessous est celle de la tâche 10 ; la liste
-  committée dans `tests/overflow.js` (32 chemins depuis le 24/10/2026) reprend ces pages et
-  celles du passage en français.
+  committée dans `tests/overflow.js` (32 chemins depuis le 24/10/2026, 55 et la largeur 2000 px
+  depuis le 27/10/2026) reprend ces pages et celles du passage en français.
   - Administrateur (`dev.admin`) : accueil, file, fiche ticket, tableau de bord, tâches, base
     de connaissances, profil, administration, Paramètres > Tickets, agents, sujets d'aide,
     plugins, journaux ; et, après lui avoir donné la permission d'agent « User Directory »
@@ -650,6 +657,20 @@ bloquées dans les scripts (sauf les réglages volontaires ci-dessous).
   retour arrière et le panneau s'ouvre avec la marque « modifié » ; Firefox ne restaure pas
   la valeur (défaut, rien de masqué). Firefox signale le cookie de session `SameSite=None`
   sans `Secure` (démo en HTTP, réglage du cœur, hors thème).
+
+Intégration de la passe 5 (démo 42781531, français, `dev.admin` et `dev.agent`) :
+`tests/overflow.js` porte désormais 55 chemins (pièce jointe, réglages, listes et éditions
+d'administration) à 390, 820, 1280 et 2000 px : aucun débordement ; console : 0 erreur sur
+55 pages par compte (et 110 en RTL forcé à 390 et 1280, sans débordement) ; connexion et mot de
+passe oublié à 390 / 820 / 1280 / 2000, état d'erreur compris. PJAX file → fiche → file (deux
+fois, sans doublon) et réglages → agents → fiche agent → SLA → réglages dans le même document ;
+tableau de bord (lien `no-pjax` et accès direct) : titre, bandeau, 4 indicateurs, 2 panneaux,
+graphique, statistiques ; barre d'enregistrement (compteur 1 puis 2 réglages, dernier champ
+au-dessus de la barre, réinitialisation) ; repli « Options d'envoi », onglet « Journal »,
+« Marquer comme résolu » (dialogue du cœur), 12 menus × 4 largeurs × LTR/RTL dans la fenêtre et
+au premier plan ; `editor-check.js` (réponse, note, dialogue Transférer) : ok. Anglais : la
+langue d'un seul agent ne suffit pas (le cœur n'accepte qu'une langue activée : principale ou
+secondaire) ; vérifié avec `local-demo.sh language en_US`, puis retour à `fr`.
 
 ### Saisie dans les éditeurs (QA d'interaction, 2026-10-24)
 
@@ -746,4 +767,7 @@ du ticket 1, ticket 2 en RTL forcé ; la file est dans `fidelity-w3-*`) ; passe 
 file vide, RTL forcé, interface anglaise, maquette et file côte à côte à 1280 px ; passe 4
 (`fidelity-w4-*`) : fiche à 2000 px (groupe à droite du titre) et barre flottante, onglet
 « Journal », zone de réponse repliée et ouverte (« modifié »), note repliée, RTL forcé à
-2000 px, éditeur de colonnes d'une file (administration).
+2000 px, éditeur de colonnes d'une file (administration) ; passe 5 (`fidelity-w5-*`, 8
+captures) : fiche à 2000 px, file, tableau de bord à 1280 et 390 px, liste des agents,
+Paramètres > Tickets avec la barre d'enregistrement (réglage modifié), connexion à 1280 et
+390 px. 202 captures en tout.

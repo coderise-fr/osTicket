@@ -1,4 +1,4 @@
-// Mesure du débordement horizontal du panneau agent/admin à 390, 820 et 1280 px.
+// Mesure du débordement horizontal du panneau agent/admin à 390, 820, 1280 et 2000 px.
 //
 // Corps d'une fonction asynchrone pour `browser_evaluate` de Playwright, à exécuter
 // dans un contexte AUTHENTIFIÉ du panneau (envelopper : async () => { ...corps... }).
@@ -48,8 +48,32 @@ const paths = [
     '/scp/templates.php',
     '/scp/forms.php',
     '/scp/roles.php',
+    // fifth fidelity pass (27/10/2026): attachment ticket, administration lists and edit pages
+    '/scp/tickets.php?id=3',
+    '/scp/settings.php?t=kb',
+    '/scp/settings.php?t=users',
+    '/scp/settings.php?t=tasks',
+    '/scp/settings.php?t=emails',
+    '/scp/settings.php?t=alerts',
+    '/scp/staff.php?a=add',
+    '/scp/departments.php?id=1',
+    '/scp/slas.php?id=1',
+    '/scp/teams.php',
+    '/scp/emails.php',
+    '/scp/emails.php?id=1',
+    '/scp/apikeys.php',
+    '/scp/filters.php',
+    '/scp/lists.php',
+    '/scp/pages.php',
+    '/scp/pages.php?id=1',
+    '/scp/forms.php?id=1',
+    '/scp/roles.php?id=1',
+    '/scp/schedules.php',
+    '/scp/banlist.php',
+    '/scp/queues.php?id=1',
+    '/scp/system.php',
 ];
-const widths = [390, 820, 1280];
+const widths = [390, 820, 1280, 2000];
 const result = {};
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
