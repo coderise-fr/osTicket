@@ -151,6 +151,8 @@ return array(
     'Attach a file' => 'Joindre un fichier',
     'Set the status to' => "Passer l'état à",
     'Canned responses' => 'Réponses types',
+    // name of core's untitled menu buttons (keyboard access, coderise.js)
+    'More actions' => "Plus d'actions",
     // "Log" tab of the ticket view (the thread's events only)
     'Log' => 'Journal',
     'No event has been recorded for this ticket yet.' => "Aucun événement n'a encore été enregistré pour ce ticket.",

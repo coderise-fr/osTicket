@@ -212,7 +212,7 @@ $labels = array(
     'No event has been recorded for this ticket yet.',
     // wave 5: the note line in two parts, reply / note footer, canned responses
     'Visible to the team only.', 'The client receives nothing.', 'Attach a file', 'Set the status to',
-    'Canned responses',
+    'Canned responses', 'More actions',
 );
 $untranslated = array();
 foreach ($labels as $l)

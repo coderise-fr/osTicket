@@ -284,3 +284,13 @@ html.rtl #content.cdr-ticket #response_options p.cdr-foot > input.cdr-reset { tr
   #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar:not(.fixed) > .content > .pull-right.flush-right { flex-direction: row; align-items: center; gap: 8px 12px; }
   #content.cdr-ticket:has(> .cdr-idline > .tixTitle) .sticky.bar > .content > .pull-right.flush-right { gap: 8px 12px; }
 }
+
+/* prefers-reduced-motion: no rotation animation on the "Options" chevron
+   (jQuery animations are switched off by coderise.js) */
+@media (prefers-reduced-motion: reduce) {
+  #content.cdr-ticket #response_options .cdr-opts-btn::after { transition: none; }
+}
+
+/* A property whose value is empty (e.g. no priority) is a core edit link
+   around an empty span (core fills it after an edit): a 0 x 0 focus stop. It shows a dash, so the focus ring has a box. */
+#content.cdr.cdr-ticket aside.cdr-props table.ticket_info td a.inline-edit > span:empty::before { content: "\2014"; color: var(--ardoise); }

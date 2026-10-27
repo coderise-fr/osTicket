@@ -204,6 +204,9 @@ if ($cdr_ticket_view)
             'attach' => 'Attach a file',
             'state-label' => 'Set the status to',
             'canned' => 'Canned responses',
+            // name of core's untitled menu buttons (a thread entry's
+            // chevron), made keyboard buttons by coderise.js
+            'menu-label' => 'More actions',
             // "Log" tab: the thread's events only (ticket-chrome.js)
             'journal-tab' => 'Log',
             'journal-empty' => 'No event has been recorded for this ticket yet.',

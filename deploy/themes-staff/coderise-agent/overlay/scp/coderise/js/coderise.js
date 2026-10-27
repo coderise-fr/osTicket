@@ -20,6 +20,7 @@
       thread entry, the note mode of the reply area.
     - Compact search button of the top bar below 920 px.
     - Dashboard chart: readable x axis on narrow screens, keyboard legend.
+    - prefers-reduced-motion: jQuery animations off ($.fx.off).
     - Admin forms: changed-field marks and the save bar counter.
 
     Every handler is delegated and bound once; init() only reads the DOM
@@ -33,6 +34,17 @@
     if (!$ || window.cdrBound)
         return;
     window.cdrBound = true;
+
+    // prefers-reduced-motion: jQuery animations end at once (core's
+    // floating bars and thread scrolling, the theme's scroll correction);
+    // their callbacks still run. Followed live (the setting can change).
+    if (window.matchMedia) {
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        $.fx.off = !!reduceMotion.matches;
+        var onMotion = function (e) { $.fx.off = !!e.matches; };
+        if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', onMotion);
+        else if (reduceMotion.addListener) reduceMotion.addListener(onMotion);
+    }
 
     var countsRequest = null;
 
@@ -686,7 +698,57 @@
         }, 60);
     }
 
+    // Keyboard access to core's menu buttons: a [data-dropdown="#menu"]
+    // trigger that is a bare <span> with no link or button inside (the
+    // ticket's "More" cog, each thread entry's chevron, the queue's "Sort")
+    // cannot take the focus in core. It gets tabindex 0, role button,
+    // aria-haspopup, a name when it shows no text (its tooltip, else
+    // data-cdr-menu-label of #content) and aria-expanded; Enter and Space click it, so core's own
+    // dropdown handler opens the menu, whose links follow in the tab order.
+    // Triggers with a focusable link or button inside are left as they are.
+    var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    function menuButtons() {
+        var fallback = $.trim($('#content').attr('data-cdr-menu-label') || '');
+        $('#content [data-dropdown^="#"], .sticky.bar [data-dropdown^="#"]').each(function () {
+            var $t = $(this);
+            if ($t.is('[data-cdr-kbd]') || this.tabIndex >= 0 || $t.find(FOCUSABLE).length) return;
+            var name = $.trim($t.attr('data-original-title') || $t.attr('title') || $t.attr('aria-label') || '') || fallback;
+            $t.attr({ tabindex: '0', role: 'button', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'data-cdr-kbd': '' });
+            // a visible text is the name (label in name); else the tooltip
+            if (name && !$t.attr('aria-label') && !$.trim($t.text())) $t.attr('aria-label', name);
+        });
+    }
+    function menuExpanded() {
+        $('[data-cdr-kbd]').each(function () {
+            var $m = $($(this).attr('data-dropdown'));
+            $(this).attr('aria-expanded', $m.length && $m.is(':visible') ? 'true' : 'false');
+        });
+    }
+    $(document).on('keydown.cdrmenu', '[data-cdr-kbd]', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+        e.preventDefault();
+        $(this).trigger('click');
+        setTimeout(menuExpanded, 0);
+    });
+    // Escape closes a menu opened from such a button (core's own way: a
+    // click on the page) and gives the focus back to the button
+    $(document).on('keydown.cdrmenu', function (e) {
+        if (e.key !== 'Escape') return;
+        var $t = $('[data-cdr-kbd]').filter(function () {
+            var $m = $($(this).attr('data-dropdown'));
+            return $m.length && $m.is(':visible')
+                && (this === document.activeElement || $.contains($m[0], document.activeElement));
+        }).first();
+        if (!$t.length) return;
+        $('html').trigger('click');
+        $t.trigger('focus');
+        setTimeout(menuExpanded, 0);
+    });
+    if (document.addEventListener)
+        document.addEventListener('click', function () { setTimeout(menuExpanded, 0); }, true);
+
     function init() {
+        menuButtons();
         ticketLayout();
         fitTables();
         tagPagers();
