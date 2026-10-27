@@ -5,7 +5,9 @@
 // Usage:  LOGIN_PASS=<password> node deploy/themes-staff/tests/fidelity-check.mjs
 // Env:    LOGIN_PASS (required, never printed), LOGIN_USER (dev.admin), BASE (http://127.0.0.1:8480),
 //         PW_CORE (playwright-core module name or path), CHROME (chromium.exe path),
-//         VIEW_W / VIEW_H (1280 / 800), MOCKUP_DIR (default: <repo>/docs/theme-mockups-admin).
+//         VIEW_W / VIEW_H (1280 / 800), MOCKUP_DIR (default: <repo>/docs/theme-mockups-admin),
+//         ONLY (comma-separated kinds, default all: queue, ticket, note, urgent, att, login, dash,
+//         agents, settings), OVERLAY_DIR (an overlay folder served over the demo, see below).
 // Output: one line per metric, "OK|DIFF  <name>  mockup=<v>  real=<v>", then "OK n  DIFF n
 //         ALLOWED n". Exit code = number of DIFF lines (capped at 125). Exit 2 on configuration
 //         or login errors (not counted as diffs). A missing element prints MISSING (a DIFF).
@@ -40,9 +42,17 @@
 // in a browser context of its own (KINDS entry 'anon: true'); kind 'dash' (tableau-de-bord.html vs
 // /scp/dashboard.php) measures the panels coderise/dashboard.inc.php emits. A px tolerance only
 // applies to single px values ('box-shadow' and other lists are compared as text).
+// Wave 5, admin: kinds 'agents' (admin-agents.html vs /scp/staff.php) and 'settings'
+// (admin-parametres.html vs /scp/settings.php?t=tickets). '.sticky.bar h2' is the list title core
+// prints in its sticky bar, '#content > h2' the settings title; '.cdr-av' / '.cdr-st' / '.cdr-name a'
+// are the cells admin.js builds; the save bar is the last <p> of form.save (its position differs on
+// purpose: pinned to the window, the mockup's is sticky). Env OVERLAY_DIR=<overlay folder of the
+// package>: serve that folder's css/js over the demo (signed-in and signed-out contexts) and inject
+// its admin.css / admin.js into the pages that do not link them yet (a demo older than the package).
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, extname } from 'node:path';
+import { readFileSync, existsSync } from 'node:fs';
 
 // { metric: '<pair name> <property>', reason: '...' }: printed as OK with the reason, not counted.
 const ALLOWED_DIFFS = [
@@ -60,6 +70,8 @@ const VIEW_W = Number(env.VIEW_W || 1280);
 const VIEW_H = Number(env.VIEW_H || 800);
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MOCKUP_DIR = env.MOCKUP_DIR || join(HERE, '..', '..', '..', 'docs', 'theme-mockups-admin');
+// ONLY=<kind>[,<kind>...]: measure these kinds only (default: every kind of KINDS)
+const ONLY = (env.ONLY || '').split(',').map((s) => s.trim()).filter(Boolean);
 
 const KINDS = {
   queue: { mock: 'tickets.html', real: '/scp/tickets.php' },
@@ -73,6 +85,9 @@ const KINDS = {
   // Wave 5: the login page (measured signed out, in a fresh browser context: anon) and the dashboard
   login: { mock: 'login.html', real: '/scp/login.php', anon: true },
   dash: { mock: 'tableau-de-bord.html', real: '/scp/dashboard.php' },
+  // Wave 5, admin: agents list and Paramètres > Tickets
+  agents: { mock: 'admin-agents.html', real: '/scp/staff.php' },
+  settings: { mock: 'admin-parametres.html', real: '/scp/settings.php?t=tickets' },
 };
 
 // name, kind, mock/real selector, css properties, px tolerance (default 0.5).
@@ -202,7 +217,52 @@ const PAIRS = [
   { name: 'dash agent department', kind: 'dash', mock: '.data .who small', real: 'table.data .who small', props: ['font-size', 'color'] },
   { name: 'dash agent avatar', kind: 'dash', mock: '.data .avatar', real: 'table.data .avatar', props: ['width', 'height', 'font-size', 'font-family', 'background-color', 'color'] },
   { name: 'dash load bar', kind: 'dash', mock: '.load', real: '.load', props: ['height', 'background-color', 'border-top-left-radius'] },
+  // Admin, wave 5: agents list (admin-agents.html)
+  { name: 'agents title', kind: 'agents', mock: 'h1', real: '#content .sticky.bar h2', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'left'] },
+  { name: 'agents add button', kind: 'agents', mock: '.t-actions .btn-primary', real: '#content .sticky.bar a.green.button', props: ['font-size', 'font-weight', 'font-family', 'height', 'background-color', 'color', 'border-top-left-radius'] },
+  { name: 'agents panel', kind: 'agents', mock: '.panel', real: '#content > #basic_search', props: ['left', 'width', 'background-color', 'border-top-left-radius', 'box-shadow'] },
+  { name: 'agents table header', kind: 'agents', mock: '.data thead th:nth-child(2)', real: 'table.list thead th:nth-child(2)', props: ['font-size', 'font-weight', 'font-family', 'color', 'background-color', 'padding-top', 'padding-left'] },
+  { name: 'agents table cell', kind: 'agents', mock: '.data tbody tr:nth-child(1) td:nth-child(3)', real: 'table.list tbody tr:nth-child(1) td:nth-child(5)', props: ['font-size', 'font-weight', 'font-family', 'color', 'padding-top', 'padding-left'] },
+  { name: 'agents last login', kind: 'agents', mock: '.data td.muted', real: 'table.list tbody tr:nth-child(1) td:last-child', props: ['color', 'font-size'] },
+  { name: 'agents avatar', kind: 'agents', mock: '.data .avatar', real: 'table.list .cdr-av', props: ['width', 'height', 'font-size', 'font-weight', 'font-family', 'background-color', 'color', 'border-top-left-radius'] },
+  { name: 'agents name link', kind: 'agents', mock: '.data .name a', real: 'table.list .cdr-name a', props: ['font-size', 'font-weight', 'font-family', 'color', 'text-decoration-line'] },
+  { name: 'agents status', kind: 'agents', mock: '.data .status', real: 'table.list .cdr-st', props: ['font-size', 'font-weight', 'font-family', 'color', 'gap', 'height'] },
+  { name: 'agents footer row', kind: 'agents', mock: '.tfoot', real: 'table.list tfoot td', props: ['padding-top', 'padding-left', 'color', 'border-top-width', 'border-top-color'] },
+  // Admin, wave 5: Paramètres > Tickets (admin-parametres.html)
+  { name: 'settings title', kind: 'settings', mock: 'h1', real: '#content > h2', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'left'] },
+  { name: 'settings panel', kind: 'settings', mock: 'form.panel', real: '#content > form.save', props: ['left', 'width', 'background-color', 'border-top-left-radius', 'box-shadow'] },
+  { name: 'settings section title', kind: 'settings', mock: '.form fieldset:nth-of-type(2) legend', real: 'th:has(> em > b) b', props: ['font-size', 'font-weight', 'font-family', 'color'] },
+  { name: 'settings label', kind: 'settings', mock: '.field > label[for=sla]', real: '#settings tr:nth-child(5) > td:first-child', props: ['font-size', 'font-weight', 'font-family', 'color', 'left'] },
+  { name: 'settings select', kind: 'settings', mock: '#sla', real: 'select[name=default_sla_id]', props: ['height', 'width', 'font-size', 'font-family', 'border-top-width', 'border-top-color', 'border-top-left-radius', 'padding-left', 'left', 'background-color', 'color'] },
+  { name: 'settings hint', kind: 'settings', mock: '.hint', real: '#settings .faded', props: ['font-size', 'color'] },
+  { name: 'settings save bar', kind: 'settings', mock: '.savebar', real: 'form.save > p:last-of-type', props: ['left', 'width', 'height', 'background-color', 'padding-top', 'padding-left', 'border-top-left-radius', 'box-shadow', 'z-index'] },
+  { name: 'settings save bar reset', kind: 'settings', mock: '.savebar .btn-on-dark', real: 'form.save > p input[type=reset]', props: ['height', 'font-size', 'font-weight', 'font-family', 'padding-left', 'color', 'background-color', 'border-top-color', 'border-top-width', 'border-top-left-radius'] },
+  { name: 'settings save bar submit', kind: 'settings', mock: '.savebar .btn-primary-dark', real: 'form.save > p input[type=submit]', props: ['height', 'font-size', 'font-weight', 'font-family', 'padding-left', 'color', 'background-color', 'border-top-width', 'border-top-left-radius', 'right'] },
 ];
+
+// OVERLAY_DIR: the files of a package newer than the demo (see the header).
+async function useOverlay(context, dir) {
+  const types = { '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
+  await context.route(/\/scp\/coderise\/(css|js|img|fonts)\/[^?]+/, async (route) => {
+    const rel = new URL(route.request().url()).pathname.replace(/^.*\/scp\/coderise\//, '');
+    const file = join(dir, 'scp', 'coderise', rel);
+    if (!existsSync(file)) return route.continue();
+    await route.fulfill({ status: 200, contentType: types[extname(file)] || 'application/octet-stream', body: readFileSync(file) });
+  });
+  await context.route(/\/scp\/[a-z_-]+\.php/, async (route) => {
+    const req = route.request();
+    if (req.resourceType() !== 'document' || req.headers()['x-pjax']) return route.continue();
+    const resp = await route.fetch();
+    if (!(resp.headers()['content-type'] || '').includes('text/html')) return route.fulfill({ response: resp });
+    let body = await resp.text();
+    const f = (n) => { const p = join(dir, 'scp', 'coderise', n); return existsSync(p) ? readFileSync(p, 'utf8') : ''; };
+    // each file only where the page does not link it yet (a demo older than the package)
+    const extra = (body.includes('css/admin.css') ? '' : '<style>' + f('css/admin.css') + '</style>')
+      + (body.includes('js/admin.js') ? '' : '<script>' + f('js/admin.js') + '</script>');
+    if (extra) body = body.replace('</head>', () => extra + '</head>');
+    await route.fulfill({ response: resp, body });
+  });
+}
 
 async function login(page) {
   await page.goto(BASE + '/scp/login.php', { waitUntil: 'load' });
@@ -277,16 +337,23 @@ async function measure(page, url, targets) {
 async function run() {
   if (!LOGIN_PASS) { console.error('LOGIN_PASS is required'); return 2; }
   const core = /^([./]|[A-Za-z]:)/.test(PW_CORE) ? pathToFileURL(resolve(PW_CORE)).href : PW_CORE;
-  const { chromium } = await import(core);
+  const pw = await import(core);
+  const chromium = pw.chromium || pw.default.chromium;
   const browser = await chromium.launch({ executablePath: CHROME, headless: true });
   try {
     const context = await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' });
     const page = await context.newPage();
     // signed-out pages (login): a context of their own, never logged in
-    const anonPage = await (await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' })).newPage();
+    const anonContext = await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' });
+    const anonPage = await anonContext.newPage();
+    if (env.OVERLAY_DIR) {
+      await useOverlay(context, env.OVERLAY_DIR);
+      await useOverlay(anonContext, env.OVERLAY_DIR);
+    }
     await login(page);
     let diffs = 0, oks = 0, allowedN = 0;
     for (const [kind, urls] of Object.entries(KINDS)) {
+      if (ONLY.length && !ONLY.includes(kind)) continue;
       // minWidth / maxWidth: a pair measured only at the viewport widths where it applies
       const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind
         && VIEW_W >= (p.minWidth ?? 0) && VIEW_W <= (p.maxWidth ?? Infinity));

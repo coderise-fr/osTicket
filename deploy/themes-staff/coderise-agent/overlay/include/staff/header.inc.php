@@ -79,6 +79,7 @@ if (osTicket::is_ie())
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket-chrome.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/queue.js')); ?>"></script>
+    <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/admin.js')); ?>"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="<?php echo cdr_h(cdr_asset('img/favicon.svg')); ?>" />
 

@@ -28,12 +28,18 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   fichiers du cœur dont le thème **dépend** sans les remplacer (pages et gabarits dont la
   feuille de style et `coderise.js` habillent ou déplacent le balisage, classes et routes
   AJAX appelées, feuilles du cœur surchargées, plugin `sla_first_response`) : la liste est
-  `WATCH_FILES` dans le script (72 fichiers au 25/10/2026, dont, pour les passes de fidélité,
+  `WATCH_FILES` dans le script (92 fichiers au 27/10/2026, dont, pour les passes de fidélité,
   le menu et la liste des états derrière « Marquer comme résolu », les actions groupées
   derrière « Réclamation », `thread.js`, `tips.js`, les compteurs de files et les jointures
   utilisateur/organisation de la file ; passe 4 : le plugin de menus `jquery.dropdown.js`,
   `thread-entries.tmpl.php` de l'onglet « Journal », `redactor-osticket.js` et
-  `class.staff.php` pour la signature par défaut). Code de sortie 0 = aucune dérive.
+  `class.staff.php` pour la signature par défaut ; passe 5 : zone de dépôt et infobulles du
+  cœur, et pour le tableau de bord `class.report.php` (période), `class.topic.php`,
+  `class.format.php`, `class.config.php`, la signature du schéma
+  `include/upgrader/streams/core.sig` (tables lues par les requêtes agrégées) et
+  `premiere-reponse.sql` ; pour `admin.js` les listes d'administration dont il habille les
+  colonnes état et nom : agents, services, rubriques, SLA, équipes, filtres, pages, gabarits,
+  clés d'API, bannis, plugins). Code de sortie 0 = aucune dérive.
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php`, `tests/test-rail.php` et `tests/test-dashboard.php` (assistants PHP, en CLI dans l'image de
@@ -66,13 +72,23 @@ rôle, en-tête d'entrée, événements, défilement), `ticket-chrome.css` + `ti
 ont besoin arrivent traduits par des attributs `data-cdr-*` de `#content` (`header.inc.php`,
 `cdr_data_attrs()`).
 Passe 5 (27/10/2026) : `login.css` (connexion et mot de passe oublié) et `dash.css` (tableau de bord),
-`include/staff/coderise/dashboard.inc.php` (panneaux du tableau de bord, voir ci-dessous).
-Toutes les autres pages (administration, utilisateurs, base de connaissances, tâches,
-journaux…) ne sont habillées que par la feuille de style.
+`include/staff/coderise/dashboard.inc.php` (panneaux du tableau de bord, voir ci-dessous),
+`admin.css` + `admin.js` (pages d'administration, voir « Administration »).
+Toutes les autres pages (utilisateurs, base de connaissances, tâches, journaux…) ne sont
+habillées que par la feuille de style.
 
-### Tableau de bord (passe 5)
+### Connexion et tableau de bord (passe 5)
 
-`scp/dashboard.php` n'affiche que la barre de période, le graphique Raphael et les tableaux de
+Connexion (`login.css`, `login.tpl.php`, `login.header.php`) : rythme, signature Montserrat,
+motif et champs de la maquette ; bandeau neutre à la première visite, rouge avec champs en
+erreur et phrase d'aide sous le mot de passe après un échec (serveur : `$_POST && $errors` ;
+AJAX : le gestionnaire en ligne existant ajoute `is-err`, aucun script nouveau) ; présentation
+complète à 390 px ; bouton « Se connecter ». Contrats gardés : `#loginBox`, `#login`, `#name`,
+`#pass`, `#reset-link`, CSRF, 2FA, authentifications externes. Mot de passe oublié : un filtre
+`ob_start` limité à `pwreset.php` remplace deux chaînes exactes du cœur (paragraphe « envoyé » non
+traduit, bouton « Login » en dur) par le catalogue du thème ; sans entrée, la page reste celle du cœur.
+
+Tableau de bord : `scp/dashboard.php` n'affiche que la barre de période, le graphique Raphael et les tableaux de
 statistiques du cœur. La maquette a en plus un titre, un bandeau d'alerte, quatre indicateurs et
 trois panneaux. `header.inc.php` (un seul bloc, sur `dashboard.php` uniquement) charge
 `coderise/dashboard.inc.php`, qui lit les données avec cinq requêtes agrégées au plus, une fois
@@ -97,6 +113,31 @@ attendu (formulaire absent) la page reste telle que le cœur la rend.
   catalogue du thème). Tests : `tests/test-dashboard.php` (assistants purs, requêtes simulées et
   comptées, injection, catalogue français complet).
 
+### Administration (passe 5)
+
+`admin.css` et `admin.js` (portée `#content.cdr-is-admin` ; `dashboard.php`, `logs.php` et
+`system.php` gardent la carte) suivent `admin-parametres.html` et `admin-agents.html` :
+
+- Titre sur le fond gris (h2 21 px Montserrat 700) ; `admin.js` sort le h2 que le cœur imprime
+  dans le formulaire pour le placer devant. Panneaux blancs (rayon 10, anneau 1 px) pour le
+  tableau d'une liste ou le formulaire d'une page de réglages ; onglets hors formulaire en haut
+  du panneau.
+- Listes : bouton d'ajout cyan, « Plus » en contour, pied « Sélectionner » gris. Agents : bande de
+  filtres collée au tableau, disque d'initiales 24 px, nom en 600, état « icône + texte »
+  (`span.cdr-st`, colonne repérée par son lien de tri `sort=status`, jamais par le texte traduit ;
+  pas sur les services, où le cœur compare l'état traduit au mot anglais), dernière connexion en ardoise.
+- Formulaires : étiquettes 220 px, sans filet entre champs, filet et barre cyan 28 × 3 sous le titre
+  de section, listes seules à 520 px, champs modifiés repérés (barre cyan 4 px, marque « modifié »).
+- Barre d'enregistrement nuit **fixée** en bas de la fenêtre sur la largeur de la colonne (54 px,
+  boutons 30 px), toujours visible ; compteur « N réglages modifiés » (`coderise.js`) à gauche,
+  « Enregistrer » en dernier (déplacé dans le DOM : ordre clavier = ordre visuel). `admin.js` publie
+  sa hauteur en `--cdr-savebar-h` (place réservée sous la page, `scroll-padding-bottom`).
+- `admin.js` : IIFE idempotente (prêt et `pjax:end`), aucun texte propre, aucun `eval`. Sans lui,
+  les pages restent complètes. Vérifié identique avec et sans `admin.css`/`admin.js` sur les pages
+  agent (aucune règle hors `.cdr-is-admin`).
+- `fidelity-check.mjs` : types `agents` et `settings` ; `OVERLAY_DIR=<overlay>` sert les fichiers
+  d'un paquet plus récent que la démo et injecte `admin.css` / `admin.js` dans les pages qui ne les
+  lient pas encore.
 
 ## Jauge de premier retour (règle I-4)
 
