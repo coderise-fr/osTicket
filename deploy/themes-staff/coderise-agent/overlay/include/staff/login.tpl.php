@@ -15,10 +15,14 @@
 **********************************************************************/
 include_once(INCLUDE_DIR.'staff/login.header.php');
 $info = ($_POST && $errors)?Format::htmlchars($_POST):array();
-
+// A failed attempt (non-AJAX POST): the card shows its error state; attemptLoginAjax() sets the same class on a 401
+$cdr_err = ($_POST && $errors);
 
 if ($thisstaff && $thisstaff->is2FAPending())
     $msg = "2FA Pending";
+// Core's first-visit notice, in the panel language (core's pack has no entry for it)
+if ($msg === 'Authentication Required')
+    $msg = cdr__('Authentication Required');
 
 ?>
 <div id="brickwall"></div>
@@ -35,7 +39,7 @@ if ($thisstaff && $thisstaff->is2FAPending())
         '<span class="up">'.Format::htmlchars(cdr__('take off')).'</span>'); ?></p>
     <span class="sommet" aria-hidden="true"></span>
 </section>
-<div id="loginBox" class="login-card">
+<div id="loginBox" class="login-card<?php echo $cdr_err ? ' is-err' : ''; ?>">
     <div id="blur">
         <div id="background"></div>
     </div>
@@ -71,20 +75,24 @@ if ($thisstaff && $thisstaff->is2FAPending())
         } else { ?>
             <input type="hidden" name="do" value="scplogin">
             <fieldset>
-            <label for="name"><?php echo cdr__('Email or Username'); ?></label>
+            <label for="name"><?php echo cdr_t('Email or Username'); ?></label>
             <input type="text" name="userid" id="name" value="<?php
                 echo $info['userid'] ?? null; ?>"
-                autofocus autocorrect="off" autocapitalize="off" autocomplete="username">
+                autofocus autocorrect="off" autocapitalize="off" autocomplete="username"<?php
+                echo $cdr_err ? ' aria-describedby="login-hint"' : ''; ?>>
             <label for="pass"><?php echo cdr__('Password'); ?></label>
             <input type="password" name="passwd" id="pass" maxlength="128"
-                autocorrect="off" autocapitalize="off" autocomplete="current-password">
+                autocorrect="off" autocapitalize="off" autocomplete="current-password"<?php
+                echo $cdr_err ? ' aria-describedby="login-hint"' : ''; ?>>
+            <p class="field-error" id="login-hint"><?php
+                echo Format::htmlchars(cdr__('Check the username and password, then try again.')); ?></p>
                 <button class="submit button btn btn-primary" type="submit"
                     name="submit"><i class="icon-signin"></i>
-                    <?php echo cdr__('Log In'); ?>
+                    <?php echo cdr_t('Log In'); ?>
                 </button>
                 <p class="alt"><a id="reset-link" class="<?php
                     if (!$show_reset || !$cfg->allowPasswordReset()) echo 'hidden';
-                    ?>" href="pwreset.php"><?php echo cdr__('Forgot My Password'); ?></a></p>
+                    ?>" href="pwreset.php"><?php echo cdr_t('Forgot My Password'); ?></a></p>
             </fieldset>
         <?php
         } ?>
@@ -174,6 +182,9 @@ if (($bks=StaffAuthenticationBackend::getExternal())) { ?>
                         document.location.href = json.redirect;
                     if (json && json.message)
                         $('#login-message').text(json.message)
+                    // error state of the card: red banner, field borders and hint; the fields point to the hint
+                    $('#loginBox').addClass('is-err')
+                    $('#name, #pass').attr('aria-describedby', 'login-hint')
                     if (json && json.show_reset)
                         $('#reset-link').show()
                     if ($.fn.effect) {

@@ -1,1 +1,113 @@
 /* coderise-agent: dash rules (loaded after the other sheets; one workstream owns this file). Stay faithful to docs/theme-mockups-admin/theme.css. px sizes only; RICH exclusion for user content. */
+
+/* ───────── Dashboard (scp/dashboard.php) ─────────
+   Markup: core's form, period bar, chart and statistics tables, plus the panels of
+   include/staff/coderise/dashboard.inc.php (.cdr-dash*, class names of the mockup:
+   .alert-strip, .stats, .panel, .data, .props, .load, .avatar). The page sits on the grey of the
+   shell like the mockup (no white card around everything); #content never clips. */
+#content.cdr.cdr-dashboard { padding: 0; border-radius: 0; background: none; box-shadow: none; --dash-ring: 0 0 0 1px rgba(0,15,38,.08); }
+
+/* Title (mockup .title-row h1 + .sub) */
+#content.cdr-dashboard .cdr-dash-title { margin: 0 0 16px; }
+#content.cdr-dashboard .cdr-dash-title h1 { margin: 0; padding: 0; color: var(--nuit); font: 700 21px/1.25 var(--f-titre); }
+#content.cdr-dashboard .cdr-dash-title .sub { margin: 2px 0 0; color: var(--ardoise); font: 400 13.5px/1.5 var(--f-texte); }
+
+/* Alert strip (mockup .alert-strip): nuit band, the Coderise mark behind, a cyan button */
+#content.cdr-dashboard .alert-strip { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 0 0 16px; padding: 14px 18px; border-radius: 10px; overflow: hidden; background: var(--nuit); color: var(--blanc); font: 400 13.5px/1.5 var(--f-texte); }
+#content.cdr-dashboard .alert-strip > * { position: relative; z-index: 1; }
+#content.cdr-dashboard .alert-strip .ic { flex: none; color: var(--cyan); }
+#content.cdr-dashboard .alert-strip p { flex: 1; min-width: 14em; margin: 0; }
+#content.cdr-dashboard .alert-strip strong { font-weight: 700; }
+#content.cdr-dashboard .alert-strip::after { content: ""; position: absolute; inset-inline-end: 180px; bottom: -30px; width: 130px; aspect-ratio: 409 / 342; background: var(--cyan); opacity: .16; clip-path: polygon(49.9% 0, 100% 100%, 84.1% 100%, 49.9% 29.8%, 15.9% 100%, 0 100%); }
+#content.cdr-dashboard .alert-strip a.btn-primary-dark { background: var(--cyan); color: var(--nuit); text-decoration: none; }
+#content.cdr-dashboard .alert-strip a.btn-primary-dark:hover { background: var(--blanc); color: var(--nuit); }
+#content.cdr-dashboard .alert-strip a.btn-primary-dark:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+
+/* Four indicators (mockup .stats) */
+#content.cdr-dashboard .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 16px; border-radius: 10px; background: var(--blanc); box-shadow: var(--dash-ring); }
+#content.cdr-dashboard .stats > div { display: grid; align-content: start; padding: 14px 18px; min-width: 0; }
+#content.cdr-dashboard .stats > div + div { border-inline-start: 1px solid var(--gris); }
+#content.cdr-dashboard .stats b { color: var(--nuit); font: 700 26px/1.2 var(--f-titre); }
+#content.cdr-dashboard .stats span { color: var(--ardoise); }
+#content.cdr-dashboard .stats .delta { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; font: 600 12px var(--f-titre); }
+#content.cdr-dashboard .stats .delta-up { color: var(--succes); }
+#content.cdr-dashboard .stats .delta-down { color: var(--erreur); }
+#content.cdr-dashboard .stats .delta-flat { color: var(--ardoise); }
+
+/* Panels: .panel / .panel-h come from coderise.css */
+#content.cdr-dashboard .panel { margin-bottom: 16px; }
+#content.cdr-dashboard .panel-h h2 { margin: 0; font: 700 15px/1.2 var(--f-titre); }
+#content.cdr-dashboard .panel-h a.more { color: var(--cyan-profond); font-weight: 600; }
+#content.cdr-dashboard .cdr-dash-empty { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 14px 16px; color: var(--ardoise); }
+#content.cdr-dashboard .cdr-dash-empty .ic { flex: none; margin-top: 2px; color: var(--succes); }
+
+/* Tables of the panels (mockup .data) */
+#content.cdr-dashboard .table-wrap { overflow-x: auto; }
+#content.cdr-dashboard table.data { width: 100%; margin: 0; border-collapse: collapse; background: none; }
+#content.cdr-dashboard table.data thead th { padding: 8px 12px; border: 0; background: var(--nuit); color: var(--blanc); font: 600 12px/1.35 var(--f-titre); text-align: start; white-space: nowrap; }
+#content.cdr-dashboard table.data :is(td, tbody th) { padding: 8px 12px; border: 0; background: none; color: var(--nuit); font: 400 13.5px/1.5 var(--f-texte); text-align: start; vertical-align: top; }
+#content.cdr-dashboard table.data tbody tr:nth-child(even) { background: var(--gris); }
+#content.cdr-dashboard table.data tbody tr:hover { background: var(--voile); }
+#content.cdr-dashboard table.data td a { color: var(--nuit); text-decoration-color: var(--cyan-profond); }
+#content.cdr-dashboard table.data small { display: block; color: var(--ardoise); font-size: 12.5px; }
+#content.cdr-dashboard table.data .who { display: flex; align-items: center; gap: 8px; }
+#content.cdr-dashboard table.data .who .name { line-height: 1.25; font-weight: 400; }
+#content.cdr-dashboard table.data td strong { font-weight: 700; }
+#content.cdr-dashboard .avatar { display: inline-grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--voile); color: var(--nuit); font: 700 11px var(--f-titre); box-shadow: inset 0 0 0 1.5px var(--cyan-profond); }
+#content.cdr-dashboard .avatar.av-team { background: var(--nuit); color: var(--blanc); box-shadow: none; }
+#content.cdr-dashboard .avatar.av-sm { width: 24px; height: 24px; font-size: 10px; }
+#content.cdr-dashboard .load { min-width: 90px; height: 8px; border-radius: 2px; overflow: hidden; background: var(--gris); box-shadow: inset 0 0 0 1px rgba(0,15,38,.18); }
+#content.cdr-dashboard .load i { display: block; height: 100%; background: var(--nuit); }
+#content.cdr-dashboard .gauge { display: grid; gap: 3px; min-width: 128px; }
+#content.cdr-dashboard table.data small.muted { color: var(--ardoise); }
+
+/* Topics (mockup .props) */
+#content.cdr-dashboard dl.props { display: grid; margin: 0; }
+#content.cdr-dashboard dl.props > div { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
+#content.cdr-dashboard dl.props > div:nth-child(even) { background: var(--gris); }
+#content.cdr-dashboard dl.props dt { margin: 0; padding: 0; width: auto; float: none; color: var(--ardoise); font-weight: 400; }
+#content.cdr-dashboard dl.props dd { margin: 0; padding: 0; font-weight: 500; overflow-wrap: anywhere; }
+
+/* Core's period bar: a white bar of the page (it was a grey strip) */
+#content.cdr-dashboard form[action="dashboard.php"] #basic_search { margin: 0 0 16px; padding: 10px 14px; border-radius: 10px; background: var(--blanc); box-shadow: var(--dash-ring); }
+
+/* Core's "Ticket Activity" title and chart: one panel (the title is the panel head) */
+#content.cdr-dashboard { --cdr-i-dash-chart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20V4M4 20h16'/%3E%3Cpath d='M8 16v-4M12 16V8M16 16v-6'/%3E%3C/svg%3E"); }
+#content.cdr-dashboard .cdr-dash-chart > div:first-child { margin: 0 !important; padding: 11px 16px !important; border-bottom: 1px solid var(--gris); }
+#content.cdr-dashboard .cdr-dash-chart > div:first-child .pull-left { float: none; }
+#content.cdr-dashboard .cdr-dash-chart > div:first-child + .clear { display: none; }
+#content.cdr-dashboard .cdr-dash-chart h2 { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 15px/1.3 var(--f-titre); }
+#content.cdr-dashboard .cdr-dash-chart h2::before { content: ""; flex: none; width: 18px; height: 18px; background: var(--cyan-profond); -webkit-mask: var(--cdr-i-dash-chart) center / contain no-repeat; mask: var(--cdr-i-dash-chart) center / contain no-repeat; }
+#content.cdr-dashboard .cdr-dash-chart div:has(> #line-chart-here) { margin: 0 !important; padding: 14px 16px 12px; border-radius: 0; background: none; box-shadow: none; }
+
+/* Core's "Statistics" and its tables: the second panel */
+#content.cdr-dashboard .cdr-dash-stats { padding: 14px 16px 16px; }
+#content.cdr-dashboard .cdr-dash-stats > h2 { margin: 0 0 8px; font: 700 15px/1.3 var(--f-titre); }
+
+@media (max-width: 1180px) {
+  #content.cdr-dashboard .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #content.cdr-dashboard .stats > div:nth-child(3) { border-inline-start: 0; }
+  #content.cdr-dashboard .stats > div:nth-child(n+3) { border-top: 1px solid var(--gris); }
+}
+@media (max-width: 760px) {
+  #content.cdr-dashboard .stats b { font-size: 22px; }
+  #content.cdr-dashboard dl.props > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  /* the per-agent table becomes one card per agent, labels from data-label */
+  #content.cdr-dashboard table.data:has(td[data-label]) thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  #content.cdr-dashboard table.data:has(td[data-label]) :is(tbody, tr, td, th) { display: block; }
+  #content.cdr-dashboard table.data:has(td[data-label]) tbody tr { padding: 10px 14px; border-bottom: 1px solid var(--gris); }
+  #content.cdr-dashboard table.data:has(td[data-label]) td { display: grid; grid-template-columns: 8em minmax(0, 1fr); gap: 8px; align-items: center; padding: 2px 0; }
+  #content.cdr-dashboard table.data:has(td[data-label]) td::before { content: attr(data-label); color: var(--ardoise); }
+  #content.cdr-dashboard table.data:has(td[data-label]) tbody th { padding: 0 0 4px; }
+}
+
+/* Chart x axis: Raphael draws 9 dates; coderise.js tags every second one (.cdr-skip). Up to 780 px they are hidden
+   (coderise.css); the chart is also narrower than 650 px between 921 and 985 px (full-width card beside the rail) and
+   between 1181 and 1325 px (main column beside the 330 px side column): measured overlap there. */
+@media (min-width: 921px) and (max-width: 985px), (min-width: 1181px) and (max-width: 1325px) {
+  #content.cdr-dashboard #line-chart-here svg text.cdr-skip { display: none; }
+}
+/* Period bar: one line in the main column (core's help icon was wrapping alone) */
+#content.cdr-dashboard form[action="dashboard.php"] #basic_search > div { gap: 8px 10px; }
+#content.cdr-dashboard form[action="dashboard.php"] #basic_search input.dp { width: 8em; }
+#content.cdr-dashboard form[action="dashboard.php"] #basic_search select { max-width: 11em; }

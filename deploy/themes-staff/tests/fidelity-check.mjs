@@ -59,6 +59,9 @@ const KINDS = {
   note: { mock: 'ticket.html', real: '/scp/tickets.php?id=1' },
   // demo ticket 45: open, Standard contract, High priority (urgent)
   urgent: { mock: 'ticket.html', real: '/scp/tickets.php?id=45' },
+  // Wave 5: the login page (measured signed out, in a fresh browser context: anon) and the dashboard
+  login: { mock: 'login.html', real: '/scp/login.php', anon: true },
+  dash: { mock: 'tableau-de-bord.html', real: '/scp/dashboard.php' },
 };
 
 // name, kind, mock/real selector, css properties, px tolerance (default 0.5).
@@ -127,6 +130,47 @@ const PAIRS = [
   { name: 'queue number to subject columns', kind: 'queue', mock: '.data tbody tr:first-child td.subj', mockRef: '.data tbody tr:first-child td.c-n', real: 'table.queue tbody tr:has(small.cdr-client) td:has(> small.cdr-client)', realRef: 'table.queue tbody tr:has(small.cdr-client) td:has(a.preview)', props: ['col-delta'] },
   { name: 'queue From column hidden', kind: 'queue', mock: '.data thead th:nth-child(3)', real: 'table.queue thead th.cdr-col-from', props: ['display'], expect: { mock: 'table-cell', real: 'none' } },
   { name: 'rail top-level queue count', kind: 'queue', mock: '.rail .queues .badge', real: '#cdr-queues .cdr-qcount:not(.cdr-zero)', props: ['font-size', 'font-weight', 'height', 'min-width', 'background-color'] },
+  // Login (wave 5). Signed out, the real banner is the neutral first-visit notice (the mockup shows its error state:
+  // only its geometry is compared, not its colours); tops are compared where the mockup has no extra row above.
+  { name: 'login headline', kind: 'login', mock: '.login-art h1', real: '.login-art .hook', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'left', 'top'] },
+  { name: 'login presentation text', kind: 'login', mock: '.login-art > div:nth-child(2) p', real: '.login-art > div:nth-child(2) p:not(.hook)', props: ['font-size', 'line-height', 'color', 'top'] },
+  { name: 'login signature', kind: 'login', mock: '.login-art .signature', real: '.login-art .signature', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'top'] },
+  { name: 'login mark', kind: 'login', mock: '.login-art .sommet', real: '.login-art .sommet', props: ['width', 'height', 'top', 'left'] },
+  { name: 'login card', kind: 'login', mock: '.login-card', real: '.login-card', props: ['left', 'width', 'padding-left', 'padding-top', 'padding-bottom', 'background-color'] },
+  { name: 'login card title', kind: 'login', mock: '.login-card h2', real: '.login-card .card-title', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color'] },
+  { name: 'login lead', kind: 'login', mock: '.login-card .lead', real: '.login-card .lead', props: ['font-size', 'line-height', 'color'] },
+  { name: 'login banner', kind: 'login', mock: '.login-card .banner', real: '#login-message', props: ['font-size', 'line-height', 'padding-top', 'padding-left', 'border-top-left-radius', 'border-left-width'] },
+  { name: 'login label', kind: 'login', mock: '.login-card .field label', real: '#login label[for=name]', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color', 'height'] },
+  { name: 'login field', kind: 'login', mock: '.login-card .field input', real: '#name', props: ['font-size', 'font-family', 'line-height', 'padding-left', 'border-top-left-radius', 'background-color', 'left', 'width'] },
+  { name: 'login button', kind: 'login', mock: '.login-card .btn', real: '#login button[type=submit]', props: ['font-size', 'font-weight', 'font-family', 'height', 'width', 'border-top-left-radius', 'background-color', 'color'] },
+  // Dashboard (wave 5): title, alert strip, indicators, side panels, topics, per-agent table.
+  { name: 'dash title', kind: 'dash', mock: 'h1', real: '.cdr-dash-title h1', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'left', 'top'] },
+  { name: 'dash subtitle', kind: 'dash', mock: '.title-row .sub', real: '.cdr-dash-title .sub', props: ['font-size', 'line-height', 'color', 'top'] },
+  { name: 'dash alert strip', kind: 'dash', mock: '.alert-strip', real: '.alert-strip', props: ['background-color', 'color', 'border-top-left-radius', 'padding-top', 'padding-left', 'left', 'width', 'font-size'] },
+  { name: 'dash alert button', kind: 'dash', mock: '.alert-strip .btn', real: '.alert-strip .btn', props: ['font-size', 'font-weight', 'font-family', 'height', 'background-color', 'color', 'border-top-left-radius'] },
+  { name: 'dash indicators', kind: 'dash', mock: '.stats', real: '.stats', props: ['background-color', 'border-top-left-radius', 'left', 'width', 'box-shadow'] },
+  { name: 'dash indicator cell', kind: 'dash', mock: '.stats > div:nth-child(2)', real: '.stats > div:nth-child(2)', props: ['padding-top', 'padding-left', 'left', 'width', 'border-left-width'] },
+  { name: 'dash indicator value', kind: 'dash', mock: '.stats b', real: '.stats b', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color'] },
+  { name: 'dash indicator label', kind: 'dash', mock: '.stats > div:nth-child(2) > span:nth-of-type(1)', real: '.stats > div:nth-child(2) > span:nth-of-type(1)', props: ['font-size', 'line-height', 'color'] },
+  { name: 'dash indicator delta', kind: 'dash', mock: '.stats .delta', real: '.stats .delta', props: ['font-size', 'font-weight', 'font-family'] },
+  { name: 'dash side column', kind: 'dash', mock: '.col-side', real: 'aside.col-side', props: ['width', 'right'] },
+  { name: 'dash side panel', kind: 'dash', mock: '.col-side .panel', real: 'aside.col-side .panel', props: ['background-color', 'border-top-left-radius', 'box-shadow', 'margin-bottom'] },
+  { name: 'dash panel title', kind: 'dash', mock: '.col-side .panel-h h2', real: 'aside.col-side .panel-h h2', props: ['font-size', 'font-weight', 'font-family', 'line-height', 'color'] },
+  { name: 'dash panel head', kind: 'dash', mock: '.col-side .panel-h', real: 'aside.col-side .panel-h', props: ['padding-top', 'padding-left', 'border-bottom-width', 'border-bottom-color'] },
+  { name: 'dash panel title icon', kind: 'dash', mock: '.col-side .panel-h .ic', real: 'aside.col-side .panel-h .ic', props: ['width', 'color'] },
+  { name: 'dash risk ticket link', kind: 'dash', mock: '.col-side .data td a', real: 'aside.col-side .data td a', props: ['font-size', 'color'] },
+  { name: 'dash risk subject', kind: 'dash', mock: '.col-side .data td small', real: 'aside.col-side .data td small', props: ['font-size', 'color', 'display'] },
+  { name: 'dash risk cell', kind: 'dash', mock: '.col-side .data td', real: 'aside.col-side .data td', props: ['padding-top', 'padding-left', 'font-size'] },
+  { name: 'dash topic label', kind: 'dash', mock: '.props dt', real: 'dl.props dt', props: ['font-size', 'color'] },
+  { name: 'dash topic value', kind: 'dash', mock: '.props dd', real: 'dl.props dd', props: ['font-size', 'font-weight'] },
+  { name: 'dash topic row', kind: 'dash', mock: '.props > div', real: 'dl.props > div', props: ['padding-top', 'padding-left', 'column-gap'] },
+  { name: 'dash agents panel title', kind: 'dash', mock: '.col-main .panel:last-child .panel-h h2', real: '.col-main > .panel:last-child .panel-h h2', props: ['font-size', 'font-weight', 'font-family'] },
+  { name: 'dash table header', kind: 'dash', mock: '.col-main .data thead th', real: '.col-main table.data thead th', props: ['font-size', 'font-weight', 'font-family', 'background-color', 'color', 'padding-top', 'padding-left'] },
+  { name: 'dash table cell', kind: 'dash', mock: '.col-main .data tbody td', real: '.col-main table.data tbody td', props: ['font-size', 'padding-top', 'padding-left', 'color'] },
+  { name: 'dash agent name', kind: 'dash', mock: '.data .who .name', real: 'table.data .who .name', props: ['font-size', 'line-height'] },
+  { name: 'dash agent department', kind: 'dash', mock: '.data .who small', real: 'table.data .who small', props: ['font-size', 'color'] },
+  { name: 'dash agent avatar', kind: 'dash', mock: '.data .avatar', real: 'table.data .avatar', props: ['width', 'height', 'font-size', 'font-family', 'background-color', 'color'] },
+  { name: 'dash load bar', kind: 'dash', mock: '.load', real: '.load', props: ['height', 'background-color', 'border-top-left-radius'] },
 ];
 
 async function login(page) {
@@ -202,15 +246,18 @@ async function run() {
   try {
     const context = await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' });
     const page = await context.newPage();
+    // signed-out pages (login): a context of their own, never logged in
+    const anonPage = await (await browser.newContext({ viewport: { width: VIEW_W, height: VIEW_H }, locale: 'fr-FR' })).newPage();
     await login(page);
     let diffs = 0, oks = 0, allowedN = 0;
     for (const [kind, urls] of Object.entries(KINDS)) {
       // minWidth / maxWidth: a pair measured only at the viewport widths where it applies
       const pairs = PAIRS.map((p, i) => ({ ...p, i })).filter((p) => p.kind === kind
         && VIEW_W >= (p.minWidth ?? 0) && VIEW_W <= (p.maxWidth ?? Infinity));
-      const mock = await measure(page, pathToFileURL(join(MOCKUP_DIR, urls.mock)).href,
+      const pg = urls.anon ? anonPage : page;
+      const mock = await measure(pg, pathToFileURL(join(MOCKUP_DIR, urls.mock)).href,
         pairs.map((p) => ({ key: String(p.i), sel: p.mock, ref: p.mockRef, props: p.props })));
-      const real = await measure(page, BASE + urls.real,
+      const real = await measure(pg, BASE + urls.real,
         pairs.map((p) => ({ key: String(p.i), sel: p.real, ref: p.realRef, props: p.props })));
       for (const p of pairs) {
         for (const prop of p.props) {
@@ -220,7 +267,7 @@ async function run() {
           let same;
           if (p.expect) same = a === p.expect.mock && b === p.expect.real;
           else if (a === 'MISSING' || b === 'MISSING') same = false;
-          else if (/px$/.test(a) && /px$/.test(b)) same = Math.abs(parseFloat(a) - parseFloat(b)) <= (p.tol ?? 0.5);
+          else if (/^-?[\d.]+px$/.test(a) && /^-?[\d.]+px$/.test(b)) same = Math.abs(parseFloat(a) - parseFloat(b)) <= (p.tol ?? 0.5);
           else same = a === b;
           const allowed = ALLOWED_DIFFS.find((d) => d.metric === name);
           const ok = same || !!allowed;
