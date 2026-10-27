@@ -1,1 +1,132 @@
-/* coderise-agent: admin rules (loaded after the other sheets; one workstream owns this file). Stay faithful to docs/theme-mockups-admin/theme.css. px sizes only; RICH exclusion for user content. */
+/* coderise-agent: admin rules (loaded after the other sheets; one workstream owns this file). Stay faithful to docs/theme-mockups-admin/theme.css. px sizes only; RICH exclusion for user content.
+
+   Mockups "Paramètres" (admin-parametres.html) and "Agents" (admin-agents.html).
+   Scope: #content.cdr-is-admin, except the pages another stylesheet owns (dashboard.php, logs.php,
+   system.php: the :not() list below). Core markup is unchanged: the title (h2) sits on the grey,
+   then white panels (10 px, 1 px ring): the table of a list, the form of a settings or edit page.
+   admin.js (optional) moves the h2 that core prints inside a form out of it, wraps the status cell
+   of the lists and puts an initials disc before the agent name; without it the title stays in the
+   panel and the cells are plain text. */
+
+/* ───────── Page shell: the card of #content is gone, panels take over ───────── */
+#content.cdr.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+@media (max-width: 920px) {
+  #content.cdr.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) { margin: 18px 20px 28px; }
+}
+
+/* Title block (mockup .title-row: h1 21 px Montserrat 700, line 26 px; actions at the end of the row) */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) h2:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *) { font: 700 21px/1.25 var(--f-titre); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > h2,
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form > h2 { margin: 0 0 16px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) h2 small { font-size: 17px; }
+/* the row core wraps the sticky bar in (inline margin-bottom: 20px; padding-top: 5px) */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) div:has(> .sticky.bar):not(.sticky) { margin-bottom: 16px !important; padding-top: 0 !important; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px 24px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content > :is(.pull-left, .pull-right) { float: none; margin: 0; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content > .pull-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+/* the add button is the primary action of the page (mockup .btn-primary); on the fixed bar (nuit) it stays cyan */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar > .content > .pull-right > a.green.button { border-color: transparent; background: var(--cyan); color: var(--nuit); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar > .content > .pull-right > a.green.button:hover { background: var(--nuit); color: var(--blanc); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar.fixed > .content > .pull-right > a.green.button:hover { background: var(--blanc); }
+
+/* ───────── Lists (table.list): the table is the panel ─────────
+   Mockup .panel > .data: 10 px radius and 1 px ring, nuit header, rows 8 x 12 (core sheet), the
+   "Select: All, None, Toggle" row of core's tfoot is the mockup's .tfoot (9 x 16, ardoise, gris
+   rule above). Rounded by the corner cells: the table keeps separate borders, so nothing clips. */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form > table.list,
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > table.list { margin: 0 0 12px; border-collapse: separate; border-spacing: 0; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > thead > tr:first-child > th:first-child { border-start-start-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > thead > tr:first-child > th:last-child { border-start-end-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > :is(tbody, tfoot):last-child > tr:last-child > td:first-child { border-end-start-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > :is(tbody, tfoot):last-child > tr:last-child > td:last-child { border-end-end-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > tfoot > tr > td { padding: 9px 16px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar.opaque:not(.fixed) { background: none; } /* core: white */
+
+/* Filter row of a list (mockup .filters): white strip on top of the table, same panel. It comes
+   first in core's markup and is moved after the title by the flex order. */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) { display: flex; flex-direction: column; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > div:has(> .sticky.bar) { order: 1; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > #basic_search { order: 2; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > form { order: 3; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > .clear { order: 4; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > #basic_search { margin: 0; padding: 12px 16px; border-radius: 10px 10px 0 0; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); border-bottom: 1px solid var(--gris); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > #basic_search form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > form > table.list { border-radius: 0 0 10px 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system):has(> #basic_search) > form > table.list > thead > tr:first-child > th { border-radius: 0; }
+
+/* Status cell (admin.js wraps it): icon and text, never colour alone (mockup .status-resolved, 12.5 px
+   Montserrat 600, succes). A locked or disabled account reads in erreur with a "blocked" icon. */
+:root {
+  --cdr-ic-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='m8 12.2 3 3 5-5.7'/%3E%3C/svg%3E");
+  --cdr-ic-ban: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+}
+#content.cdr-is-admin table.list .cdr-st { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px var(--f-titre); white-space: nowrap; }
+#content.cdr-is-admin table.list .cdr-st::before { content: ""; flex: none; width: 14px; height: 14px; background: currentColor; -webkit-mask: var(--cdr-ic-check) center / contain no-repeat; mask: var(--cdr-ic-check) center / contain no-repeat; }
+#content.cdr-is-admin table.list .cdr-st :is(b, strong) { font-weight: inherit; }
+#content.cdr-is-admin table.list .cdr-st-on { color: var(--succes); }
+#content.cdr-is-admin table.list .cdr-st-off { color: var(--erreur); }
+#content.cdr-is-admin table.list .cdr-st-off::before { -webkit-mask-image: var(--cdr-ic-ban); mask-image: var(--cdr-ic-ban); }
+
+/* Agent cell (mockup .who: 24 px nuit disc with 10 px initials, name in 600 without underline) */
+#content.cdr-is-admin table.list .cdr-who { display: flex; align-items: center; gap: 8px; }
+#content.cdr-is-admin table.list .cdr-who .cdr-av { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--nuit); color: var(--blanc); font: 700 10px var(--f-titre); }
+#content.cdr-is-admin table.list .cdr-who .cdr-name { line-height: 1.25; }
+#content.cdr-is-admin table.list .cdr-who .cdr-name a { font-weight: 600; text-decoration: none; }
+#content.cdr-is-admin table.list .cdr-who .cdr-name a:hover { text-decoration: underline; text-decoration-color: var(--cyan-profond); text-decoration-thickness: 2px; }
+/* last login: quiet (mockup .muted) */
+#content.cdr-is-admin.cdr-staff table.list > tbody > tr > td:last-child { color: var(--ardoise); }
+#content.cdr-is-admin.cdr-staff table.list > tbody > tr > td { vertical-align: middle; }
+
+/* ───────── Forms: the form is the panel ─────────
+   Mockup .panel > .form (padding 4 x 20 x 20) with fieldsets as legends and .field rows (label
+   column 220 px + 20 px gap, controls capped at 520 px, no rule between fields). The tab strip of
+   a settings page sits at the top of the panel, full width. */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form:is(.save, .manage-form) { margin: 0 0 16px; padding: 4px 20px 20px; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+/* tabs outside the form (help topics, plugins): strip on top of the panel, content below it */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > ul.tabs { margin: 0; padding: 0 16px; border-radius: 10px 10px 0 0; border-bottom: 1px solid var(--gris); background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > ul.tabs + :is(form, div) { margin: 0 0 16px; padding: 4px 20px 20px; border-radius: 0 0 10px 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+/* tabs inside the form: the strip spans the panel */
+#content.cdr-is-admin form:is(.save, .manage-form) > ul.tabs { margin: 0 -20px 0; padding: 0 16px; }
+#content.cdr-is-admin form:is(.save, .manage-form) > ul.tabs ~ .tab_content:not(.left) { padding: 4px 0 0; }
+
+/* Rows: label cell 220 px + 20 px, 7 px above and below, no rule; both cells centred on the row */
+#content.cdr-is-admin :is(.form_table, .settings_table) > tbody > tr > td { padding: 7px 0; border: 0; vertical-align: middle; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td:first-child:nth-last-child(2) { width: 220px; padding: 7px 20px 7px 0; vertical-align: middle; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr > td + td { vertical-align: middle; }
+/* tall controls: the label stays at the top */
+#content.cdr-is-admin :is(.form_table, .settings_table) > tbody > tr:has(> td + td :is(textarea, .redactor-box, select[multiple], table, ul, .filedrop)) > td:first-child:nth-last-child(2) { vertical-align: top; padding-top: 15px; }
+
+/* ───────── Save bar (mockup .savebar) ─────────
+   The button row of the form is the nuit bar pinned to the bottom of the window, over the width of
+   the main column (padding 12 x 28, no radius, no shadow), always visible like the mockup's. The
+   counter span (coderise.js: "N settings changed") is its first item, the buttons are the mockup's
+   .btn-sm (30 px, 12.5 px); the submit is last (admin.js). Room is kept under the page for it. */
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) {
+  position: fixed; inset-inline: var(--rail-w) 0; bottom: 0; z-index: 4; gap: 8px 16px; margin: 0; padding: 12px 28px; border-radius: 0; box-shadow: none;
+}
+#content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) > :is(input, button, .button) { min-height: 30px; padding: 0 10px; font-size: 12.5px; }
+.cdr-main:has(> #content.cdr-is-admin form.save > p:last-of-type > :is(input, button)[type=submit], > #content.cdr-is-admin form.save > div > p:last-of-type > :is(input, button)[type=submit]) { padding-bottom: var(--cdr-savebar-h, 54px); }
+@media (max-width: 920px) {
+  #content.cdr-is-admin :is(form.save > p, form.save > div > p):last-of-type:has(> :is(input, button)[type=submit]) { inset-inline: 0; padding-inline: 20px; }
+}
+/* Section rows (mockup fieldset + legend): a rule above every section but the first, 18 px above
+   the title, 7 px below the bar (+ 7 px of the first row = the legend's 14 px margin) */
+#content.cdr-is-admin :is(.form_table, .settings_table) > * > tr > th { padding: 18px 0 7px; border: 0; border-top: 1px solid var(--gris); }
+#content.cdr-is-admin :is(.form_table, .settings_table) > * > tr:first-child > th { padding-top: 10px; border-top: 0; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > * > tr > th:has(> em > :is(b, strong)):not(:has(h4))::after { margin-top: 6px; }
+/* a lone select takes the 520 px of the mockup's controls; text fields keep their own width (the
+   text and the help icon after them share the line) */
+#content.cdr-is-admin :is(.form_table, .settings_table) > tbody > tr > td + td select:not([multiple]):only-of-type { width: 520px; max-width: 100%; }
+
+/* Changed fields (mockup .is-changed): the 4 px cyan bar sits on the control, in the gap before it;
+   the "modified" flag (pencil + text, coderise.js) is under the label text, out of the flow so the
+   required "*" stays right after the label */
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) { box-shadow: none; }
+#content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr.is-changed > td:first-child:nth-last-child(2) { position: relative; padding-bottom: 28px; }
+#content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { inset-inline-start: 0; bottom: 8px; }
+#content.cdr-is-admin form.save tr.is-changed > td + td :is(input:not([type=hidden]), select, textarea, .redactor-box) { box-shadow: -4px 0 0 var(--cyan); }
+html.rtl #content.cdr-is-admin form.save tr.is-changed > td + td :is(input:not([type=hidden]), select, textarea, .redactor-box) { box-shadow: 4px 0 0 var(--cyan); }
+@media (max-width: 600px) {
+  #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr.is-changed > td:first-child:nth-last-child(2) { padding-bottom: 0; padding-inline-end: 96px; }
+  #content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { inset-inline: auto 12px; top: 14px; bottom: auto; }
+}

@@ -32,6 +32,7 @@ scp/coderise/fonts/montserrat-latin-ext-700-normal.woff2
 scp/coderise/fonts/montserrat-latin-ext-800-normal.woff2
 scp/coderise/img/favicon.svg
 scp/coderise/img/logo-horizontal-sombre.png
+scp/coderise/js/admin.js
 scp/coderise/js/coderise.js
 scp/coderise/js/queue.js
 scp/coderise/js/ticket-chrome.js
