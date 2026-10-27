@@ -52,6 +52,12 @@
             if ($h.length && !$f.prev('h2').length)
                 $f.before($h);
         });
+        // core's "&nbsp;<a>Plugins</a>" title: the space is an indent, not a word
+        $(SCOPE).children('h2').each(function () {
+            var first = this.firstChild;
+            if (first && first.nodeType === 3 && /^[\s ]+$/.test(first.nodeValue))
+                this.removeChild(first);
+        });
     }
 
     // Index of the column whose header links to a sort on the status.

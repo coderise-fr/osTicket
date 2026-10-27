@@ -33,13 +33,13 @@
    Mockup .panel > .data: 10 px radius and 1 px ring, nuit header, rows 8 x 12 (core sheet), the
    "Select: All, None, Toggle" row of core's tfoot is the mockup's .tfoot (9 x 16, ardoise, gris
    rule above). Rounded by the corner cells: the table keeps separate borders, so nothing clips. */
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form > table.list,
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > table.list { margin: 0 0 12px; border-collapse: separate; border-spacing: 0; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > thead > tr:first-child > th:first-child { border-start-start-radius: 10px; }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > thead > tr:first-child > th:last-child { border-start-end-radius: 10px; }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > :is(tbody, tfoot):last-child > tr:last-child > td:first-child { border-end-start-radius: 10px; }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > :is(tbody, tfoot):last-child > tr:last-child > td:last-child { border-end-end-radius: 10px; }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list > tfoot > tr > td { padding: 9px 16px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form:not(.save, .manage-form) table.list,
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > table.list { margin: 0 0 16px; border-collapse: separate; border-spacing: 0; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead > tr:first-child > th:first-child { border-start-start-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead > tr:first-child > th:last-child { border-start-end-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > :is(tbody, tfoot):last-child > tr:last-child > td:first-child { border-end-start-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > :is(tbody, tfoot):last-child > tr:last-child > td:last-child { border-end-end-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > tfoot > tr > td { padding: 9px 16px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar.opaque:not(.fixed) { background: none; } /* core: white */
 
 /* Filter row of a list (mockup .filters): white strip on top of the table, same panel. It comes
@@ -130,3 +130,4 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > td + td :is(input:not([
   #content.cdr-is-admin :is(table.form_table, table.settings_table, form.save table.table:not(.list)) > tbody > tr.is-changed > td:first-child:nth-last-child(2) { padding-bottom: 0; padding-inline-end: 96px; }
   #content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { inset-inline: auto 12px; top: 14px; bottom: auto; }
 }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > h2[style] { margin: 0 0 16px !important; } /* emails.php: inline margin: 0 0 10px 2px */
