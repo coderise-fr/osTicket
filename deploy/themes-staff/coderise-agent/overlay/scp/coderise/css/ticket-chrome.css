@@ -294,3 +294,8 @@ html.rtl #content.cdr-ticket #response_options p.cdr-foot > input.cdr-reset { tr
 /* A property whose value is empty (e.g. no priority) is a core edit link
    around an empty span (core fills it after an edit): a 0 x 0 focus stop. It shows a dash, so the focus ring has a box. */
 #content.cdr.cdr-ticket aside.cdr-props table.ticket_info td a.inline-edit > span:empty::before { content: "\2014"; color: var(--ardoise); }
+
+/* A menu button's hover tooltip (core's tooltip plugin puts it right after
+   the button, under it) would cover the top of the menu it opens (RTL: the
+   menu starts under the button): hidden while the menu is open */
+#content .sticky.bar [data-dropdown].dropdown-open + .tooltip { display: none !important; } /* the plugin writes display: block inline */
