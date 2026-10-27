@@ -164,18 +164,27 @@
     // - the properties column sticks under the floating bar: its real
     //   height goes into --cdr-fixed-bar-h on #content (no hard-coded value).
     // Watched with a MutationObserver on the bar's class (scp.js toggles it).
-    var barObserver = null, cellWidth = 0;
+    // - the floating bar can be shorter than the bar in the page (below
+    //   1024 px the labels are hidden once it floats): core's placeholder
+    //   gets the floating bar's height, so it gets the in-page height as
+    //   its min-height while the bar floats (core clears its style when the
+    //   bar comes back): the page does not move.
+    var barObserver = null, cellWidth = 0, pageBarH = 0;
     function barState() {
-        var $c = $('#content.cdr-ticket'), $bar = barOf($c), $cell = $bar.parent();
+        var $c = $('#content.cdr-ticket'), $bar = barOf($c), $cell = $bar.parent(),
+            $ph = $bar.prev('.sticky.placeholder');
         if (!$bar.length) return;
         var wide = window.matchMedia && window.matchMedia('(min-width: 1560px)').matches;
         if ($bar.hasClass('fixed')) {
             if (wide && cellWidth) $cell.css('min-width', cellWidth + 'px');
+            if (pageBarH && $ph.length) $ph.css('min-height', pageBarH + 'px');
             var h = $bar.outerHeight();
             if (h) $c[0].style.setProperty('--cdr-fixed-bar-h', Math.round(h) + 'px');
         } else {
             $cell.css('min-width', '');
+            $ph.css('min-height', '');
             cellWidth = wide ? $cell.width() : 0;
+            pageBarH = Math.round($bar.outerHeight() || 0);
         }
     }
     function watchBar() {

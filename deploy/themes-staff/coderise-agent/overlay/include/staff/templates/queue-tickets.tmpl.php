@@ -345,9 +345,12 @@ if ($canManageTickets) { ?>
 // included) is repeated after the subject's: "Subject / From".
 $cdrGaugeTh = $cdrGauge
     ? '<th class="cdr-gauge-col">' . cdr_h(cdr__('First reply')) . '</th>' : '';
-$cdrHeads = array();
+$cdrHeads = $cdrLabels = array();
 foreach ($columns as $C) {
     $heading = Format::htmlchars($C->getLocalHeading());
+    // the heading as each cell's data-label (queue.css: the label of the
+    // cell in the stacked cards of narrow screens, mockup .data td::before)
+    $cdrLabels[] = ' data-label="' . cdr_h((string) $C->getLocalHeading()) . '"';
     if ($C->isSortable()) {
         $args = $_GET;
         $dir = $sort['col'] != $C->id ?: ($sort['dir'] ? 'desc' : 'asc');
@@ -391,7 +394,7 @@ foreach ($tickets as $T) {
     // cell by the contract chip under the number and the client under the
     // subject; the first-reply cell after the subject cell.
     $cdrTid = isset($T['ticket_id']) ? (int) $T['ticket_id'] : 0;
-    $cdrGaugeTd = $cdrGauge ? '<td class="cdr-gauge-col">'
+    $cdrGaugeTd = $cdrGauge ? '<td class="cdr-gauge-col" data-label="' . cdr_h(cdr__('First reply')) . '">'
         . (($cdrTid && !empty($cdrGauges[$cdrTid])) ? $cdrGauges[$cdrTid] : $cdrNone)
         . '</td>' : '';
     if ($cdrLayout['gauge'] < 0)
@@ -415,7 +418,9 @@ foreach ($tickets as $T) {
             $cdrAfter .= '<span class="stack">' . $cdrPlans[$cdrTid] . '</span>';
         if ($cdrI === $cdrLayout['subject'])
             $cdrAfter .= $cdrClient;
-        $cdrTd = ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"' : '';
+        $cdrTd = (($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"'
+            : ($cdrI === $cdrLayout['subject'] ? ' class="cdr-col-subject"' : ''))
+            . ($cdrLabels[$cdrI] ?? '');
         if ($style = $styles ? 'style="'.$styles.'"' : '') {
             echo "<td$cdrTd $style><div $style>$contents</div>$cdrAfter</td>";
         }
