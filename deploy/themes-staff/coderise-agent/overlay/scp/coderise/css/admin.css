@@ -35,8 +35,8 @@
    rule above). Rounded by the corner cells: the table keeps separate borders, so nothing clips. */
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form:not(.save, .manage-form) table.list,
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > table.list { margin: 0 0 16px; border-collapse: separate; border-spacing: 0; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead > tr:first-child > th:first-child { border-start-start-radius: 10px; }
-#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead > tr:first-child > th:last-child { border-start-end-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead:first-child > tr:first-child > th:first-child { border-start-start-radius: 10px; }
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead:first-child > tr:first-child > th:last-child { border-start-end-radius: 10px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > :is(tbody, tfoot):last-child > tr:last-child > td:first-child { border-end-start-radius: 10px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > :is(tbody, tfoot):last-child > tr:last-child > td:last-child { border-end-end-radius: 10px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > tfoot > tr > td { padding: 9px 16px; }
@@ -131,3 +131,14 @@ html.rtl #content.cdr-is-admin form.save tr.is-changed > td + td :is(input:not([
   #content.cdr-is-admin form.save tr.is-changed > td:first-child:nth-last-child(2) > .cdr-changed-flag { inset-inline: auto 12px; top: 14px; bottom: auto; }
 }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > h2[style] { margin: 0 0 16px !important; } /* emails.php: inline margin: 0 0 10px 2px */
+/* Below 600 px core's field table (dynamic forms: type, label, name, delete on one row) is a block
+   whose rows stay table rows, wider than the screen: it scrolls sideways inside the panel */
+@media (max-width: 600px) {
+  #content.cdr-is-admin :is(.form_table, .settings_table) > tbody:has(> tr > td:nth-child(3)) { overflow-x: auto; }
+}
+/* a button core floats to the end of the cell ("Manage" beside the ticket number sequence) follows the control instead of the far edge of a wide panel */
+#content.cdr-is-admin :is(.form_table, .settings_table) > tbody > tr > td + td > :is(button, .button, .action-button).pull-right { float: none; margin-inline-start: 8px; }
+/* date columns of the help topics list: one line */
+#content.cdr-is-admin.cdr-helptopics table.list > tbody > tr > td:nth-last-child(-n+2) { white-space: nowrap; }
+/* the pinned bar must not hide the field that takes the focus */
+html:has(#content.cdr-is-admin form.save > p:last-of-type > :is(input, button)[type=submit]) { scroll-padding-bottom: calc(var(--cdr-savebar-h, 54px) + 8px); }

@@ -17,7 +17,8 @@
       .cdr-st-on or .cdr-st-off (core prints the off states in bold), so
       the stylesheet can draw an icon next to the text.
     - Agents list: an initials disc before the agent name.
-    - Save bar: the submit button goes last in the button row, so the
+    - Save bar: its height is published as --cdr-savebar-h (the page keeps that
+      room under its last line); the submit button goes last in the button row, so the
       primary action is at the end of the bar (mockup) and the keyboard
       order stays the visual order.
 

@@ -175,10 +175,11 @@ async function useOverlay(context, dir) {
     const resp = await route.fetch();
     if (!(resp.headers()['content-type'] || '').includes('text/html')) return route.fulfill({ response: resp });
     let body = await resp.text();
-    if (!body.includes('css/admin.css')) {
-      const f = (n) => { const p = join(dir, 'scp', 'coderise', n); return existsSync(p) ? readFileSync(p, 'utf8') : ''; };
-      body = body.replace('</head>', () => '<style>' + f('css/admin.css') + '</style><script>' + f('js/admin.js') + '</script></head>');
-    }
+    const f = (n) => { const p = join(dir, 'scp', 'coderise', n); return existsSync(p) ? readFileSync(p, 'utf8') : ''; };
+    // each file only where the page does not link it yet (a demo older than the package)
+    const extra = (body.includes('css/admin.css') ? '' : '<style>' + f('css/admin.css') + '</style>')
+      + (body.includes('js/admin.js') ? '' : '<script>' + f('js/admin.js') + '</script>');
+    if (extra) body = body.replace('</head>', () => extra + '</head>');
     await route.fulfill({ response: resp, body });
   });
 }
