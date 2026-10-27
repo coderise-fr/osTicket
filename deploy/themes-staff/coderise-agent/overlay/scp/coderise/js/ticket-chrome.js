@@ -60,7 +60,7 @@
     // this agent (core prints the menu only with the close permission).
     // The button forwards the click to that core link: core's own handler
     // opens core's status dialog (comment, confirmation, permission checks
-    // on the server). Its title is the status name the link shows.
+    // on the server). Its title is its own label.
     function closeLink($c) {
         var id = String($c.attr('data-cdr-resolve-status') || '');
         if (!/^[1-9][0-9]*$/.test(id)) return $();
@@ -76,7 +76,9 @@
         var $link = closeLink($c);
         if (!$link.length) return;
         var $btn = $('<button type="button" class="btn btn-primary cdr-resolve"><i class="icon-ok-circle"></i></button>');
-        $btn.append($('<span></span>').text(label)).attr('title', $.trim($link.text()));
+        // tooltip = the theme's label (translated msgid), not the raw status
+        // name of core's menu entry ("Resolved" is stored data, untranslated)
+        $btn.append($('<span></span>').text(label)).attr('title', label);
         $btn.on('click', function () {
             var $l = closeLink($('#content.cdr-ticket'));
             if ($l.length) $l[0].click();
@@ -119,6 +121,21 @@
             wraps.push($tools[0]);
         }
         $box.prepend(wraps).addClass('cdr-ordered');
+        toolsPlace();
+    }
+    // From 1840 px the two groups share one row at the right of the title
+    // block (ticket-chrome.css): the labelled group ends the row, as in the
+    // mockup, so the icon cluster goes before it in the DOM (focus order =
+    // visual order); below, after it (labelled group first, under the title
+    // or on the first of two rows). Only the two theme wrappers move.
+    var WIDE_ROW = '(min-width: 1840px)';
+    function toolsPlace() {
+        var $box = barOf($('#content.cdr-ticket')).find('.content > .pull-right.flush-right').first(),
+            $acts = $box.children('.cdr-acts'), $tools = $box.children('.cdr-tools');
+        if (!$acts.length || !$tools.length) return;
+        var first = !!(window.matchMedia && window.matchMedia(WIDE_ROW).matches);
+        if (first && $tools.next()[0] !== $acts[0]) $acts.before($tools);
+        else if (!first && $acts.next()[0] !== $tools[0]) $tools.before($acts);
     }
 
     // core's scp.js gives the bar's .content an inline width (the bar's
@@ -135,7 +152,7 @@
         window.cdrBarResize = true;
         $(window).on('resize.cdrchrome', function () {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function () { barWidth(); barState(); }, 150);
+            resizeTimer = setTimeout(function () { toolsPlace(); barWidth(); barState(); }, 150);
         });
     }
 
@@ -147,18 +164,27 @@
     // - the properties column sticks under the floating bar: its real
     //   height goes into --cdr-fixed-bar-h on #content (no hard-coded value).
     // Watched with a MutationObserver on the bar's class (scp.js toggles it).
-    var barObserver = null, cellWidth = 0;
+    // - the floating bar can be shorter than the bar in the page (below
+    //   1024 px the labels are hidden once it floats): core's placeholder
+    //   gets the floating bar's height, so it gets the in-page height as
+    //   its min-height while the bar floats (core clears its style when the
+    //   bar comes back): the page does not move.
+    var barObserver = null, cellWidth = 0, pageBarH = 0;
     function barState() {
-        var $c = $('#content.cdr-ticket'), $bar = barOf($c), $cell = $bar.parent();
+        var $c = $('#content.cdr-ticket'), $bar = barOf($c), $cell = $bar.parent(),
+            $ph = $bar.prev('.sticky.placeholder');
         if (!$bar.length) return;
         var wide = window.matchMedia && window.matchMedia('(min-width: 1560px)').matches;
         if ($bar.hasClass('fixed')) {
             if (wide && cellWidth) $cell.css('min-width', cellWidth + 'px');
+            if (pageBarH && $ph.length) $ph.css('min-height', pageBarH + 'px');
             var h = $bar.outerHeight();
             if (h) $c[0].style.setProperty('--cdr-fixed-bar-h', Math.round(h) + 'px');
         } else {
             $cell.css('min-width', '');
+            $ph.css('min-height', '');
             cellWidth = wide ? $cell.width() : 0;
+            pageBarH = Math.round($bar.outerHeight() || 0);
         }
     }
     function watchBar() {
@@ -212,8 +238,26 @@
     // row of its own in the core) moves into the button paragraph, so that
     // it sits on the buttons' line like the mockup. The nodes are moved, not
     // copied: names, ids and scp.js lookups by name keep working.
+    // Footer like the mockup's .compose-foot ("Attach a file" | "Set the
+    // status to [select]" | buttons):
+    // - the status label is the theme's (data-cdr-state-label), a <label>
+    //   bound to the select (an id is given to the select if it has none);
+    //   core's label stays in the box, hidden; core's lone required mark
+    //   ("*", no message) after the select is hidden too (.cdr-req), an
+    //   error message is not;
+    // - the attachments block (core's .attachments: drop zone, file list,
+    //   its script) moves into the footer, first; the drop zone becomes a
+    //   button-like "Attach a file" (ticket-chrome.css): the zone is still
+    //   the drop target, its link still opens the file picker, core's hint
+    //   ("Drop files here or choose them") becomes the zone's tooltip and
+    //   the link's accessible name is the theme's label. Moved with the DOM
+    //   API (no script re-run), inside the same form;
+    // - the reset button is marked for a quieter (ghost) look.
     function replyFoot() {
-        $('#content.cdr-ticket #response_options > form').each(function () {
+        var $c = $('#content.cdr-ticket'),
+            stateLbl = $.trim($c.attr('data-cdr-state-label') || ''),
+            attachLbl = $.trim($c.attr('data-cdr-attach') || '');
+        $c.find('#response_options > form').each(function () {
             var $f = $(this);
             if ($f.find('.cdr-state').length) return;
             var $sel = $f.find('select[name=reply_status_id], select[name=note_status_id]').first(),
@@ -225,7 +269,53 @@
             $box.append($cells.eq(0).contents(), $cells.eq(1).contents());
             $row.addClass('cdr-moved');
             $p.addClass('cdr-foot').prepend($box);
+            if (stateLbl) {
+                if (!$sel.attr('id')) $sel.attr('id', 'cdr-' + ($f.attr('id') || 'form') + '-status');
+                $box.children('label').addClass('cdr-core-lbl');
+                $box.prepend($('<label class="cdr-state-lbl"></label>').attr('for', $sel.attr('id')).text(stateLbl));
+            }
+            $box.find('.error').each(function () {
+                if (!$.trim($(this).text()).replace(/[\s*]+/g, '')) $(this).addClass('cdr-req');
+            });
+            $p.children('input[type=reset]').addClass('cdr-reset').each(function () {
+                if (!this.title && this.value) this.title = this.value;
+            });
+            attachFoot($f, $p, attachLbl);
         });
+    }
+    function attachFoot($f, $p, label) {
+        var att = $f.children('table').first().find('div.attachments').first()[0];
+        if (!att || !label || $(att).hasClass('cdr-attach')) return;
+        var $dz = $(att).find('.filedrop > .dropzone').first(), $link = $dz.children('a.manual').first();
+        if (!$dz.length || !$link.length) return;
+        var hint = $.trim($dz.text()).replace(/\s+/g, ' ');
+        if (hint && !$dz.attr('title')) $dz.attr('title', hint);
+        $link.attr('aria-label', label).append($('<span class="cdr-attach-lbl"></span>').text(label));
+        $(att).addClass('cdr-attach');
+        $p[0].insertBefore(att, $p[0].firstChild);
+    }
+
+    // Canned responses (reply form): the row becomes compact (mockup: a
+    // small "Canned responses" button at the right of the editor's
+    // toolbar): core's "Response:" label cell is hidden, the select (and its
+    // select2 box) right-aligned, and its first entry (core's "Select a
+    // canned response", value 0, which core selects again after each pick)
+    // reads the theme's label. Nothing moves; core's handlers are kept.
+    function cannedCompact() {
+        var $c = $('#content.cdr-ticket'), label = $.trim($c.attr('data-cdr-canned') || ''),
+            $sel = $c.find('#response_options > form#reply select#cannedResp').first();
+        if (!$sel.length) return;
+        var $row = $sel.closest('tr');
+        if ($row.hasClass('cdr-canned')) return;
+        if ($row.children('td').length !== 2) return;
+        $row.addClass('cdr-canned');
+        var $first = $sel.children('option').first();
+        if (label && $first.length && $first.val() === '0') {
+            $first.text(label);
+            // select2 (scp.js) may already show the old text: refresh its box
+            // only (namespaced event: core's change handler does not run)
+            if ($sel.hasClass('select2-hidden-accessible')) $sel.trigger('change.select2');
+        }
     }
 
     // Reply and note forms, compact (mockup .compose: a "To:" / "Visible to
@@ -325,7 +415,14 @@
                 $line = $('<div class="cdr-opts"></div>').addClass(isNote ? 'cdr-opts-note' : 'cdr-opts-reply')
                     .append($sum, $btn);
             var summary = function () {
-                if (isNote) return $sum.text($.trim($c.attr('data-cdr-opts-team') || ''));
+                if (isNote) {
+                    // mockup: "<b>Visible to the team only.</b> The client receives nothing."
+                    var lead = $.trim($c.attr('data-cdr-opts-team-lead') || ''),
+                        rest = $.trim($c.attr('data-cdr-opts-team-rest') || '');
+                    if (!lead || !rest) return $sum.text($.trim($c.attr('data-cdr-opts-team') || ''));
+                    if ($sum.children('b').length) return $sum;
+                    return $sum.empty().append($('<b></b>').text(lead), document.createTextNode(' ' + rest));
+                }
                 var $to = $f.find('select[name="reply-to"]').first();
                 if ($to.length && $to.val() === 'none')
                     return $sum.text($.trim($to.find('option:selected').text()));
@@ -491,6 +588,7 @@
         watchTabs();
         journalTab();
         replyFoot();
+        cannedCompact();
         replyOptions();
         propsLabels();
         propsTitles();

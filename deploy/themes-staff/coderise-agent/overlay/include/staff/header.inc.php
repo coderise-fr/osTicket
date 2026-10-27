@@ -195,6 +195,18 @@ if ($cdr_ticket_view)
             'opts-changed' => 'modified',
             'opts-to' => 'To: %s',
             'opts-team' => 'Visible to the team only. The client receives nothing.',
+            // the same line in two parts (mockup: the first sentence bold)
+            'opts-team-lead' => 'Visible to the team only.',
+            'opts-team-rest' => 'The client receives nothing.',
+            // reply and note footer (mockup .compose-foot): the attachment
+            // drop zone as a button, the status select's label; the canned
+            // response select's first entry (ticket-chrome.js)
+            'attach' => 'Attach a file',
+            'state-label' => 'Set the status to',
+            'canned' => 'Canned responses',
+            // name of core's untitled menu buttons (a thread entry's
+            // chevron), made keyboard buttons by coderise.js
+            'menu-label' => 'More actions',
             // "Log" tab: the thread's events only (ticket-chrome.js)
             'journal-tab' => 'Log',
             'journal-empty' => 'No event has been recorded for this ticket yet.',

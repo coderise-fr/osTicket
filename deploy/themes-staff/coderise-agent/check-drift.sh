@@ -38,7 +38,9 @@ overlay="$here/overlay"
 # pass: the dropdown plugin, which places a menu from its trigger's positioned
 # parent (the action-group wrappers), the thread entries/events order of the
 # "Log" tab, the editor setup behind the reply area and the change tracker, the
-# agent's default signature of the folded reply options). The
+# agent's default signature of the folded reply options; fifth pass: the file
+# upload widget and its script behind the "Attach a file" button of the reply
+# footer, the tooltip plugin whose tip is hidden while a menu is open). The
 # replaced files themselves are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
@@ -58,6 +60,8 @@ scp/js/dashboard.inc.js
 scp/js/thread.js
 scp/js/tips.js
 scp/js/jquery.dropdown.js
+scp/js/bootstrap-tooltip.js
+js/filedrop.field.js
 js/redactor-osticket.js
 scp/css/scp.css
 scp/css/dropdown.css
@@ -72,6 +76,7 @@ include/class.pagenate.php
 include/class.ticket.php
 include/class.thread.php
 include/class.misc.php
+include/class.forms.php
 include/class.list.php
 include/class.search.php
 include/class.user.php

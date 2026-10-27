@@ -248,6 +248,8 @@ if ($queue->id > 0 && $queue->isOwner($thisstaff)) { ?>
 //    (user__name), the line is core's own rendering of that cell (its link
 //    filter and annotations, e.g. the collaborator count, kept) followed
 //    by the escaped organisation; otherwise the owner's name, escaped;
+//  - the state icon in core's Status column, when the queue has one
+//    (mockup .status: icon + name), from the same query;
 //  - with the plugin sla_first_response only: the contract chip under the
 //    ticket number and the first-reply gauge. The contract level is
 //    resolved once per owner; only open tickets of a Priority owner are
@@ -264,7 +266,7 @@ if ($queue->id > 0 && $queue->isOwner($thisstaff)) { ?>
 // stays in the DOM at its place (its cells and no-CSS reading are core's)
 // and its sort link is repeated in the subject heading ("Subject / From").
 $cdrGauge = function_exists('coderise_contract_level');
-$cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = array();
+$cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = $cdrStates = array();
 $cdrPrimaries = array();
 foreach ($columns as $C)
     $cdrPrimaries[] = (string) $C->primary;
@@ -287,6 +289,7 @@ if ($cdrIds) {
             $cdrTid = (int) $cdrTid;
             $cdrUid = (int) $cdrUid;
             $cdrOrgs[$cdrTid] = $cdrOrg;
+            $cdrStates[$cdrTid] = $cdrState;
             if ($cdrName !== null && $cdrName !== '')
                 $cdrClients[$cdrTid] = cdr_queue_client(class_exists('UsersName')
                     ? (string) new UsersName($cdrName) : $cdrName, $cdrOrg);
@@ -310,7 +313,7 @@ if ($cdrIds) {
         // for the admin.
         error_log('coderise-agent: queue rows skipped (client, contract, gauge): '
             . get_class($e) . ': ' . $e->getMessage());
-        $cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = array();
+        $cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = $cdrStates = array();
         $cdrStacked = false;
     }
 }
@@ -336,14 +339,18 @@ if ($canManageTickets) { ?>
 }
 
 // Coderise: the first-reply heading follows the subject column (else the
-// last one); core's "From" column is tagged when the client is stacked
+// last one); the number column is tagged (queue.css: as narrow as its
+// content, mockup .c-n); core's "From" column is tagged when the client is stacked
 // under the subject (hidden by queue.css), and its heading (sort link
 // included) is repeated after the subject's: "Subject / From".
 $cdrGaugeTh = $cdrGauge
     ? '<th class="cdr-gauge-col">' . cdr_h(cdr__('First reply')) . '</th>' : '';
-$cdrHeads = array();
+$cdrHeads = $cdrLabels = array();
 foreach ($columns as $C) {
     $heading = Format::htmlchars($C->getLocalHeading());
+    // the heading as each cell's data-label (queue.css: the label of the
+    // cell in the stacked cards of narrow screens, mockup .data td::before)
+    $cdrLabels[] = ' data-label="' . cdr_h((string) $C->getLocalHeading()) . '"';
     if ($C->isSortable()) {
         $args = $_GET;
         $dir = $sort['col'] != $C->id ?: ($sort['dir'] ? 'desc' : 'asc');
@@ -364,7 +371,8 @@ foreach ($cdrHeads as $cdrI => $cdrH) {
             . $cdrHeads[$cdrLayout['user']][1];
     echo sprintf('<th width="%s" data-id="%d"%s>%s</th>',
         $C->getWidth(), $C->id,
-        ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"' : '',
+        ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"'
+            : ($cdrI === $cdrLayout['number'] ? ' class="cdr-col-number"' : ''),
         $heading);
     if ($cdrI === $cdrLayout['gauge'])
         echo $cdrGaugeTh;
@@ -386,7 +394,7 @@ foreach ($tickets as $T) {
     // cell by the contract chip under the number and the client under the
     // subject; the first-reply cell after the subject cell.
     $cdrTid = isset($T['ticket_id']) ? (int) $T['ticket_id'] : 0;
-    $cdrGaugeTd = $cdrGauge ? '<td class="cdr-gauge-col">'
+    $cdrGaugeTd = $cdrGauge ? '<td class="cdr-gauge-col" data-label="' . cdr_h(cdr__('First reply')) . '">'
         . (($cdrTid && !empty($cdrGauges[$cdrTid])) ? $cdrGauges[$cdrTid] : $cdrNone)
         . '</td>' : '';
     if ($cdrLayout['gauge'] < 0)
@@ -402,12 +410,17 @@ foreach ($tickets as $T) {
         $cdrClient = $cdrClients[$cdrTid];
     foreach ($cdrCells as $cdrI => $cdrCell) {
         list($contents, $styles) = $cdrCell;
+        // the Status column (status__id): core's text with the state icon
+        if ($cdrI === $cdrLayout['status'] && !empty($cdrStates[$cdrTid]))
+            $contents = cdr_queue_status_html((string) $contents, $cdrStates[$cdrTid]);
         $cdrAfter = '';
         if ($cdrI === $cdrLayout['number'] && !empty($cdrPlans[$cdrTid]))
             $cdrAfter .= '<span class="stack">' . $cdrPlans[$cdrTid] . '</span>';
         if ($cdrI === $cdrLayout['subject'])
             $cdrAfter .= $cdrClient;
-        $cdrTd = ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"' : '';
+        $cdrTd = (($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"'
+            : ($cdrI === $cdrLayout['subject'] ? ' class="cdr-col-subject"' : ''))
+            . ($cdrLabels[$cdrI] ?? '');
         if ($style = $styles ? 'style="'.$styles.'"' : '') {
             echo "<td$cdrTd $style><div $style>$contents</div>$cdrAfter</td>";
         }

@@ -132,12 +132,28 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   titre), le groupe est à droite du bloc titre, sur deux rangées (libellés, puis icônes) aussi
   hautes que le bloc titre ; en dessous, sous le titre comme avant. Même conteneur et même
   barre collante du cœur : la cellule garde sa largeur quand la barre flotte (aucun
-  déplacement de la page) et la barre flottante aligne ses boutons à droite. Écarts : le groupe
-  libellé est 30 px plus large que celui de la maquette (le bouton Imprimer garde le chevron
-  du menu d'impression du cœur), il commence donc 30 px plus à gauche à 2000 px ; la
-  barre nuit fixée n'affiche plus « Ticket #N » (le fil d'Ariane le montre) ; le libellé du
-  contrat est celui du plugin (« Priorité » avec le pack français, la maquette écrit
-  « Priority ») ; l'état est le nom du statut en base (« Open »).
+  déplacement de la page) et la barre flottante aligne ses boutons à droite.
+  Passe 5 (27/10/2026) : le groupe libellé a la largeur de celui de la maquette (le chevron
+  du menu d'impression du cœur, toujours là car c'est le seul accès visible à ce menu, prend
+  la place de la marge droite d'« Imprimer » : 117 px comme la maquette), donc « Modifier »,
+  « Imprimer » et « Marquer comme résolu » sont aux positions de la maquette à toutes les
+  largeurs ; à partir de 1840 px (le bloc titre garde la largeur du titre de la maquette,
+  785 px), le groupe d'icônes passe sur la même rangée, **avant** le groupe libellé (qui finit
+  la rangée comme dans la maquette ; l'ordre du DOM suit, donc l'ordre du clavier aussi) ; de
+  1560 à 1839 px, deux rangées comme avant. Les menus à chevron du groupe d'icônes sont plus
+  étroits (chevron de 12 px). Sous 1024 px, les libellés restent dans la page (maquette à 820
+  et 390 px) ; à 760 px et moins, le groupe libellé prend toute la largeur (« Modifier » et
+  « Imprimer » se partagent la rangée, « Marquer comme résolu » sur la sienne) ; la barre
+  flottante garde des icônes seules (une rangée compacte), sa réserve dans la page garde la
+  hauteur de la barre dans la page (aucun saut). L'infobulle de « Marquer comme résolu » est
+  son libellé (msgid du thème), plus le nom brut du statut (« Resolved »). L'infobulle d'un
+  bouton à menu est masquée tant que son menu est ouvert (elle en couvrait le haut, en RTL).
+  Écarts : la barre nuit fixée n'affiche plus « Ticket #N » (le fil d'Ariane le montre) ; le
+  libellé du contrat est celui du plugin (« Priorité » avec le pack français, la maquette écrit
+  « Priority ») ; l'état est le nom du statut en base (« Open ») ; les six actions du cœur
+  (répondre, note, état, assigner, transférer, plus) restent des icônes en plus des trois
+  boutons (la maquette les range ailleurs : onglets du compositeur, propriétés, panneau
+  d'actions, ce qui demanderait de remplacer `ticket-view.inc.php`).
 - Zone de réponse (passe 4) : une ligne au-dessus de l'éditeur, comme la maquette
   (« À : » suivi du client et de son adresse pour la réponse, « Visible de l'équipe uniquement. Le client ne
   reçoit rien. » pour la note), avec un bouton « Options d'envoi » / « Options de la note »
@@ -153,6 +169,25 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
   replié diffère de sa valeur par défaut, le bouton porte la marque « modifié ». Restent
   visibles : réponses types, éditeur (barre Redactor complète, composant tiers), zone de
   dépôt, état et boutons d'envoi.
+  Passe 5 : la ligne de la note est en deux graisses comme la maquette (« **Visible de
+  l'équipe uniquement.** Le client ne reçoit rien. », deux msgids du thème) ; le pied suit
+  `.compose-foot` : « Joindre un fichier » au début, puis « Passer l'état à [liste] » et le
+  bouton d'envoi. « Joindre un fichier » est la zone de dépôt du cœur elle-même (bloc
+  `.attachments` déplacé dans le pied, dans le même formulaire, sans réexécuter son script),
+  habillée en bouton `.btn-line.btn-sm` : elle reste la cible du glisser-déposer, son lien
+  ouvre toujours le sélecteur de fichiers (nom accessible « Joindre un fichier ») et le texte
+  du cœur (« Déposez les fichiers ici ou… ») devient son infobulle ; les fichiers joints
+  s'affichent sous le bouton. L'étiquette « Passer l'état à » est un `<label>` du thème lié à
+  la liste (celle du cœur reste, masquée) ; l'astérisque « requis » seul du cœur est masqué
+  (un vrai message d'erreur ne l'est pas). « Réinitialiser » (absent de la maquette) devient
+  un bouton fantôme à icône de 36 px (sa valeur reste son nom accessible et son infobulle).
+  La ligne des réponses types est compacte : libellé « Réponse : » masqué, liste select2 de
+  220 px alignée à droite, sans cadre, première entrée « Réponses types » (msgid du thème ;
+  la maquette met ce bouton dans la barre de l'éditeur) ; la ligne vide du cœur avant
+  l'éditeur est masquée. La barre de Redactor (composant tiers, ses 15 boutons) prend les
+  dimensions de la maquette (boutons de 30 × 30 px espacés de 1 px, icônes de 16 px, barre
+  de 39 px). Mesuré : `FormData` des formulaires de réponse et de note identique avec et sans
+  le thème ; sélecteur de fichiers ouvert par le bouton ; réponse type insérée.
 - Onglet « Journal » (passe 4) : ajouté après les onglets du cœur, même balisage
   (`ul#ticket_tabs > li > a`), il montre le même contenu que « Fil du ticket » en mode
   journal : seulement les événements (`.thread-event`), en liste compacte, ou « Aucun
@@ -225,18 +260,26 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    - Fait dans la passe 2 (classe 1, `header.inc.php` étant déjà remplacé) : ligne d'identité
      (état, contrat, urgence), sous-titre client, boutons « Modifier / Imprimer / Marquer comme
      résolu » sous le titre (voir « Écart assumé »). Classe 1 possible mais non faite, à
-     décider : libellés du pack (« Éditer » ailleurs, « Réclamation », « Fil du ticket »), sujet
-     d'entrée masqué quand il égale celui du ticket, boutons par entrée au survol.
+     décider : libellés du pack (« Éditer » ailleurs, « Réclamation », « Fil du ticket » au
+     lieu de « Conversation »), boutons par entrée au survol.
    - Fait dans la passe 4 : groupe d'actions à droite du titre à partir de 1560 px, actions
      du cœur en groupe d'icônes compact, champs secondaires de la réponse et de la note
      repliés derrière « Options », onglet « Journal » (voir « Écart assumé »).
+   - Fait dans la passe 5 (27/10/2026) : groupe libellé à la largeur de la maquette, groupe
+     d'icônes sur la rangée du titre à partir de 1840 px, libellés sous 1024 px, ligne de la
+     note en deux graisses, pied « Joindre un fichier | Passer l'état à | bouton » (zone de
+     dépôt du cœur en bouton), réponses types compactes, barre Redactor aux dimensions de la
+     maquette, sujet d'entrée masqué quand il répète celui du ticket, étiquette de note placée
+     comme la maquette, pièces jointes à la hauteur de la maquette, valeur de propriété vide
+     affichée « — », boutons à menu du cœur atteignables au clavier (voir « Vérifications »).
    - Demanderait de remplacer un autre gabarit du cœur (`ticket-view.inc.php`,
      `thread-entry.tmpl.php`), **non fait par décision** : panneau d'actions, ordre et
-     contenu des propriétés, zone de réponse réécrite (pied « Joindre un fichier | Passer
-     l'état à | Publier » avec bouton de pièce jointe au lieu de la zone de dépôt du cœur,
-     champs supprimés plutôt que repliés).
+     contenu des propriétés, zone de réponse réécrite (champs supprimés plutôt que repliés,
+     bouton « Réponses types » dans la barre de l'éditeur, libellés des boutons d'envoi
+     « Publier la note » au lieu de ceux du cœur, sans « Réinitialiser »).
    - Impossible ou configuration du cœur (classe 3) : propriétés en liens d'édition plutôt
-     qu'en listes, barre de Redactor complète (15 boutons du cœur au lieu de 7), les six
+     qu'en listes, barre de Redactor complète (15 boutons du cœur au lieu de 7, aux dimensions
+     de la maquette), les six
      actions du cœur en plus des trois boutons de la maquette (fonctions réelles, gardées). La colonne n'est collante que si elle tient dans la fenêtre sous la barre
      d'actions flottante, sinon elle défile avec la page.
 3. File de tickets : fait côté thème : bloc titre (nom de la file, texte « Visible 1 - 25
@@ -256,9 +299,17 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
      « Contrat / Département / Assigné à / Reçus » (n'existent pas dans le cœur), sous-titre
      « 24 tickets, triés par… » (le total du cœur est approché, « environ »),
      « Enregistrer la recherche ».
-   - Le numéro reste en gras sur les tickets que le cœur marque non répondus. Sous ~1180 px,
-     le tableau défile latéralement dans `.cdr-hscroll` (pas de cartes empilées comme la
-     maquette sous 760 px, faute d'étiquettes de colonne).
+   - Le numéro reste en gras sur les tickets que le cœur marque non répondus. De 761 à
+     ~1180 px, le tableau défile latéralement dans `.cdr-hscroll`. À 760 px et moins (passe
+     5), une carte par ticket comme la maquette : chaque cellule porte l'en-tête de sa colonne
+     (`data-label`, `queue-tickets.tmpl.php`), affiché devant la valeur ; le sujet sans
+     étiquette sur toute la largeur ; la case à cocher en haut à la fin de la carte (absente
+     de la maquette, nécessaire aux actions groupées) ; l'en-tête du tableau n'est pas affiché
+     (le tri reste dans « Trier »), la ligne du cœur « Sélectionner : Tous / Aucun / Inverser »
+     l'est à sa place.
+   - Passe 5 : colonne « Status » du cœur avec l'icône d'état de la maquette (ouvert : boîte
+     cyan-profond, fermé : coche succes ; Montserrat 600 12,5 px), colonne du numéro aussi
+     étroite que son contenu (`.c-n` de la maquette), quelle que soit sa largeur réglée.
    - Pastilles du rail : « Tickets » porte le compteur de la file Open sur toutes les pages
      (une requête `ajax.php/queue/counts`, qui donne aussi ceux des files de premier niveau ;
      une file vide n'a pas de pastille ; la réponse est gardée 60 s dans le `sessionStorage`
@@ -271,8 +322,12 @@ Vérification en français (libellés, jauge, compteur de la barre d'enregistrem
    jour courant voile, boutons du thème) ; ses flèches restent les icônes du cœur.
    Éditeur Redactor en plein écran : la boîte passe sous `<body>` ; le thème n'y garde
    que la police, la colonne centrée de 950 px et la barre d'outils sont celles du cœur.
-6. RTL : vérifié seulement en forçant `dir="rtl"` sur la file et la fiche (rail à droite,
-   pas de débordement, propriétés logiques) ; aucune langue RTL n'est installée sur la démo.
+6. RTL : vérifié seulement en forçant `dir="rtl"` et `html.rtl` (rail à droite, pas de
+   débordement, propriétés logiques) : passe 5 sur la file (1280 et 390 px, cartes), la fiche
+   (390, 1280, 2000 px : groupe d'icônes à droite du groupe libellé, chevron d'Imprimer à
+   gauche), le tableau de bord et Paramètres > Tickets ; menus de la barre dans la fenêtre et
+   au premier plan à 390, 1280, 1600, 1840, 2000 px. Hors thème agent : le graphique Raphael
+   du tableau de bord reste de gauche à droite. Aucune langue RTL n'est installée sur la démo.
 7. Administration : les listes (agents, équipes, départements, sujets d'aide, SLA,
    plugins, formulaires…) prennent le style `table.list` ; les étiquettes d'état et de
    rôle de la maquette ne sont **pas faisables en CSS** (« Active / Disabled » sont du
@@ -363,25 +418,43 @@ la démo (compte administrateur, interface en français, 25/10/2026) :
    déplace la ligne.
 4. Renommer en tapant dans le champ d'en-tête : « Last Updated » → **« Dernière activité »**,
    et, pour des en-têtes en français, « Subject » → « Sujet », « Assigned To » → « Assigné à »
-   (c'est le seul moyen de traduire un en-tête : il est stocké tel que saisi, dans une seule
-   langue pour tous les agents).
+   (sans langue secondaire configurée, comme sur la démo, c'est le seul moyen de traduire un
+   en-tête : il est stocké tel que saisi, dans une seule langue pour tous les agents ; le champ
+   porte une clé de traduction du cœur, `data-translate-tag`, non essayée ici).
 5. Ajouter l'état : liste « — Ajouter une colonne — » sous les lignes, choisir **« Status »**,
    bouton **« Ajouter »**, puis renommer son en-tête « État ».
-6. Retirer **« Priority »** avec sa corbeille.
+6. Retirer **« Priority »** avec sa corbeille (pas de confirmation : la ligne disparaît, rien
+   n'est enregistré avant l'étape 9).
 7. Ordonner avec les poignées : **Ticket, Sujet, État, Assigné à, Dernière activité**. Garder
    la colonne « From » (n'importe où) : le thème la masque et affiche son contenu sous le sujet
    (lien et pastille de collaborateurs compris) ; sans elle, le nom du client reste affiché sous
    le sujet, mais en texte simple. « Premier retour » n'est pas une colonne de la file : le thème
-   l'insère toujours juste après le sujet.
-8. **« Enregistrer les changements »**.
+   l'insère toujours juste après le sujet. Renommer « From » → **« Client »** : son lien de tri
+   est repris dans l'en-tête du sujet, qui se lit alors « Sujet / Client » (maquette « Sujet et
+   client ») au lieu de « Sujet / From ».
+8. Largeurs (champ à droite de l'en-tête, en px ; des indications pour le navigateur, le
+   tableau occupe toute la largeur) : **Sujet 420, État 80, Assigné à 140, Dernière activité
+   120** donnent les proportions de la maquette (le sujet prend la place). La largeur de
+   « Ticket » est ignorée par le thème (colonne aussi étroite que son contenu).
+9. **« Enregistrer les changements »** (message « Mis à jour avec succès de Open »).
 
 Le réglage vaut **pour une file** : chaque file (et chaque sous-file) a ses propres colonnes.
 Sur la démo, les sous-files (« Open / Open », « Open / Answered »…) ont la case « Hériter les
 colonnes de la file parente » décochée : il faut soit refaire les étapes pour chacune, soit
 cocher cette case dans leur onglet « Colonnes » pour qu'elles suivent « Open ». Les files
 personnelles des agents ne sont pas touchées. Capture : `captures/fidelity-w4-queue-columns-admin.png`.
-Le contrôle `fidelity-check.mjs` garde une exception (« Last Updated » entre le numéro et le
-sujet) tant que la démo garde les colonnes d'origine.
+
+**Démo locale (27/10/2026)** : ce guide a été suivi tel quel dans l'interface (compte
+`dev.admin`, par un script Playwright qui clique les mêmes contrôles) sur la file « Open »
+seulement ; libellés vérifiés (onglet « files », « Colonnes », « — Ajouter une colonne — »,
+« Status », « Ajouter », corbeille « Supprimer », « Enregistrer les changements »). Avant :
+Ticket 100, Last Updated 150, Subject 300, From 185, Priority 85, Assigned To 160. Après :
+**Ticket 100, Sujet 420, État 80, Assigné à 140, Dernière activité 120, Client 185** (Client
+masquée par le thème). Gardé sur la démo (données de démonstration). Pour revenir à l'état
+d'origine : mêmes écrans, en-têtes et largeurs d'avant, ajouter « Priority », retirer
+« Status », ordre d'avant. Le contrôle `fidelity-check.mjs` garde une exception (« Last
+Updated » entre le numéro et le sujet) pour une file aux colonnes d'origine ; sur la démo
+actuelle elle ne sert plus (la mesure est conforme).
 
 ## Fidélité à la maquette (25/10/2026)
 
@@ -415,6 +488,17 @@ Paires ajoutées : bloc titre, fin du groupe d'actions et position de « Marquer
 `maxWidth` : le groupe réel est plus large de 30 px, chevron d'Imprimer), onglet « Journal »,
 ligne « À : … » de la zone de réponse. Résultat : **1280 × 800 : 172 OK, 0 DIFF, 1 ALLOWED** ;
 **2000 × 1000 : 174 OK, 0 DIFF, 1 ALLOWED** (avant : 153 OK, 4 DIFF).
+
+Passe 5 (27/10/2026, démo b0afed40, colonnes de la file « Open » réglées selon le guide) : le
+début du groupe (« Modifier ») est comparé à toutes les largeurs (plus de `maxWidth`), plus la
+largeur d'« Imprimer », le groupe d'icônes centré sur la rangée du titre à partir de 1840 px
+(mesure `center-y`), la ligne de la note (deux graisses), le pied (« Joindre un fichier »,
+« Passer l'état à », hauteur de la liste), la barre Redactor et ses boutons, les réponses
+types, l'étiquette de note et le corps du message client (mesure `entry-top`, position dans
+l'entrée), les pièces jointes (ticket 3) et la cellule d'état de la file. Résultat :
+**1280 × 800 : 218 OK, 0 DIFF, 0 ALLOWED** ; **2000 × 1000 : 222 OK, 0 DIFF, 0 ALLOWED** ;
+1600 × 1000 : 221 OK ; 1840 × 1000 : 222 OK (l'exception « Last Updated » ne sert plus sur
+la démo : la mesure est conforme).
 
 ## Vérifications (tâche 10)
 
@@ -459,6 +543,42 @@ des comptes jetables créés à la main dans la base de la démo locale pour ces
   `ul.tabs` (le cœur retire le contour) et zone d'édition Redactor (contour sur le cadre).
   Tab reste dans l'éditeur Redactor (comportement du cœur) : les 18 éléments qui le suivent
   ont été vérifiés un par un.
+
+### Passe 5 : contraste, clavier, mouvement, sans plugin, navigateurs (27/10/2026)
+
+Démo b0afed40, interface en français, comptes `dev.admin` et `dev.agent`, requêtes non-GET
+bloquées dans les scripts (sauf les réglages volontaires ci-dessous).
+
+- Contraste (chaque nœud de texte visible, couleurs composées avec leur transparence sur les
+  fonds des ancêtres et l'opacité, seuil 4,5:1, 3:1 pour le grand texte), à 390 et 1280 px :
+  file (et ses menus État / Assigner, barre groupée), fiche 1 et 2 (onglet note compris), les
+  quatre menus de la barre (Imprimer, État, Assigner, Plus), dialogues Transférer et
+  Assigner, tableau de bord, menu mobile ouvert : **0 échec** (admin et agent). Minimums :
+  contenu 4,91, barre haute 5,83, rail 8,21, barres 5,27, menus 19,16, dialogues 6,54.
+  Hors mesure : 5 éléments de la légende du graphique (fond en dégradé, voir plus haut).
+- Clavier (Tab depuis le haut, 80 arrêts, 390 / 1280 / 2000 px, admin et agent) : chaque
+  arrêt a un contour d'au moins 2 px ; ordre rail, barre haute, bloc titre (« Ticket #N »),
+  barre d'actions (dans l'ordre visuel, y compris à partir de 1840 px), onglets, fil, zone de
+  réponse, colonne des propriétés. Corrigés : les boutons à menu du cœur sans lien (« Plus »,
+  chevron de chaque entrée du fil, « Trier » de la file) n'étaient pas atteignables : ils ont
+  `tabindex`, `role=button`, `aria-haspopup`, `aria-expanded` ; Entrée / Espace ouvrent le
+  menu (Tab y entre), Échap le ferme et rend le focus ; nom : le texte visible, sinon
+  l'infobulle, sinon « Plus d'actions ». Une valeur de propriété vide (lien d'édition vide du
+  cœur, 0 × 0) affiche « — ».
+- `prefers-reduced-motion: reduce` : animations jQuery coupées (`$.fx.off` : barres
+  flottantes du cœur, défilement du fil, correction de défilement du thème), plus de
+  rotation du chevron « Options ».
+- Sans le plugin `sla_first_response` (désactivé puis réactivé dans Administration > Gérer >
+  Plugins, « Plus » > « Désactiver » / « Activer ») : file, fiches 1, 2, 45 et tableau de bord
+  sans erreur PHP (journaux du conteneur), sans jauge, colonne « Premier retour », puce de
+  contrat ni partie contrat de la ligne d'identité, mise en page sans trou ; réactivé : 15
+  jauges et 25 puces revenues.
+- Firefox et WebKit (versions Playwright déjà installées, rien téléchargé) : file et fiche
+  identiques à Chromium (mêmes éléments, 0 débordement, aucune erreur du thème) ; PJAX
+  file → fiche → file → fiche ; repli « Options » : WebKit restaure la valeur modifiée au
+  retour arrière et le panneau s'ouvre avec la marque « modifié » ; Firefox ne restaure pas
+  la valeur (défaut, rien de masqué). Firefox signale le cookie de session `SameSite=None`
+  sans `Secure` (démo en HTTP, réglage du cœur, hors thème).
 
 ### Saisie dans les éditeurs (QA d'interaction, 2026-10-24)
 

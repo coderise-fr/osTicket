@@ -143,3 +143,50 @@
 #content table.queue > tbody > tr > td > small.cdr-client { display: block; clear: none; margin: 0; color: var(--ardoise); font: 400 12.5px/1.5 var(--f-texte); overflow-wrap: break-word; }
 #content table.queue > :is(thead, tbody) > tr > .cdr-col-from { display: none; }
 #content table.queue > thead > tr > th .cdr-th-sep { color: rgba(255,255,255,.6); font-weight: 400; } /* "Subject / From": both sort links of core (the From column itself is hidden) */
+
+/* State cell (core's Status column with the state icon, cdr_queue_status_html
+   in queue-tickets.tmpl.php; mockup .status: Montserrat 600 12.5 px, 14 px
+   icon 5 px before the name, cyan-profond for an open ticket, succes for a
+   closed one) */
+#content table.queue tbody td .status { display: inline-flex; align-items: center; gap: 5px; color: var(--nuit); font: 600 12.5px/normal var(--f-titre); white-space: nowrap; }
+#content table.queue tbody td .status > .ic { flex: none; }
+#content table.queue tbody td .status-open > .ic { color: var(--cyan-profond); }
+#content table.queue tbody td .status-closed > .ic { color: var(--succes); }
+#content table.queue tbody td :is(.status-archived, .status-deleted) > .ic { color: var(--ardoise); }
+/* Number column (th.cdr-col-number, queue-tickets.tmpl.php): as narrow as its
+   content like the mockup's .c-n (width 1%, no wrap), whatever width hint
+   the queue's settings give it; the other columns keep theirs */
+#content table.queue > thead > tr > th.cdr-col-number { width: 1%; white-space: nowrap; }
+
+/* Narrow screens (mockup at 760 px and less): one card per ticket instead
+   of a table that scrolls sideways. Every cell carries its column heading in
+   data-label (queue-tickets.tmpl.php), shown before the value in a 8em
+   column (mockup .data td::before); the subject cell (td.cdr-col-subject) has
+   no label and takes the whole width; the row check box stays, at the top
+   end of the card (the mockup has none; the bulk actions need it). The
+   header row is not shown (sorting stays in the "Sort" menu above the
+   table); core's "Select: All / None / Toggle" row (tfoot.cdr-sel-foot,
+   queue.js) is shown instead of the header check box. */
+@media (max-width: 760px) {
+  #content table.queue, #content table.queue > tbody, #content table.queue > tbody > tr, #content table.queue > tbody > tr > td { display: block; }
+  #content table.queue > thead { display: none; }
+  #content table.queue > tbody > tr { position: relative; padding: 10px 14px; border-bottom: 1px solid var(--gris); }
+  #content table.queue > tbody > tr > td { display: grid; grid-template-columns: 8em minmax(0, 1fr); gap: 8px; align-items: center; min-width: 0; padding: 2px 0; border: 0; }
+  #content table.queue > tbody > tr > td::before { content: attr(data-label); color: var(--ardoise); font: 400 13.5px/20.25px var(--f-texte); }
+  #content table.queue > tbody > tr > td:not([data-label])::before,
+  #content table.queue > tbody > tr > td.cdr-col-subject::before { content: none; display: none; }
+  #content table.queue > tbody > tr > td.cdr-col-subject { display: block; padding-inline-end: 28px; } /* block: core's annotations float at the end of the first line (queue.js) */
+  #content table.queue > tbody > tr > td.cdr-col-from { display: none; }
+  #content table.queue > tbody > tr > td:first-child:has(> input.ckb) { position: absolute; top: 10px; inset-inline-end: 14px; display: block; padding: 0; }
+  #content table.queue > tbody > tr > td:has(> .truncate, > div > .truncate) { min-width: 0; }
+  #content table.queue > tbody > tr > .cdr-gauge-col { width: auto; white-space: normal; padding-inline: 0; }
+  /* the stripes, hover and selection belong to the card, not to its cells */
+  #content table.queue > tbody > tr:nth-child(odd) { background: var(--blanc); }
+  #content table.queue > tbody > tr:nth-child(even) { background: var(--gris); }
+  #content table.queue > tbody > tr:is(:hover, .highlight) { background: var(--voile); }
+  #content table.queue > tbody > tr.highlight { box-shadow: inset 4px 0 0 var(--cyan); }
+  #content table.queue > tbody > tr:nth-child(n) > td:nth-child(n):not(.cdr-x) { background-color: transparent !important; box-shadow: none; } /* core's inline cell colours (coderise.css: !important) */
+  #content table.queue > tfoot.cdr-sel-foot { position: static; display: block; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+  #content table.queue > tfoot.cdr-sel-foot > tr, #content table.queue > tfoot.cdr-sel-foot > tr > td { display: block; }
+  #content table.queue > tfoot.cdr-sel-foot > tr > td { padding: 10px 14px; }
+}
