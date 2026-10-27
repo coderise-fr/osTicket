@@ -73,6 +73,8 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket-chrome.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/queue.css')); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/admin.css')); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/dash.css')); ?>"/>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/coderise.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket-chrome.js')); ?>"></script>

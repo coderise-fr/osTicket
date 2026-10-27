@@ -37,6 +37,7 @@ if (strpos($cdr_html, ' lang="') === false)
     <link rel="stylesheet" href="css/login.css" type="text/css" />
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css">
     <link rel="stylesheet" href="<?php echo Format::htmlchars(cdr_asset('css/coderise.css')); ?>" type="text/css" />
+    <link rel="stylesheet" href="<?php echo Format::htmlchars(cdr_asset('css/login.css')); ?>" type="text/css" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="pragma" content="no-cache" />

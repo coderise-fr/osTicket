@@ -7,8 +7,11 @@ include/staff/header.inc.php
 include/staff/login.header.php
 include/staff/login.tpl.php
 include/staff/templates/queue-tickets.tmpl.php
+scp/coderise/css/admin.css
 scp/coderise/css/coderise.css
+scp/coderise/css/dash.css
 scp/coderise/css/icons.css
+scp/coderise/css/login.css
 scp/coderise/css/queue.css
 scp/coderise/css/rail.css
 scp/coderise/css/ticket-chrome.css
