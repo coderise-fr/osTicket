@@ -166,6 +166,15 @@ if ($cdr_script === 'tickets.php' && empty($GLOBALS['cdr_sla_connected'])) {
         }
     });
 }
+// Dashboard (dashboard.php): the title, alert strip, indicators and the risk, topic and
+// agent panels the mockup has around core's chart. Data read here, once, by a few
+// aggregate queries (coderise/dashboard.inc.php); the panels are put into the page's
+// output buffer around core's form (the period form and the chart stay core's).
+if ($cdr_script === 'dashboard.php' && empty($GLOBALS['cdr_dash_started'])) {
+    $GLOBALS['cdr_dash_started'] = true;
+    require_once INCLUDE_DIR . 'staff/coderise/dashboard.inc.php';
+    cdr_dash_start(isset($thisstaff) ? $thisstaff : null);
+}
 // Labels the ticket view's and the queue's CSS and JS need (no translation
 // in CSS/JS): see cdr_data_attrs()
 $cdr_content_attrs = '';

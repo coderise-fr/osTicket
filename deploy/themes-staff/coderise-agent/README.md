@@ -36,7 +36,7 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   `class.staff.php` pour la signature par défaut). Code de sortie 0 = aucune dérive.
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
-  `tests/test-helpers.php` et `tests/test-rail.php` (assistants PHP, en CLI dans l'image de
+  `tests/test-helpers.php`, `tests/test-rail.php` et `tests/test-dashboard.php` (assistants PHP, en CLI dans l'image de
   démo avec `-d open_basedir=`), `node --check overlay/scp/coderise/js/coderise.js`,
   `deploy/themes-staff/tests/overflow.js` (débordement, Playwright),
   `deploy/themes-staff/tests/editor-check.js` (texte saisi dans les éditeurs Redactor de la
@@ -65,8 +65,38 @@ rôle, en-tête d'entrée, événements, défilement), `ticket-chrome.css` + `ti
 (bloc titre, barre d'actions groupées, assigné, sélection, pied). Les textes dont ces scripts
 ont besoin arrivent traduits par des attributs `data-cdr-*` de `#content` (`header.inc.php`,
 `cdr_data_attrs()`).
+Passe 5 (27/10/2026) : `login.css` (connexion et mot de passe oublié) et `dash.css` (tableau de bord),
+`include/staff/coderise/dashboard.inc.php` (panneaux du tableau de bord, voir ci-dessous).
 Toutes les autres pages (administration, utilisateurs, base de connaissances, tâches,
-tableau de bord, journaux…) ne sont habillées que par la feuille de style.
+journaux…) ne sont habillées que par la feuille de style.
+
+### Tableau de bord (passe 5)
+
+`scp/dashboard.php` n'affiche que la barre de période, le graphique Raphael et les tableaux de
+statistiques du cœur. La maquette a en plus un titre, un bandeau d'alerte, quatre indicateurs et
+trois panneaux. `header.inc.php` (un seul bloc, sur `dashboard.php` uniquement) charge
+`coderise/dashboard.inc.php`, qui lit les données avec cinq requêtes agrégées au plus, une fois
+par requête HTTP, puis insère les panneaux dans la sortie du cœur (`ob_start`, `cdr_dash_inject()`) :
+titre, bandeau et indicateurs avant le formulaire ; « Premier retour à risque » et « Par sujet
+d'aide » dans la colonne de droite à côté du graphique ; « Charge par agent » sous le graphique ;
+« Statistiques » du cœur dans un panneau. Le cœur n'est pas modifié ; si son balisage n'est pas celui
+attendu (formulaire absent) la page reste telle que le cœur la rend.
+
+- Périmètre : les départements de l'agent (ou ses tickets et ceux de ses équipes si son accès est
+  limité). « Charge par agent » liste, comme les statistiques « Agent » du cœur, l'agent lui-même, les
+  agents des départements qu'il gère, et ceux de tous ses départements s'il est administrateur ou a
+  la permission « stats.agents ».
+- Contrat Priority (bandeau, panneau « à risque », moyenne et taux de premiers retours, colonne
+  « Premier retour tenu ») : seulement si le plugin `sla_first_response` est actif
+  (`coderise_contract_level()` et `SlaContractLevel`). Même règle que la jauge de la file : premier
+  retour = première réponse d'un agent adressée au client (définition de
+  `contrib/sla-first-response/sql/premiere-reponse.sql`), échéance = création + 4 h ou échéance du plan
+  « Priority 4h » (actif, ticket jamais rouvert). Sans le plugin, les indicateurs 3 et 4 deviennent
+  « Tickets fermés » et « Tickets en retard » et les deux panneaux Priority ne sont pas dessinés.
+- Textes : msgids anglais, français dans `i18n/fr.php` (lus par `cdr_t()`, qui donne la priorité au
+  catalogue du thème). Tests : `tests/test-dashboard.php` (assistants purs, requêtes simulées et
+  comptées, injection, catalogue français complet).
+
 
 ## Jauge de premier retour (règle I-4)
 

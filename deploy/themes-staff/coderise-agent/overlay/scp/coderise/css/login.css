@@ -1,1 +1,64 @@
-/* coderise-agent: login rules (loaded after the other sheets; one workstream owns this file). Stay faithful to docs/theme-mockups-admin/theme.css. px sizes only; RICH exclusion for user content. */
+/* coderise-agent: login rules (loaded after the other sheets; one workstream owns this file). Stay faithful to docs/theme-mockups-admin/theme.css. px sizes only; RICH exclusion for user content.
+   Fidelity pass against docs/theme-mockups-admin/login.html (1280x800, 2000x1000, 390x844). Every rule is scoped by body.cdr-login
+   (login.header.php) and, being one class more specific than the base rules of coderise.css, wins without !important. */
+
+/* Text rhythm of the mockup: 15px / 1.6 (24px lines) */
+body.cdr-login { line-height: 1.6; }
+
+/* ───── Presentation column ───── */
+body.cdr-login .login-art p { margin: 16px 0 0; }
+body.cdr-login .login-art .hook { margin: 0; }
+body.cdr-login .login-art .logo { display: inline; } /* the mockup logo is inline (its line box sets the height of the first block, hence the headline position) */
+/* The signature is a <p> in the mockup: Montserrat 15px, same white as the other paragraphs */
+body.cdr-login .login-art .signature { margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); font: 600 15px/1.6 var(--f-titre); }
+/* The mark (tokens.css .sommet): 409/342 ratio and its own polygon; 54 % wide, -4 % / -8 % off the corner */
+body.cdr-login .login-art .sommet { aspect-ratio: 409 / 342; clip-path: polygon(49.9% 0, 100% 100%, 84.1% 100%, 49.9% 29.8%, 15.9% 100%, 0 100%); }
+
+/* ───── Card ───── */
+body.cdr-login .login-wrap #loginBox { position: relative; padding: 48px 44px; }
+body.cdr-login .login-card .card-title { font: 700 22px/1.2 var(--f-titre); }
+body.cdr-login .login-card .lead { line-height: 1.6; }
+/* Copyright line: out of the flow, so the form block is centred exactly as in the mockup (which has none) */
+body.cdr-login .login-wrap #company { position: absolute; inset: auto 44px 16px; margin: 0; line-height: 1.6; }
+
+/* Fields: mockup .field (label, 4px gap, 36px+ control, 14px below) */
+body.cdr-login #loginBox label { margin: 0 0 4px; line-height: 1.6; }
+body.cdr-login #loginBox input:not([type=hidden]):not([type=submit]):not([type=checkbox]):not([type=radio]) { min-height: 36px; margin: 0 0 14px; line-height: 1.6; }
+body.cdr-login #loginBox button[type=submit], body.cdr-login #loginBox input[type=submit] { margin: 0; line-height: normal; }
+body.cdr-login #loginBox .alt { margin: 16px 0 0; line-height: 1.6; }
+body.cdr-login #loginBox .alt a { line-height: 1.6; }
+body.cdr-login #loginBox #login > fieldset > .field-error { margin-top: -10px; margin-bottom: 14px; } /* under the password: 4px from the field, like .error */
+
+/* ───── Banner (#login-message) ─────
+   Neutral by default (the "Authentication Required" notice of a first visit, or a message kept in the
+   session); .is-err (set by the template after a failed POST, and by attemptLoginAjax() on a 401) gives the
+   mockup's .banner-err: erreur-fond, 4px erreur edge, red bold headline, red field borders and inline hint. */
+body.cdr-login { --cdr-ic-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5.5M12 7.8h.01'/%3E%3C/svg%3E"); }
+body.cdr-login #loginBox #login-message { gap: 10px; margin: 0 0 18px; padding: 12px 14px; border-radius: 6px; border-inline-start: 4px solid var(--cyan-profond); background: var(--voile); color: var(--nuit); font: 400 15px/1.6 var(--f-texte); }
+body.cdr-login #loginBox #login-message::before { background: var(--cyan-profond); -webkit-mask-image: var(--cdr-ic-info); mask-image: var(--cdr-ic-info); margin-top: 2px; }
+body.cdr-login #loginBox.is-err #login-message { border-inline-start-color: var(--erreur); background: var(--erreur-fond); color: var(--erreur); font-weight: 700; }
+body.cdr-login #loginBox.is-err #login-message::before { background: var(--erreur); -webkit-mask-image: var(--cdr-ic-alert); mask-image: var(--cdr-ic-alert); }
+body.cdr-login #loginBox #login-message:empty { margin: 0; padding: 0; border: 0; }
+/* Field errors: 2px erreur border (mockup .has-error) and the hint under the password */
+body.cdr-login #loginBox.is-err #login input:not([type=hidden]) { border: 2px solid var(--erreur); padding: 5px 9px; }
+body.cdr-login #loginBox .field-error { display: none; margin: 0; align-items: flex-start; gap: 6px; color: var(--erreur); font: 600 15px/1.6 var(--f-texte); }
+body.cdr-login #loginBox.is-err .field-error { display: flex; }
+body.cdr-login #loginBox .field-error::before { content: ""; flex: none; width: 16px; height: 16px; margin-top: 4px; background: var(--erreur); -webkit-mask: var(--cdr-ic-alert) center / contain no-repeat; mask: var(--cdr-ic-alert) center / contain no-repeat; }
+/* The button's icon is not in the mockup (still in the markup of the 2FA and external-auth variants) */
+body.cdr-login #loginBox button[type=submit] > i { display: none; }
+
+/* ───── Narrow: the mockup keeps the whole presentation (390 x 844 is not a reduced variant) ───── */
+@media (max-width: 860px) {
+  body.cdr-login .login-wrap { grid-template-rows: none; }
+  body.cdr-login .login-art { gap: 28px; padding: 28px 24px 36px; }
+  body.cdr-login .login-art .hook { font-size: 26px; }
+  body.cdr-login .login-art .hook ~ p { display: block; }
+  body.cdr-login .login-art .signature { display: block; }
+  body.cdr-login .login-art .sommet { width: 54%; opacity: .16; }
+  body.cdr-login .login-wrap #loginBox { padding: 32px 24px 40px; }
+  body.cdr-login .login-wrap #company { inset: auto 24px 12px; }
+}
+
+/* ───── Password reset pages (core markup of pwreset*.php: h3 lines, the sent page's <em> and inline colour) ───── */
+body.cdr-login #loginBox > h3 { line-height: 1.6; }
+body.cdr-login #loginBox > h3 em { font: 400 15px/1.6 var(--f-texte); font-style: normal; }
