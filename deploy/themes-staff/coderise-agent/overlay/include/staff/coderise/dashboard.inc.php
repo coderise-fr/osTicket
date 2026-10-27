@@ -63,6 +63,7 @@ if (!function_exists('cdr_dash_start')) {
 
     /** n of "FROM_UNIXTIME(n)" (OverviewReport::getDateRange()), or null. */
     function cdr_dash_int($expr) {
+        $m = array();
         return preg_match('/^FROM_UNIXTIME\((\d+)\)$/', (string) $expr, $m) ? (int) $m[1] : null;
     }
 
@@ -260,6 +261,7 @@ if (!function_exists('cdr_dash_start')) {
         // between the form and the rule: the period form, then "Ticket Activity" and the chart
         $middle = substr($html, $bodyAt, $hr - $bodyAt);
         $closeChart = '';
+        $mt = array();
         // (the semicolon before the closing quote is optional: it differs between core versions)
         if (preg_match('/<div style="margin-bottom:20px; ?padding-top:5px;?">/', $middle, $mt, PREG_OFFSET_CAPTURE)) {
             $c = $mt[0][1];
