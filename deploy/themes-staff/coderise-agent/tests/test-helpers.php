@@ -210,6 +210,9 @@ $labels = array(
     'Other ticket actions', 'Sending options', 'Note options', 'To: %s',
     'Visible to the team only. The client receives nothing.', 'Log',
     'No event has been recorded for this ticket yet.',
+    // wave 5: the note line in two parts, reply / note footer, canned responses
+    'Visible to the team only.', 'The client receives nothing.', 'Attach a file', 'Set the status to',
+    'Canned responses',
 );
 $untranslated = array();
 foreach ($labels as $l)
@@ -234,6 +237,9 @@ check('fr: wave 4 strings', implode('|', array(cdr__('Log'), cdr__('Sending opti
     "Journal|Options d'envoi|\xC3\x80 : %s|Options de la note");
 check('data attrs: wave 4 escaped', cdr_data_attrs(array('opts-reply' => 'Sending options', 'opts-team' => 'Visible to the team only. The client receives nothing.')),
     " data-cdr-opts-reply=\"Options d&#039;envoi\" data-cdr-opts-team=\"Visible de l&#039;\xC3\xA9quipe uniquement. Le client ne re\xC3\xA7oit rien.\"");
+check('fr: wave 5 strings', implode('|', array(cdr__('Visible to the team only.'), cdr__('The client receives nothing.'),
+    cdr__('Attach a file'), cdr__('Set the status to'), cdr__('Canned responses'))),
+    "Visible de l'\xC3\xA9quipe uniquement.|Le client ne re\xC3\xA7oit rien.|Joindre un fichier|Passer l'\xC3\xA9tat \xC3\xA0|R\xC3\xA9ponses types");
 check('fr: sign out wording', cdr__('Sign Out'), "Se d\xC3\xA9connecter");
 check('fr: search placeholder names tickets', cdr__('Search tickets by number, subject or client'),
     "Rechercher un ticket : num\xC3\xA9ro, sujet, client");
@@ -593,21 +599,31 @@ check('plan chip: same markup as the identity line', strpos(cdr_ticket_idline(ar
 // ---------- cdr_queue_layout (columns found by data path) ----------
 // Seeded "Open" queue: Ticket, Last Updated, Subject, From, Priority, Assigned To
 check('queue layout: seeded open queue', cdr_queue_layout(array('number', 'lastupdate', 'cdata__subject', 'user__name', 'cdata__priority', 'assignee')),
-    array('number' => 0, 'subject' => 2, 'user' => 3, 'gauge' => 2));
+    array('number' => 0, 'subject' => 2, 'user' => 3, 'gauge' => 2, 'status' => null));
 check('queue layout: mockup order', cdr_queue_layout(array('number', 'cdata__subject', 'status__id', 'assignee', 'lastupdate')),
-    array('number' => 0, 'subject' => 1, 'user' => null, 'gauge' => 1));
+    array('number' => 0, 'subject' => 1, 'user' => null, 'gauge' => 1, 'status' => 2));
 check('queue layout: no subject = gauge last', cdr_queue_layout(array('number', 'created', 'assignee')),
-    array('number' => 0, 'subject' => null, 'user' => null, 'gauge' => 2));
+    array('number' => 0, 'subject' => null, 'user' => null, 'gauge' => 2, 'status' => null));
 check('queue layout: no column = gauge first', cdr_queue_layout(array()),
-    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1));
+    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1, 'status' => null));
 check('queue layout: first match wins, case and spaces ignored', cdr_queue_layout(array('assignee', ' CDATA__Subject', 'cdata__subject', 'user__name', 'user__name')),
-    array('number' => null, 'subject' => 1, 'user' => 3, 'gauge' => 1));
+    array('number' => null, 'subject' => 1, 'user' => 3, 'gauge' => 1, 'status' => null));
 check('queue layout: subject-like paths are not the subject', cdr_queue_layout(array('cdata__subject_extra', 'thread__lastmessage', 'user__email')),
-    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => 2));
+    array('number' => null, 'subject' => null, 'user' => null, 'gauge' => 2, 'status' => null));
 check('queue layout: non-scalar paths skipped', cdr_queue_layout(array(null, array('x'), 'subject')),
-    array('number' => null, 'subject' => 2, 'user' => null, 'gauge' => 2));
+    array('number' => null, 'subject' => 2, 'user' => null, 'gauge' => 2, 'status' => null));
 check('queue layout: associative input', cdr_queue_layout(array('a' => 'number', 'b' => 'user__name')),
-    array('number' => 0, 'subject' => null, 'user' => 1, 'gauge' => 1));
+    array('number' => 0, 'subject' => null, 'user' => 1, 'gauge' => 1, 'status' => null));
+
+// ---------- cdr_queue_status_html (state icon in core's Status column) ----------
+check('queue status: open', cdr_queue_status_html('Open', 'open'), '<span class="status status-open">' . cdr_icon('inbox', 14) . 'Open</span>');
+check('queue status: closed icon', strpos(cdr_queue_status_html('Resolved', 'closed'), cdr_icon('checkc', 14)) !== false, true);
+check('queue status: state reduced to [a-z]', strpos(cdr_queue_status_html('X', 'op"en<'), 'status-open"') !== false, true);
+check('queue status: core markup kept as is', cdr_queue_status_html('<b>A &amp; B</b>', 'open'), '<span class="status status-open">' . cdr_icon('inbox', 14) . '<b>A &amp; B</b></span>');
+check('queue status: no state = unchanged', cdr_queue_status_html('Open', ''), 'Open');
+check('queue status: empty cell = unchanged', cdr_queue_status_html('  ', 'open'), '  ');
+check('queue status: unknown state = flag icon', strpos(cdr_queue_status_html('X', 'weird'), cdr_icon('flag', 14)) !== false, true);
+check('queue status: non-scalar = empty', cdr_queue_status_html(array('x'), 'open'), '');
 
 // ---------- cdr_queue_client (client line under the subject) ----------
 check('queue client: name and org', cdr_queue_client("L\xC3\xA9a Marchand", 'Maison Verdier'),

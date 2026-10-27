@@ -248,6 +248,8 @@ if ($queue->id > 0 && $queue->isOwner($thisstaff)) { ?>
 //    (user__name), the line is core's own rendering of that cell (its link
 //    filter and annotations, e.g. the collaborator count, kept) followed
 //    by the escaped organisation; otherwise the owner's name, escaped;
+//  - the state icon in core's Status column, when the queue has one
+//    (mockup .status: icon + name), from the same query;
 //  - with the plugin sla_first_response only: the contract chip under the
 //    ticket number and the first-reply gauge. The contract level is
 //    resolved once per owner; only open tickets of a Priority owner are
@@ -264,7 +266,7 @@ if ($queue->id > 0 && $queue->isOwner($thisstaff)) { ?>
 // stays in the DOM at its place (its cells and no-CSS reading are core's)
 // and its sort link is repeated in the subject heading ("Subject / From").
 $cdrGauge = function_exists('coderise_contract_level');
-$cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = array();
+$cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = $cdrStates = array();
 $cdrPrimaries = array();
 foreach ($columns as $C)
     $cdrPrimaries[] = (string) $C->primary;
@@ -287,6 +289,7 @@ if ($cdrIds) {
             $cdrTid = (int) $cdrTid;
             $cdrUid = (int) $cdrUid;
             $cdrOrgs[$cdrTid] = $cdrOrg;
+            $cdrStates[$cdrTid] = $cdrState;
             if ($cdrName !== null && $cdrName !== '')
                 $cdrClients[$cdrTid] = cdr_queue_client(class_exists('UsersName')
                     ? (string) new UsersName($cdrName) : $cdrName, $cdrOrg);
@@ -310,7 +313,7 @@ if ($cdrIds) {
         // for the admin.
         error_log('coderise-agent: queue rows skipped (client, contract, gauge): '
             . get_class($e) . ': ' . $e->getMessage());
-        $cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = array();
+        $cdrGauges = $cdrPlans = $cdrClients = $cdrOrgs = $cdrStates = array();
         $cdrStacked = false;
     }
 }
@@ -402,6 +405,9 @@ foreach ($tickets as $T) {
         $cdrClient = $cdrClients[$cdrTid];
     foreach ($cdrCells as $cdrI => $cdrCell) {
         list($contents, $styles) = $cdrCell;
+        // the Status column (status__id): core's text with the state icon
+        if ($cdrI === $cdrLayout['status'] && !empty($cdrStates[$cdrTid]))
+            $contents = cdr_queue_status_html((string) $contents, $cdrStates[$cdrTid]);
         $cdrAfter = '';
         if ($cdrI === $cdrLayout['number'] && !empty($cdrPlans[$cdrTid]))
             $cdrAfter .= '<span class="stack">' . $cdrPlans[$cdrTid] . '</span>';

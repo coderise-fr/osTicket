@@ -939,15 +939,16 @@ if (!defined('CDR_VERSION')) {
      *   number  'number'                  ticket number (contract chip)
      *   subject 'cdata__subject'          subject (client line, gauge)
      *   user    'user__name'              core's "From" column
+ *   status  'status__id'              ticket status (state icon)
      * Each is the index of the first matching column, or null. 'gauge' is
      * the index of the column the first-reply cell follows: the subject
      * (mockup order: Ticket, Subject, First reply, ...), else the last
      * column; -1 when there is no column (the cell comes first).
      */
     function cdr_queue_layout($primaries) {
-        $out = array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1);
+        $out = array('number' => null, 'subject' => null, 'user' => null, 'gauge' => -1, 'status' => null);
         $roles = array('number' => 'number', 'cdata__subject' => 'subject', 'subject' => 'subject',
-            'user__name' => 'user');
+            'user__name' => 'user', 'status__id' => 'status');
         $i = -1;
         foreach (array_values((array) $primaries) as $i => $p) {
             $p = is_scalar($p) ? strtolower(trim((string) $p)) : '';
@@ -987,6 +988,26 @@ if (!defined('CDR_VERSION')) {
             return '';
         return '<small class="cdr-client">' . ($org !== ''
             ? sprintf(cdr__('%1$s, %2$s'), $cellHtml, cdr_h($org)) : $cellHtml) . '</small>';
+    }
+
+    /**
+     * The mockup's state cell (.status: state icon + name, Montserrat 600):
+     * core's own rendering of the queue's Status column (the status name,
+     * escaped by core) in a span with the state's icon, the same classes
+     * as the identity line of the ticket view. The state is the row's
+     * status__state (open, closed, archived, deleted), reduced to [a-z].
+     * Without a state or a cell text, the cell is returned unchanged.
+     */
+    function cdr_queue_status_html($cellHtml, $state) {
+        $cellHtml = (is_scalar($cellHtml) || (is_object($cellHtml) && method_exists($cellHtml, '__toString')))
+            ? (string) $cellHtml : '';
+        $state = is_scalar($state) ? preg_replace('/[^a-z]/', '', strtolower((string) $state)) : '';
+        if ($state === '' || trim(strip_tags($cellHtml)) === '')
+            return $cellHtml;
+        static $icons = array('open' => 'inbox', 'closed' => 'checkc',
+            'archived' => 'layers', 'deleted' => 'ban');
+        return '<span class="status status-' . $state . '">'
+            . cdr_icon(isset($icons[$state]) ? $icons[$state] : 'flag', 14) . $cellHtml . '</span>';
     }
 
     /**
