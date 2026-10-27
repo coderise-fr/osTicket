@@ -489,6 +489,17 @@ Paires ajoutées : bloc titre, fin du groupe d'actions et position de « Marquer
 ligne « À : … » de la zone de réponse. Résultat : **1280 × 800 : 172 OK, 0 DIFF, 1 ALLOWED** ;
 **2000 × 1000 : 174 OK, 0 DIFF, 1 ALLOWED** (avant : 153 OK, 4 DIFF).
 
+Passe 5 (27/10/2026, démo b0afed40, colonnes de la file « Open » réglées selon le guide) : le
+début du groupe (« Modifier ») est comparé à toutes les largeurs (plus de `maxWidth`), plus la
+largeur d'« Imprimer », le groupe d'icônes centré sur la rangée du titre à partir de 1840 px
+(mesure `center-y`), la ligne de la note (deux graisses), le pied (« Joindre un fichier »,
+« Passer l'état à », hauteur de la liste), la barre Redactor et ses boutons, les réponses
+types, l'étiquette de note et le corps du message client (mesure `entry-top`, position dans
+l'entrée), les pièces jointes (ticket 3) et la cellule d'état de la file. Résultat :
+**1280 × 800 : 218 OK, 0 DIFF, 0 ALLOWED** ; **2000 × 1000 : 222 OK, 0 DIFF, 0 ALLOWED** ;
+1600 × 1000 : 221 OK ; 1840 × 1000 : 222 OK (l'exception « Last Updated » ne sert plus sur
+la démo : la mesure est conforme).
+
 ## Vérifications (tâche 10)
 
 Comptes utilisés : `dev.admin` (administrateur) et `dev.agent` (agent non administrateur) sont
@@ -532,6 +543,42 @@ des comptes jetables créés à la main dans la base de la démo locale pour ces
   `ul.tabs` (le cœur retire le contour) et zone d'édition Redactor (contour sur le cadre).
   Tab reste dans l'éditeur Redactor (comportement du cœur) : les 18 éléments qui le suivent
   ont été vérifiés un par un.
+
+### Passe 5 : contraste, clavier, mouvement, sans plugin, navigateurs (27/10/2026)
+
+Démo b0afed40, interface en français, comptes `dev.admin` et `dev.agent`, requêtes non-GET
+bloquées dans les scripts (sauf les réglages volontaires ci-dessous).
+
+- Contraste (chaque nœud de texte visible, couleurs composées avec leur transparence sur les
+  fonds des ancêtres et l'opacité, seuil 4,5:1, 3:1 pour le grand texte), à 390 et 1280 px :
+  file (et ses menus État / Assigner, barre groupée), fiche 1 et 2 (onglet note compris), les
+  quatre menus de la barre (Imprimer, État, Assigner, Plus), dialogues Transférer et
+  Assigner, tableau de bord, menu mobile ouvert : **0 échec** (admin et agent). Minimums :
+  contenu 4,91, barre haute 5,83, rail 8,21, barres 5,27, menus 19,16, dialogues 6,54.
+  Hors mesure : 5 éléments de la légende du graphique (fond en dégradé, voir plus haut).
+- Clavier (Tab depuis le haut, 80 arrêts, 390 / 1280 / 2000 px, admin et agent) : chaque
+  arrêt a un contour d'au moins 2 px ; ordre rail, barre haute, bloc titre (« Ticket #N »),
+  barre d'actions (dans l'ordre visuel, y compris à partir de 1840 px), onglets, fil, zone de
+  réponse, colonne des propriétés. Corrigés : les boutons à menu du cœur sans lien (« Plus »,
+  chevron de chaque entrée du fil, « Trier » de la file) n'étaient pas atteignables : ils ont
+  `tabindex`, `role=button`, `aria-haspopup`, `aria-expanded` ; Entrée / Espace ouvrent le
+  menu (Tab y entre), Échap le ferme et rend le focus ; nom : le texte visible, sinon
+  l'infobulle, sinon « Plus d'actions ». Une valeur de propriété vide (lien d'édition vide du
+  cœur, 0 × 0) affiche « — ».
+- `prefers-reduced-motion: reduce` : animations jQuery coupées (`$.fx.off` : barres
+  flottantes du cœur, défilement du fil, correction de défilement du thème), plus de
+  rotation du chevron « Options ».
+- Sans le plugin `sla_first_response` (désactivé puis réactivé dans Administration > Gérer >
+  Plugins, « Plus » > « Désactiver » / « Activer ») : file, fiches 1, 2, 45 et tableau de bord
+  sans erreur PHP (journaux du conteneur), sans jauge, colonne « Premier retour », puce de
+  contrat ni partie contrat de la ligne d'identité, mise en page sans trou ; réactivé : 15
+  jauges et 25 puces revenues.
+- Firefox et WebKit (versions Playwright déjà installées, rien téléchargé) : file et fiche
+  identiques à Chromium (mêmes éléments, 0 débordement, aucune erreur du thème) ; PJAX
+  file → fiche → file → fiche ; repli « Options » : WebKit restaure la valeur modifiée au
+  retour arrière et le panneau s'ouvre avec la marque « modifié » ; Firefox ne restaure pas
+  la valeur (défaut, rien de masqué). Firefox signale le cookie de session `SameSite=None`
+  sans `Secure` (démo en HTTP, réglage du cœur, hors thème).
 
 ### Saisie dans les éditeurs (QA d'interaction, 2026-10-24)
 
