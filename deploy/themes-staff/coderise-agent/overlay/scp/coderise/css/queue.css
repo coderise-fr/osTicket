@@ -153,3 +153,7 @@
 #content table.queue tbody td .status-open > .ic { color: var(--cyan-profond); }
 #content table.queue tbody td .status-closed > .ic { color: var(--succes); }
 #content table.queue tbody td :is(.status-archived, .status-deleted) > .ic { color: var(--ardoise); }
+/* Number column (th.cdr-col-number, queue-tickets.tmpl.php): as narrow as its
+   content like the mockup's .c-n (width 1%, no wrap), whatever width hint
+   the queue's settings give it; the other columns keep theirs */
+#content table.queue > thead > tr > th.cdr-col-number { width: 1%; white-space: nowrap; }

@@ -339,7 +339,8 @@ if ($canManageTickets) { ?>
 }
 
 // Coderise: the first-reply heading follows the subject column (else the
-// last one); core's "From" column is tagged when the client is stacked
+// last one); the number column is tagged (queue.css: as narrow as its
+// content, mockup .c-n); core's "From" column is tagged when the client is stacked
 // under the subject (hidden by queue.css), and its heading (sort link
 // included) is repeated after the subject's: "Subject / From".
 $cdrGaugeTh = $cdrGauge
@@ -367,7 +368,8 @@ foreach ($cdrHeads as $cdrI => $cdrH) {
             . $cdrHeads[$cdrLayout['user']][1];
     echo sprintf('<th width="%s" data-id="%d"%s>%s</th>',
         $C->getWidth(), $C->id,
-        ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"' : '',
+        ($cdrStacked && $cdrI === $cdrLayout['user']) ? ' class="cdr-col-from"'
+            : ($cdrI === $cdrLayout['number'] ? ' class="cdr-col-number"' : ''),
         $heading);
     if ($cdrI === $cdrLayout['gauge'])
         echo $cdrGaugeTh;
