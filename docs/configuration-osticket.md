@@ -60,7 +60,7 @@ secondes entre le choix du formulaire et l'enregistrement de la rubrique.
 
 ## Anti-spam
 
-- Adresse bannie : `tralotus@gmail.com` (spam du 28/10/2026, 10 tickets depuis `188.163.4.215`).
+- Adresse bannie : une adresse de spammeur (spam du 28/10/2026, 10 tickets d'une même source).
 - **Compte obligatoire pour ouvrir un ticket** (« Inscription requise » = `clients_only`), inscription publique,
   CAPTCHA actif. Vérifié : `GET /open.php` affiche la connexion et un `POST` anonyme est redirigé sans créer de ticket.
 - Conséquence : l'e-mail de confirmation d'inscription dépend du SMTP (Brevo, pas encore opérationnel) ; tant qu'il ne

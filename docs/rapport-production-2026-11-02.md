@@ -31,7 +31,7 @@ modifiée. Les sauvegardes et la sonde externe sont suivies par Julien, hors de 
    Microsoft 365 : IMAP en OAuth2 (Entra) ou boîte de relais, pas encore décidé.
 3. **Redémarrage du serveur requis** (noyau 6.8.0-142, 4 paquets en attente) ; `Automatic-Reboot` est désactivé.
    *Action* : planifier un redémarrage dans une fenêtre calme (la pile redémarre seule, `restart: unless-stopped`).
-4. **Compte agent sans mot de passe** : `antony_abbate` (administrateur, mot de passe vide). Julien avait indiqué
+4. **Compte agent sans mot de passe** : un second compte administrateur sans mot de passe. Julien avait indiqué
    être seul : à confirmer ; l'invitation ne peut de toute façon pas partir (point 1). Un administrateur
    sans mot de passe défini n'est pas exploitable, mais c'est un compte privilégié de plus à justifier.
 
@@ -45,7 +45,7 @@ modifiée. Les sauvegardes et la sonde externe sont suivies par Julien, hors de 
    Le calendrier `Monday - Friday 8am - 5pm with U.S. Holidays` est resté en base : à retirer, et les jours fériés
    français sont à vérifier dans `Horaires bureau`.
 7. **Anti-spam** : 10 tickets de spam le 28/10 (supprimés depuis, il ne reste que le ticket de bienvenue). La liste
-   de bannissement ne contient que `test@example.com`, `tralotus@gmail.com` n'y est pas. `enable_captcha=1` mais
+   de bannissement ne contient que `test@example.com`, l'adresse du spammeur n'y est pas. `enable_captcha=1` mais
    `client_registration=public` : le CAPTCHA n'a pas empêché le flux. *Actions* : bannir l'expéditeur, exiger un
    compte pour ouvrir un ticket, limiter le débit de `POST /open.php` dans Caddy, vérifier que le CAPTCHA est bien rendu.
 8. **Langue** : `system_language=en_US`, français en langue secondaire. Le pack `fr.phar` est dans l'image ; la

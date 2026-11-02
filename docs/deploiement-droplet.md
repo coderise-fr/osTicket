@@ -11,7 +11,7 @@ du Droplet est dans [deploy/docker/droplet/README.md](../deploy/docker/droplet/R
 GitHub (push sur main)
    │  workflow « docker-image »
    ▼
-construit coderise/osticket:sha-xxxxxxx ──ssh (clé restreinte)──► Droplet 161.35.193.138
+construit coderise/osticket:sha-xxxxxxx ──ssh (clé restreinte)──► Droplet (IP dans DigitalOcean)
                                                                   │
                           Internet ─443→ Caddy (hôte, TLS) ─127.0.0.1:8080→ web ──réseau interne──► db (MariaDB)
                                                                            cron ──┘

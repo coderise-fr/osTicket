@@ -25,3 +25,6 @@ nbproject/
 
 # Environnement local de démonstration (deploy/docker/scripts/local-demo.sh) : état, identifiants
 .local-demo/
+
+# Instantanés du navigateur piloté (Playwright MCP) : pages d'administration, ne jamais publier
+.playwright-mcp/
