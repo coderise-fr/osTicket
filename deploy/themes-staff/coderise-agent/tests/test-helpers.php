@@ -137,6 +137,22 @@ check('layout version: changes with the size at the same mtime', cdr_layout_vers
 $none = cdr_layout_version($lv . '/missing/');
 check('layout version: missing folder = fallback', $none, '-cdr' . substr(md5(CDR_VERSION), 0, 8));
 check('layout version: default (installed tree) is cached', cdr_layout_version(), cdr_layout_version());
+
+// ---------- page kind: sheets/scripts of a kind of page only, and its PJAX version ----------
+check('page kind: admin page', cdr_page_kind('settings.php', true), 'admin');
+check('page kind: dashboard', cdr_page_kind('dashboard.php', false), 'dashboard');
+check('page kind: dashboard path', cdr_page_kind('/scp/dashboard.php'), 'dashboard');
+check('page kind: agent page', cdr_page_kind('tickets.php', false), 'agent');
+check('page kind: admin wins', cdr_page_kind('dashboard.php', true), 'admin');
+check('page assets: admin', cdr_page_assets('admin'), array('css' => array('css/admin.css'), 'js' => array('js/admin.js')));
+check('page assets: dashboard', cdr_page_assets('dashboard'), array('css' => array('css/dash.css'), 'js' => array()));
+check('page assets: agent = none', cdr_page_assets('agent'), array('css' => array(), 'js' => array()));
+check('page assets: unknown = none', cdr_page_assets('x'), array('css' => array(), 'js' => array()));
+check('page version: agent = layout version', cdr_page_version('agent', $lv . '/'), cdr_layout_version($lv . '/'));
+check('page version: admin', cdr_page_version('admin', $lv . '/'), cdr_layout_version($lv . '/') . '-admin');
+check('page version: dashboard', cdr_page_version('dashboard', $lv . '/'), cdr_layout_version($lv . '/') . '-dashboard');
+check('page version: three different values (PJAX between kinds = full load)',
+    count(array_unique(array(cdr_page_version('agent', $lv), cdr_page_version('admin', $lv), cdr_page_version('dashboard', $lv)))), 3);
 foreach (array('/css/a.css', '/js/b.js') as $f)
     @unlink($lv . $f);
 @rmdir($lv . '/css');

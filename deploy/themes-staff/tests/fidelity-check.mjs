@@ -48,7 +48,7 @@
 // are the cells admin.js builds; the save bar is the last <p> of form.save (its position differs on
 // purpose: pinned to the window, the mockup's is sticky). Env OVERLAY_DIR=<overlay folder of the
 // package>: serve that folder's css/js over the demo (signed-in and signed-out contexts) and inject
-// its admin.css / admin.js into the pages that do not link them yet (a demo older than the package).
+// its admin.css / admin.js into the administration pages that do not link them yet (a demo older than the package).
 
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve, extname } from 'node:path';
@@ -256,8 +256,10 @@ async function useOverlay(context, dir) {
     if (!(resp.headers()['content-type'] || '').includes('text/html')) return route.fulfill({ response: resp });
     let body = await resp.text();
     const f = (n) => { const p = join(dir, 'scp', 'coderise', n); return existsSync(p) ? readFileSync(p, 'utf8') : ''; };
-    // each file only where the page does not link it yet (a demo older than the package)
-    const extra = (body.includes('css/admin.css') ? '' : '<style>' + f('css/admin.css') + '</style>')
+    // each file only where the page does not link it yet (a demo older than the package), and only
+    // on an administration page: the package loads admin.css / admin.js there only (cdr_page_assets())
+    const admin = body.includes('cdr-is-admin');
+    const extra = !admin ? '' : (body.includes('css/admin.css') ? '' : '<style>' + f('css/admin.css') + '</style>')
       + (body.includes('js/admin.js') ? '' : '<script>' + f('js/admin.js') + '</script>');
     if (extra) body = body.replace('</head>', () => extra + '</head>');
     await route.fulfill({ response: resp, body });

@@ -17,8 +17,11 @@
       .cdr-st-on or .cdr-st-off (core prints the off states in bold), so
       the stylesheet can draw an icon next to the text.
     - Agents list: an initials disc before the agent name.
-    - Save bar: its height is published as --cdr-savebar-h (the page keeps that
-      room under its last line); the submit button goes last in the button row, so the
+    - Save bar: the height of the tallest pinned bar is published as
+      --cdr-savebar-h (the page keeps that room under its last line), measured
+      again when a bar changes size, when the window is resized and after a
+      tab switch (a bar inside a hidden tab measures 0 until its tab shows);
+      the submit button goes last in the button row, so the
       primary action is at the end of the bar (mockup) and the keyboard
       order stays the visual order.
 
@@ -126,30 +129,40 @@
 
     // The save bar is pinned to the window (admin.css): its height, which grows when the
     // buttons wrap on a narrow screen, is published as --cdr-savebar-h so the page keeps
-    // that much room under its last line.
-    var barWatch = null, barEl = null;
+    // that much room under its last line. Every row admin.css pins (position: fixed) is
+    // measured: pinned bars share the bottom of the window, so the room is the tallest
+    // visible one (a bar in a hidden tab measures 0).
+    var barWatch = null, barEls = [];
     function barHeight() {
-        if (barEl && document.documentElement)
-            document.documentElement.style.setProperty('--cdr-savebar-h', barEl.offsetHeight + 'px');
+        var h = 0, i;
+        for (i = 0; i < barEls.length; i++)
+            h = Math.max(h, barEls[i].offsetHeight);
+        if (barEls.length && document.documentElement)
+            document.documentElement.style.setProperty('--cdr-savebar-h', h + 'px');
     }
     function saveBar() {
-        var $p = $(SCOPE + ' form.save > p, ' + SCOPE + ' form.save > div > p').filter(function () {
-            return $(this).children('input[type=submit], button[type=submit]').length > 0;
-        }).last();
         if (barWatch) {
             barWatch.disconnect();
             barWatch = null;
         }
-        barEl = $p.length ? $p[0] : null;
-        if (!barEl)
+        barEls = $(SCOPE + ' form.save > p, ' + SCOPE + ' form.save > div > p').filter(function () {
+            return $(this).children('input[type=submit], button[type=submit]').length > 0
+                && $(this).css('position') === 'fixed';
+        }).get();
+        if (!barEls.length)
             return;
         barHeight();
         if (window.ResizeObserver) {
             barWatch = new window.ResizeObserver(barHeight);
-            barWatch.observe(barEl);
+            barEls.forEach(function (el) { barWatch.observe(el); });
         }
     }
     $(window).on('resize.cdradmin', barHeight);
+    // core's tabs (ul.tabs) show and hide panels on click: measure once the panel is shown
+    // (the ResizeObserver also sees it; this is for a bar whose size does not change)
+    $(document).on('click.cdradmin', SCOPE + ' ul.tabs a', function () {
+        window.setTimeout(barHeight, 0);
+    });
 
     function run() {
         title();

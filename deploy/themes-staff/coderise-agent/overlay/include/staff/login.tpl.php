@@ -45,7 +45,7 @@ if ($msg === 'Authentication Required')
     </div>
     <h1 id="logo" class="sr-only"><a href="index.php" tabindex="-1">
         <span class="valign-helper"></span>
-        <img src="logo.php?login" alt="osTicket :: <?php echo cdr__('Staff Control Panel');?>" />
+        <img src="logo.php?login" alt="osTicket :: <?php echo Format::htmlchars(cdr__('Staff Control Panel')); ?>" />
     </a></h1>
     <h2 class="card-title"><?php echo Format::htmlchars(cdr__('Team sign-in')); ?></h2>
     <p class="lead"><?php echo Format::htmlchars(cdr__('Use your Coderise username.')); ?></p>
@@ -53,7 +53,7 @@ if ($msg === 'Authentication Required')
     <div class="banner"><small><?php echo ($content) ? Format::display($content->getLocalBody()) : ''; ?></small></div>
     <div id="loading" style="display:none;" class="dialog">
         <h1><i class="icon-spinner icon-spin icon-large"></i>
-        <?php echo cdr__('Verifying');?></h1>
+        <?php echo Format::htmlchars(cdr__('Verifying')); ?></h1>
     </div>
     <form action="login.php" method="post" id="login" onsubmit="attemptLoginAjax(event)">
         <?php csrf_token();
@@ -68,19 +68,19 @@ if ($msg === 'Authentication Required')
             <input type="hidden" name="do" value="2fa">
             <button class="submit button btn btn-primary pull-center" type="submit"
                 name="submit"><i class="icon-signin"></i>
-                <?php echo cdr__('Verify'); ?>
+                <?php echo Format::htmlchars(cdr__('Verify')); ?>
             </button>
              </fieldset>
         <?php
         } else { ?>
             <input type="hidden" name="do" value="scplogin">
             <fieldset>
-            <label for="name"><?php echo cdr_t('Email or Username'); ?></label>
+            <label for="name"><?php echo Format::htmlchars(cdr_t('Email or Username')); ?></label>
             <input type="text" name="userid" id="name" value="<?php
                 echo $info['userid'] ?? null; ?>"
                 autofocus autocorrect="off" autocapitalize="off" autocomplete="username"<?php
                 echo $cdr_err ? ' aria-describedby="login-hint"' : ''; ?>>
-            <label for="pass"><?php echo cdr__('Password'); ?></label>
+            <label for="pass"><?php echo Format::htmlchars(cdr__('Password')); ?></label>
             <input type="password" name="passwd" id="pass" maxlength="128"
                 autocorrect="off" autocapitalize="off" autocomplete="current-password"<?php
                 echo $cdr_err ? ' aria-describedby="login-hint"' : ''; ?>>
@@ -88,11 +88,11 @@ if ($msg === 'Authentication Required')
                 echo Format::htmlchars(cdr__('Check the username and password, then try again.')); ?></p>
                 <button class="submit button btn btn-primary" type="submit"
                     name="submit"><i class="icon-signin"></i>
-                    <?php echo cdr_t('Log In'); ?>
+                    <?php echo Format::htmlchars(cdr_t('Log In')); ?>
                 </button>
                 <p class="alt"><a id="reset-link" class="<?php
                     if (!$show_reset || !$cfg->allowPasswordReset()) echo 'hidden';
-                    ?>" href="pwreset.php"><?php echo cdr_t('Forgot My Password'); ?></a></p>
+                    ?>" href="pwreset.php"><?php echo Format::htmlchars(cdr_t('Forgot My Password')); ?></a></p>
             </fieldset>
         <?php
         } ?>
@@ -109,12 +109,12 @@ if (($bks=StaffAuthenticationBackend::getExternal())) { ?>
 
     <div id="company">
         <div class="content">
-            <?php echo cdr__('Copyright'); ?> &copy; <?php echo Format::htmlchars($ost->company) ?: date('Y'); ?>
+            <?php echo Format::htmlchars(cdr__('Copyright')); ?> &copy; <?php echo Format::htmlchars($ost->company) ?: date('Y'); ?>
         </div>
     </div>
 </div>
 </div>
-<div id="poweredBy"><?php echo cdr__('Powered by'); ?>
+<div id="poweredBy"><?php echo Format::htmlchars(cdr__('Powered by')); ?>
     <a href="http://www.osticket.com" target="_blank">
         <img alt="osTicket" src="images/osticket-grey.png" class="osticket-logo">
     </a>

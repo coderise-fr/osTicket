@@ -13,16 +13,30 @@
     indicators, and three panels: the first replies at risk, the load
     per agent and the tickets per help topic. Core has no such data, so
     this file reads it with a few aggregate queries, once per request,
-    only on the dashboard:
+    only on the dashboard. Its own queries (5):
 
       cdr_dash_counts()          1 query  : tickets received / open / closed / overdue
       cdr_dash_priority_rows()   1 query  : Priority tickets of the window and of the
                                             open ones, with their first client reply
                                             (correlated sub-selects on the indexed
-                                            thread_id; no query per ticket)
+                                            thread_id; no query per ticket), at most
+                                            CDR_DASH_PRIORITY_LIMIT rows, open ones first
       cdr_dash_agents()          1 query  : open tickets per agent
       cdr_dash_topics()          1 query  : tickets per help topic
       cdr_dash_subjects()        1 query  : subjects of the (at most 5) listed tickets
+
+    plus those of the core helpers it calls, each once per request at most:
+    $staff->getManagedDepartments(), Topic::getHelpTopics() (names in the
+    panel language), the Priority organisation (SlaContractLevel::
+    priorityOrg(), plugin only) and $staff->getDepts() when core has not
+    loaded it yet: 8 to 9 queries for a dashboard page. A failed query is
+    not reported through core's db_query() logging (which may mail the
+    administrator on every SQL error): the panel shows no data and one line
+    goes to the PHP error log (cdr_dash_log_once(), once per session).
+    The Priority rows are capped (CDR_DASH_PRIORITY_LIMIT, 3000): when the
+    cap is reached the open tickets are still all read (they come first),
+    the average and rate cover the most recent closed ones only, a note
+    says so under the indicators and one line is logged.
 
     Everything about the Priority contract (first reply, alert strip,
     risk panel, average and rate) needs the SLA plugin's
@@ -30,8 +44,14 @@
     panels are not drawn and the indicators fall back to closed and
     overdue tickets. The scope is the agent's: the departments they may
     access (or, when their access is limited, their own and their teams'
-    tickets); the per-agent panel needs the "stats.agents" permission,
-    as core's agent statistics. Core's markup is not touched: the panels
+    tickets); the per-agent panel lists other agents only with the
+    "stats.agents" permission or for the departments the viewer manages,
+    as core's agent statistics. Times: the report's getDateRange()
+    gives database times, kept as they are in the SQL (as core's own
+    statistics); every comparison with a ticket's dates and the period
+    shown ("From ... to ...") use UTC (Misc::db2gmtime(), cdr_dash_period()).
+    "View the N tickets" opens core's ad hoc search on exactly the tickets
+    at risk (cdr_dash_risk_redirect()). Core's markup is not touched: the panels
     are injected into the page's output buffer around the period form
     and before the rule that precedes "Statistics" (cdr_dash_inject());
     when core's markup is not found as expected the page is left as core
@@ -39,6 +59,8 @@
 
     1. Pure helpers (no osTicket needed: tested in tests/test-dashboard.php)
        - cdr_dash_int()           a "FROM_UNIXTIME(n)" expression as n
+       - cdr_dash_period()        the period in database time (SQL) and in UTC
+       - cdr_dash_risk_criteria() core ad hoc search criteria for the tickets at risk
        - cdr_dash_pct()           whole percentage or null
        - cdr_dash_delta()         change against the previous period
        - cdr_dash_span()          "4 h", "52 min", "3 d"
@@ -55,6 +77,10 @@
 if (!defined('INCLUDE_DIR')) die('Access Denied');
 require_once INCLUDE_DIR . 'staff/coderise/coderise.inc.php';
 
+// Cap on the Priority rows read per dashboard page (see the header); tests may define a lower one.
+if (!defined('CDR_DASH_PRIORITY_LIMIT'))
+    define('CDR_DASH_PRIORITY_LIMIT', 3000);
+
 if (!function_exists('cdr_dash_start')) {
 
     /* ------------------------------------------------------------------
@@ -65,6 +91,73 @@ if (!function_exists('cdr_dash_start')) {
     function cdr_dash_int($expr) {
         $m = array();
         return preg_match('/^FROM_UNIXTIME\((\d+)\)$/', (string) $expr, $m) ? (int) $m[1] : null;
+    }
+
+    /** A database time (Unix seconds, as Misc::dbtime() gives them) in UTC; unchanged without core. */
+    function cdr_dash_gmt($ts) {
+        if (class_exists('Misc', false) && is_callable(array('Misc', 'db2gmtime'))) {
+            $g = Misc::db2gmtime((int) $ts);
+            if (is_int($g) || (is_string($g) && ctype_digit($g)))
+                return (int) $g;
+        }
+        return (int) $ts;
+    }
+
+    /**
+     * The report period from OverviewReport::getDateRange(): array(db_from,
+     * db_to, from, to), or null. db_* are database times (Misc::dbtime()),
+     * used as they are in the SQL like core's statistics; from/to are UTC,
+     * the time of every value read from a ticket (Misc::db2gmtime()) and of
+     * Format::date(): comparisons and the subtitle use them.
+     */
+    function cdr_dash_period($range) {
+        if (!is_array($range) || count($range) < 2)
+            return null;
+        $a = cdr_dash_int($range[0]);
+        $b = cdr_dash_int($range[1]);
+        if ($a === null || $b === null || $b < $a)
+            return null;
+        return array('db_from' => $a, 'db_to' => $b, 'from' => cdr_dash_gmt($a), 'to' => cdr_dash_gmt($b));
+    }
+
+    /**
+     * Criteria of core's ad hoc ticket search (scp/tickets.php?queue=adhoc,<key>,
+     * class.search.php AdhocSearch) matching exactly the tickets at risk: their
+     * numbers, as one anchored pattern of the "Ticket Number matches" filter.
+     * null when there is none or a number has a character outside letters,
+     * digits and "-" (the pattern would need escaping: the caller falls back
+     * to the queue).
+     */
+    function cdr_dash_risk_criteria($risk) {
+        $nums = array();
+        foreach ((array) $risk as $r) {
+            $n = (string) ($r['number'] ?? '');
+            if ($n === '' || !preg_match('/^[A-Za-z0-9-]+$/', $n))
+                return null;
+            $nums[$n] = true;
+        }
+        if (!$nums)
+            return null;
+        return array(array('number', 'match', '^(' . implode('|', array_keys($nums)) . ')$'));
+    }
+
+    /**
+     * Writes $msg to the PHP error log once per session (once per request
+     * without a session) for $key: a broken query or the row cap would
+     * otherwise log on every dashboard page.
+     */
+    function cdr_dash_log_once($key, $msg) {
+        static $done = array();
+        if (isset($done[$key]))
+            return false;
+        $done[$key] = true;
+        if (isset($_SESSION) && is_array($_SESSION)) {
+            if (!empty($_SESSION['cdr_dash_logged'][$key]))
+                return false;
+            $_SESSION['cdr_dash_logged'][$key] = 1;
+        }
+        error_log('coderise-agent dashboard: ' . $msg);
+        return true;
     }
 
     /** Whole percentage of $num in $den, null when $den is 0. */
@@ -299,15 +392,28 @@ if (!function_exists('cdr_dash_start')) {
         return $depts ? $a . '.dept_id IN (' . implode(',', $depts) . ')' : '0';
     }
 
-    /** Rows of a query as arrays; array() on a failed query (never throws). */
+    /**
+     * Rows of a query as arrays; array() on a failed query (never throws).
+     * Core's logging is off for these queries (db_query($sql, false)): with
+     * "alert on SQL error" on, core mails the administrator for each failed
+     * query, which would be one mail per dashboard page; one line goes to
+     * the PHP error log instead (once per session).
+     */
     function cdr_dash_fetch($sql) {
         $rows = array();
         try {
-            if (($res = db_query($sql)))
-                while (($row = db_fetch_array($res)))
-                    $rows[] = $row;
+            $res = db_query($sql, false);
+            if (!$res) {
+                cdr_dash_log_once('query', 'a panel query failed'
+                    . (function_exists('db_error') ? ' (' . db_error() . ')' : '')
+                    . '; the panel shows no data. Query: ' . substr(preg_replace('/\s+/', ' ', $sql), 0, 300));
+                return array();
+            }
+            while (($row = db_fetch_array($res)))
+                $rows[] = $row;
         }
         catch (Throwable $e) {
+            cdr_dash_log_once('query', 'a panel query failed (' . $e->getMessage() . '); the panel shows no data.');
             return array();
         }
         return $rows;
@@ -344,9 +450,11 @@ if (!function_exists('cdr_dash_start')) {
      * premiere-reponse.sql: type R, agent, neither system nor hidden, not a
      * canned SYSTEM reply, a "to" recipient). One query; the sub-selects use
      * the thread_id index. Closed tickets with no such reply are dropped
-     * (no gauge, as cdr_ticket_gauge()).
+     * (no gauge, as cdr_ticket_gauge()). At most $limit rows, the open
+     * tickets first (the risk list and alert need every one of them), then
+     * the most recent; $truncated is set to true when the cap is reached.
      */
-    function cdr_dash_priority_rows($orgId, $from, $scope, $hours, $limit = 3000) {
+    function cdr_dash_priority_rows($orgId, $from, $scope, $hours, $limit = CDR_DASH_PRIORITY_LIMIT, &$truncated = null) {
         $mask = (int) ((defined('ThreadEntry::FLAG_HIDDEN') ? ThreadEntry::FLAG_HIDDEN : 0x04)
             | (defined('ThreadEntry::FLAG_SYSTEM') ? ThreadEntry::FLAG_SYSTEM : 0x80));
         $reply = 'te.thread_id=th.id AND te.type=\'R\' AND te.staff_id>0 AND (te.flags & ' . $mask . ')=0'
@@ -361,9 +469,14 @@ if (!function_exists('cdr_dash_start')) {
             . ' LEFT JOIN ' . SLA_TABLE . ' sl ON sl.id=t.sla_id'
             . ' LEFT JOIN ' . THREAD_TABLE . ' th ON th.object_type=\'T\' AND th.object_id=t.ticket_id'
             . ' WHERE (s.state=\'open\' OR t.created >= FROM_UNIXTIME(' . (int) $from . ')) AND ' . $scope
-            . ' ORDER BY t.created DESC LIMIT ' . (int) $limit;
+            . ' ORDER BY (s.state=\'open\') DESC, t.created DESC LIMIT ' . (int) $limit;
         $rows = array();
-        foreach (cdr_dash_fetch($sql) as $r) {
+        $all = cdr_dash_fetch($sql);
+        $truncated = count($all) >= (int) $limit;
+        if ($truncated)
+            cdr_dash_log_once('limit', sprintf('%d Priority tickets or more in scope: the average and rate'
+                . ' of the first replies cover the %d most recent (open ones first).', (int) $limit, (int) $limit));
+        foreach ($all as $r) {
             $open = ($r['state'] ?? '') === 'open';
             if (!$open && empty($r['first_reply']))
                 continue;
@@ -393,18 +506,22 @@ if (!function_exists('cdr_dash_start')) {
     }
 
     /**
-     * Open tickets per active agent, busiest first. The agents core's own agent
-     * statistics shows: the viewer, the agents of the departments they manage,
-     * and those of all their departments when they are an administrator or hold
-     * "stats.agents" (class.report.php, getTabularData('staff')).
+     * Open tickets per active agent, busiest first. The departments are those
+     * of core's own agent statistics (class.report.php, getTabularData('staff')):
+     * the viewer, plus the departments they manage, plus all their departments
+     * with "stats.agents" (being an administrator is not enough, as in core).
+     * Core picks the agents by the department of their activity in the period;
+     * this panel, a current load, picks them by membership: primary department
+     * or extended access (staff_dept_access) in one of those departments.
      */
     function cdr_dash_agents($staff, $scope, $limit = 12) {
         $depts = array_map('intval', (array) $staff->getManagedDepartments());
-        $all = $staff->isAdmin() || (class_exists('ReportModel', false) && $staff->hasPerm(ReportModel::PERM_AGENTS));
-        if ($all)
+        if (class_exists('ReportModel', false) && $staff->hasPerm(ReportModel::PERM_AGENTS))
             $depts = array_merge($depts, array_map('intval', (array) $staff->getDepts()));
         $depts = array_values(array_unique(array_filter($depts)));
-        $who = 'st.staff_id=' . (int) $staff->getId() . ($depts ? ' OR st.dept_id IN (' . implode(',', $depts) . ')' : '');
+        $in = implode(',', $depts);
+        $who = 'st.staff_id=' . (int) $staff->getId() . ($depts ? ' OR st.dept_id IN (' . $in . ')'
+            . ' OR st.staff_id IN (SELECT da.staff_id FROM ' . STAFF_DEPT_TABLE . ' da WHERE da.dept_id IN (' . $in . '))' : '');
         $sql = 'SELECT st.staff_id, st.firstname, st.lastname, d.name AS dept, COUNT(t.ticket_id) AS open_n'
             . ' FROM ' . STAFF_TABLE . ' st'
             . ' LEFT JOIN ' . DEPT_TABLE . ' d ON d.id=st.dept_id'
@@ -458,16 +575,18 @@ if (!function_exists('cdr_dash_start')) {
         if ($memo !== null)
             return $memo;
         $memo = array('from' => 0, 'to' => 0, 'counts' => null, 'prio' => null, 'agents' => null,
-            'topics' => array(), 'hours' => CDR_FIRST_RESPONSE_HOURS, 'queue' => '', 'subjects' => array());
+            'topics' => array(), 'hours' => CDR_FIRST_RESPONSE_HOURS, 'queue' => '', 'subjects' => array(),
+            'risk_url' => '', 'truncated' => 0);
         if (!is_object($staff) || !is_object($report))
             return $memo;
-        list($a, $b) = $report->getDateRange();
-        $from = cdr_dash_int($a);
-        $to = cdr_dash_int($b);
-        if ($from === null || $to === null || $to < $from)
+        $period = cdr_dash_period($report->getDateRange());
+        if ($period === null)
             return $memo;
-        $memo['from'] = $from;
-        $memo['to'] = $to;
+        // database times in the SQL (as core's statistics), UTC everywhere else
+        $from = $period['db_from'];
+        $to = $period['db_to'];
+        $memo['from'] = $period['from'];
+        $memo['to'] = $period['to'];
         $scope = cdr_dash_scope($staff);
         $memo['counts'] = cdr_dash_counts($from, $to, $scope);
         $memo['topics'] = cdr_dash_topics($from, $to, $scope);
@@ -476,8 +595,11 @@ if (!function_exists('cdr_dash_start')) {
             ? SlaContractLevel::priorityOrg() : null;
         if (is_object($org) && ($orgId = (int) $org->getId()) > 0) {
             $len = max(1, $to - $from);
-            $rows = cdr_dash_priority_rows($orgId, $from - $len, $scope, CDR_FIRST_RESPONSE_HOURS);
-            $memo['prio'] = cdr_dash_priority_summary($rows, $from, $to, time());
+            $truncated = false;
+            $rows = cdr_dash_priority_rows($orgId, $from - $len, $scope, CDR_FIRST_RESPONSE_HOURS,
+                CDR_DASH_PRIORITY_LIMIT, $truncated);
+            $memo['truncated'] = $truncated ? CDR_DASH_PRIORITY_LIMIT : 0;
+            $memo['prio'] = cdr_dash_priority_summary($rows, $period['from'], $period['to'], time());
             $ids = array();
             foreach (array_slice($memo['prio']['risk'], 0, 5) as $r)
                 $ids[] = $r['id'];
@@ -488,7 +610,42 @@ if (!function_exists('cdr_dash_start')) {
         $qid = (is_object($cfg) && is_callable(array($cfg, 'getDefaultTicketQueueId')))
             ? (int) $cfg->getDefaultTicketQueueId() : 0;
         $memo['queue'] = ROOT_PATH . 'scp/tickets.php' . ($qid ? '?queue=' . $qid : '');
+        // "View the N tickets": the dashboard itself, which stores core's ad hoc search of
+        // those tickets and redirects to it (cdr_dash_risk_redirect()); the queue when the
+        // numbers cannot be expressed as a search
+        $memo['risk_url'] = (is_array($memo['prio']) && cdr_dash_risk_criteria($memo['prio']['risk']))
+            ? ROOT_PATH . 'scp/dashboard.php?cdr_risk=1' : $memo['queue'];
         return $memo;
+    }
+
+    /**
+     * scp/dashboard.php?cdr_risk=1 (header.inc.php, before any output): reads the
+     * tickets at risk now, in the agent's scope, stores them as core's ad hoc search
+     * "cdr-risk" ($_SESSION['advsearch'], as core's own ?orgid= and ?uid= links do)
+     * and redirects to that list (tickets.php?queue=adhoc,cdr-risk), whose rows are
+     * also limited by core to the tickets the agent may see. Without a ticket at risk
+     * (or a number the search cannot express), the default queue. Never returns.
+     */
+    function cdr_dash_risk_redirect($staff) {
+        $url = ROOT_PATH . 'scp/tickets.php';
+        try {
+            if (class_exists('OverviewReport', false)) {
+                $m = cdr_dash_model($staff, new OverviewReport(null, 'now'));
+                $url = $m['queue'] ?: $url;
+                $crit = is_array($m['prio']) ? cdr_dash_risk_criteria($m['prio']['risk']) : null;
+                if ($crit && isset($_SESSION) && is_array($_SESSION)) {
+                    $_SESSION['advsearch']['cdr-risk'] = $crit;
+                    $url = ROOT_PATH . 'scp/tickets.php?queue=adhoc,cdr-risk';
+                }
+            }
+        }
+        catch (Throwable $e) {
+            cdr_dash_log_once('risk', 'the list of the tickets at risk could not be built (' . $e->getMessage() . ').');
+        }
+        if (class_exists('Http', false) && is_callable(array('Http', 'redirect')))
+            Http::redirect($url);
+        header('Location: ' . $url);
+        exit;
     }
 
     /* ------------------------------------------------------------------
@@ -504,6 +661,11 @@ if (!function_exists('cdr_dash_start')) {
         return gmdate('j M Y', (int) $ts);
     }
 
+    /** Target of "View the N tickets" / "View all (N)": the list of the tickets at risk, else the queue. */
+    function cdr_dash_risk_link($m) {
+        return !empty($m['risk_url']) ? $m['risk_url'] : (string) ($m['queue'] ?? '');
+    }
+
     /** Title, alert strip and indicators. */
     function cdr_dash_head($m) {
         $h = '<div class="cdr-dash cdr-dash-head"><div class="cdr-dash-title"><h1>' . cdr_h(cdr_t('Dashboard')) . '</h1>';
@@ -515,11 +677,12 @@ if (!function_exists('cdr_dash_start')) {
         if (is_array($p) && ($total = $p['over'] + $p['warn']) > 0) {
             list($strong, $rest) = cdr_dash_alert_text($total, $p['over'], $p['oldest_over'], $p['next_due'], $m['hours']);
             $one = $total === 1 ? $p['risk'][0] : null;
-            $link = $one ? ROOT_PATH . 'scp/tickets.php?id=' . (int) $one['id'] : $m['queue'];
+            // several: the list of exactly those tickets (cdr_dash_risk_redirect(), full page load)
+            $link = $one ? ROOT_PATH . 'scp/tickets.php?id=' . (int) $one['id'] : cdr_dash_risk_link($m);
             $label = $one ? cdr_t('View the ticket') : sprintf(cdr_t('View the %d tickets'), $total);
             $h .= '<div class="cdr-dash alert-strip" role="status">' . cdr_icon('alert', 22)
                 . '<p><strong>' . cdr_h($strong) . '</strong> ' . cdr_h($rest) . '</p>'
-                . '<a class="btn btn-primary-dark" href="' . cdr_h($link) . '">' . cdr_h($label) . '</a></div>';
+                . '<a class="btn btn-primary-dark' . ($one ? '' : ' no-pjax') . '" href="' . cdr_h($link) . '">' . cdr_h($label) . '</a></div>';
         }
         $c = $m['counts'];
         if (!is_array($c))
@@ -564,7 +727,12 @@ if (!function_exists('cdr_dash_start')) {
             $h .= '<div><b>' . cdr_h($k[0]) . '</b><span>' . cdr_h($k[1]) . '</span>'
                 . '<span class="delta delta-' . ($k[3] === 'warn' ? 'down' : $k[3]) . '">' . $ic . cdr_h($k[2]) . '</span></div>';
         }
-        return $h . '</div>';
+        $h .= '</div>';
+        // the Priority rows were capped (CDR_DASH_PRIORITY_LIMIT): the average and rate are partial
+        if (is_array($p) && !empty($m['truncated']))
+            $h .= '<p class="cdr-dash cdr-dash-note">' . cdr_h(sprintf(cdr_t('Average and rate computed on the %s most recent Priority tickets (open ones first).'),
+                cdr_dash_num($m['truncated']))) . '</p>';
+        return $h;
     }
 
     /** "First reply at risk" panel (Priority tickets over or close to the deadline). */
@@ -576,7 +744,7 @@ if (!function_exists('cdr_dash_start')) {
             . cdr_h(cdr_t('First reply at risk')) . '</h2>';
         $total = count($p['risk']);
         if ($total > 5)
-            $h .= '<a class="more" href="' . cdr_h($m['queue']) . '">' . cdr_h(sprintf(cdr_t('View all (%d)'), $total)) . '</a>';
+            $h .= '<a class="more no-pjax" href="' . cdr_h(cdr_dash_risk_link($m)) . '">' . cdr_h(sprintf(cdr_t('View all (%d)'), $total)) . '</a>';
         $h .= '</div>';
         if ($total === 0)
             return $h . '<p class="cdr-dash-empty">' . cdr_icon('checkc', 16)

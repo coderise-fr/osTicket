@@ -23,8 +23,18 @@ foreach (array('TICKET_TABLE' => 'ost_ticket', 'TICKET_STATUS_TABLE' => 'ost_tic
         'THREAD_TABLE' => 'ost_thread', 'THREAD_ENTRY_TABLE' => 'ost_thread_entry',
         'USER_TABLE' => 'ost_user', 'SLA_TABLE' => 'ost_sla', 'STAFF_TABLE' => 'ost_staff',
         'DEPT_TABLE' => 'ost_department', 'TOPIC_TABLE' => 'ost_help_topic',
-        'TICKET_CDATA_TABLE' => 'ost_ticket__cdata') as $k => $v)
+        'TICKET_CDATA_TABLE' => 'ost_ticket__cdata', 'STAFF_DEPT_TABLE' => 'ost_staff_dept_access') as $k => $v)
     define($k, $v);
+// test seam: a low cap on the Priority rows (the theme's default is 3000)
+define('CDR_DASH_PRIORITY_LIMIT', 2);
+// error_log() lines of the dashboard (cdr_dash_log_once) go to a file the tests read
+$ERRLOG = tempnam(sys_get_temp_dir(), 'cdrdash');
+ini_set('error_log', $ERRLOG);
+function errlog_count($needle) {
+    global $ERRLOG;
+    clearstatcache();
+    return substr_count((string) @file_get_contents($ERRLOG), $needle);
+}
 
 $fails = 0;
 function check($name, $got, $want) {
@@ -48,8 +58,15 @@ function __($msgid) { return $msgid; }
 class Internationalization {
     static function getCurrentLanguage() { return 'en_US'; }
 }
+// osTicket's db2gmtime(): a database time (text or Unix seconds) to UTC; $off = the database
+// time zone's offset (0 = a UTC database, the container's default)
 class Misc {
-    static function db2gmtime($d) { return $d ? strtotime($d . ' UTC') : 0; }
+    static $off = 0;
+    static function db2gmtime($d) {
+        if (!$d)
+            return 0;
+        return (is_int($d) ? $d : strtotime($d . ' UTC')) - self::$off;
+    }
 }
 class ReportModel { const PERM_AGENTS = 'stats.agents'; }
 class ThreadEntry {
@@ -59,18 +76,23 @@ class ThreadEntry {
 
 // ---------- stubbed database: queries are recorded, rows come from $DB_ROWS by a SQL marker ----------
 $DB_LOG = array();
+$DB_LOGERR = array();
 $DB_ROWS = array();
-function db_query($sql) {
-    global $DB_LOG, $DB_ROWS;
+function db_query($sql, $logError = true) {
+    global $DB_LOG, $DB_ROWS, $DB_LOGERR;
     $DB_LOG[] = $sql;
+    $DB_LOGERR[] = $logError;
     foreach ($DB_ROWS as $marker => $rows) {
         if ($rows === 'throw' && strpos($sql, $marker) !== false)
             throw new RuntimeException('db down');
+        if ($rows === 'false' && strpos($sql, $marker) !== false)
+            return false;   // what db_query() returns on an SQL error
         if (strpos($sql, $marker) !== false)
             return new ArrayIterator($rows);
     }
     return new ArrayIterator(array());
 }
+function db_error() { return "Unknown column 'subject'"; }
 function db_fetch_array($res) {
     if (!$res->valid())
         return false;
@@ -205,6 +227,19 @@ check_has('counts: scoped to the departments', $DB_LOG[0], 't.dept_id IN (1,2)')
 check_has('counts: previous period starts one length before', $DB_LOG[0], 'FROM_UNIXTIME(0)');
 $DB_ROWS = array('COUNT(CASE' => 'throw');
 check('counts: failed query = zeros', cdr_dash_counts(1, 2, '1'), array('received' => 0, 'previous' => 0, 'open_n' => 0, 'unassigned' => 0, 'overdue' => 0, 'closed_n' => 0));
+// m5: an SQL error (db_query() returns false): no data, core's logging off (no alert mail), one log line
+$DB_ROWS = array('COUNT(CASE' => 'false', 'ost_help_topic h' => 'false');
+$DB_LOGERR = array();
+check('fetch: SQL error = zeros', cdr_dash_counts(1, 2, '1'), array('received' => 0, 'previous' => 0, 'open_n' => 0, 'unassigned' => 0, 'overdue' => 0, 'closed_n' => 0));
+check('fetch: SQL error = no topic', cdr_dash_topics(1, 2, '1'), array());
+check('fetch: core\'s SQL error logging (alert mail) is off for every query', in_array(true, $DB_LOGERR, true), false);
+check('fetch: one log line for all the failures of the request', errlog_count('a panel query failed'), 1);
+$_SESSION = array();
+cdr_dash_log_once('session-test', 'x1');
+cdr_dash_log_once('session-test', 'x2');
+check('log once: once per key', errlog_count('dashboard: x'), 1);
+check('log once: remembered in the session', $_SESSION['cdr_dash_logged']['session-test'] ?? null, 1);
+unset($_SESSION);
 
 $DB_LOG = array();
 $DB_ROWS = array('MIN(te.created)' => array(
@@ -223,21 +258,37 @@ check_has('priority rows: client reply = "to" recipient', $DB_LOG[0], 'te.recipi
 check_has('priority rows: neither hidden nor system', $DB_LOG[0], '(te.flags & 132)=0');
 check_has('priority rows: scoped', $DB_LOG[0], 't.dept_id IN (1,2)');
 check('priority rows: answered ticket keeps its first reply and author', array($pr[1]['window']['first'] - $pr[1]['window']['start'], $pr[1]['first_staff']), array(1200, 2));
+// m4: the cap (test seam CDR_DASH_PRIORITY_LIMIT = 2): open tickets first, flag and one log line
+check_has('priority rows: capped by CDR_DASH_PRIORITY_LIMIT', $DB_LOG[0], 'LIMIT 2');
+check_has('priority rows: open tickets first, then the most recent', $DB_LOG[0], "ORDER BY (s.state='open') DESC, t.created DESC");
+$tr = null;
+cdr_dash_priority_rows(2, $from, '1', 4, CDR_DASH_PRIORITY_LIMIT, $tr);
+check('priority rows: cap reached = truncated', $tr, true);
+$tr = null;
+cdr_dash_priority_rows(2, $from, '1', 4, 50, $tr);
+check('priority rows: under the cap = not truncated', $tr, false);
+check('priority rows: one log line for the cap', errlog_count('Priority tickets or more in scope'), 1);
 
 $DB_LOG = array();
 $DB_ROWS = array('FROM ost_staff' => array(array('staff_id' => '5', 'firstname' => 'Théo', 'lastname' => 'Martin', 'dept' => 'Support', 'open_n' => '20')));
 $ag = cdr_dash_agents($st, 't.dept_id IN (1,2)');
 check('agents: row', $ag, array(array('id' => 5, 'name' => 'Théo Martin', 'dept' => 'Support', 'open' => 20)));
 check_has('agents: the viewer only without permission', $DB_LOG[0], 'WHERE st.isactive=1 AND (st.staff_id=7)');
+$st->admin = true;
+$DB_LOG = array();
+cdr_dash_agents($st, 't.dept_id IN (1,2)');
+check_has('agents: an administrator without "stats.agents" sees the viewer only (as core)', $DB_LOG[0], 'WHERE st.isactive=1 AND (st.staff_id=7)');
+$st->admin = false;
 $st->perm = true;
 $DB_LOG = array();
 cdr_dash_agents($st, 't.dept_id IN (1,2)');
-check_has('agents: all departments with the permission', $DB_LOG[0], '(st.staff_id=7 OR st.dept_id IN (1,2))');
+check_has('agents: all departments with the permission', $DB_LOG[0], '(st.staff_id=7 OR st.dept_id IN (1,2)');
+check_has('agents: extended access counts as membership', $DB_LOG[0], ' OR st.staff_id IN (SELECT da.staff_id FROM ost_staff_dept_access da WHERE da.dept_id IN (1,2)))');
 $st->perm = false;
 $st->managed = array(2);
 $DB_LOG = array();
 cdr_dash_agents($st, 't.dept_id IN (1,2)');
-check_has('agents: managed departments', $DB_LOG[0], '(st.staff_id=7 OR st.dept_id IN (2))');
+check_has('agents: managed departments', $DB_LOG[0], '(st.staff_id=7 OR st.dept_id IN (2) OR st.staff_id IN (SELECT da.staff_id FROM ost_staff_dept_access da WHERE da.dept_id IN (2)))');
 
 $DB_ROWS = array('ost_help_topic h' => array(array('topic_id' => '12', 'topic' => 'Incident', 'n' => '8'), array('topic_id' => '13', 'topic' => '', 'n' => '1')));
 check('topics: unnamed topic skipped', cdr_dash_topics(1, 2, '1'), array(array('name' => 'Incident', 'n' => 8)));
@@ -294,6 +345,61 @@ check_has('agents: first-reply column with Priority data', $ap, 'First reply met
 check_has('agents: no data = dash', $ap, "\xE2\x80\x94");
 $m['prio'] = null;
 check_not('agents: no first-reply column without Priority data', cdr_dash_agents_panel($m), 'First reply met');
+
+// ---------- m2: period in database time for the SQL, UTC for comparisons and display ----------
+$nowU = strtotime('2026-11-02 11:00:00 UTC');
+$fromU = $nowU - 30 * 86400;
+Misc::$off = 14 * 3600;   // a database 14 h ahead of UTC (Pacific/Kiritimati)
+$range = array('FROM_UNIXTIME(' . ($fromU + Misc::$off) . ')', 'FROM_UNIXTIME(' . ($nowU + Misc::$off) . ')');
+$per = cdr_dash_period($range);
+check('period: database times kept for the SQL', array($per['db_from'], $per['db_to']), array($fromU + Misc::$off, $nowU + Misc::$off));
+check('period: UTC for the rest', array($per['from'], $per['to']), array($fromU, $nowU));
+check('period: invalid range', cdr_dash_period(array('x', 'y')), null);
+check('period: end before start', cdr_dash_period(array('FROM_UNIXTIME(5)', 'FROM_UNIXTIME(4)')), null);
+// tickets 2 h inside and 2 h outside the period start; the database stores its own wall time
+$dbText = function ($utc) { return gmdate('Y-m-d H:i:s', $utc + Misc::$off); };
+$edge = array(
+    array('id' => 41, 'number' => '41', 'open' => false, 'staff_id' => 0, 'first_staff' => 5,
+        'window' => cdr_dash_window(array('created' => $dbText($fromU + 7200), 'first' => $dbText($fromU + 7200 + 1800)), 4)),
+    array('id' => 42, 'number' => '42', 'open' => false, 'staff_id' => 0, 'first_staff' => 5,
+        'window' => cdr_dash_window(array('created' => $dbText($fromU - 7200), 'first' => $dbText($fromU - 7200 + 1800)), 4)),
+);
+check('period: the ticket\'s window is in UTC', $edge[0]['window']['start'], $fromU + 7200);
+$sEdge = cdr_dash_priority_summary($edge, $per['from'], $per['to'], $nowU);
+check('period: ticket 2 h after the start counted, the one 2 h before not', array($sEdge['answered'], $sEdge['by_staff'][5]['decided'] ?? 0), array(1, 1));
+check('period: (database times against UTC windows would drop it: the old mix)',
+    cdr_dash_priority_summary($edge, $per['db_from'], $per['db_to'], $nowU)['answered'], 0);
+$mEdge = array('from' => $per['from'], 'to' => $per['to'], 'hours' => 4, 'queue' => '', 'counts' => null, 'prio' => null);
+check_has('period: subtitle shows the UTC dates', cdr_dash_head($mEdge), 'From 3 Oct 2026 to 2 Nov 2026.');
+$mEdge['to'] = $per['db_to'];
+check_has('period: (the database time would show the next day: the old subtitle)', cdr_dash_head($mEdge), 'to 3 Nov 2026.');
+Misc::$off = 0;
+check('period: UTC database = same values', cdr_dash_period(array('FROM_UNIXTIME(100)', 'FROM_UNIXTIME(200)')), array('db_from' => 100, 'db_to' => 200, 'from' => 100, 'to' => 200));
+
+// ---------- m6: "View the N tickets" = core's ad hoc search of exactly those tickets ----------
+check('risk criteria: numbers as one anchored pattern, duplicates once',
+    cdr_dash_risk_criteria(array(array('number' => '111'), array('number' => '222'), array('number' => '111'))),
+    array(array('number', 'match', '^(111|222)$')));
+check('risk criteria: letters and hyphen allowed', cdr_dash_risk_criteria(array(array('number' => 'AB-12'))), array(array('number', 'match', '^(AB-12)$')));
+check('risk criteria: a number needing escaping = none (queue link)', cdr_dash_risk_criteria(array(array('number' => '1.2'), array('number' => '3'))), null);
+check('risk criteria: nothing at risk', cdr_dash_risk_criteria(array()), null);
+check('risk link: the dashboard redirect when set', cdr_dash_risk_link(array('risk_url' => '/scp/dashboard.php?cdr_risk=1', 'queue' => '/q')), '/scp/dashboard.php?cdr_risk=1');
+check('risk link: else the queue', cdr_dash_risk_link(array('queue' => '/q')), '/q');
+$mr = $m;
+$mr['prio'] = $s;
+$mr['risk_url'] = '/scp/dashboard.php?cdr_risk=1';
+check_has('head: several tickets = the list of exactly those, full load', cdr_dash_head($mr), '<a class="btn btn-primary-dark no-pjax" href="/scp/dashboard.php?cdr_risk=1">View the 2 tickets</a>');
+$mr['prio']['risk'] = array_fill(0, 6, $s['risk'][0]);
+check_has('risk panel: "View all" = the same list', cdr_dash_risk_panel($mr), '<a class="more no-pjax" href="/scp/dashboard.php?cdr_risk=1">View all (6)</a>');
+
+// ---------- m4: note when the Priority rows were capped ----------
+$mt = $m;
+$mt['prio'] = $s;
+check_not('note: none without the cap', cdr_dash_head($mt), 'cdr-dash-note');
+$mt['truncated'] = 3000;
+check_has('note: shown when capped', cdr_dash_head($mt), '<p class="cdr-dash cdr-dash-note">Average and rate computed on the 3,000 most recent Priority tickets (open ones first).</p>');
+$mt['prio'] = null;
+check_not('note: not without Priority data', cdr_dash_head($mt), 'cdr-dash-note');
 
 // ---------- injection into core's page ----------
 $core = "<script src=\"x\"></script>\n<form method=\"post\" action=\"dashboard.php\">\n<div id=\"basic_search\">bar</div>\n"

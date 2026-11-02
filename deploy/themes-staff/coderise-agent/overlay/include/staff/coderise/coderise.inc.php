@@ -15,6 +15,10 @@
        - cdr_icon()            inline line icons (no icon font, no request)
        - cdr_initials()        initials of a name, instead of remote avatars
        - cdr_asset()           URL of a theme asset, with a cache-busting version
+       - cdr_layout_version()  PJAX layout version (core's + the theme's assets)
+       - cdr_page_kind()       agent, dashboard or admin page
+       - cdr_page_assets()     the sheets and scripts of a page kind only
+       - cdr_page_version()    the PJAX version of a page kind
        - cdr_duration()        "44 min", "3 h 27"
     3. First-reply gauge (Priority support contract)
        - cdr_gauge_state()     pure computation of the gauge from timestamps
@@ -280,6 +284,40 @@ if (!defined('CDR_VERSION')) {
         if ($self)
             $cached = $v;
         return $v;
+    }
+
+    /**
+     * Kind of a staff page, for the stylesheets and scripts it needs beyond
+     * the common ones: 'admin' (ADMINPAGE: admin.css, admin.js), 'dashboard'
+     * (scp/dashboard.php: dash.css) or 'agent' (nothing more).
+     */
+    function cdr_page_kind($script, $admin = false) {
+        if ($admin)
+            return 'admin';
+        return basename((string) $script) === 'dashboard.php' ? 'dashboard' : 'agent';
+    }
+
+    /** array('css' => [...], 'js' => [...]): the files of scp/coderise/ only a page kind loads. */
+    function cdr_page_assets($kind) {
+        if ($kind === 'admin')
+            return array('css' => array('css/admin.css'), 'js' => array('js/admin.js'));
+        if ($kind === 'dashboard')
+            return array('css' => array('css/dash.css'), 'js' => array());
+        return array('css' => array(), 'js' => array());
+    }
+
+    /**
+     * PJAX layout version of a page kind: cdr_layout_version(), plus
+     * "-admin" or "-dashboard". A PJAX response only replaces
+     * #pjax-container, never <head>: going by PJAX to a page of another kind
+     * would leave it without its sheets (or keep the previous page's). Its
+     * X-PJAX-Version then differs from the meta of the page in the browser
+     * and jquery.pjax loads it in full instead, with its own <head>. Core
+     * already makes the admin / agent switch and the Dashboard tab full loads.
+     */
+    function cdr_page_version($kind, $dir = null) {
+        $v = cdr_layout_version($dir);
+        return ($kind === 'admin' || $kind === 'dashboard') ? $v . '-' . $kind : $v;
     }
 
     /** "44 min", "3 h 27", "1 h 05": whole minutes (seconds are dropped). */

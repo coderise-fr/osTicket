@@ -14,6 +14,25 @@
 if (!defined('INCLUDE_DIR')) die('Access Denied');
 require_once INCLUDE_DIR . 'staff/coderise/coderise.inc.php';
 
+// Coderise shell: page kind, from what the controller set before this include
+$cdr_script = basename($_SERVER['SCRIPT_NAME']);
+$cdr_inc = isset($inc) ? (string) $inc : '';
+// scp/index.php only does require('tickets.php'): same page as tickets.php
+if ($cdr_script === 'index.php' && $cdr_inc !== '')
+    $cdr_script = 'tickets.php';
+$cdr_admin = defined('ADMINPAGE');
+// Sheets and scripts of this kind of page only (admin.css + admin.js, dash.css), and the
+// PJAX version that makes a PJAX link to another kind of page a full load (cdr_page_version())
+$cdr_kind = cdr_page_kind($cdr_script, $cdr_admin);
+$cdr_assets = cdr_page_assets($cdr_kind);
+$cdr_version = cdr_page_version($cdr_kind);
+// Dashboard, "View the N tickets" (scp/dashboard.php?cdr_risk=1): core's ad hoc search of the
+// tickets at risk, then a redirect to it; before any output (coderise/dashboard.inc.php)
+if ($cdr_script === 'dashboard.php' && isset($_GET['cdr_risk']) && !$_POST) {
+    require_once INCLUDE_DIR . 'staff/coderise/dashboard.inc.php';
+    cdr_dash_risk_redirect(isset($thisstaff) ? $thisstaff : null);
+}
+
 header("Content-Type: text/html; charset=UTF-8");
 header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'");
 
@@ -40,7 +59,7 @@ if (osTicket::is_ie())
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="x-pjax-version" content="<?php echo cdr_h(cdr_layout_version()); ?>">
+    <meta http-equiv="x-pjax-version" content="<?php echo cdr_h($cdr_version); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#000F26">
     <title><?php echo Format::htmlchars($title); ?></title>
@@ -73,13 +92,16 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/ticket-chrome.css')); ?>"/>
     <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/queue.css')); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/admin.css')); ?>"/>
-    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset('css/dash.css')); ?>"/>
+<?php foreach ($cdr_assets['css'] as $cdr_f) { ?>
+    <link type="text/css" rel="stylesheet" href="<?php echo cdr_h(cdr_asset($cdr_f)); ?>"/>
+<?php } ?>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/coderise.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/ticket-chrome.js')); ?>"></script>
     <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/queue.js')); ?>"></script>
-    <script type="text/javascript" src="<?php echo cdr_h(cdr_asset('js/admin.js')); ?>"></script>
+<?php foreach ($cdr_assets['js'] as $cdr_f) { ?>
+    <script type="text/javascript" src="<?php echo cdr_h(cdr_asset($cdr_f)); ?>"></script>
+<?php } ?>
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="<?php echo cdr_h(cdr_asset('img/favicon.svg')); ?>" />
 
@@ -103,8 +125,9 @@ if (osTicket::is_ie())
     ?>
     <div id="pjax-container" class="<?php if ($_POST) echo 'no-pjax'; ?>">
 <?php } else {
-    // same value as the meta of a full page: core's version + the theme's assets
-    header('X-PJAX-Version: ' . cdr_layout_version());
+    // same value as the meta of a full page of this kind: core's version + the theme's assets
+    // (+ the page kind: a PJAX link to another kind of page is loaded in full by jquery.pjax)
+    header('X-PJAX-Version: ' . $cdr_version);
     if ($pjax = $ost->getExtraPjax()) { ?>
     <script type="text/javascript">
     <?php foreach (array_filter($pjax) as $s) echo $s.";"; ?>
@@ -117,13 +140,7 @@ if (osTicket::is_ie())
     <title><?php echo ($ost && ($title=$ost->getPageTitle()))?$title:'osTicket :: '.__('Staff Control Panel'); ?></title><?php
 } # endif X_PJAX
 
-// Coderise shell: page kind, from what the controller set before this include
-$cdr_script = basename($_SERVER['SCRIPT_NAME']);
-$cdr_inc = isset($inc) ? (string) $inc : '';
-// scp/index.php only does require('tickets.php'): same page as tickets.php
-if ($cdr_script === 'index.php' && $cdr_inc !== '')
-    $cdr_script = 'tickets.php';
-$cdr_admin = defined('ADMINPAGE');
+// Coderise shell ($cdr_script, $cdr_inc and $cdr_admin are set at the top)
 // Ticket view: tickets.php with an id and no "a" (edit/print are other pages)
 $cdr_ticket_view = ($cdr_inc !== '')
     ? ($cdr_inc === 'ticket-view.inc.php')

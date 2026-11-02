@@ -45,7 +45,11 @@ overlay="$here/overlay"
 # date/number formats and default queue helpers it calls, the schema signature
 # of the tables its aggregate queries read, the first-response definition of the
 # SLA contrib it repeats; the admin list templates whose status / name columns
-# admin.js dresses, the plugins title it trims). The replaced files themselves
+# admin.js dresses, the plugins title it trims; minor pass: jquery.pjax.js, whose
+# version check turns a PJAX link to another kind of page into a full load (admin.css,
+# admin.js and dash.css are loaded by their pages only), mysqli.php for the db_query()
+# logging flag and db_error() of the dashboard queries, and the ad hoc search of
+# "View the N tickets" in scp/tickets.php / class.search.php). The replaced files themselves
 # are in BASE.sha256 (computed from overlay/).
 WATCH_FILES="
 scp/index.php
@@ -66,6 +70,7 @@ scp/js/thread.js
 scp/js/tips.js
 scp/js/jquery.dropdown.js
 scp/js/bootstrap-tooltip.js
+js/jquery.pjax.js
 js/filedrop.field.js
 js/redactor-osticket.js
 scp/css/scp.css
@@ -91,6 +96,7 @@ include/class.report.php
 include/class.topic.php
 include/class.format.php
 include/class.config.php
+include/mysqli.php
 include/upgrader/streams/core.sig
 include/ajax.tickets.php
 include/ajax.search.php

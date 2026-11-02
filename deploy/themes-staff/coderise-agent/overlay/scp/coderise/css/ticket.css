@@ -50,6 +50,8 @@
 /* B13. Message body: Inter 13.5/20.25 on the container only (core thread.css
    forces Helvetica 14px !important); rich content with inline styles wins. */
 #content.cdr-ticket .thread-entry > .thread-body { font-family: var(--f-texte); font-size: 13.5px !important; line-height: 20.25px; }
+/* the one em length of the theme, on purpose: rich content (inline font sizes of the message)
+   keeps a paragraph gap proportional to its own text */
 #content.cdr-ticket .thread-entry > .thread-body p { margin: 0 0 .6em; }
 #content.cdr-ticket .thread-entry > .thread-body p:last-child { margin-bottom: 0; }
 
