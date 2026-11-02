@@ -212,6 +212,7 @@ return array(
     'Target of %s missed' => 'Objectif de %s manqué',
     'First replies within the target' => "Premiers retours dans l'objectif",
     'No Priority ticket to measure in this period' => 'Aucun ticket Priority à mesurer sur cette période',
+    'Average and rate computed on the %s most recent Priority tickets (open ones first).' => "Moyenne et taux calculés sur les %s tickets Priority les plus récents (les ouverts d'abord).",
     '%1$d of %2$d Priority tickets' => '%1$d sur %2$d tickets Priority',
     'Tickets closed' => 'Tickets fermés',
     'In this period' => 'Sur cette période',

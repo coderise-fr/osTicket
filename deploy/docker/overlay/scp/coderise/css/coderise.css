@@ -450,7 +450,7 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul { min-width: 180px; margin: 0; padding: 4px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); font: 400 13.5px/1.35 var(--f-texte); text-align: start; }
 :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li { line-height: 1.35; }
 :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 6px; color: var(--nuit); text-decoration: none; white-space: nowrap; }
-:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a i { flex: none; width: 1.1em; margin: 0; color: var(--cyan-profond); text-align: center; }
+:is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a i { flex: none; width: 14.85px; margin: 0; color: var(--cyan-profond); text-align: center; }
 :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li > a:hover,
 :is(#content, body) :is(.action-dropdown, .noclick-dropdown) ul li.active > a:hover { background: var(--voile); color: var(--nuit) !important; } /* core: #FFF !important */
 :is(#content, body) .action-dropdown ul li.active > a { background: var(--voile); color: var(--nuit); font-weight: 600; }
@@ -465,7 +465,7 @@ html.rtl :is(#content, .dialog) table.list > tbody > tr.highlight > td:first-chi
 /* ───────── Dialogs (.dialog, #popup, #alert) ───────── */
 #overlay { background: var(--nuit); opacity: .55; }
 .dialog { padding: 20px 24px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.1), 0 24px 64px rgba(0,15,38,.35); color: var(--nuit); font-size: 13.5px; }
-.dialog h3:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *), .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 3em; color: var(--nuit); font: 700 18px/1.3 var(--f-titre); }
+.dialog h3:not(:is(.thread-body, .redactor-box, [contenteditable], .quicknote, .cat-desc) *), .dialog h3.drag-handle { margin: 0 0 4px; padding: 0; padding-inline-end: 54px; color: var(--nuit); font: 700 18px/1.3 var(--f-titre); }
 .dialog a { color: var(--cyan-profond); }
 .dialog a.close { top: 16px; right: 18px; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--nuit); font-size: 16px; text-decoration: none; }
 html.rtl .dialog a.close { right: auto; left: 18px; }
@@ -519,7 +519,7 @@ body:not(.cdr-login) #loading h1 { color: var(--nuit); font: 600 16px var(--f-ti
 :is(#content, .dialog) i.help-tip { color: var(--ardoise); opacity: 1; }
 :is(#content, .dialog) i.help-tip:hover { color: var(--cyan-profond) !important; } /* core: orange !important */
 .tip_box .tip_content { box-sizing: border-box; min-width: min(400px, calc(100vw - 24px)); max-width: calc(100vw - 24px); padding: 14px 16px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 13.5px/1.5 var(--f-texte); }
-.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 0 8px; padding-inline-end: 1.5em; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 16px/1.3 var(--f-titre); }
+.tip_box .tip_content h1 { margin: 0 0 8px; padding: 0 0 8px; padding-inline-end: 24px; border-bottom: 1px solid var(--gris); color: var(--nuit); font: 700 16px/1.3 var(--f-titre); }
 .tip_box .tip_content .links { border-top-color: var(--gris); }
 .tip_box .tip_content a, .tip_box .tip_content .links a { color: var(--cyan-profond); }
 .tip_box .tip_close { color: var(--nuit); }
@@ -554,10 +554,15 @@ body .tooltip.right .tooltip-arrow { border-right-color: var(--nuit); }
 /* ───────── Date picker (jQuery UI #ui-datepicker-div, appended to body) ─────────
    Core ships the orange "ui-lightness" theme; the id weight beats its
    .ui-state-* classes. Today = voile with a cyan-profond ring, the chosen day
-   = nuit; past days stay disabled by core (opacity). */
+   = nuit; past days stay disabled by core (opacity).
+   Stacking: no z-index here on purpose. jQuery UI writes "ancestor + 1" inline
+   (1 on an admin page, 11 in a dialog) and core's scp.css forces
+   .ui-datepicker { z-index: 200 !important }: above the pinned save bar (4),
+   the top bar (5) and the dialogs (10), measured. An #ui-datepicker-div rule
+   with !important would beat core's (id weight) and could only lower it. */
 #ui-datepicker-div { padding: 6px; border: 0; border-radius: 10px; background: var(--blanc); box-shadow: var(--cdr-ring); color: var(--nuit); font: 400 13px/1.35 var(--f-texte); }
 #ui-datepicker-div .ui-datepicker-header { border: 0; border-radius: 6px; background: var(--nuit); color: var(--blanc); }
-#ui-datepicker-div .ui-datepicker-title { color: var(--blanc); font: 700 13px/1.8em var(--f-titre); }
+#ui-datepicker-div .ui-datepicker-title { color: var(--blanc); font: 700 13px/23.4px var(--f-titre); }
 #ui-datepicker-div :is(.ui-datepicker-prev, .ui-datepicker-next) { border: 0; background: none; cursor: pointer; }
 #ui-datepicker-div :is(.ui-datepicker-prev, .ui-datepicker-next):hover { border: 0; border-radius: 4px; background: rgba(255,255,255,.16); }
 #ui-datepicker-div th { color: var(--ardoise); font: 600 12px var(--f-titre); }
@@ -838,7 +843,7 @@ html.rtl #content.cdr-ticket .thread-entry.cdr-latest:not(.note) { box-shadow: i
 #content.cdr-ticket aside.cdr-props > table.custom-data > :is(thead, tbody),
 #content.cdr-ticket aside.cdr-props > table.custom-data > thead > tr { display: block; width: auto; margin: 0; padding: 0; border: 0; background: none; }
 #content.cdr-ticket aside.cdr-props > table.ticket_info table tr,
-#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
+#content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr { display: grid; grid-template-columns: 114.75px minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 16px; }
 #content.cdr-ticket aside.cdr-props > table.ticket_info table tr:nth-child(even),
 #content.cdr-ticket aside.cdr-props > table.custom-data > tbody > tr:nth-child(even) { background: var(--gris); }
 #content.cdr-ticket aside.cdr-props > table.ticket_info:not(.custom-data) table :is(th, td),
@@ -1047,8 +1052,8 @@ body.cdr-login > #loginBox > #logo a img { position: absolute; width: 1px; heigh
 .cdr-login .login-wrap #loginBox { width: auto; margin: 0; padding: 48px 44px 28px; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
 .cdr-login .login-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 40px 48px; text-align: start; }
 .cdr-login .login-art .logo { display: block; height: 30px; width: auto; }
-.cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); }
-.cdr-login .login-art .hook { margin: 0; max-width: 13em; color: var(--blanc); font: 800 36px/1.12 var(--f-titre); }
+.cdr-login .login-art p { position: relative; z-index: 1; margin: 16px 0 0; max-width: 450px; color: rgba(255,255,255,.88); }
+.cdr-login .login-art .hook { margin: 0; max-width: 468px; color: var(--blanc); font: 800 36px/1.12 var(--f-titre); }
 .cdr-login .login-art .signature { margin: 0; color: var(--blanc); font-weight: 600; font-size: 14px; }
 .cdr-login .login-art .signature .up { color: var(--cyan); }
 .cdr-login .login-art .sommet { position: absolute; inset-inline-end: -4%; bottom: -8%; width: 54%; aspect-ratio: 1 / .9; background: var(--cyan); opacity: .16; clip-path: polygon(50% 0, 100% 100%, 78% 100%, 50% 40%, 22% 100%, 0 100%); }
@@ -1057,7 +1062,7 @@ body.cdr-login > #loginBox > #logo a img { position: absolute; width: 1px; heigh
 @media (max-width: 860px) {
   .cdr-login .login-wrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .cdr-login .login-art { gap: 20px; padding: 24px 24px 28px; }
-  .cdr-login .login-art .hook { font-size: 24px; }
+  .cdr-login .login-art .hook { max-width: 312px; font-size: 24px; }
   .cdr-login .login-art .hook ~ p, .cdr-login .login-art .signature { display: none; }
   .cdr-login .login-art .sommet { width: 70%; opacity: .12; }
   .cdr-login .login-wrap #loginBox { padding: 28px 24px 24px; }
@@ -1073,7 +1078,7 @@ body.cdr-login > #loginBox > #logo a img { position: absolute; width: 1px; heigh
    the absolute legend (inline style) are replaced here, hence the !important. */
 #content form[action="dashboard.php"] #basic_search > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 0; }
 #content form[action="dashboard.php"] #basic_search label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 600; }
-#content form[action="dashboard.php"] #basic_search input.dp { width: 9.5em; }
+#content form[action="dashboard.php"] #basic_search input.dp { width: 128.25px; }
 #content form[action="dashboard.php"] #basic_search button[type=submit] { margin: 0; }
 #content div:has(> #line-chart-here) { margin-bottom: 20px !important; padding: 12px 14px 10px; border-radius: 10px; background: var(--blanc); box-shadow: 0 0 0 1px rgba(0,15,38,.12); }
 #content #line-chart-here { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; filter: none; overflow-x: auto; overflow-y: hidden; }

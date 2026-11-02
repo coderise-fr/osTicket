@@ -10,7 +10,7 @@ body.cdr-login .login-art p { margin: 16px 0 0; }
 body.cdr-login .login-art .hook { margin: 0; }
 body.cdr-login .login-art .logo { display: inline; } /* the mockup logo is inline (its line box sets the height of the first block, hence the headline position) */
 /* The signature is a <p> in the mockup: Montserrat 15px, same white as the other paragraphs */
-body.cdr-login .login-art .signature { margin: 16px 0 0; max-width: 30em; color: rgba(255,255,255,.88); font: 600 15px/1.6 var(--f-titre); }
+body.cdr-login .login-art .signature { margin: 16px 0 0; max-width: 450px; color: rgba(255,255,255,.88); font: 600 15px/1.6 var(--f-titre); }
 /* The mark (tokens.css .sommet): 409/342 ratio and its own polygon; 54 % wide, -4 % / -8 % off the corner */
 body.cdr-login .login-art .sommet { aspect-ratio: 409 / 342; clip-path: polygon(49.9% 0, 100% 100%, 84.1% 100%, 49.9% 29.8%, 15.9% 100%, 0 100%); }
 
@@ -51,7 +51,7 @@ body.cdr-login #loginBox button[type=submit] > i { display: none; }
 @media (max-width: 860px) {
   body.cdr-login .login-wrap { grid-template-rows: none; }
   body.cdr-login .login-art { gap: 28px; padding: 28px 24px 36px; }
-  body.cdr-login .login-art .hook { font-size: 26px; }
+  body.cdr-login .login-art .hook { max-width: 338px; font-size: 26px; } /* 13 x the font size */
   body.cdr-login .login-art .hook ~ p { display: block; }
   body.cdr-login .login-art .signature { display: block; }
   body.cdr-login .login-art .sommet { width: 54%; opacity: .16; }
