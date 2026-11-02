@@ -187,13 +187,14 @@ traduit pas déjà le texte (le pack l'emporte : « Services » pour les départ
 (`coderise-agent`) et le pack `fr.phar` : ils arrivent avec l'image. Le pack reste **inactif** tant
 qu'un administrateur n'a pas choisi Français comme langue principale (Admin > Paramètres > Système)
 et, pour chaque agent, sa langue dans son profil (la commande `language` n'existe que pour la démo
-locale). À savoir avant de mettre en service : le durcissement d'Apache de l'image refuse les
-requêtes `DELETE`, ce qui casse dans l'interface la suppression des brouillons (bouton « Supprimer le
-brouillon » de l'éditeur, panneau agent et portail client), des organisations, des notes rapides
-d'utilisateur ou d'organisation, des réponses de formulaire et des recherches enregistrées. Seule la
-suppression de brouillon a été constatée, les autres se déduisent du code. Le correctif (autoriser
-`DELETE` sur les seuls routeurs `ajax.php`) n'est **pas appliqué** : il reste à décider et à tester,
-voir « Limites connues » dans `deploy/docker/README.md`.
+locale). À savoir avant de mettre en service : jusqu'au 27/10/2026, le durcissement d'Apache de
+l'image refusait les requêtes `DELETE`, ce qui cassait dans l'interface la suppression des brouillons
+(bouton « Supprimer le brouillon » de l'éditeur, panneau agent et portail client), des organisations,
+des notes rapides d'utilisateur ou d'organisation et des réponses de formulaire. C'est corrigé :
+Apache accepte désormais `DELETE` sur les seuls routeurs `ajax.php` et `scp/ajax.php` (osTicket
+vérifie le jeton CSRF de ces requêtes). Une image construite avant ce correctif doit être
+reconstruite. Détails et tests : « Méthodes HTTP et requêtes `DELETE` » dans
+`deploy/docker/README.md`.
 
 ## 4. Limites à connaître
 

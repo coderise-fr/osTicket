@@ -18,6 +18,7 @@ reverse proxy TLS, par exemple `support.coderise.fr`.
 | `scripts/backup.sh`, `scripts/restore.sh` | Sauvegarde (SQL + volume de configuration) et restauration sur une pile vierge |
 | `overlay/` | Thème, packs de langue et plugins superposés à osTicket (voir son `README.md`) |
 | `scripts/local-demo.sh`, `local-demo/` | Environnement local de **démonstration** (jamais en production) : voir la section du même nom |
+| `tests/test-methods.sh` | Matrice méthode HTTP × chemin d'une instance (POSIX sh + curl, sans effet sur les données) : voir « Méthodes HTTP et requêtes `DELETE` » |
 | `plugins.env` (non versionné) | Variables d'environnement des plugins, par exemple le secret du webhook Stripe |
 
 ## Prérequis
@@ -78,7 +79,7 @@ uniquement depuis les réseaux de `OSTICKET_TRUSTED_PROXIES`.
 | Processus | Utilisateur `www-data` (uid 33), port 8080, aucune capability Linux, `no-new-privileges` |
 | Système de fichiers | Racine en lecture seule, code appartenant à `root` ; seuls `/tmp` (tmpfs, `noexec`) et `/run/apache2` sont inscriptibles |
 | Configuration | `ost-config.php` (mot de passe de la base, `SECRET_SALT`) vit dans un volume dédié, monté **en lecture seule** en production ; le conteneur refuse de démarrer s'il est inscriptible |
-| Apache | Liste blanche de 13 modules, pas de `.htaccess` hors 4 dossiers de routage, `include/` et fichiers `*.inc.php`, `bootstrap.php`, `manage.php`, `.git`, `.htaccess` interdits, méthodes limitées à GET/POST/HEAD, `TRACE` refusé, limites de requête, en-têtes de sécurité, HSTS conditionnel |
+| Apache | Liste blanche de 13 modules, pas de `.htaccess` hors 4 dossiers de routage, `include/` et fichiers `*.inc.php`, `bootstrap.php`, `manage.php`, `.git`, `.htaccess` interdits, méthodes limitées à GET/POST/HEAD (plus `DELETE` sur les deux seuls routeurs AJAX `ajax.php` et `scp/ajax.php`), `TRACE` refusé, limites de requête, en-têtes de sécurité, HSTS conditionnel |
 | PHP | Réglages de production, `display_errors` coupé, `disable_functions` (`exec`, `system`, `shell_exec`, `passthru`, `popen`, `proc_open`, ...), `open_basedir`, cookies de session `HttpOnly`, `SameSite=Lax` et `Secure`, OPcache sans revalidation |
 | Base de données | Aucun port publié, réseau `internal` sans accès Internet, mots de passe en secrets Docker, `--local-infile=0`, racine en lecture seule |
 | Exploitation | Limites mémoire, CPU et processus, journaux Docker avec rotation, contrôles de santé (web, cron, base) |
@@ -106,6 +107,9 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 - **PHP 8.3** (image construite avec `PHP_IMAGE=php:8.3-apache-bookworm`) : installation par
   l'assistant, 44 pages d'administration, PDF, pièce jointe, extension `imap`. PHP 8.4 : voir
   « Versions supportées ».
+- **Méthodes HTTP** (27/10/2026) : `DELETE` accepté sur les seuls routeurs AJAX, matrice de
+  113 requêtes avant/après et suppressions réelles dans le panneau agent : voir « Méthodes HTTP et
+  requêtes `DELETE` ».
 
 ### Non vérifié
 
@@ -127,6 +131,115 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 | osTicket | v1.18.x (tête de `develop`) ; migration depuis v1.17.8 | La version affichée est `1.18-git` (les builds ne portent pas le numéro de release). |
 | Debian | bookworm | trixie : `libc-client-dev` n'existe plus, la construction échoue. |
 
+### Méthodes HTTP et requêtes `DELETE` (issue #8, corrigé le 27/10/2026)
+
+**Historique.** Depuis le commit `6e7f290d`, `conf/apache2.conf` (bloc `<Directory "/var/www/html">`,
+`Require method GET POST HEAD`) refusait toute requête `DELETE` (403 d'Apache), or osTicket en envoie
+par AJAX. Constaté le 24/10/2026 sur la démo locale (`DELETE /scp/ajax.php/draft/<id>` → 403, le
+brouillon restait). Fonctions cassées : suppression d'un **brouillon** depuis l'éditeur (panneau
+agent et portail client), d'une **note rapide** d'utilisateur ou d'organisation, d'une
+**organisation** depuis sa page, d'une **réponse de formulaire**.
+
+**Correctif.** `DELETE` est accepté **uniquement** quand le fichier exécuté est l'un des deux routeurs
+AJAX, testé sur le chemin du fichier (`REQUEST_FILENAME`, info de chemin déjà retirée) et non sur
+l'URL :
+
+```apache
+<RequireAll>
+    Require all granted
+    <RequireAny>
+        Require method GET POST HEAD
+        <RequireAll>
+            Require method DELETE
+            Require expr "%{REQUEST_FILENAME} in { '/var/www/html/ajax.php', '/var/www/html/scp/ajax.php' }"
+        </RequireAll>
+    </RequireAny>
+</RequireAll>
+```
+
+Pourquoi pas un `<LocationMatch "^/(scp/)?ajax\.php/">` avec `Require all granted` (piste notée dans
+l'issue) : les sections `Location` sont fusionnées **après** `Directory` et `Files`, et leurs `Require`
+**remplacent** les précédents (`AuthMerging Off` par défaut). Une telle section rouvrirait tout ce
+que son expression couvre, refus de `include/` et des fichiers cachés compris, et ferait dépendre la
+sécurité du lien entre l'URL et le fichier. Ici, la règle reste dans le bloc `Directory` de la racine :
+aucune nouvelle section n'accorde d'accès, les refus (`include/`, `.htaccess`, `*.inc.php`, sauvegardes,
+`bootstrap.php`, `manage.php`) sont fusionnés après elle et l'emportent toujours. `PUT`, `PATCH`,
+`OPTIONS`, `PROPFIND`, etc. restent refusés partout (403), `TRACE` aussi (405, `TraceEnable Off`).
+La règle échoue en position fermée : un passage futur à PHP-FPM (`ProxyPassMatch`) changerait
+`REQUEST_FILENAME` en `proxy:fcgi://…` et `DELETE` serait de nouveau refusé, sans rien ouvrir ; à
+reprendre lors d'une telle migration.
+
+Ce que `DELETE` expose : les routes `url_delete` de `scp/ajax.php` (`draft/<id>`, `note/<id>`,
+`form/answer/<entry>/<field>`, `orgs/<id>/delete`, `tickets/search/<id>`) et de `ajax.php`
+(`draft/<id>`), **mais aussi** toutes les routes déclarées par `url()` sans méthode imposée (une
+soixantaine dans `scp/ajax.php`, par exemple `tickets/<id>/assign`, `staff/<id>/set-password`,
+`queue/<id>/delete`). Pour celles-ci, un vrai `DELETE` arrive avec `$_POST` vide : les gestionnaires
+suivent le chemin « affichage », comme un `GET`, avec en plus le jeton CSRF exigé ; seul
+`ajax.orgs.php` agit sur `REQUEST_METHOD == 'DELETE'` (et exige `org.delete`). Rien de nouveau en
+pratique : le répartiteur d'osTicket accepte déjà `POST` + `_method=DELETE` sur toutes ces routes
+(`include/class.dispatcher.php`), dont un vrai `DELETE` est un sous-ensemble (même méthode vue par PHP,
+sans corps de formulaire), et `scp/staff.inc.php` et `client.inc.php` exigent le jeton CSRF pour
+`DELETE` comme pour `POST` (400 côté agent, redirection côté portail). Un `DELETE` venu d'un autre
+site est de toute façon impossible : il exige une pré-requête `OPTIONS`, refusée (403). Chaque
+gestionnaire applique ensuite **ses propres** contrôles, vérifiés à la lecture : `deleteDraft`
+(agent connecté, propriétaire du brouillon), `deleteNote` (propriétaire ou administrateur),
+`OrgsAjaxAPI::delete` (permission `org.delete`). La route `tickets/search/<id>` pointe vers une
+méthode absente du cœur (500 « Dispatcher compile error ») : l'interface supprime les recherches
+enregistrées par `POST queue/<id>/delete`, jamais touché par la règle.
+
+Deux faiblesses **du cœur d'osTicket**, hors périmètre de ce correctif, existent déjà aujourd'hui par
+`POST` + `_method=DELETE` (ou `POST`) et ne sont pas introduites par lui (à signaler en amont ou à
+corriger à part) :
+
+- `include/ajax.forms.php` `deleteAnswer` ne vérifie que la connexion : tout agent connecté peut
+  supprimer n'importe quelle réponse de formulaire dynamique, sans contrôle d'accès à l'objet.
+- `include/ajax.draft.php` (l. 185-219, `updateDraftClient` et `deleteDraftClient`) compare
+  l'identifiant du client connecté à la colonne `staff_id` du brouillon, où osTicket range aussi bien
+  un identifiant d'agent que de client : le client d'identifiant N peut supprimer ou réécrire les
+  brouillons de l'agent d'identifiant N (constat de lecture du code, non reproduit).
+
+**Test.** `tests/test-methods.sh <URL>` rejoue 113 requêtes (116 avec `OST_SESSID=<cookie d'un agent>`,
+qui ajoute le refus d'un `DELETE` sans jeton CSRF ou avec un jeton forgé) et indique pour chacune si
+Apache a répondu (page d'erreur) ou osTicket. Sans effet sur les tickets, brouillons, notes et
+organisations (identifiants inexistants, pas de jeton), mais **pas sans écriture** : chaque jeton
+refusé ajoute un avertissement « Invalid CSRF Token » au journal système (`ost_syslog` : 1 ligne, 4
+avec `OST_SESSID`) et les requêtes qui atteignent PHP peuvent créer des lignes de session. En
+production, le lancer en connaissance de cause et purger ces lignes au besoin. Le cookie de
+`OST_SESSID` est lu dans l'environnement et passé à curl par un fichier d'en-têtes privé (mode 600,
+`-H @fichier`, curl 7.55 ou plus), jamais sur une ligne de commande visible dans `ps` : utiliser une
+session d'agent jetable et la fermer ensuite. Un serveur injoignable ou muet (code `000`, délai de 10 s
+par requête) compte comme un écart. Code de sortie = nombre d'écarts. Résultat du 27/10/2026, image de la démo
+(commit `f30e2429`, avant) contre l'image corrigée (après) :
+
+| Méthode | Chemin | Avant | Après |
+|---|---|---|---|
+| `DELETE` | `/scp/ajax.php/draft/<id>`, `note/<id>`, `form/answer/…`, `orgs/<id>/delete` | 403 Apache | osTicket (403 « Must login » sans session ; avec session et jeton : 205, 404, 403 « Permission Denied » selon la route) |
+| `DELETE` | `/ajax.php/draft/<id>` (portail) | 403 Apache | osTicket (302 : jeton CSRF absent) |
+| `DELETE` | `/scp/ajax.php/…` connecté, sans jeton ou jeton forgé | 403 Apache | 400 « Valid CSRF Token Required » |
+| `DELETE` | `/`, `/index.php`, `/scp/tickets.php`, `/scp/orgs.php`, `/css/…`, `/js/…`, `/api/…`, `/apps/…`, `/include/…`, `/setup/…`, `/manage.php`, `/.htaccess`, `/.git/config` | 403 | 403 |
+| `DELETE` | `/scp/tickets.php/ajax.php/…`, `/index.php/ajax.php/…`, `/SCP/ajax.php/…`, `/scp/Ajax.php/…` | 403 | 403 |
+| `DELETE`, `GET` | `/ajax.php/../include/ost-config.php`, `/scp/ajax.php/%2e%2e/%2e%2e/include/ost-config.php` | 403 | 403 |
+| `DELETE` | `/scp/ajax.php/..%2f..%2finclude/…`, `/scp/ajax.php%00/…` | 404 | 404 |
+| `PUT`, `PATCH`, `OPTIONS`, `PROPFIND`, `MKCOL`, `COPY`, `MOVE` | routeurs AJAX, `/scp/tickets.php`, `/index.php`, `/api/tickets.json` | 403 | 403 |
+| `TRACE` | idem | 405 | 405 |
+| `CONNECT` | idem | 400 | 400 |
+| `GET` | `/include/…`, `*.inc.php`, `/manage.php`, `/bootstrap.php`, `/.htaccess`, `/README.md` | 403 | 403 |
+| `GET` | `/setup/…` (absent de l'image `runtime`) | 404 | 404 |
+
+Vérifié dans un navigateur (Chromium sans interface, conteneur jetable de l'image corrigée branché
+sur la base de la démo, agent `dev.admin`) : brouillon de réponse enregistré puis supprimé par
+l'icône de l'éditeur (`DELETE /scp/ajax.php/draft/<id>` → 200, éditeur vidé, brouillon absent de
+`ost_draft`) ; note rapide d'organisation supprimée par l'icône (`DELETE /scp/ajax.php/note/<id>` →
+204, en-tête `X-CSRFToken` envoyé, note absente de `ost_note`) ; recherche enregistrée créée puis
+supprimée par l'interface (`POST /scp/ajax.php/queue/<id>/delete` → 201). Liste des modules
+(`apache2 -M`) identique, `apache2 -t` : `Syntax OK`.
+
+Non vérifié : la suppression d'une **organisation** de bout en bout (`dev.admin` n'a pas la permission
+`org.delete` sur la démo ; la route répond « Permission Denied » d'osTicket, plus 403 d'Apache) ; la
+suppression d'un brouillon **côté portail client** avec une session client ; la suppression d'une
+réponse de formulaire (le bouton n'apparaît que pour une réponse à un champ supprimé ; la route
+répond « Answer not found » d'osTicket pour un identifiant inexistant).
+
 ## Limites connues
 
 - **Vulnérabilités du système de base.** Un scan (Docker Scout, 20/10/2026) remonte 26
@@ -146,25 +259,12 @@ Vérifié le 21/10/2026 (tests exécutés, détails dans les sections correspond
 - **Page « Information » de l'administration** (Tableau de bord > Information, `scp/system.php`) :
   erreur fatale `Call to undefined function shell_exec()`, car `shell_exec` est désactivée.
   Constaté sur PHP 8.2 et 8.3 ; sans conséquence pour le reste de l'administration.
-- **Requêtes `DELETE` refusées (403 d'Apache).** `conf/apache2.conf` (bloc `<Directory "/var/www/html">`,
-  `Require method GET POST HEAD`, en place depuis le commit `6e7f290d`) refuse toute requête `DELETE`,
-  or osTicket en envoie par AJAX. Fonctions cassées dans cette image :
-  - suppression d'un **brouillon** depuis l'éditeur (« Supprimer le brouillon », `js/redactor-osticket.js`
-    vers `scp/ajax.php` `draft/<id>` et, côté portail client, `ajax.php` `draft/<id>`) : **constaté** le
-    24/10/2026 sur la démo locale (`DELETE /scp/ajax.php/draft/<id>` → 403, le brouillon reste) ;
-  - suppression d'une **organisation** (Agents > Organisations > Supprimer :
-    `include/staff/templates/org-delete.tmpl.php`, formulaire `method="delete"` envoyé par
-    `scp/js/scp.js` vers `scp/ajax.php` `orgs/<id>/delete`) ;
-  - suppression d'une **note rapide** d'utilisateur ou d'organisation (`scp/js/scp.js` vers
-    `scp/ajax.php` `note/<id>`) ;
-  - suppression d'une **réponse de formulaire** (`scp/ajax.php` `form/answer/<entry>/<field>`) ;
-  - suppression d'une **recherche enregistrée** (`scp/ajax.php` `tickets/search/<id>`).
-  Seule la suppression de brouillon a été constatée ; les autres se déduisent du code (routes
-  `url_delete` des deux routeurs AJAX). Correctif possible, **non appliqué ici** et à décider puis
-  tester à part : autoriser `DELETE` uniquement sur les routeurs AJAX, par exemple
-  `<LocationMatch "^/(scp/)?ajax\.php/">` avec `Require method GET POST HEAD DELETE` (osTicket vérifie
-  déjà le jeton CSRF des `DELETE` : `scp/staff.inc.php` et `client.inc.php`). Contournement en
-  attendant : supprimer une organisation ou un brouillon reste impossible depuis l'interface.
+- **Requêtes `DELETE` : corrigé le 27/10/2026** (issue #8). Les images construites avant ce correctif
+  refusent toute requête `DELETE` (403 d'Apache) et cassent la suppression des brouillons, des notes
+  rapides, des organisations et des réponses de formulaire. Les recherches enregistrées n'étaient pas
+  touchées (l'interface les supprime par `POST`). Historique, règle, raisonnement et matrice de tests :
+  « Méthodes HTTP et requêtes `DELETE` ». Reste à vérifier : suppression d'une organisation de bout en
+  bout par un agent ayant `org.delete`, et d'un brouillon côté portail client.
 - **Pas de `sendmail`** dans l'image : osTicket n'envoie des e-mails que par le SMTP configuré
   dans l'administration (Emails > adresse > SMTP). Sans SMTP, le journal système affiche
   « Unable to email via Sendmail ».
@@ -359,10 +459,10 @@ fichier, mettre à jour son SHA-256 dans `overlay/README.md`, committer et recon
 
 **Passage en production.** L'overlay committé livre le thème du panneau agent `coderise-agent` et
 `fr.phar`. Le pack reste inactif tant qu'un administrateur n'a pas réglé la langue principale (et la
-langue des agents dans leur profil). Avant la mise en service, lire « Requêtes `DELETE` refusées »
-dans « Limites connues » : la suppression des brouillons, des organisations, des notes rapides, des
-réponses de formulaire et des recherches enregistrées ne fonctionne pas avec la configuration Apache
-actuelle (correctif non appliqué, à décider et tester à part).
+langue des agents dans leur profil). Les suppressions AJAX (brouillons, notes rapides, organisations,
+réponses de formulaire), refusées par Apache jusqu'au 27/10/2026, fonctionnent depuis le correctif
+décrit dans « Méthodes HTTP et requêtes `DELETE` » : une image construite avant ce commit les refuse
+encore, reconstruire avant la mise en service.
 
 ### Permissions et exécution (constatées)
 
