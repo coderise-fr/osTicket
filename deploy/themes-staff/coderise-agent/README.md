@@ -28,7 +28,7 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   fichiers du cœur dont le thème **dépend** sans les remplacer (pages et gabarits dont la
   feuille de style et `coderise.js` habillent ou déplacent le balisage, classes et routes
   AJAX appelées, feuilles du cœur surchargées, plugin `sla_first_response`) : la liste est
-  `WATCH_FILES` dans le script (92 fichiers au 27/10/2026, dont, pour les passes de fidélité,
+  `WATCH_FILES` dans le script (94 fichiers au 02/11/2026, dont, pour les passes de fidélité,
   le menu et la liste des états derrière « Marquer comme résolu », les actions groupées
   derrière « Réclamation », `thread.js`, `tips.js`, les compteurs de files et les jointures
   utilisateur/organisation de la file ; passe 4 : le plugin de menus `jquery.dropdown.js`,
@@ -39,7 +39,10 @@ réglages modifiés repérés, connexion en carte. Il s'installe par recopie de 
   `include/upgrader/streams/core.sig` (tables lues par les requêtes agrégées) et
   `premiere-reponse.sql` ; pour `admin.js` les listes d'administration dont il habille les
   colonnes état et nom : agents, services, rubriques, SLA, équipes, filtres, pages, gabarits,
-  clés d'API, bannis, plugins). Code de sortie 0 = aucune dérive.
+  clés d'API, bannis, plugins ; passe mineure : `js/jquery.pjax.js`, dont la comparaison de
+  version fait d'un lien PJAX vers un autre type de page un chargement complet, et
+  `include/mysqli.php`, pour le drapeau de journalisation de `db_query()` et `db_error()`).
+  Code de sortie 0 = aucune dérive.
 - Tests : `sh deploy/themes-staff/tests/test-scripts.sh` (scripts), `sh
   deploy/themes-staff/tests/lint-php.sh` (`php -l` dans l'image de démo),
   `tests/test-helpers.php`, `tests/test-rail.php` et `tests/test-dashboard.php` (assistants PHP, en CLI dans l'image de
@@ -73,7 +76,8 @@ ont besoin arrivent traduits par des attributs `data-cdr-*` de `#content` (`head
 `cdr_data_attrs()`).
 Passe 5 (27/10/2026) : `login.css` (connexion et mot de passe oublié) et `dash.css` (tableau de bord),
 `include/staff/coderise/dashboard.inc.php` (panneaux du tableau de bord, voir ci-dessous),
-`admin.css` + `admin.js` (pages d'administration, voir « Administration »).
+`admin.css` + `admin.js` (pages d'administration, voir « Administration »). Ces trois fichiers ne sont
+chargés que par leurs pages (voir « Feuilles par type de page » ci-dessous).
 Toutes les autres pages (utilisateurs, base de connaissances, tâches, journaux…) ne sont
 habillées que par la feuille de style.
 
@@ -87,11 +91,16 @@ complète à 390 px ; bouton « Se connecter ». Contrats gardés : `#loginBox`,
 `#pass`, `#reset-link`, CSRF, 2FA, authentifications externes. Mot de passe oublié : un filtre
 `ob_start` limité à `pwreset.php` remplace deux chaînes exactes du cœur (paragraphe « envoyé » non
 traduit, bouton « Login » en dur) par le catalogue du thème ; sans entrée, la page reste celle du cœur.
+Tout texte du catalogue écrit dans ces pages passe par `Format::htmlchars()` (étiquettes, bouton,
+lien, phrase de mot de passe oublié), sans changement visible (captures identiques en français et
+en anglais).
 
 Tableau de bord : `scp/dashboard.php` n'affiche que la barre de période, le graphique Raphael et les tableaux de
 statistiques du cœur. La maquette a en plus un titre, un bandeau d'alerte, quatre indicateurs et
 trois panneaux. `header.inc.php` (un seul bloc, sur `dashboard.php` uniquement) charge
-`coderise/dashboard.inc.php`, qui lit les données avec cinq requêtes agrégées au plus, une fois
+`coderise/dashboard.inc.php`, qui lit les données avec cinq requêtes agrégées à lui (plus celles des
+assistants du cœur qu'il appelle : services gérés, noms des sujets d'aide, organisation Priority,
+services de l'agent s'ils ne sont pas déjà chargés, soit 8 à 9 requêtes pour la page), une fois
 par requête HTTP, puis insère les panneaux dans la sortie du cœur (`ob_start`, `cdr_dash_inject()`) :
 titre, bandeau et indicateurs avant le formulaire ; « Premier retour à risque » et « Par sujet
 d'aide » dans la colonne de droite à côté du graphique ; « Charge par agent » sous le graphique ;
@@ -99,9 +108,35 @@ d'aide » dans la colonne de droite à côté du graphique ; « Charge par agent
 attendu (formulaire absent) la page reste telle que le cœur la rend.
 
 - Périmètre : les départements de l'agent (ou ses tickets et ceux de ses équipes si son accès est
-  limité). « Charge par agent » liste, comme les statistiques « Agent » du cœur, l'agent lui-même, les
-  agents des départements qu'il gère, et ceux de tous ses départements s'il est administrateur ou a
-  la permission « stats.agents ».
+  limité). « Charge par agent » prend les services des statistiques « Agent » du cœur : l'agent
+  lui-même, les services qu'il gère, et tous ses services s'il a la permission « stats.agents »
+  (Administration > Agents > fiche > Permissions). Être administrateur ne suffit pas, comme dans le
+  cœur : sur la démo, `dev.admin` (administrateur sans « stats.agents ») ne voit plus que sa ligne.
+  Écart restant avec le cœur (choix assumé : le panneau montre une charge, pas une activité) : le cœur choisit les agents par le service de leur
+  **activité** sur la période (événements du fil) ; le panneau, qui montre une charge **actuelle**,
+  les choisit par **appartenance** (service principal ou accès étendu `staff_dept_access` à l'un de
+  ces services). Un agent d'un autre service qui a traité un ticket du service apparaît chez le
+  cœur, pas dans le panneau ; un membre sans activité apparaît dans le panneau avec sa charge.
+- Dates : la période du cœur (`getDateRange()`) est en heure de la base ; le SQL la garde telle
+  quelle (comme les statistiques du cœur), mais toute comparaison avec les dates d'un ticket et le
+  sous-titre « Du … au … » passent en UTC (`Misc::db2gmtime()`, `cdr_dash_period()`) : avec une
+  base qui n'est pas en UTC, les tickets en bordure de période sont bien classés et le sous-titre
+  donne le bon jour (vérifié avec `db_timezone` à +14 h, puis retiré).
+- « Voir les N tickets » (bandeau) et « Tout voir (N) » (panneau) ouvrent la liste de **ces**
+  tickets : `dashboard.php?cdr_risk=1` (lien `no-pjax`) relit les tickets à risque dans le périmètre
+  de l'agent, enregistre la recherche ponctuelle du cœur « Numéro de ticket correspond à
+  ^(n1|n2|…)$ » (`$_SESSION['advsearch']['cdr-risk']`, comme les liens `?orgid=` / `?uid=` du cœur)
+  et redirige vers `tickets.php?queue=adhoc,cdr-risk` ; la visibilité de l'agent reste celle du
+  cœur. La recherche apparaît ensuite dans « Recherches récentes » du menu Recherche (après un clic
+  seulement). Sans ticket à risque, ou si un numéro contient autre chose que lettres, chiffres et
+  « - », le lien mène à la file par défaut. Un seul ticket : lien direct vers le ticket.
+- Requêtes en échec : le panneau n'affiche rien et une ligne part dans le journal PHP (une fois par
+  session), sans la journalisation SQL du cœur (`db_query($sql, false)`), qui enverrait un courriel
+  d'alerte à l'administrateur à chaque affichage si « alerte sur erreur SQL » est active.
+- Plafond : au plus 3000 tickets Priority lus (`CDR_DASH_PRIORITY_LIMIT`), les ouverts d'abord
+  (le bandeau et le panneau à risque restent complets), puis les plus récents ; s'il est atteint,
+  une note sous les indicateurs le dit (« Moyenne et taux calculés sur les 3 000 tickets Priority
+  les plus récents ») et une ligne part dans le journal PHP (une fois par session).
 - Contrat Priority (bandeau, panneau « à risque », moyenne et taux de premiers retours, colonne
   « Premier retour tenu ») : seulement si le plugin `sla_first_response` est actif
   (`coderise_contract_level()` et `SlaContractLevel`). Même règle que la jauge de la file : premier
@@ -133,11 +168,32 @@ attendu (formulaire absent) la page reste telle que le cœur la rend.
   « Enregistrer » en dernier (déplacé dans le DOM : ordre clavier = ordre visuel). `admin.js` publie
   sa hauteur en `--cdr-savebar-h` (place réservée sous la page, `scroll-padding-bottom`).
 - `admin.js` : IIFE idempotente (prêt et `pjax:end`), aucun texte propre, aucun `eval`. Sans lui,
-  les pages restent complètes. Vérifié identique avec et sans `admin.css`/`admin.js` sur les pages
-  agent (aucune règle hors `.cdr-is-admin`).
+  les pages restent complètes. La place réservée sous la page est la hauteur de la plus haute barre
+  épinglée (toutes sont mesurées : elles partagent le bas de la fenêtre ; une barre dans un onglet
+  masqué mesure 0) ; elle est recalculée quand une barre change de taille, au redimensionnement et
+  après un changement d'onglet.
+- Le calendrier jQuery UI passe au-dessus de la barre épinglée sans règle du thème : le cœur
+  (`scp.css`) impose `.ui-datepicker { z-index: 200 !important }` (mesuré : calendrier au premier
+  plan sur la barre, la barre haute et les dialogues). Une règle `#ui-datepicker-div` avec
+  `!important` gagnerait sur celle du cœur (poids de l'id) et ne pourrait que l'abaisser.
 - `fidelity-check.mjs` : types `agents` et `settings` ; `OVERLAY_DIR=<overlay>` sert les fichiers
-  d'un paquet plus récent que la démo et injecte `admin.css` / `admin.js` dans les pages qui ne les
-  lient pas encore.
+  d'un paquet plus récent que la démo et injecte `admin.css` / `admin.js` dans les pages
+  d'administration qui ne les lient pas encore.
+
+### Feuilles par type de page (passe mineure)
+
+`admin.css` + `admin.js` ne sont chargés que par les pages d'administration (`ADMINPAGE`), `dash.css`
+que par `dashboard.php` (`cdr_page_kind()`, `cdr_page_assets()`). Une navigation PJAX ne remplace que
+`#pjax-container`, jamais `<head>` : la version PJAX (`x-pjax-version` / `X-PJAX-Version`) porte donc
+le type de page (`cdr_page_version()` : version du thème, plus `-admin` ou `-dashboard`). Un lien PJAX
+vers une page d'un autre type reçoit une autre version et jquery.pjax la charge en entier, avec ses
+feuilles. Le cœur fait déjà de la bascule Agent / Administration et de l'onglet Tableau de bord des
+chargements complets ; ce qui change : quitter le tableau de bord par un lien PJAX recharge la page
+(une requête PJAX perdue puis un chargement complet), et l'entrée « Tableau de bord » du sous-menu,
+lien PJAX du cœur, charge maintenant la page en entier (le graphique Raphael du cœur échouait en
+PJAX : « Raphael is not defined »). Vérifié avec Playwright (`fixmin/m10.mjs`) : file → utilisateurs
+→ tableau de bord → file → réglages → agents → réglages → file, retour et avance de l'historique :
+feuilles présentes sur leurs pages seulement, `admin.js` lié une fois, styles appliqués, 0 erreur.
 
 ## Jauge de premier retour (règle I-4)
 
@@ -671,6 +727,49 @@ au-dessus de la barre, réinitialisation) ; repli « Options d'envoi », onglet 
 au premier plan ; `editor-check.js` (réponse, note, dialogue Transférer) : ok. Anglais : la
 langue d'un seul agent ne suffit pas (le cœur n'accepte qu'une langue activée : principale ou
 secondaire) ; vérifié avec `local-demo.sh language en_US`, puis retour à `fr`.
+
+### Passe de correction mineure (02/11/2026)
+
+Les dix constats mineurs de la revue pré-production de la vague 5 (m1 à m10), corrigés sur
+`fid4/base`, démo reconstruite (ce034e71), chaque point montré avant / après avec Playwright :
+
+- m1, calendrier sous la barre épinglée : **non reproduit**. Le cœur force déjà
+  `.ui-datepicker { z-index: 200 !important }` ; calendrier ouvert sur la barre (z 4) : le point
+  du recouvrement renvoie le calendrier, comme dans un dialogue (z 10). La règle proposée
+  (`#ui-datepicker-div { z-index: 10 !important }`) l'aurait abaissé de 200 à 10 (à égalité avec
+  les dialogues) : non appliquée, raison notée dans `coderise.css`.
+- m2, fuseau : comparaisons et sous-titre en UTC, SQL en heure de la base (`cdr_dash_period()`) ;
+  démo avec `db_timezone` à +14 h : « Du 3 octobre au 3 novembre » avant, « Du 2 octobre au
+  2 novembre » après ; tests avec un décalage de 14 h.
+- m3, « Charge par agent » : plus d'élargissement pour un administrateur (comme le cœur), accès
+  étendu compté comme appartenance ; écart restant documenté plus haut.
+- m4, plafond de 3000 tickets Priority : ouverts d'abord, note visible et une ligne de journal
+  (une fois par session) ; testé avec un plafond abaissé (`CDR_DASH_PRIORITY_LIMIT`).
+- m5, en-tête du fichier : 5 requêtes propres + 3 à 4 des assistants du cœur ; requêtes sans la
+  journalisation SQL du cœur (pas de courriel d'alerte par affichage), une ligne de journal ; testé.
+- m6, « Voir les 7 tickets » / « Tout voir (7) » : la file par défaut (41 tickets, 3 des 5 tickets
+  du panneau absents de la première page) avant ; la recherche ponctuelle du cœur avec exactement
+  les 7 tickets à risque après (« Visible 1 - 7 », `queue-tickets.tmpl.php` compte exactement cette
+  recherche ; le cœur affiche « environ 500 » et dix pages pour toute recherche ponctuelle).
+- m7, texte du catalogue échappé dans `login.tpl.php` et `login.header.php` : connexion, mot de
+  passe oublié et page « envoyé », en français et en anglais, captures identiques au pixel près.
+- m8, unités `em` converties en px (taille réelle × em) : `dash.css`, `queue.css`, `login.css` et
+  `coderise.css` ; valeurs calculées identiques (606 valeurs, écart 0) à 390 / 820 / 1280 / 2000 et
+  en RTL forcé. Seule exception gardée : la marge des paragraphes de `.thread-body` (contenu riche,
+  `ticket.css`), proportionnelle au texte du message.
+- m9, `admin.js` : réserve = plus haute barre épinglée (deux barres de 130 et 54 px : 54 avant,
+  76 px du pied masqués ; 130 après), recalcul au changement d'onglet (sans ResizeObserver : 0 px
+  avant, 54 px après).
+- m10, `admin.css` / `admin.js` / `dash.css` chargés par leurs pages seulement, version PJAX par
+  type de page (voir « Feuilles par type de page ») ; le tableau de bord ouvert par un lien PJAX ne
+  donne plus les 5 erreurs du cœur (« Raphael is not defined »).
+
+Contrôles après la passe (démo ce034e71) : `fidelity-check` **1280 × 800 : 505 OK, 0 DIFF** ;
+**2000 × 1000 : 509 OK, 0 DIFF** ; `overflow.js` 55 chemins × 390 / 820 / 1280 / 2000, admin et
+agent : aucun débordement ; console : 0 erreur (55 pages par compte, 110 en RTL forcé) ; connexion
+et mot de passe oublié à 4 largeurs, LTR et RTL : 0 débordement ; `editor-check.js` (réponse, note,
+dialogue Transférer) : ok ; tests PHP : test-dashboard 151, test-helpers 235, test-rail 109, 0 échec ;
+suite du dépôt : 15 suites, 0 échec, 90 avertissements (inchangé) ; `check-drift.sh` : aucune dérive.
 
 ### Saisie dans les éditeurs (QA d'interaction, 2026-10-24)
 
