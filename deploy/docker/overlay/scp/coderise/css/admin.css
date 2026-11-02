@@ -24,6 +24,8 @@
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px 24px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content > :is(.pull-left, .pull-right) { float: none; margin: 0; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar:not(.fixed) > .content > .pull-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+/* roles, departments, teams: core puts an empty .clear inside the bar's content, which became a third flex item and pushed the buttons to the middle of the row */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar > .content > .clear { display: none; }
 /* the add button is the primary action of the page (mockup .btn-primary); on the fixed bar (nuit) it stays cyan */
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar > .content > .pull-right > a.green.button { border-color: transparent; background: var(--cyan); color: var(--nuit); }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) .sticky.bar > .content > .pull-right > a.green.button:hover { background: var(--nuit); color: var(--blanc); }
@@ -35,6 +37,8 @@
    rule above). Rounded by the corner cells: the table keeps separate borders, so nothing clips. */
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form:not(.save, .manage-form) table.list,
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > table.list { margin: 0 0 16px; border-collapse: separate; border-spacing: 0; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,15,38,.08); }
+/* a list page whose bar sits directly in the form (plugins, help topics, API keys, roles, departments…): nothing separates the bar from the table, so the buttons touch its header. The space is a margin on the table (or on the .cdr-hscroll wrapper the theme puts around it below 920 px), not on the bar, so the table does not move when the bar sticks */
+#content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) > form > .sticky.bar ~ :is(table.list, .cdr-hscroll) { margin-top: 16px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead:first-child > tr:first-child > th:first-child { border-start-start-radius: 10px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > thead:first-child > tr:first-child > th:last-child { border-start-end-radius: 10px; }
 #content.cdr-is-admin:not(.cdr-dashboard, .cdr-logs, .cdr-system) table.list:not(:is(form.save, form.manage-form) table) > :is(tbody, tfoot):last-child > tr:last-child > td:first-child { border-end-start-radius: 10px; }
