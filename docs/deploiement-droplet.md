@@ -131,13 +131,14 @@ Règle de la CI : une clé qui fuit permet de charger une image arbitraire sur l
 | Installation d'osTicket, production, TLS (Let's Encrypt, expire le 21/01/2027), HSTS, cookies `secure` | fait |
 | CI : build et envoi de l'image par SSH ; image en service `sha-5032310` (`origin/main`), `sha-40c46cd` gardée pour le retour arrière | fait |
 | Durcissement SSH (root et mots de passe refusés), `sudo` sans mot de passe pour `deploy` | fait |
-| Plugins `sla_first_response` 0.4 et `stripe-sync` 0.2 dans l'image, installés et actifs | fait (Stripe jamais éprouvé, webhook non configuré) |
+| Plugins `sla_first_response` 0.4 et `stripe-sync` 0.2 dans l'image, installés et actifs | fait ; Stripe éprouvé en production le 02/11/2026, voir section 9 |
 | Sauvegardes quotidiennes locales, instantané DigitalOcean, sonde externe | fait (par Julien) |
 | Nettoyage des images Docker (2 Go récupérés, 02/11/2026) | fait |
-| Envoi d'e-mails (Brevo) | **à faire** : compte SMTP inactif, authentification refusée |
+| Envoi d'e-mails (Brevo) | fait : compte SMTP actif (`tls://smtp-relay.brevo.com`, 2525) |
+| Webhook Stripe (destination, secret, instance du plugin, restriction IP) | fait le 02/11/2026, recette réussie, voir section 9 |
 | Réception d'e-mails (Microsoft 365) | **à faire** : OAuth2 ou relais IMAP à décider |
 | Structure osTicket (départements, rubriques, formulaire, SLA, calendrier, anti-spam) | fait le 02/11/2026, voir [configuration-osticket.md](configuration-osticket.md) |
-| Redémarrage du serveur (noyau mis à jour) | **à faire** |
+| Redémarrage du serveur (noyau mis à jour) | fait |
 
 Détail des écarts constatés : [rapport-production-2026-11-02.md](rapport-production-2026-11-02.md).
 
@@ -154,3 +155,31 @@ Détail des écarts constatés : [rapport-production-2026-11-02.md](rapport-prod
 - Les MX de `coderise.fr` sont chez Microsoft 365 : IMAP en mot de passe simple refusé ; OAuth2 demande le plugin
   OAuth2 d'osTicket (`.phar`, à placer dans `deploy/docker/overlay/include/plugins/` avec l'exception `.gitignore` et
   `Dockerfile.dockerignore`) et une inscription d'application Entra.
+
+## 9. Stripe (plugin stripe-sync)
+
+Mis en place et éprouvé le 02/11/2026, en production (le compte connecté n'a pas de mode test).
+
+- **Destination Stripe** (créée par Julien dans le tableau de bord) : `https://support.coderise.fr/api/stripe-sync/webhook`,
+  7 événements : `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+  `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`,
+  `invoice.payment_failed`.
+- **Secret de signature** (`whsec_…`) : jamais dans le chat ni dans le dépôt. Saisi en entrée masquée sur le Droplet,
+  écrit dans le volume `osticket_ost-config` sous `/etc/osticket/stripe-sync-webhook-secret` (`root:www-data`, 640).
+  `plugins.env` (dans `/opt/osticket/deploy/docker/`, mode 600, ignoré par git) contient
+  `STRIPE_SYNC_WEBHOOK_SECRET_FILE=/etc/osticket/stripe-sync-webhook-secret` et les identifiants de prix et de produit
+  Priority (Heatlens et Auditlens). Recréer `web` après toute modification : `docker compose up -d --wait web`.
+- **Instance du plugin obligatoire** : sans au moins une instance (Administration > Plugins > Stripe sync > Instances),
+  le plugin ne s'initialise pas et la route répond `400 URL not supported`. Instance « Stripe » créée, activée,
+  « événements de test » décoché ; les identifiants de prix viennent de `plugins.env`.
+- **Restriction par adresse IP** : `droplet/Caddyfile` n'autorise `/api/stripe-sync/*` et `/api/http.php/stripe-sync/*` que
+  pour les 15 adresses webhook de Stripe (https://stripe.com/files/ips/ips_webhooks.json) ; le reste reçoit 403. À
+  actualiser si Stripe change la liste. Le Caddyfile du Droplet (`/etc/caddy/Caddyfile`) n'est pas mis à jour par
+  `update.sh` : le recopier avec le domaine substitué, valider (`caddy validate`) puis `systemctl reload caddy`.
+- **Recette** : commande réelle à 0 € avec le code `100PCTFREE` (coupon 100 %, une utilisation) sur le lien Auditlens
+  Priority. Résultat : 3 webhooks reçus et acceptés (200), utilisateur et compte portail créés, rattachés à
+  l'organisation `Priority`, aucune erreur de messagerie. Le lien de paiement Auditlens Priority a été réglé sur
+  « codes promotionnels autorisés » et « carte seulement si le total n'est pas à 0 € » ; les codes promotionnels sont
+  laissés ouverts à la demande de Julien.
+- **Champ « license reference or order email »** du lien de paiement : obligatoire pour le client, mais non lu par le
+  plugin (le lien licence-accès repose donc sur l'adresse e-mail du paiement).

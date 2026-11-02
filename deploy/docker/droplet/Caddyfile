@@ -15,6 +15,16 @@ SUPPORT_DOMAIN {
         max_size 13MB
     }
 
+    # Stripe webhook route (plugin stripe-sync): only Stripe's published webhook addresses
+    # (https://stripe.com/files/ips/ips_webhooks.json, https://docs.stripe.com/ips). The
+    # signature is checked anyway; this keeps everyone else off the endpoint. Refresh the
+    # list if Stripe announces a change.
+    @stripe_webhook_blocked {
+        path /api/stripe-sync/* /api/http.php/stripe-sync/*
+        not remote_ip 3.18.12.63 3.69.109.8 3.120.168.93 3.130.192.231 13.235.14.237 13.235.122.149 18.211.135.69 35.154.171.200 35.157.207.129 52.15.183.38 54.88.130.119 54.88.130.237 54.187.174.169 54.187.205.235 54.187.216.72
+    }
+    respond @stripe_webhook_blocked 403
+
     # Caddy adds X-Forwarded-For / X-Forwarded-Proto. The container trusts them from
     # the Docker bridge (OSTICKET_TRUSTED_PROXIES).
     reverse_proxy 127.0.0.1:8080
