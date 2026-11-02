@@ -139,6 +139,11 @@ if (($Q->extra && isset($Q->extra['tables'])) || !$Q->constraints || $empty) {
     $count = '-';
 }
 
+// The dashboard's "tickets at risk" list (coderise/dashboard.inc.php, cdr_dash_risk_redirect()):
+// core's ad hoc search on a handful of ticket numbers, counted exactly (core shows "about 500"
+// and ten pages for every ad hoc search: the getCount() of a saved search)
+if (!isset($count) && $queue instanceof AdhocSearch && $queue->getId() === 'adhoc,cdr-risk')
+    $count = $queue->getTotal($thisstaff);
 $count = $count ?? $queue->getCount($thisstaff);
 $pageNav->setTotal($count, true);
 $pageNav->setURL('tickets.php', $args);
