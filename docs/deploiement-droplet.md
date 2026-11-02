@@ -90,7 +90,9 @@ Règle de la CI : une clé qui fuit permet de charger une image arbitraire sur l
    `ost_`, identifiant administrateur différent de `admin`).
 6. **Production** : arrêter et supprimer `web` d'installation, `docker compose up -d --no-build --pull never --wait`,
    `sudo systemctl enable --now caddy`, vérifier `https://support.coderise.fr`.
-7. **Durcissement** : `sh provision.sh --harden-ssh` après avoir vérifié `ssh deploy@<ip>`.
+7. **Durcissement** : `provision.sh` donne à `deploy` un `sudo` sans mot de passe (`/etc/sudoers.d/deploy`).
+   Après avoir vérifié `ssh deploy@<ip>`, lancer `sudo SUPPORT_DOMAIN=support.coderise.fr sh provision.sh --harden-ssh`
+   (le script refuse sans ce `sudo`). Une fois root fermé en SSH, il n'est plus joignable que par la console de récupération.
 8. **Réglages osTicket** (`/scp/`) : URL du helpdesk, e-mails (IMAP/SMTP), SLA, rubriques ; première
    sauvegarde manuelle (`droplet/backup-local.sh`).
 
@@ -118,17 +120,37 @@ Règle de la CI : une clé qui fuit permet de charger une image arbitraire sur l
   nouvelle image, jamais depuis l'interface d'administration.
 - **CVE de l'image de base** : reconstruire régulièrement (la CI relance `apt-get upgrade` à chaque build sans
   cache) et scanner.
-- **Jetons exposés** : le jeton DigitalOcean communiqué en conversation pendant la mise en place de la registry
-  est à révoquer s'il ne l'est pas déjà ; le secret GitHub `DIGITALOCEAN_ACCESS_TOKEN` n'est plus utilisé.
+- **Jetons** : le jeton DigitalOcean de la registry abandonnée a été retiré du Droplet ; le révoquer côté
+  DigitalOcean et supprimer le secret GitHub `DIGITALOCEAN_ACCESS_TOKEN` s'ils ne le sont pas déjà.
 
-## 7. État au 23/10/2026
+## 7. État au 02/11/2026
 
 | Étape | État |
 | --- | --- |
-| Serveur préparé (système, UFW, swap, Docker, Caddy installé) | fait |
-| Dépôt cloné, `.env`, secrets de la base, minuterie de sauvegarde | fait |
-| CI : build et envoi de l'image par SSH (testé de bout en bout) | fait |
-| Image d'installation sur le Droplet, base et assistant démarrés (`http://127.0.0.1:8080/setup/` en local sur le Droplet) | fait |
-| Installation d'osTicket, mise en production, TLS (Let's Encrypt), première sauvegarde | fait (23/10/2026, `https://support.coderise.fr`) |
-| Durcissement SSH (`--harden-ssh`) | à faire |
-| Copie des sauvegardes hors serveur | à faire |
+| Serveur préparé (système, UFW, swap, Docker, Caddy) | fait |
+| Installation d'osTicket, production, TLS (Let's Encrypt, expire le 21/01/2027), HSTS, cookies `secure` | fait |
+| CI : build et envoi de l'image par SSH ; image en service `sha-5032310` (`origin/main`), `sha-40c46cd` gardée pour le retour arrière | fait |
+| Durcissement SSH (root et mots de passe refusés), `sudo` sans mot de passe pour `deploy` | fait |
+| Plugins `sla_first_response` 0.4 et `stripe-sync` 0.2 dans l'image, installés et actifs | fait (Stripe jamais éprouvé, webhook non configuré) |
+| Sauvegardes quotidiennes locales, instantané DigitalOcean, sonde externe | fait (par Julien) |
+| Nettoyage des images Docker (2 Go récupérés, 02/11/2026) | fait |
+| Envoi d'e-mails (Brevo) | **à faire** : compte SMTP inactif, authentification refusée |
+| Réception d'e-mails (Microsoft 365) | **à faire** : OAuth2 ou relais IMAP à décider |
+| Structure osTicket (départements, rubriques, formulaire, SLA, calendrier, anti-spam) | fait le 02/11/2026, voir [configuration-osticket.md](configuration-osticket.md) |
+| Redémarrage du serveur (noyau mis à jour) | **à faire** |
+
+Détail des écarts constatés : [rapport-production-2026-11-02.md](rapport-production-2026-11-02.md).
+
+## 8. Messagerie : pièges constatés
+
+- **DigitalOcean bloque le SMTP sortant** sur les ports 25, 465 et 587 des Droplets ; 2525 et 443 passent (testé
+  depuis l'hôte et depuis le conteneur). Brevo accepte le port 2525.
+- osTicket ne déduit le chiffrement que pour les ports 465, 993, 995 (SSL) et 587 (STARTTLS) : sur 2525, préfixer l'hôte
+  par `tls://` (`tls://smtp-relay.brevo.com`, port `2525`), sinon les identifiants partiraient sans chiffrement
+  (`include/class.mail.php`).
+- Le champ « Hôte » ne doit contenir que le nom du serveur (pas de login `@…`, pas de `:port`, pas d'espace) : sinon
+  « The input … cannot match against hostname schema for TLD 'COM' ».
+- Le login SMTP de Brevo (`…@smtp-brevo.com`) n'est pas l'e-mail du compte, et la clé SMTP (`xsmtpsib-…`) n'est pas une clé d'API.
+- Les MX de `coderise.fr` sont chez Microsoft 365 : IMAP en mot de passe simple refusé ; OAuth2 demande le plugin
+  OAuth2 d'osTicket (`.phar`, à placer dans `deploy/docker/overlay/include/plugins/` avec l'exception `.gitignore` et
+  `Dockerfile.dockerignore`) et une inscription d'application Entra.
