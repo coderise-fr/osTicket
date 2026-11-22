@@ -22,7 +22,7 @@
 #
 # To refresh the base image: pick the new digest of php:8.3-apache-bookworm
 #   (docker buildx imagetools inspect php:8.3-apache-bookworm) and update PHP_IMAGE.
-ARG PHP_IMAGE=php:8.3-apache-bookworm@sha256:cbd3b3d9011668443d54ab40ec31db56c73d91b4c8198935d639aa80d2d815c1
+ARG PHP_IMAGE=php:8.3-apache-bookworm@sha256:d60f7be79a869deb1562b6ecb2f555bccb65c8dd4af930b50ae4d14d4bd4696c
 ARG APCU_VERSION=5.1.28
 
 
